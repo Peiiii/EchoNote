@@ -1,3 +1,7 @@
+import { SetupApp } from "@/core/components/setup-app";
+
 export const MobileApp = () => {
-  return <div>MobileApp</div>;
+  return <div>
+    <SetupApp extensions={[]} />
+  </div>;
 };
