@@ -100,7 +100,33 @@ When user requests refactoring:
 - Use descriptive, semantic names for components and functions
 - Maintain clear import/export relationships
 
-## Communication Patterns
+## UI/UX Design Excellence
+
+### `/beautify` - World-Class UI Beautification
+When user types `/beautify`, transform the current UI into a world-class design:
+1. **Visual Hierarchy**: Implement sophisticated typography scales, spacing systems, and visual weight distribution
+2. **Modern Aesthetics**: Apply glassmorphism, subtle gradients, micro-interactions, and refined shadows
+3. **Color Harmony**: Create sophisticated color palettes with proper contrast ratios and accessibility
+4. **Layout Excellence**: Implement grid systems, responsive design patterns, and visual balance
+5. **Interactive Elements**: Add hover states, focus indicators, loading states, and smooth transitions
+6. **Typography**: Use premium font combinations, proper line heights, and semantic text hierarchy
+7. **Spacing & Rhythm**: Apply consistent spacing scales and visual rhythm throughout the interface
+8. **Micro-interactions**: Implement subtle animations, state changes, and feedback mechanisms
+9. **Accessibility**: Ensure WCAG compliance with proper contrast, focus management, and screen reader support
+10. **Performance**: Optimize animations and transitions for smooth 60fps performance
+
+**Design Principles:**
+- **Elegance**: Clean, sophisticated, and timeless design language
+- **Modernity**: Contemporary trends with lasting appeal
+- **Usability**: Intuitive navigation and clear information architecture
+- **Delight**: Surprising and delightful user experiences
+- **Consistency**: Cohesive design system across all components
+- **Accessibility**: Inclusive design for all users
+- **Performance**: Smooth, responsive interactions
+- **Maintainability**: Scalable and well-structured design tokens
+
+**Expected Outcome:**
+Transform any interface into a visually stunning, highly functional, and emotionally engaging experience that feels premium, modern, and unforgettable while maintaining excellent usability and accessibility standards.
 
 ### Code Review Responses
 - Always start with current mode declaration: `[MODE: RESEARCH/PLAN/EXECUTE/REVIEW/DISCUSSION]`

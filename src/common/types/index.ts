@@ -37,7 +37,7 @@ export interface Message {
   replyTo?: string; // ID of the message being replied to
   createdAt: string;
   updatedAt: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Tag related types
@@ -70,7 +70,7 @@ export interface UIState {
   error: string | null;
   modal: {
     type: string | null;
-    data: any;
+    data: unknown;
   };
 }
 
@@ -85,7 +85,7 @@ export interface AppState {
 }
 
 // API response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -113,7 +113,7 @@ export interface PaginatedResponse<T> {
 // Event types
 export interface AppEvent {
   type: string;
-  data: any;
+  data: unknown;
   timestamp: string;
 }
 
@@ -121,5 +121,5 @@ export interface AppEvent {
 export interface StorageConfig {
   type: 'local' | 'session' | 'indexeddb';
   key: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
 } 

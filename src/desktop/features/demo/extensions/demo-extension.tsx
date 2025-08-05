@@ -1,20 +1,22 @@
-import { defineExtension, Disposable } from "@cardos/extension";
-import { useActivityBarStore, ActivityBarGroup } from "@/core/stores/activity-bar.store";
+import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
-import { PageContainer } from "@/common/components/page-container";
-import { DemoPage } from "../pages/demo-page";
-import { 
-  TestTube, 
-  Settings, 
-  FileText, 
-  MessageSquare,
-  Users,
+import { defineExtension, Disposable } from "@cardos/extension";
+import {
   Calendar,
+  FileText,
+  Heart,
+  MessageSquare,
+  Settings,
   Star,
-  Heart
+  TestTube,
+  Users
 } from "lucide-react";
+import { DemoChatPage } from "../pages/demo-chat-page";
+import { DemoDocsPage } from "../pages/demo-docs-page";
+import { DemoPage } from "../pages/demo-page";
+import { DemoSettingsPage } from "../pages/demo-settings-page";
 
 export const demoExtension = defineExtension({
   manifest: {
@@ -120,59 +122,4 @@ export const demoExtension = defineExtension({
       )
     );
   },
-});
-
-// Sub-page components
-function DemoSettingsPage() {
-  return (
-    <PageContainer>
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Demo Settings</h1>
-          <p className="text-muted-foreground">
-            Settings page for demo extension
-          </p>
-        </div>
-        <div className="p-4 border rounded">
-          <p>Here you can configure various settings for the Demo extension</p>
-        </div>
-      </div>
-    </PageContainer>
-  );
-}
-
-function DemoDocsPage() {
-  return (
-    <PageContainer>
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Demo Documentation</h1>
-          <p className="text-muted-foreground">
-            Documentation page for demo extension
-          </p>
-        </div>
-        <div className="p-4 border rounded">
-          <p>Here you can find usage documentation and API references for the Demo extension</p>
-        </div>
-      </div>
-    </PageContainer>
-  );
-}
-
-function DemoChatPage() {
-  return (
-    <PageContainer>
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Demo Chat</h1>
-          <p className="text-muted-foreground">
-            Chat functionality page for demo extension
-          </p>
-        </div>
-        <div className="p-4 border rounded">
-          <p>Here you can see the chat functionality of the Demo extension</p>
-        </div>
-      </div>
-    </PageContainer>
-  );
-} 
+}); 
