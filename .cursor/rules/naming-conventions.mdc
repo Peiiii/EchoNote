@@ -4,13 +4,21 @@
 
 ### 1. 文件命名规范
 - 所有文件和文件夹必须使用 **kebab-case** 命名
+- 包括但不限于：TypeScript、JavaScript、CSS、SCSS、HTML、Markdown、JSON、YAML等所有文件类型
 - 示例：
   - ✅ `user-profile.tsx`
   - ✅ `product-detail-page.tsx`
   - ✅ `data-manager.service.ts`
+  - ✅ `project-brief.md`
+  - ✅ `tech-context.md`
+  - ✅ `system-patterns.md`
+  - ✅ `active-context.md`
+  - ✅ `progress.md`
   - ❌ `userProfile.tsx`
   - ❌ `productDetailPage.tsx`
   - ❌ `dataManagerService.ts`
+  - ❌ `projectBrief.md`
+  - ❌ `techContext.md`
 
 ### 2. Service文件特殊规范
 - Service文件必须以 `.service.ts` 结尾
