@@ -111,12 +111,10 @@ export const demoExtension = defineExtension({
           {
             activityKey: "demo",
             routerPath: "/demo",
-            children: [
-              {
-                activityKey: "demo-settings",
-                routerPath: "/demo/settings",
-              },
-            ],
+          },
+          {
+            activityKey: "demo-settings",
+            routerPath: "/demo/settings",
           },
         ])
       )
