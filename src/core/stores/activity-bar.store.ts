@@ -14,6 +14,13 @@ export interface ActivityItem {
   onClick?: () => void;
 }
 
+const DEFAULT_ACTIVE_ID = 'chat';
+
+export enum ActivityBarGroup {
+  MAIN = 'main',
+  FOOTER = 'footer',
+}
+
 export interface ActivityBarState {
   items: ActivityItem[];
   activeId?: string;
@@ -51,7 +58,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
           items: state.items.filter((item) => item.id !== id),
           // 如果删除的是当前激活项，则激活第一个可用项
           activeId: state.activeId === id
-            ? state.items.find(item => item.id !== id)?.id || 'chat'
+            ? state.items.find(item => item.id !== id)?.id || DEFAULT_ACTIVE_ID
             : state.activeId,
         }));
       },
@@ -89,7 +96,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
       reset: () => {
         set({
           items: [],
-          activeId: 'chat',
+          activeId: DEFAULT_ACTIVE_ID,
           expanded: false,
         });
       },
