@@ -1,0 +1,97 @@
+# EchoNote 当前工作上下文
+
+## 项目状态
+
+### 当前阶段
+- **START_PHASE_STEP**: 4 (Scaffolding)
+- **PROJECT_PHASE**: INITIALIZING
+- **RIPER_CURRENT_MODE**: RESEARCH
+
+### 已完成的工作
+1. ✅ **需求分析** - 创建了完整的项目简介文档
+2. ✅ **技术栈分析** - 确定了前端技术栈和架构
+3. ✅ **系统架构设计** - 定义了组件架构和状态管理
+4. ✅ **目录结构重组** - 按照文件组织规则重新组织代码结构
+
+## 当前目录结构
+
+```
+src/
+├── common/                    # 通用模块
+│   ├── components/           # 通用组件
+│   │   └── ui/              # UI组件 (shadcn/ui)
+│   ├── features/            # 功能组件 (待添加)
+│   ├── hooks/               # 通用hooks (待添加)
+│   ├── lib/                 # 通用库
+│   │   └── utils.ts         # 工具函数
+│   └── types/               # 类型定义
+│       └── index.ts         # 主要类型定义
+├── core/                     # 应用核心
+│   ├── config/              # 配置 (待添加)
+│   ├── hooks/               # 应用级hooks (待添加)
+│   ├── services/            # 服务层 (待添加)
+│   ├── stores/              # 状态管理
+│   │   └── index.ts         # Zustand store
+│   └── utils/               # 工具函数 (待添加)
+├── assets/                   # 静态资源
+├── App.tsx                   # 主应用组件
+├── main.tsx                  # 应用入口
+└── index.css                 # 全局样式
+```
+
+## 配置更新
+
+### 路径别名配置
+已更新 `components.json` 和 `vite.config.ts` 以支持新的目录结构：
+- `@/common/components` - 通用组件
+- `@/common/types` - 类型定义
+- `@/core/stores` - 状态管理
+- `@/core/utils` - 工具函数
+- `@/common/lib` - 通用库
+
+## 下一步计划
+
+### 立即需要完成的工作
+1. **创建工具函数** - 在 `src/core/utils/` 中添加基础工具函数
+2. **创建服务层** - 在 `src/core/services/` 中添加AI服务等
+3. **创建应用级hooks** - 在 `src/core/hooks/` 中添加业务逻辑hooks
+4. **创建通用hooks** - 在 `src/common/hooks/` 中添加可复用hooks
+
+### 核心功能开发优先级
+1. **消息系统** - 对话式界面核心
+2. **频道管理** - 频道创建和管理
+3. **标签系统** - 消息标签和过滤
+4. **AI集成** - OpenAI API集成
+
+### 技术债务
+- 需要添加错误处理机制
+- 需要添加加载状态管理
+- 需要添加数据持久化策略
+- 需要添加主题切换功能
+
+## 开发规范
+
+### 文件命名
+- 所有文件使用 kebab-case
+- 组件文件使用 PascalCase 组件名
+- Hook文件以 `use-` 开头
+
+### 代码组织
+- 每个文件不超过200行
+- 按功能模块组织代码
+- 使用绝对路径导入
+
+### 状态管理
+- 使用Zustand进行全局状态管理
+- 状态持久化到LocalStorage
+- 模块化的store设计
+
+## 当前焦点
+
+正在搭建项目的基础架构，确保：
+1. 目录结构符合项目规范
+2. 类型定义完整且类型安全
+3. 状态管理架构清晰
+4. 路径别名配置正确
+
+下一步将开始创建核心功能组件和业务逻辑。 
