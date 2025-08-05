@@ -2,10 +2,10 @@ import { navigationStore } from "@/core/stores/navigation.store";
 import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 
 /**
- * 路由配置示例：
+ * Route configuration examples:
  * 
  * ```typescript
- * // 基础路由配置
+ * // Basic route configuration
  * const basicRoutes: RouteConfig[] = [
  *   {
  *     activityKey: "home",
@@ -18,7 +18,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *   }
  * ];
  * 
- * // 带动态参数的路由
+ * // Routes with dynamic parameters
  * const dynamicRoutes: RouteConfig[] = [
  *   {
  *     activityKey: "chat",
@@ -36,7 +36,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *   }
  * ];
  * 
- * // 带通配符的路由
+ * // Routes with wildcards
  * const wildcardRoutes: RouteConfig[] = [
  *   {
  *     activityKey: "settings",
@@ -48,7 +48,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *   }
  * ];
  * 
- * // 复杂嵌套路由
+ * // Complex nested routes
  * const nestedRoutes: RouteConfig[] = [
  *   {
  *     activityKey: "workspace",
@@ -72,13 +72,13 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *   }
  * ];
  * 
- * // 使用示例
+ * // Usage example
  * function App() {
  *   useEffect(() => {
- *     // 基础使用
+ *     // Basic usage
  *     const unsubscribe = connectRouterWithActivityBar(basicRoutes);
  *     
- *     // 带匹配选项的使用
+ *     // Usage with match options
  *     const unsubscribeWithOptions = connectRouterWithActivityBar(dynamicRoutes, {
  *       exact: false,
  *       sensitive: true
@@ -112,65 +112,65 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  */
 
 /**
- * 路由匹配选项
+ * Route matching options
  */
 export interface RouteMatchOptions {
   /**
-   * 是否精确匹配
+   * Whether to match exactly
    * @default false
    */
   exact?: boolean;
   /**
-   * 是否敏感匹配（区分大小写）
+   * Whether to match case-sensitive
    * @default false
    */
   sensitive?: boolean;
 }
 
 /**
- * 路由配置项
+ * Route configuration item
  */
 export interface RouteConfig {
   /**
-   * 活动栏的 key
+   * Activity bar key
    */
   activityKey: string;
   /**
-   * 路由路径（单个）
+   * Route path (single)
    */
   routerPath?: string;
   /**
-   * 路由路径（多个）
+   * Route paths (multiple)
    */
   routerPaths?: string[];
   /**
-   * 路由匹配选项
+   * Route matching options
    */
   matchOptions?: RouteMatchOptions;
   /**
-   * 子路由配置
+   * Child route configuration
    */
   children?: RouteConfig[];
 }
 
 /**
- * 创建路由到活动栏的映射
+ * Create route to activity bar mapping
  */
 export function createRouterToActivityBarMap(items: RouteConfig[]) {
   const map: Record<string, string> = {};
   
   function processRoute(route: RouteConfig) {
-    // 处理单个路由路径
+    // Process single route path
     if (route.routerPath) {
       map[route.routerPath] = route.activityKey;
     }
-    // 处理多个路由路径
+    // Process multiple route paths
     if (route.routerPaths) {
       route.routerPaths.forEach(path => {
         map[path] = route.activityKey;
       });
     }
-    // 处理子路由
+    // Process child routes
     if (route.children) {
       route.children.forEach(processRoute);
     }
@@ -181,13 +181,13 @@ export function createRouterToActivityBarMap(items: RouteConfig[]) {
 }
 
 /**
- * 创建活动栏到路由的映射
+ * Create activity bar to route mapping
  */
 export function createActivityBarToRouterMap(items: RouteConfig[]) {
   const map: Record<string, string> = {};
   
   function processRoute(route: RouteConfig) {
-    // 优先使用 routerPath，如果没有则使用 routerPaths 的第一个路径
+    // Prefer routerPath, if not available use the first path from routerPaths
     const primaryPath = route.routerPath || (route.routerPaths && route.routerPaths[0]);
     if (primaryPath) {
       map[route.activityKey] = primaryPath;
@@ -202,7 +202,7 @@ export function createActivityBarToRouterMap(items: RouteConfig[]) {
 }
 
 /**
- * 将路由路径转换为正则表达式
+ * Convert route path to regular expression
  */
 function pathToRegexp(
   path: string,
@@ -210,10 +210,10 @@ function pathToRegexp(
 ): RegExp {
   const { exact = false, sensitive = false } = options;
   
-  // 处理动态参数
+  // Handle dynamic parameters
   const pattern = path
-    .replace(/:[^/]+/g, '([^/]+)') // 将 :param 转换为 ([^/]+)
-    .replace(/\*/g, '.*'); // 将 * 转换为 .*
+    .replace(/:[^/]+/g, '([^/]+)') // Convert :param to ([^/]+)
+    .replace(/\*/g, '.*'); // Convert * to .*
     
   const flags = sensitive ? '' : 'i';
   const regexp = new RegExp(
@@ -225,14 +225,14 @@ function pathToRegexp(
 }
 
 /**
- * 查找匹配的路由
+ * Find matching route
  */
 function findMatchingRoute(
   path: string,
   routes: RouteConfig[],
   options: RouteMatchOptions = {}
 ): RouteConfig | undefined {
-  // 按优先级排序：精确匹配 > 动态参数 > 通配符
+  // Sort by priority: exact match > dynamic parameters > wildcards
   const sortedRoutes = [...routes].sort((a, b) => {
     const aHasParams = (a.routerPath?.includes(':') || a.routerPaths?.some(p => p.includes(':'))) ?? false;
     const bHasParams = (b.routerPath?.includes(':') || b.routerPaths?.some(p => p.includes(':'))) ?? false;
@@ -247,14 +247,14 @@ function findMatchingRoute(
   });
 
   for (const route of sortedRoutes) {
-    // 检查单个路由路径
+    // Check single route path
     if (route.routerPath) {
       const regexp = pathToRegexp(route.routerPath, options);
       if (regexp.test(path)) {
         return route;
       }
     }
-    // 检查多个路由路径
+    // Check multiple route paths
     if (route.routerPaths) {
       for (const routePath of route.routerPaths) {
         const regexp = pathToRegexp(routePath, options);
@@ -263,7 +263,7 @@ function findMatchingRoute(
         }
       }
     }
-    // 检查子路由
+      // Check child routes
     if (route.children) {
       const childMatch = findMatchingRoute(path, route.children, options);
       if (childMatch) {
@@ -276,7 +276,7 @@ function findMatchingRoute(
 }
 
 /**
- * 根据路由路径更新活动栏状态
+ * Update activity bar state based on route path
  */
 function updateActivityBarByPath(
   currentPath: string,
@@ -290,22 +290,22 @@ function updateActivityBarByPath(
 }
 
 /**
- * 根据活动栏状态更新路由路径
+ * Update route path based on activity bar state
  */
 function updateRouterByActivityBar(
   activeItemKey: string,
   routes: RouteConfig[],
   options: RouteMatchOptions = {}
 ) {
-  // 查找匹配的路由配置
+  // Find matching route configuration
   const route = routes.find(r => r.activityKey === activeItemKey);
   if (!route) return;
 
-  // 获取当前路径
+  // Get current path
   const currentPath = navigationStore.getState().currentPath;
   if (!currentPath) return;
 
-  // 获取所有可能的目标路径
+  // Get all possible target paths
   const targetPaths: string[] = [];
   if (route.routerPath) {
     targetPaths.push(route.routerPath);
@@ -324,33 +324,33 @@ function updateRouterByActivityBar(
     });
   }
 
-  // 检查当前路径是否已经匹配任一目标路径
+  // Check if current path already matches any target path
   for (const path of targetPaths) {
     const regexp = pathToRegexp(path, options);
     if (regexp.test(currentPath)) {
-      // 当前路径已经匹配，不需要跳转
+      // Current path already matches, no need to redirect
       return;
     }
   }
 
-  // 按优先级排序路径
+  // Sort paths by priority
   const sortedPaths = targetPaths.sort((a, b) => {
     const aHasParams = a.includes(':');
     const bHasParams = b.includes(':');
     const aHasWildcard = a.includes('*');
     const bHasWildcard = b.includes('*');
     
-    // 优先选择静态路径
+    // First select static paths
     if (!aHasParams && bHasParams) return -1;
     if (aHasParams && !bHasParams) return 1;
-    // 其次选择带参数路径
+    // Then select paths with parameters
     if (!aHasWildcard && bHasWildcard) return -1;
     if (aHasWildcard && !bHasWildcard) return 1;
-    // 最后按路径长度排序（较短的路径优先）
+    // Sort by path length (shorter paths first)
     return a.length - b.length;
   });
 
-  // 选择优先级最高的路径
+  // Select the path with the highest priority
   const targetPath = sortedPaths[0];
   if (targetPath) {
     navigationStore.getState().navigate(targetPath);
@@ -361,7 +361,7 @@ export function mapRouterToActivityBar(
   routes: RouteConfig[],
   options: RouteMatchOptions = {}
 ) {
-  // 初始化时进行一次映射
+  // Initialize with a mapping
   const currentPath = navigationStore.getState().currentPath;
   if (currentPath) {
     updateActivityBarByPath(currentPath, routes, options);
@@ -381,7 +381,7 @@ export function mapRouterToActivityBar(
 export function mapActivityBarToRouter(
   routes: RouteConfig[]
 ) {
-  // 初始化时进行一次映射
+  // Initialize with a mapping
   const activeItemKey = useActivityBarStore.getState().activeId;    
   if (activeItemKey) {
     updateRouterByActivityBar(activeItemKey, routes);
@@ -399,10 +399,10 @@ export function mapActivityBarToRouter(
 }
 
 /**
- * 连接路由和活动栏
- * @param routes 路由配置
- * @param options 路由匹配选项
- * @returns 取消订阅函数
+ * Connect routes with activity bar
+ * @param routes Route configuration
+ * @param options Route matching options
+ * @returns Unsubscribe function
  */
 export function connectRouterWithActivityBar(
   routes: RouteConfig[],

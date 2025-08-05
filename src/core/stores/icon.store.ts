@@ -46,22 +46,22 @@ import {
 import { create } from "zustand";
 
 export interface IconState {
-  // 图标映射
+  // Icon mapping
   icons: Record<string, LucideIcon>;
-  // 添加图标
+  // Add icon
   addIcon: (id: string, icon: LucideIcon) => () => void;
   addIcons: (icons: Record<string, LucideIcon>) => () => void;
-  // 移除图标
+  // Remove icon
   removeIcon: (id: string) => void;
-  // 获取图标
+  // Get icon
   getIcon: (id: string) => LucideIcon | undefined;
-  // 重置
+  // Reset
   reset: () => void;
 }
 
-// 默认图标映射
+// Default icon mapping
 const defaultIcons: Record<string, LucideIcon> = {
-  // 基础图标
+  // Basic icons
   message: MessageSquare,
   users: Users,
   settings: Settings,
@@ -76,7 +76,7 @@ const defaultIcons: Record<string, LucideIcon> = {
   bookmark: Bookmark,
   bot: Bot,
 
-  // 操作图标
+  // Action icons
   download: Download,
   upload: Upload,
   share: Share,
@@ -87,7 +87,7 @@ const defaultIcons: Record<string, LucideIcon> = {
   check: Check,
   x: X,
 
-  // 导航图标
+  // Navigation icons
   "chevron-left": ChevronLeft,
   "chevron-right": ChevronRight,
   "chevron-up": ChevronUp,
@@ -96,18 +96,18 @@ const defaultIcons: Record<string, LucideIcon> = {
   "more-horizontal": MoreHorizontal,
   "more-vertical": MoreVertical,
 
-  // 主题图标
+  // Theme icons
   sun: Sun,
   moon: Moon,
   monitor: Monitor,
 
-  // 用户相关图标
+  // User related icons
   bell: Bell,
   user: User,
   "log-out": LogOut,
   cog: Cog,
 
-  // 状态图标
+  // Status icons
   "help-circle": HelpCircle,
   info: Info,
   "alert-circle": AlertCircle,

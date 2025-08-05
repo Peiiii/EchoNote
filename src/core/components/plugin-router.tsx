@@ -19,7 +19,9 @@ function renderRoutes(nodes: RouteNode[]): React.ReactNode {
 
 export const PluginRouter: React.FC = () => {
   const routes = useRouteTreeStore(state => state.routes);
-  return <Routes>
-    {renderRoutes(routes)}
-  </Routes>
+  return (
+    <Routes>
+      {renderRoutes(routes)}
+    </Routes>
+  );
 };

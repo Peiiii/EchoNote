@@ -56,7 +56,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
       removeItem: (id: string) => {
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),
-          // 如果删除的是当前激活项，则激活第一个可用项
+          // If the deleted item is currently active, activate the first available item
           activeId: state.activeId === id
             ? state.items.find(item => item.id !== id)?.id || DEFAULT_ACTIVE_ID
             : state.activeId,
@@ -73,7 +73,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
 
       setActiveId: (id: string) => {
         set((state) => {
-          // 在一个set操作中同时更新activeId和items
+          // Update both activeId and items in a single set operation
           const updatedItems = state.items.map((item) => ({
             ...item,
             isActive: item.id === id,
@@ -103,7 +103,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
     }),
     {
       name: 'activity-bar-store',
-      partialize: (state) => ({ expanded: state.expanded }), // 只持久化 expanded
+      partialize: (state) => ({ expanded: state.expanded }), // Only persist expanded
     }
   )
 );

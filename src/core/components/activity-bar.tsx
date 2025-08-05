@@ -41,7 +41,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     >
       <ActivityBar.Header
         icon={<LayoutDashboard className="w-5 h-5" />}
-        title="AgentVerse"
+        title="EchoNote"
         showSearch={false}
       />
 

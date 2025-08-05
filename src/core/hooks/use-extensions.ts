@@ -6,7 +6,7 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
     const [initialized, setInitialized] = useState(false);
     const processedExtensionsRef = useRef<Set<string>>(new Set());
 
-    // 注册 extensions（只在首次或新增时）
+    // Register extensions (only on first load or when new ones are added)
     useEffect(() => {
         extensions.forEach((extension) => {
             const extensionId = extension.manifest.id;
@@ -16,12 +16,12 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
         });
     }, [extensions]);
 
-    // 激活 extensions（只在首次或新增时）
+    // Activate extensions (only on first load or when new ones are added)
     useEffect(() => {
         const currentExtensionIds = new Set(extensions.map(ext => ext.manifest.id));
         const processedIds = processedExtensionsRef.current;
 
-        // 激活新的 extensions
+        // Activate new extensions
         extensions.forEach((extension) => {
             const extensionId = extension.manifest.id;
             if (!processedIds.has(extensionId)) {
@@ -30,7 +30,7 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
             }
         });
 
-        // 停用不再需要的 extensions
+        // Deactivate extensions that are no longer needed
         const idsToDeactivate = Array.from(processedIds).filter(id => !currentExtensionIds.has(id));
         idsToDeactivate.forEach(extensionId => {
             extensionManager.deactivateExtension(extensionId);
@@ -40,7 +40,7 @@ export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
         setInitialized(true);
     }, [extensions]);
 
-    // 清理函数（组件卸载时）
+    // Cleanup function (when component unmounts)
     useEffect(() => {
         return () => {
             const processedIds = processedExtensionsRef.current;

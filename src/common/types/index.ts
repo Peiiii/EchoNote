@@ -1,16 +1,13 @@
-// 基础类型定义
-export interface BaseEntity {
-  id: string;
-  createdAt: number;
-  updatedAt: number;
-}
+// Basic type definitions
 
-// 用户相关类型
-export interface User extends BaseEntity {
+// User related types
+export interface User {
+  id: string;
   name: string;
-  email?: string;
+  email: string;
   avatar?: string;
-  settings: UserSettings;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserSettings {
@@ -20,67 +17,51 @@ export interface UserSettings {
   autoSave: boolean;
 }
 
-// 频道相关类型
-export interface Channel extends BaseEntity {
-  name: string;
-  description?: string;
-  type: 'personal' | 'work' | 'study' | 'custom';
-  messageCount: number;
-  isArchived: boolean;
-  lastMessageAt?: number;
-}
-
-// 消息相关类型
-export interface Message extends BaseEntity {
-  content: string;
-  type: 'text' | 'image' | 'file' | 'ai';
-  sender: 'user' | 'ai' | 'system';
-  channelId: string;
-  tags: string[];
-  metadata?: MessageMetadata;
-  isEdited?: boolean;
-  replyTo?: string; // 回复的消息ID
-}
-
-export interface MessageMetadata {
-  fileSize?: number;
-  fileName?: string;
-  fileType?: string;
-  aiModel?: string;
-  aiTokens?: number;
-  imageUrl?: string;
-  thumbnailUrl?: string;
-}
-
-// 标签相关类型
-export interface Tag extends BaseEntity {
-  name: string;
-  color: string;
-  count: number;
-}
-
-export interface TaggedMessage {
-  messageId: string;
-  tagIds: string[];
-}
-
-// AI相关类型
-export interface AIResponse {
-  content: string;
-  model: string;
-  tokens: number;
-  timestamp: number;
-}
-
-export interface AIPrompt {
+// Channel related types
+export interface Channel {
   id: string;
   name: string;
-  content: string;
-  category: string;
-  isDefault: boolean;
+  description?: string;
+  type: 'personal' | 'group' | 'system';
+  createdAt: string;
+  updatedAt: string;
 }
 
-// UI状态类型
+// Message related types
+export interface Message {
+  id: string;
+  content: string;
+  type: 'text' | 'image' | 'file' | 'voice' | 'code';
+  senderId: string;
+  channelId: string;
+  replyTo?: string; // ID of the message being replied to
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, any>;
+}
+
+// Tag related types
+export interface Tag {
+  id: string;
+  name: string;
+  color?: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// AI related types
+export interface AIAssistant {
+  id: string;
+  name: string;
+  description: string;
+  capabilities: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// UI state types
 export interface UIState {
   currentChannelId: string | null;
   sidebarOpen: boolean;
@@ -93,17 +74,17 @@ export interface UIState {
   };
 }
 
-// 应用状态类型
+// Application state types
 export interface AppState {
   user: User | null;
   channels: Channel[];
-  messages: Record<string, Message[]>; // channelId -> messages
+  messages: Record<string, Message[]>;
   tags: Tag[];
   ui: UIState;
   settings: UserSettings;
 }
 
-// API响应类型
+// API response types
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -111,33 +92,34 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
-// 分页类型
+// Pagination types
 export interface PaginationParams {
   page: number;
   limit: number;
-  offset: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
   data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
-// 事件类型
-export interface MessageEvent {
-  type: 'message' | 'typing' | 'read';
-  channelId: string;
+// Event types
+export interface AppEvent {
+  type: string;
   data: any;
+  timestamp: string;
 }
 
-// 存储类型
-export interface StorageData {
-  user: User | null;
-  channels: Channel[];
-  messages: Record<string, Message[]>;
-  tags: Tag[];
-  settings: UserSettings;
+// Storage types
+export interface StorageConfig {
+  type: 'local' | 'session' | 'indexeddb';
+  key: string;
+  defaultValue?: any;
 } 
