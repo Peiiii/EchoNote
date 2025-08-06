@@ -1,0 +1,1 @@
+export { chatExtension } from './chat-extension'; 
