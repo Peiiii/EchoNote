@@ -9,6 +9,8 @@ export interface ActivityItem {
   group?: string;
   /** the order of the item in the group , smaller is higher priority  */
   order?: number;
+  /** The label to show when the activity bar is collapsed */
+  collapsedLabel?: string;
   isActive?: boolean;
   isDisabled?: boolean;
   onClick?: () => void;

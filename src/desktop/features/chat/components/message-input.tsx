@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
-import { Send, Bot, Sparkles, Brain, Heart, Eye, PenTool, Star } from "lucide-react";
+import { Send, Bot, Eye, Brain } from "lucide-react";
 import { useChatStore, useCurrentChannel } from "@/core/stores/chat-store";
 
 export const MessageInput = () => {
@@ -26,14 +26,17 @@ export const MessageInput = () => {
         setMessage("");
         setIsLoading(true);
 
-        // 模拟AI回复
+        // 模拟AI回复 - 只在有价值时回复
         setTimeout(() => {
-            const aiResponse = generateAIResponse(userMessage, currentChannel?.name || "");
-            addMessage({
-                content: aiResponse,
-                sender: "ai",
-                channelId: currentChannelId,
-            });
+            // 只有30%的概率AI会回复，模拟选择性回复
+            if (Math.random() < 0.3) {
+                const aiResponse = generateAIResponse(userMessage, currentChannel?.name || "");
+                addMessage({
+                    content: aiResponse,
+                    sender: "ai",
+                    channelId: currentChannelId,
+                });
+            }
             setIsLoading(false);
         }, 1000);
     };
@@ -67,35 +70,26 @@ export const MessageInput = () => {
     }, [message]);
 
     return (
-        <div className="border-t border-white/20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-8">
-            <div className="max-w-5xl mx-auto">
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
+            <div className="max-w-4xl mx-auto">
                 {/* 思想记录提示 */}
-                <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-                        <div className="flex items-center gap-2">
-                            <Eye className="w-4 h-4 text-blue-500" />
-                            <span className="font-medium">记录你的思想</span>
+                <div className="mb-4 flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
+                    <Eye className="w-4 h-4" />
+                    <span>记录你的思想</span>
+                    {isFocused && (
+                        <div className="flex items-center gap-2 text-slate-500 animate-pulse">
+                            <Brain className="w-4 h-4" />
+                            <span>正在思考...</span>
                         </div>
-                        {isFocused && (
-                            <div className="flex items-center gap-2 text-blue-500 animate-pulse">
-                                <Brain className="w-4 h-4" />
-                                <span>正在思考...</span>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
-                        <span>让时间见证你的成长</span>
-                        <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                        <span>每一个想法都值得被珍视</span>
-                    </div>
+                    )}
                 </div>
                 
                 {/* 思想记录区域 */}
                 <div className="relative">
-                    <div className={`relative rounded-3xl transition-all duration-500 ${
+                    <div className={`relative rounded-lg transition-all duration-300 ${
                         isFocused 
-                            ? 'ring-2 ring-blue-500/50 shadow-xl shadow-blue-500/25 scale-[1.01]' 
-                            : 'ring-1 ring-slate-200/50 dark:ring-slate-700/50 shadow-lg'
+                            ? 'ring-2 ring-slate-300 dark:ring-slate-600 shadow-md' 
+                            : 'ring-1 ring-slate-200 dark:ring-slate-700'
                     }`}>
                         <Textarea
                             ref={textareaRef}
@@ -105,27 +99,20 @@ export const MessageInput = () => {
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             placeholder="在这里记录你的想法、感受、灵感或任何想要记住的思考... (Shift+Enter换行)"
-                            className="min-h-[80px] max-h-[120px] resize-none pr-20 pl-6 py-6 bg-white/95 dark:bg-slate-800/95 border-0 rounded-3xl text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none font-medium"
+                            className="min-h-[60px] max-h-[120px] resize-none pr-16 pl-4 py-4 bg-white dark:bg-slate-800 border-0 rounded-lg text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none"
                             disabled={isLoading}
                         />
                         
-                        {/* 装饰性元素 */}
-                        <div className="absolute top-4 right-4 flex items-center gap-3">
-                            {isLoading && (
-                                <div className="flex items-center gap-2 text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
-                                    <Bot className="w-4 h-4 animate-pulse" />
-                                    <span className="text-xs font-medium">AI思考中...</span>
-                                </div>
-                            )}
-                            
+                        {/* 发送按钮 */}
+                        <div className="absolute top-3 right-3">
                             <Button
                                 onClick={handleSendMessage}
                                 disabled={!message.trim() || isLoading}
                                 size="sm"
-                                className={`rounded-full transition-all duration-300 ${
+                                className={`rounded-md transition-all duration-300 ${
                                     message.trim() && !isLoading
-                                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl hover:scale-105'
-                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+                                        ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-slate-700 dark:hover:bg-slate-300'
+                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                                 }`}
                             >
                                 <Send className="w-4 h-4" />
@@ -133,30 +120,10 @@ export const MessageInput = () => {
                         </div>
                     </div>
                     
-                    {/* 底部装饰和提示 */}
-                    <div className="flex items-center justify-between mt-4 text-xs text-slate-400 dark:text-slate-500">
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2">
-                                <PenTool className="w-3 h-3" />
-                                <span>记录思想</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Heart className="w-3 h-3" />
-                                <span>表达感受</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Star className="w-3 h-3" />
-                                <span>捕捉灵感</span>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <span>按 Enter 记录</span>
-                            <span>Shift + Enter 换行</span>
-                            <div className="flex items-center gap-1">
-                                <Sparkles className="w-3 h-3" />
-                                <span>AI助你思考</span>
-                            </div>
-                        </div>
+                    {/* 底部提示 */}
+                    <div className="flex items-center justify-between mt-3 text-xs text-slate-400 dark:text-slate-500">
+                        <span>按 Enter 记录</span>
+                        <span>Shift + Enter 换行</span>
                     </div>
                 </div>
             </div>

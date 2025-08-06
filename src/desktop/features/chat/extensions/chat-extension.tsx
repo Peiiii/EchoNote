@@ -3,7 +3,7 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { MessageSquare, Hash, Plus } from "lucide-react";
+import { Hash, MessageSquare, Plus } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 
 export const chatExtension = defineExtension({

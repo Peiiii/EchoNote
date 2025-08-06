@@ -21,6 +21,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
   const mainGroupItems = items.filter(item => item.group === ActivityBarGroup.MAIN);
   const footerItems = items.filter(item => item.group === ActivityBarGroup.FOOTER);
 
+  console.log("[ActivityBarComponent] items", {items});
   const handleExpandedChange = (newExpanded: boolean) => {
     setExpanded(newExpanded);
   };
@@ -66,6 +67,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
                 key={item.id}
                 id={item.id}
                 className="activity-bar-item"
+                collapsedLabel={item.collapsedLabel}
                 icon={
                   <div data-testid={item.id} className={cn("flex items-center justify-center", item.iconColor || "text-blue-600 dark:text-blue-400")}>
                     <IconRegistry id={item.icon} />
@@ -87,6 +89,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
                   <ActivityBar.Item
                     key={item.id}
                     id={item.id}
+                    collapsedLabel={item.collapsedLabel}
                     icon={
                       <div data-testid={item.id} className={cn("flex items-center justify-center", item.iconColor || "text-green-600 dark:text-green-400")}>
                         <IconRegistry id={item.icon} />

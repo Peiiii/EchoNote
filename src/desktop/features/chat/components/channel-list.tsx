@@ -1,22 +1,15 @@
 import { Button } from "@/common/components/ui/button";
-import { Plus, Hash, Sparkles, BookOpen, Briefcase, GraduationCap, Heart, Star } from "lucide-react";
-import { useChatStore } from "@/core/stores/chat-store";
-import { useState } from "react";
-import { Input } from "@/common/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/common/components/ui/dialog";
+import { Input } from "@/common/components/ui/input";
+import { useChatStore } from "@/core/stores/chat-store";
+import { BookOpen, Briefcase, GraduationCap, Plus, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 const channelIcons = {
     general: Sparkles,
     work: Briefcase,
     study: GraduationCap,
     default: BookOpen,
-};
-
-const channelColors = {
-    general: "from-blue-500 to-purple-600",
-    work: "from-orange-500 to-red-600",
-    study: "from-green-500 to-teal-600",
-    default: "from-slate-500 to-gray-600",
 };
 
 export const ChannelList = () => {
@@ -42,15 +35,11 @@ export const ChannelList = () => {
         return <IconComponent className="w-4 h-4" />;
     };
 
-    const getChannelColor = (channelId: string) => {
-        return channelColors[channelId as keyof typeof channelColors] || channelColors.default;
-    };
-
     return (
         <div className="flex flex-col h-full">
             {/* 标题 */}
-            <div className="p-6 border-b border-white/20">
-                <h3 className="text-lg font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
                     思想空间
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -59,38 +48,32 @@ export const ChannelList = () => {
             </div>
             
             {/* 频道列表 */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 {channels.map((channel) => {
                     const isActive = currentChannelId === channel.id;
-                    const colorClass = getChannelColor(channel.id);
                     
                     return (
                         <button
                             key={channel.id}
                             onClick={() => setCurrentChannel(channel.id)}
-                            className={`w-full group transition-all duration-300 ${
+                            className={`w-full group transition-all duration-200 ${
                                 isActive 
-                                    ? 'transform scale-105' 
-                                    : 'hover:transform hover:scale-102'
+                                    ? 'transform scale-[1.02]' 
+                                    : 'hover:transform hover:scale-[1.01]'
                             }`}
                         >
-                            <div className={`relative p-4 rounded-xl transition-all duration-300 ${
+                            <div className={`relative p-4 rounded-lg transition-all duration-200 ${
                                 isActive
-                                    ? `bg-gradient-to-br ${colorClass} text-white shadow-lg`
-                                    : 'bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 border border-white/50 dark:border-slate-700/50'
+                                    ? 'bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 shadow-sm'
+                                    : 'bg-transparent hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                             }`}>
-                                
-                                {/* 活跃状态指示器 */}
-                                {isActive && (
-                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full shadow-lg"></div>
-                                )}
                                 
                                 <div className="flex items-start gap-3">
                                     {/* 频道图标 */}
-                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                         isActive
-                                            ? 'bg-white/20'
-                                            : `bg-gradient-to-br ${colorClass} text-white`
+                                            ? 'bg-slate-100 dark:bg-slate-600'
+                                            : 'bg-slate-100 dark:bg-slate-800'
                                     }`}>
                                         {getChannelIcon(channel.id)}
                                     </div>
@@ -98,23 +81,23 @@ export const ChannelList = () => {
                                     {/* 频道信息 */}
                                     <div className="flex-1 text-left">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className={`font-semibold ${
-                                                isActive ? 'text-white' : 'text-slate-700 dark:text-slate-300'
+                                            <span className={`font-medium ${
+                                                isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'
                                             }`}>
                                                 {channel.name}
                                             </span>
                                             {channel.messageCount > 0 && (
                                                 <span className={`text-xs px-2 py-1 rounded-full ${
                                                     isActive 
-                                                        ? 'bg-white/20 text-white' 
-                                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                                                        ? 'bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300' 
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                                                 }`}>
                                                     {channel.messageCount}
                                                 </span>
                                             )}
                                         </div>
                                         <p className={`text-xs line-clamp-2 ${
-                                            isActive ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'
+                                            isActive ? 'text-slate-600 dark:text-slate-400' : 'text-slate-500 dark:text-slate-500'
                                         }`}>
                                             {channel.description}
                                         </p>
@@ -127,21 +110,21 @@ export const ChannelList = () => {
             </div>
             
             {/* 添加频道按钮 */}
-            <div className="p-4 border-t border-white/20">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button 
                             variant="outline" 
-                            className="w-full bg-white/80 dark:bg-slate-800/80 border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300" 
+                            className="w-full bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200" 
                             size="sm"
                         >
                             <Plus className="w-4 h-4 mr-2" />
                             新建空间
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-white/50 dark:border-slate-700/50">
+                    <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                         <DialogHeader>
-                            <DialogTitle className="text-lg font-bold">创建新的思想空间</DialogTitle>
+                            <DialogTitle className="text-lg font-medium">创建新的思想空间</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
                             <div>
@@ -150,7 +133,7 @@ export const ChannelList = () => {
                                     value={newChannelName}
                                     onChange={(e) => setNewChannelName(e.target.value)}
                                     placeholder="输入空间名称"
-                                    className="mt-1 bg-white/80 dark:bg-slate-800/80 border-white/50 dark:border-slate-700/50"
+                                    className="mt-1 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                 />
                             </div>
                             <div>
@@ -159,12 +142,12 @@ export const ChannelList = () => {
                                     value={newChannelDescription}
                                     onChange={(e) => setNewChannelDescription(e.target.value)}
                                     placeholder="描述这个空间的主题（可选）"
-                                    className="mt-1 bg-white/80 dark:bg-slate-800/80 border-white/50 dark:border-slate-700/50"
+                                    className="mt-1 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                 />
                             </div>
                             <Button 
                                 onClick={handleAddChannel} 
-                                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                                className="w-full bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-slate-700 dark:hover:bg-slate-300"
                             >
                                 创建空间
                             </Button>
