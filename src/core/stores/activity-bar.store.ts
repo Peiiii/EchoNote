@@ -12,6 +12,8 @@ export interface ActivityItem {
   isActive?: boolean;
   isDisabled?: boolean;
   onClick?: () => void;
+  /** Custom icon color for the activity item */
+  iconColor?: string;
 }
 
 const DEFAULT_ACTIVE_ID = 'chat';

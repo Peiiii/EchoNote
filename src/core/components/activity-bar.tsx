@@ -50,7 +50,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
         <ActivityBar.Header
           icon={
             <div className="flex items-center justify-center w-6 h-6">
-              <LayoutDashboard className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+              <LayoutDashboard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
           }
           title="EchoNote"
@@ -65,7 +65,12 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
               <ActivityBar.Item
                 key={item.id}
                 id={item.id}
-                icon={<IconRegistry id={item.icon} />}
+                className="activity-bar-item"
+                icon={
+                  <div data-testid={item.id} className={cn("flex items-center justify-center", item.iconColor || "text-blue-600 dark:text-blue-400")}>
+                    <IconRegistry id={item.icon} />
+                  </div>
+                }
                 label={item.label}
                 title={item.title}
               />
@@ -82,17 +87,21 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
                   <ActivityBar.Item
                     key={item.id}
                     id={item.id}
-                    icon={<IconRegistry id={item.icon} />}
+                    icon={
+                      <div data-testid={item.id} className={cn("flex items-center justify-center", item.iconColor || "text-green-600 dark:text-green-400")}>
+                        <IconRegistry id={item.icon} />
+                      </div>
+                    }
                     label={item.label}
                     title={item.title}
                   />
                 ))}
               </ActivityBar.Group>
-              
+
               <ActivityBar.Separator className="bg-slate-200 dark:bg-slate-700" />
             </>
           )}
-          
+
           {/* Theme Toggle - 简洁的主题切换 */}
           <div className="px-3 py-2">
             <ThemeToggle className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200" />

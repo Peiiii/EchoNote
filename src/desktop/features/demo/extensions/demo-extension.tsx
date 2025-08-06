@@ -54,6 +54,7 @@ export const demoExtension = defineExtension({
           group: ActivityBarGroup.MAIN,
           icon: "test-tube",
           order: 100,
+          iconColor: "text-purple-600 dark:text-purple-400",
         })
       )
     );
@@ -68,6 +69,7 @@ export const demoExtension = defineExtension({
           group: ActivityBarGroup.FOOTER,
           icon: "demo-settings",
           order: 1,
+          iconColor: "text-orange-600 dark:text-orange-400",
         })
       )
     );
