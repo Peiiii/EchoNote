@@ -1,13 +1,10 @@
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/common/components/ui/button";
-import { Textarea } from "@/common/components/ui/textarea";
-import { Send, Bot, Eye, Brain } from "lucide-react";
 import { useChatStore, useCurrentChannel } from "@/core/stores/chat-store";
+import { MoreHorizontal, Paperclip, Phone, Scissors, Send, Smile, Video } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export const MessageInput = () => {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { addMessage, currentChannelId } = useChatStore();
     const currentChannel = useCurrentChannel();
@@ -49,7 +46,7 @@ export const MessageInput = () => {
             "我已经记录下这个重要的想法，还有什么要补充的吗？",
             "你的思维很清晰，这个想法值得被珍视。",
         ];
-        
+
         const randomResponse = responses[Math.floor(Math.random() * responses.length)];
         return randomResponse;
     };
@@ -70,60 +67,68 @@ export const MessageInput = () => {
     }, [message]);
 
     return (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6">
-            <div className="max-w-4xl mx-auto">
-                {/* 思想记录提示 */}
-                <div className="mb-4 flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-                    <Eye className="w-4 h-4" />
-                    <span>记录你的思想</span>
-                    {isFocused && (
-                        <div className="flex items-center gap-2 text-slate-500 animate-pulse">
-                            <Brain className="w-4 h-4" />
-                            <span>正在思考...</span>
-                        </div>
-                    )}
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+            {/* 顶部工具栏 - 统一图标样式 */}
+            <div className="px-4 py-1 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                    {/* 左侧功能图标 - 统一样式 */}
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Smile className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Paperclip className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Scissors className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <MoreHorizontal className="w-4 h-4" />
+                    </button>
                 </div>
                 
-                {/* 思想记录区域 */}
-                <div className="relative">
-                    <div className={`relative rounded-lg transition-all duration-300 ${
-                        isFocused 
-                            ? 'ring-2 ring-slate-300 dark:ring-slate-600 shadow-md' 
-                            : 'ring-1 ring-slate-200 dark:ring-slate-700'
-                    }`}>
-                        <Textarea
+                {/* 右侧通话图标 - 统一样式 */}
+                <div className="flex items-center gap-1">
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Phone className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Video className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* 书写区域 - 更紧凑的布局 */}
+            <div className="px-4 pb-2">
+                <div className="w-full">
+                    <div className="relative min-h-[40px] bg-transparent">
+                        {/* 可写区域 - 无边框，像白纸 */}
+                        <textarea
                             ref={textareaRef}
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            placeholder="在这里记录你的想法、感受、灵感或任何想要记住的思考... (Shift+Enter换行)"
-                            className="min-h-[60px] max-h-[120px] resize-none pr-16 pl-4 py-4 bg-white dark:bg-slate-800 border-0 rounded-lg text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none"
+                            placeholder="记录你的想法... (Enter 记录，Shift + Enter 换行)"
+                            className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
                             disabled={isLoading}
+                            style={{
+                                caretColor: '#3b82f6', // 蓝色光标
+                            }}
                         />
                         
-                        {/* 发送按钮 */}
-                        <div className="absolute top-3 right-3">
-                            <Button
+                        {/* 发送按钮 - 悬浮在书写区域 */}
+                        <div className="absolute bottom-2 right-2">
+                            <button
                                 onClick={handleSendMessage}
                                 disabled={!message.trim() || isLoading}
-                                size="sm"
-                                className={`rounded-md transition-all duration-300 ${
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                                     message.trim() && !isLoading
-                                        ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-slate-700 dark:hover:bg-slate-300'
+                                        ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
                                         : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                                 }`}
                             >
                                 <Send className="w-4 h-4" />
-                            </Button>
+                            </button>
                         </div>
-                    </div>
-                    
-                    {/* 底部提示 */}
-                    <div className="flex items-center justify-between mt-3 text-xs text-slate-400 dark:text-slate-500">
-                        <span>按 Enter 记录</span>
-                        <span>Shift + Enter 换行</span>
                     </div>
                 </div>
             </div>

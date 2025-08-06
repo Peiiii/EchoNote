@@ -38,7 +38,7 @@ export const MessageTimeline = () => {
     }, {} as Record<string, typeof messages>);
 
     return (
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="p-8">
             <div className="max-w-3xl mx-auto space-y-12">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => (
                     <div key={date} className="relative">
