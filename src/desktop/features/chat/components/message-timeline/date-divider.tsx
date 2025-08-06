@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import { zhCN } from "date-fns/locale";
 import { Clock } from "lucide-react";
 
 interface DateDividerProps {
@@ -14,7 +13,7 @@ export const DateDivider = ({ date }: DateDividerProps) => (
         <div className="relative bg-white dark:bg-slate-900 px-3">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                 <Clock className="w-3 h-3" />
-                <span>{format(new Date(date), 'MM月dd日 EEEE', { locale: zhCN })}</span>
+                <span>{format(new Date(date), 'MMM dd, EEEE')}</span>
             </div>
         </div>
     </div>

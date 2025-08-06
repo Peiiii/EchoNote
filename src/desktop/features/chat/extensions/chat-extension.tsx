@@ -10,7 +10,7 @@ export const chatExtension = defineExtension({
   manifest: {
     id: "chat",
     name: "Chat Extension",
-    description: "对话式AI笔记功能",
+    description: "Conversational AI note-taking feature",
     version: "1.0.0",
     author: "EchoNote Team",
     icon: "message-square",
@@ -32,8 +32,8 @@ export const chatExtension = defineExtension({
       Disposable.from(
         useActivityBarStore.getState().addItem({
           id: "chat",
-          label: "聊天",
-          title: "对话式笔记",
+          label: "Chat",
+          title: "Conversational Notes",
           group: ActivityBarGroup.MAIN,
           icon: "message-square",
           order: 1,

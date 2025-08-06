@@ -1,5 +1,5 @@
 import { useChatStore, useCurrentChannel } from "@/core/stores/chat-store";
-import { MoreHorizontal, Paperclip, Phone, Scissors, Send, Smile, Video } from "lucide-react";
+import { MoreHorizontal, Paperclip, Phone, Scissors, Send, Smile, Video, Mic, Image, FileText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export const MessageInput = () => {
@@ -12,7 +12,7 @@ export const MessageInput = () => {
     const handleSendMessage = async () => {
         if (!message.trim() || !currentChannelId) return;
 
-        // 发送用户消息
+        // Send user message
         addMessage({
             content: message.trim(),
             sender: "user",
@@ -23,9 +23,9 @@ export const MessageInput = () => {
         setMessage("");
         setIsLoading(true);
 
-        // 模拟AI回复 - 只在有价值时回复
+        // Simulate AI response - only reply when valuable
         setTimeout(() => {
-            // 只有30%的概率AI会回复，模拟选择性回复
+            // Only 30% chance AI will reply, simulating selective responses
             if (Math.random() < 0.3) {
                 const aiResponse = generateAIResponse(userMessage, currentChannel?.name || "");
                 addMessage({
@@ -40,11 +40,11 @@ export const MessageInput = () => {
 
     const generateAIResponse = (userMessage: string, channelName: string): string => {
         const responses = [
-            "这个想法很有深度，让我帮你进一步思考...",
-            "我感受到了你的思考过程，这很有趣！",
-            "这个观点很有价值，建议你可以继续深入...",
-            "我已经记录下这个重要的想法，还有什么要补充的吗？",
-            "你的思维很清晰，这个想法值得被珍视。",
+            "This is a deep thought, let me help you explore it further...",
+            "I can feel your thinking process, this is fascinating!",
+            "This perspective has great value, I suggest you continue to explore...",
+            "I've recorded this important idea, anything else to add?",
+            "Your thinking is very clear, this idea deserves to be cherished.",
         ];
 
         const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -58,35 +58,38 @@ export const MessageInput = () => {
         }
     };
 
-    // 自动调整文本框高度
+    // Auto-adjust textarea height
     useEffect(() => {
         if (textareaRef.current) {
             textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
         }
     }, [message]);
 
     return (
         <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-            {/* 顶部工具栏 - 统一图标样式 */}
+            {/* Top toolbar - unified icon style */}
             <div className="px-4 py-1 flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                    {/* 左侧功能图标 - 统一样式 */}
+                    {/* Left function icons - unified style */}
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <Smile className="w-4 h-4" />
                     </button>
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
-                        <Paperclip className="w-4 h-4" />
+                        <Image className="w-4 h-4" />
                     </button>
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
-                        <Scissors className="w-4 h-4" />
+                        <FileText className="w-4 h-4" />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
+                        <Mic className="w-4 h-4" />
                     </button>
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <MoreHorizontal className="w-4 h-4" />
                     </button>
                 </div>
                 
-                {/* 右侧通话图标 - 统一样式 */}
+                {/* Right call icons - unified style */}
                 <div className="flex items-center gap-1">
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <Phone className="w-4 h-4" />
@@ -97,25 +100,25 @@ export const MessageInput = () => {
                 </div>
             </div>
 
-            {/* 书写区域 - 更紧凑的布局 */}
+            {/* Writing area - more compact layout */}
             <div className="px-4 pb-2">
                 <div className="w-full">
-                    <div className="relative min-h-[40px] bg-transparent">
-                        {/* 可写区域 - 无边框，像白纸 */}
+                    <div className="relative min-h-[50px] bg-transparent">
+                        {/* Writable area - no border, like white paper */}
                         <textarea
                             ref={textareaRef}
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder="记录你的想法... (Enter 记录，Shift + Enter 换行)"
+                            placeholder="Record your thoughts... (Enter to send, Shift+Enter for new line)"
                             className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
                             disabled={isLoading}
                             style={{
-                                caretColor: '#3b82f6', // 蓝色光标
+                                caretColor: '#3b82f6', // Blue cursor
                             }}
                         />
                         
-                        {/* 发送按钮 - 悬浮在书写区域 */}
+                        {/* Send button - floating on writing area */}
                         <div className="absolute bottom-2 right-2">
                             <button
                                 onClick={handleSendMessage}

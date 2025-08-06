@@ -2,13 +2,17 @@ import { Button } from "@/common/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/common/components/ui/dialog";
 import { Input } from "@/common/components/ui/input";
 import { useChatStore } from "@/core/stores/chat-store";
-import { BookOpen, Briefcase, GraduationCap, Plus, Sparkles } from "lucide-react";
+import { BookOpen, Briefcase, GraduationCap, Plus, Sparkles, Lightbulb, Heart, Zap, Target, Users } from "lucide-react";
 import { useState } from "react";
 
 const channelIcons = {
     general: Sparkles,
     work: Briefcase,
     study: GraduationCap,
+    ideas: Lightbulb,
+    personal: Heart,
+    goals: Target,
+    team: Users,
     default: BookOpen,
 };
 
@@ -37,17 +41,17 @@ export const ChannelList = () => {
 
     return (
         <div className="flex flex-col h-full">
-            {/* 标题 */}
+            {/* Header */}
             <div className="p-6 border-b border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-                    思想空间
+                    Thought Spaces
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    选择你的思考领域
+                    Choose your thinking domain
                 </p>
             </div>
             
-            {/* 频道列表 */}
+            {/* Channel List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 {channels.map((channel) => {
                     const isActive = currentChannelId === channel.id;
@@ -69,7 +73,7 @@ export const ChannelList = () => {
                             }`}>
                                 
                                 <div className="flex items-start gap-3">
-                                    {/* 频道图标 */}
+                                    {/* Channel Icon */}
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                         isActive
                                             ? 'bg-slate-100 dark:bg-slate-600'
@@ -78,7 +82,7 @@ export const ChannelList = () => {
                                         {getChannelIcon(channel.id)}
                                     </div>
                                     
-                                    {/* 频道信息 */}
+                                    {/* Channel Info */}
                                     <div className="flex-1 text-left">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className={`font-medium ${
@@ -109,7 +113,7 @@ export const ChannelList = () => {
                 })}
             </div>
             
-            {/* 添加频道按钮 */}
+            {/* Add Channel Button */}
             <div className="p-4 border-t border-slate-200 dark:border-slate-700">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
@@ -119,29 +123,29 @@ export const ChannelList = () => {
                             size="sm"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            新建空间
+                            New Space
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                         <DialogHeader>
-                            <DialogTitle className="text-lg font-medium">创建新的思想空间</DialogTitle>
+                            <DialogTitle className="text-lg font-medium">Create New Thought Space</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">空间名称</label>
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Space Name</label>
                                 <Input
                                     value={newChannelName}
                                     onChange={(e) => setNewChannelName(e.target.value)}
-                                    placeholder="输入空间名称"
+                                    placeholder="Enter space name"
                                     className="mt-1 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                 />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">空间描述</label>
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Space Description</label>
                                 <Input
                                     value={newChannelDescription}
                                     onChange={(e) => setNewChannelDescription(e.target.value)}
-                                    placeholder="描述这个空间的主题（可选）"
+                                    placeholder="Describe the theme of this space (optional)"
                                     className="mt-1 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                                 />
                             </div>
@@ -149,7 +153,7 @@ export const ChannelList = () => {
                                 onClick={handleAddChannel} 
                                 className="w-full bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-800 hover:bg-slate-700 dark:hover:bg-slate-300"
                             >
-                                创建空间
+                                Create Space
                             </Button>
                         </div>
                     </DialogContent>
