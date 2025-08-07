@@ -1,4 +1,4 @@
-import { useCurrentChannelMessages } from "@/core/stores/chat-store";
+import { useCurrentChannelMessages, Message } from "@/core/stores/chat-store";
 import { format } from "date-fns";
 import { useMemo } from "react";
 
@@ -19,7 +19,7 @@ export const useGroupedMessages = () => {
 };
 
 // 消息状态判断函数（非hook）
-export const getMessageStatus = (message: any, index: number, dayMessages: any[]) => {
+export const getMessageStatus = (message: Message, index: number, dayMessages: Message[]) => {
     const isUserMessage = message.sender === "user";
     const isFirstInGroup = index === 0 || dayMessages[index - 1]?.sender !== message.sender;
     const isLastInGroup = index === dayMessages.length - 1 || dayMessages[index + 1]?.sender !== message.sender;

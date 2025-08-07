@@ -8,6 +8,10 @@ export interface Message {
     timestamp: Date;
     channelId: string;
     tags?: string[];
+    parentId?: string; // 父消息ID，用于创建thread
+    threadId?: string; // thread ID，同一thread的消息共享此ID
+    isThreadExpanded?: boolean; // 是否展开thread
+    threadCount?: number; // thread中的消息数量
 }
 
 export interface Channel {
@@ -35,6 +39,11 @@ export interface ChatState {
     addMessage: (message: Omit<Message, "id" | "timestamp">) => void;
     deleteMessage: (messageId: string) => void;
     updateMessage: (messageId: string, updates: Partial<Message>) => void;
+    
+    // Thread related actions
+    addThreadMessage: (parentMessageId: string, message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">) => void;
+    toggleThreadExpansion: (messageId: string) => void;
+    getThreadMessages: (threadId: string) => Message[];
 }
 
 export const useChatStore = create<ChatState>()(
@@ -114,6 +123,47 @@ export const useChatStore = create<ChatState>()(
                         msg.id === messageId ? { ...msg, ...updates } : msg
                     ),
                 }));
+            },
+
+            // Thread related actions
+            addThreadMessage: (parentMessageId, message) => {
+                set((state) => {
+                    const parentMessage = state.messages.find((msg: Message) => msg.id === parentMessageId);
+                    if (!parentMessage) return state;
+
+                    const threadId = parentMessage.threadId || parentMessageId;
+                    const newMessage: Message = {
+                        ...message,
+                        id: "msg-" + Date.now(),
+                        timestamp: new Date(),
+                        parentId: parentMessageId,
+                        threadId: threadId,
+                    };
+
+                    return {
+                        messages: [...state.messages, newMessage],
+                        channels: state.channels.map((channel: Channel) =>
+                            channel.id === message.channelId
+                                ? { ...channel, messageCount: channel.messageCount + 1 }
+                                : channel
+                        ),
+                    };
+                });
+            },
+
+            toggleThreadExpansion: (messageId) => {
+                set((state) => ({
+                    messages: state.messages.map((msg: Message) =>
+                        msg.id === messageId 
+                            ? { ...msg, isThreadExpanded: !msg.isThreadExpanded }
+                            : msg
+                    ),
+                }));
+            },
+
+            getThreadMessages: (threadId: string): Message[] => {
+                const state = useChatStore.getState();
+                return state.messages.filter((msg: Message) => msg.threadId === threadId);
             },
         }),
         {

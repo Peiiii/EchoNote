@@ -14,23 +14,29 @@ export const MessageTimeline = () => {
     }
 
     return (
-        <div className="p-4">
-            <div className="max-w-4xl mx-auto space-y-6">
+        <div className="p-6">
+            <div className="max-w-5xl mx-auto space-y-8">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => (
-                    <div key={date} className="space-y-4">
+                    <div key={date} className="space-y-6">
                         <DateDivider date={date} />
 
-                        {/* 当天的消息 */}
-                        <div className="space-y-1">
+                        {/* Messages for the day */}
+                        <div className="space-y-2">
                             {dayMessages.map((message, index) => {
                                 const { isUserMessage, isFirstInGroup } = getMessageStatus(message, index, dayMessages);
                                 
                                 return (
-                                    <div key={message.id} className={`group ${isUserMessage ? 'flex justify-end' : 'flex justify-start'}`}>
+                                    <div key={message.id} className="group">
                                         {isUserMessage ? (
-                                            <UserMessage message={message} isFirstInGroup={isFirstInGroup} />
+                                            <UserMessage 
+                                                message={message} 
+                                                isFirstInGroup={isFirstInGroup}
+                                            />
                                         ) : (
-                                            <AIMessage message={message} isFirstInGroup={isFirstInGroup} />
+                                            <AIMessage 
+                                                message={message} 
+                                                isFirstInGroup={isFirstInGroup}
+                                            />
                                         )}
                                     </div>
                                 );

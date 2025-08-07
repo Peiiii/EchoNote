@@ -1,44 +1,59 @@
 import { format } from "date-fns";
 import { AIAvatar } from "./ai-avatar";
+import { Reply } from "lucide-react";
+import { Message } from "@/core/stores/chat-store";
 
 interface AIMessageProps {
-    message: any;
+    message: Message;
     isFirstInGroup: boolean;
+    onReply?: () => void;
 }
 
-export const AIMessage = ({ message, isFirstInGroup }: AIMessageProps) => (
-    <div className={`max-w-2xl ${isFirstInGroup ? 'mt-4' : 'mt-0.5'}`}>
-        <div className="flex items-start gap-3">
-            {/* AI Avatar */}
-            <div className="relative flex-shrink-0">
-                {isFirstInGroup && <AIAvatar />}
+export const AIMessage = ({ message, isFirstInGroup, onReply }: AIMessageProps) => (
+    <div className={`max-w-4xl mx-auto ${isFirstInGroup ? 'mt-6' : 'mt-4'}`}>
+        <div className="group relative">
+            {/* Timestamp - shown on hover */}
+            <div className="absolute -top-6 left-0 text-xs text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                {format(message.timestamp, 'MMM dd, yyyy HH:mm')}
             </div>
             
-            {/* AI Message Content */}
-            <div className="flex-1 min-w-0">
-                {/* AI Label - Only show on first message */}
-                {isFirstInGroup && (
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            AI Assistant
-                        </span>
-                        <div className="flex items-center gap-1">
-                            <div className="w-1 h-1 rounded-full bg-green-400 animate-pulse"></div>
-                            <span className="text-xs text-green-600 dark:text-green-400">Online</span>
+            {/* AI annotation content */}
+            <div className="bg-slate-50 dark:bg-slate-800 border-l-4 border-purple-500 pl-6 py-4 rounded-r-lg shadow-sm hover:shadow-md transition-all duration-200">
+                <div className="flex items-start gap-3">
+                    {/* AI avatar - small */}
+                    <div className="flex-shrink-0">
+                        <AIAvatar />
+                    </div>
+                    
+                    {/* Content area */}
+                    <div className="flex-1 min-w-0">
+                        {/* AI label - small */}
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                                AI Annotation
+                            </span>
+                        </div>
+                        
+                        {/* Annotation content */}
+                        <div className="prose prose-slate dark:prose-invert max-w-none">
+                            <div className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words">
+                                {message.content}
+                            </div>
                         </div>
                     </div>
-                )}
-                
-                {/* Timestamp */}
-                <div className="text-xs text-slate-400 dark:text-slate-500 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    {format(message.timestamp, 'HH:mm')}
                 </div>
-                
-                {/* Message Bubble */}
-                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-2xl rounded-bl-md shadow-sm hover:shadow-md transition-all duration-200 max-w-full">
-                    <div className="text-sm leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
-                        {message.content}
-                    </div>
+            </div>
+
+            {/* Action buttons - shown on hover */}
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={onReply}
+                        className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
+                        title="Reply"
+                    >
+                        <Reply className="w-4 h-4" />
+                    </button>
                 </div>
             </div>
         </div>

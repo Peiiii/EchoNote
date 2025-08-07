@@ -1,41 +1,62 @@
 import { useChatStore } from "@/core/stores/chat-store";
-import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText } from "lucide-react";
+import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText, Reply } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface MessageInputProps {
     onSend: () => void;
+    replyToMessageId?: string; // ID of the message being replied to
+    onCancelReply?: () => void; // Cancel reply
 }
 
-export const MessageInput = ({ onSend }: MessageInputProps) => {
+export const MessageInput = ({ onSend, replyToMessageId, onCancelReply }: MessageInputProps) => {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { addMessage, currentChannelId } = useChatStore();
+    const { addMessage, addThreadMessage, messages } = useChatStore();
+    const { currentChannelId } = useChatStore();
 
-    const handleSendMessage = async () => {
+    // Get the message being replied to
+    const replyToMessage = replyToMessageId ? messages.find(msg => msg.id === replyToMessageId) : null;
+
+    const handleSend = async () => {
         if (!message.trim() || !currentChannelId) return;
 
-        // Send user message
-        addMessage({
-            content: message.trim(),
-            sender: "user",
-            channelId: currentChannelId,
-        });
+        if (replyToMessageId) {
+            // Add to thread
+            addThreadMessage(replyToMessageId, {
+                content: message.trim(),
+                sender: "user" as const,
+                channelId: currentChannelId,
+            });
+        } else {
+            // Regular message
+            addMessage({
+                content: message.trim(),
+                sender: "user" as const,
+                channelId: currentChannelId,
+            });
+        }
 
         // Notify parent component that message was sent
         onSend();
 
         setMessage("");
         setIsLoading(true);
-
-        // Simulate AI response - only reply when valuable
+        
+        // Simulate AI response
         setTimeout(() => {
-            // Only 30% chance AI will reply, simulating selective responses
-            if (Math.random() < 0.3) {
-                const aiResponse = generateAIResponse();
+            if (replyToMessageId) {
+                // Add to thread
+                addThreadMessage(replyToMessageId, {
+                    content: "This is an AI response as an annotation to your message.",
+                    sender: "ai" as const,
+                    channelId: currentChannelId,
+                });
+            } else {
+                // Regular AI response
                 addMessage({
-                    content: aiResponse,
-                    sender: "ai",
+                    content: "This is an AI response as an annotation to your content.",
+                    sender: "ai" as const,
                     channelId: currentChannelId,
                 });
             }
@@ -43,23 +64,12 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
         }, 1000);
     };
 
-    const generateAIResponse = (): string => {
-        const responses = [
-            "This is a deep thought, let me help you explore it further...",
-            "I can feel your thinking process, this is fascinating!",
-            "This perspective has great value, I suggest you continue to explore...",
-            "I've recorded this important idea, anything else to add?",
-            "Your thinking is very clear, this idea deserves to be cherished.",
-        ];
 
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        return randomResponse;
-    };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            handleSendMessage();
+            handleSend();
         }
     };
 
@@ -73,6 +83,27 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
 
     return (
         <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+            {/* Reply indicator */}
+            {replyToMessage && (
+                <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Reply className="w-4 h-4 text-blue-500" />
+                            <span className="text-sm text-blue-700 dark:text-blue-300">Reply:</span>
+                            <span className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                                {replyToMessage.content.substring(0, 50)}...
+                            </span>
+                        </div>
+                        <button
+                            onClick={onCancelReply}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        >
+                            <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Top toolbar - unified icon style */}
             <div className="px-4 py-1 flex items-center justify-between">
                 <div className="flex items-center gap-1">
@@ -115,7 +146,7 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder="Record your thoughts... (Enter to send, Shift+Enter for new line)"
+                            placeholder={replyToMessage ? "Reply to this message... (Enter to send, Shift+Enter for new line)" : "Record your thoughts... (Enter to send, Shift+Enter for new line)"}
                             className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
                             disabled={isLoading}
                             style={{
@@ -126,7 +157,7 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
                         {/* Send button - floating on writing area */}
                         <div className="absolute bottom-2 right-2">
                             <button
-                                onClick={handleSendMessage}
+                                onClick={handleSend}
                                 disabled={!message.trim() || isLoading}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                                     message.trim() && !isLoading
