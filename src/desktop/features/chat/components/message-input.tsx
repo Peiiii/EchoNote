@@ -1,5 +1,5 @@
-import { useChatStore, useCurrentChannel } from "@/core/stores/chat-store";
-import { MoreHorizontal, Paperclip, Phone, Scissors, Send, Smile, Video, Mic, Image, FileText } from "lucide-react";
+import { useChatStore } from "@/core/stores/chat-store";
+import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export const MessageInput = () => {
@@ -7,7 +7,6 @@ export const MessageInput = () => {
     const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { addMessage, currentChannelId } = useChatStore();
-    const currentChannel = useCurrentChannel();
 
     const handleSendMessage = async () => {
         if (!message.trim() || !currentChannelId) return;
@@ -19,7 +18,7 @@ export const MessageInput = () => {
             channelId: currentChannelId,
         });
 
-        const userMessage = message.trim();
+
         setMessage("");
         setIsLoading(true);
 
@@ -27,7 +26,7 @@ export const MessageInput = () => {
         setTimeout(() => {
             // Only 30% chance AI will reply, simulating selective responses
             if (Math.random() < 0.3) {
-                const aiResponse = generateAIResponse(userMessage, currentChannel?.name || "");
+                const aiResponse = generateAIResponse();
                 addMessage({
                     content: aiResponse,
                     sender: "ai",
@@ -38,7 +37,7 @@ export const MessageInput = () => {
         }, 1000);
     };
 
-    const generateAIResponse = (userMessage: string, channelName: string): string => {
+    const generateAIResponse = (): string => {
         const responses = [
             "This is a deep thought, let me help you explore it further...",
             "I can feel your thinking process, this is fascinating!",
