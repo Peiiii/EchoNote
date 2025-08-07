@@ -42,23 +42,25 @@ export const ChatPage = () => {
                 </div>
 
                 {/* Right recording area - pure thinking space */}
-                <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 relative">
-                    <div ref={containerRef} className="flex-1 overflow-y-auto">
-                        <MessageTimeline />
-                    </div>
-                    
-                    {/* Sticky state indicator */}
-                    {!isSticky && (
-                        <div className="absolute bottom-20 right-6">
-                            <button
-                                onClick={handleScrollToBottom}
-                                className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-                                title="Scroll to bottom"
-                            >
-                                <ChevronDown className="w-5 h-5" />
-                            </button>
+                <div className="flex-1 flex flex-col bg-white dark:bg-slate-900">
+                    <div className="flex-1 relative min-h-0">
+                        <div ref={containerRef} className="absolute inset-0 overflow-y-auto">
+                            <MessageTimeline />
                         </div>
-                    )}
+                        
+                        {/* Scroll to bottom button - overlays on list but doesn't scroll */}
+                        {!isSticky && (
+                            <div className="absolute bottom-4 right-4 z-10">
+                                <button
+                                    onClick={handleScrollToBottom}
+                                    className="w-8 h-8 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 rounded-full shadow-sm hover:shadow-md transition-all duration-200 hover:bg-white dark:hover:bg-slate-800 group"
+                                    title="Scroll to bottom"
+                                >
+                                    <ChevronDown className="w-4 h-4 mx-auto group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     
                     <MessageInput 
                         onSend={handleSend}
