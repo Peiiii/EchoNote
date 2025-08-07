@@ -18,7 +18,7 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
     if (el) {
       el.scrollTop = el.scrollHeight
     }
-  }, [])
+  }, [containerRef])
 
   // Listen to user scroll, determine if sticky
   const handleScroll = useCallback(() => {
@@ -26,7 +26,7 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
     if (!el) return
     const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight
     setIsSticky(distanceToBottom <= threshold)
-  }, [threshold])
+  }, [threshold, containerRef])
 
   // Auto scroll to bottom when dependencies change (e.g. new messages)
   useEffect(() => {

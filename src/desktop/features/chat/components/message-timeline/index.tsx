@@ -2,7 +2,7 @@ import { useCurrentChannelMessages, useChatStore } from "@/core/stores/chat-stor
 import { EmptyState } from "./empty-state";
 import { DateDivider } from "./date-divider";
 import { ThoughtRecord } from "./thought-record";
-import { ThreadSidebar } from "../thread-sidebar";
+import { ThreadSidebar } from "../features/thread-sidebar";
 import { useGroupedMessages } from "./hooks";
 import { useState } from "react";
 
