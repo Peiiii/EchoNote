@@ -14,14 +14,14 @@ export const MessageTimeline = () => {
     }
 
     return (
-        <div className="p-6">
-            <div className="max-w-5xl mx-auto space-y-8">
+        <div className="p-8">
+            <div className="max-w-4xl mx-auto space-y-12">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => (
-                    <div key={date} className="space-y-6">
+                    <div key={date} className="space-y-8">
                         <DateDivider date={date} />
 
-                        {/* Messages for the day */}
-                        <div className="space-y-2">
+                        {/* Records for the day - clean and minimal */}
+                        <div className="space-y-1">
                             {dayMessages.map((message, index) => {
                                 const { isUserMessage, isFirstInGroup } = getMessageStatus(message, index, dayMessages);
                                 
