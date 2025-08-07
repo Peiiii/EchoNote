@@ -1,6 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export interface AIAnalysis {
+    keywords: string[];
+    topics: string[];
+    sentiment: 'positive' | 'neutral' | 'negative';
+    summary: string;
+    tags: string[];
+    insights: string[];
+    relatedTopics: string[];
+}
+
 export interface Message {
     id: string;
     content: string;
@@ -12,6 +22,7 @@ export interface Message {
     threadId?: string; // thread ID，同一thread的消息共享此ID
     isThreadExpanded?: boolean; // 是否展开thread
     threadCount?: number; // thread中的消息数量
+    aiAnalysis?: AIAnalysis; // AI分析结果
 }
 
 export interface Channel {
