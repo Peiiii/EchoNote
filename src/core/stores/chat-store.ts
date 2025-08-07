@@ -19,16 +19,16 @@ export interface Channel {
 }
 
 export interface ChatState {
-    // 频道相关
+    // Channel related
     channels: Channel[];
     currentChannelId: string | null;
-    
-    // 消息相关
+
+    // Message related
     messages: Message[];
-    
-    // 用户相关
+
+    // User related
     userId: string;
-    
+
     // Actions
     addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => void;
     setCurrentChannel: (channelId: string) => void;
@@ -40,26 +40,26 @@ export interface ChatState {
 export const useChatStore = create<ChatState>()(
     persist(
         (set) => ({
-            // 初始状态
+            // Initial state
             channels: [
                 {
                     id: "general",
-                    name: "通用",
-                    description: "日常记录和想法",
+                    name: "General",
+                    description: "Daily notes and thoughts",
                     createdAt: new Date(),
                     messageCount: 0,
                 },
                 {
                     id: "work",
-                    name: "工作日志",
-                    description: "工作相关的记录和想法",
+                    name: "Work Log",
+                    description: "Work-related notes and ideas",
                     createdAt: new Date(),
                     messageCount: 0,
                 },
                 {
                     id: "study",
-                    name: "学习笔记",
-                    description: "学习和知识整理",
+                    name: "Study Notes",
+                    description: "Learning and knowledge organization",
                     createdAt: new Date(),
                     messageCount: 0,
                 },
@@ -67,7 +67,7 @@ export const useChatStore = create<ChatState>()(
             currentChannelId: "general",
             messages: [],
             userId: "user-" + Date.now(),
-            
+
             // Actions
             addChannel: (channel) => {
                 const newChannel: Channel = {
@@ -80,18 +80,18 @@ export const useChatStore = create<ChatState>()(
                     channels: [...state.channels, newChannel],
                 }));
             },
-            
+
             setCurrentChannel: (channelId) => {
                 set({ currentChannelId: channelId });
             },
-            
+
             addMessage: (message) => {
                 const newMessage: Message = {
                     ...message,
                     id: "msg-" + Date.now(),
                     timestamp: new Date(),
                 };
-                
+
                 set((state) => ({
                     messages: [...state.messages, newMessage],
                     channels: state.channels.map((channel) =>
@@ -101,13 +101,13 @@ export const useChatStore = create<ChatState>()(
                     ),
                 }));
             },
-            
+
             deleteMessage: (messageId) => {
                 set((state) => ({
                     messages: state.messages.filter((msg) => msg.id !== messageId),
                 }));
             },
-            
+
             updateMessage: (messageId, updates) => {
                 set((state) => ({
                     messages: state.messages.map((msg) =>
@@ -122,7 +122,7 @@ export const useChatStore = create<ChatState>()(
     )
 );
 
-// 计算属性
+// Computed properties
 export const useCurrentChannel = () => {
     const { channels, currentChannelId } = useChatStore();
     return channels.find((channel) => channel.id === currentChannelId) || null;
