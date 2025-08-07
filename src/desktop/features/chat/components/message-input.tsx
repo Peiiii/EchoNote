@@ -2,7 +2,11 @@ import { useChatStore } from "@/core/stores/chat-store";
 import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-export const MessageInput = () => {
+interface MessageInputProps {
+    onSend: () => void;
+}
+
+export const MessageInput = ({ onSend }: MessageInputProps) => {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -18,6 +22,8 @@ export const MessageInput = () => {
             channelId: currentChannelId,
         });
 
+        // Notify parent component that message was sent
+        onSend();
 
         setMessage("");
         setIsLoading(true);
