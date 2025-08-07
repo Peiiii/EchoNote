@@ -36,7 +36,7 @@ export const ThreadSidebar = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-y-0 right-0 w-96 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-xl z-50 flex flex-col">
+        <div className="h-full flex flex-col bg-white dark:bg-slate-900">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2">

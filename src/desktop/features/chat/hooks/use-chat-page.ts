@@ -1,11 +1,15 @@
 import { useRef, useState } from "react";
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
 import { useChatStore } from "@/core/stores/chat-store";
+import { useThreadSidebar } from "./use-thread-sidebar";
 
 export const useChatPage = () => {
     const { currentChannelId, messages } = useChatStore();
     const containerRef = useRef<HTMLDivElement>(null);
     const [replyToMessageId, setReplyToMessageId] = useState<string | null>(null);
+
+    // Thread sidebar logic
+    const threadSidebar = useThreadSidebar();
 
     const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll(containerRef, {
         threshold: 30,
@@ -42,6 +46,9 @@ export const useChatPage = () => {
         handleSend,
         handleCancelReply,
         handleScrollToBottom,
-        setReplyToMessageId
+        setReplyToMessageId,
+        
+        // Thread sidebar
+        ...threadSidebar
     };
 };

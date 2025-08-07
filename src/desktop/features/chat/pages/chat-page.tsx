@@ -4,18 +4,25 @@ import {
     ChatLayout, 
     ChatContent, 
     MessageTimelineContainer, 
-    ScrollToBottomButton 
+    ScrollToBottomButton,
+    ThreadSidebar
 } from "../components";
-import { useChatPage } from "../hooks/use-chat-page";
+import { useChatPage } from "../hooks";
 
 export const ChatPage = () => {
     const {
         replyToMessageId,
         isSticky,
+        isThreadOpen,
+        currentParentMessage,
+        currentThreadMessages,
         containerRef,
         handleSend,
         handleCancelReply,
-        handleScrollToBottom
+        handleScrollToBottom,
+        handleOpenThread,
+        handleCloseThread,
+        handleSendThreadMessage
     } = useChatPage();
 
     return (
@@ -23,7 +30,12 @@ export const ChatPage = () => {
             sidebar={<ChannelList />}
             content={
                 <ChatContent
-                    timeline={<MessageTimelineContainer containerRef={containerRef} />}
+                    timeline={
+                        <MessageTimelineContainer 
+                            containerRef={containerRef} 
+                            onOpenThread={handleOpenThread}
+                        />
+                    }
                     input={
                         <MessageInput 
                             onSend={handleSend}
@@ -37,6 +49,17 @@ export const ChatPage = () => {
                         )
                     }
                 />
+            }
+            rightSidebar={
+                isThreadOpen && (
+                    <ThreadSidebar
+                        isOpen={isThreadOpen}
+                        onClose={handleCloseThread}
+                        parentMessage={currentParentMessage}
+                        threadMessages={currentThreadMessages}
+                        onSendMessage={handleSendThreadMessage}
+                    />
+                )
             }
         />
     );

@@ -3,10 +3,11 @@ import { ReactNode } from "react";
 interface ChatLayoutProps {
     sidebar: ReactNode;
     content: ReactNode;
+    rightSidebar?: ReactNode; // 新增右侧sidebar
     className?: string;
 }
 
-export const ChatLayout = ({ sidebar, content, className = "" }: ChatLayoutProps) => {
+export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: ChatLayoutProps) => {
     return (
         <div className={`flex-1 flex flex-col bg-white dark:bg-slate-900 ${className}`}>
             <div className="flex-1 flex min-h-0">
@@ -15,10 +16,17 @@ export const ChatLayout = ({ sidebar, content, className = "" }: ChatLayoutProps
                     {sidebar}
                 </div>
 
-                {/* Right content area */}
+                {/* Center content area */}
                 <div className="flex-1 flex flex-col bg-white dark:bg-slate-900">
                     {content}
                 </div>
+
+                {/* Right sidebar - conditional rendering */}
+                {rightSidebar && (
+                    <div className="w-96 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                        {rightSidebar}
+                    </div>
+                )}
             </div>
         </div>
     );
