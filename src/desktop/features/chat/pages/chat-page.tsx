@@ -7,23 +7,16 @@ import {
     ScrollToBottomButton,
     ThreadSidebar
 } from "../components";
-import { useChatPage } from "../hooks";
+import { useChatScroll, useChatActions, useThreadSidebar } from "../hooks";
+import { useChatStore } from "@/core/stores/chat-store";
 
 export const ChatPage = () => {
-    const {
-        replyToMessageId,
-        isSticky,
-        isThreadOpen,
-        currentParentMessage,
-        currentThreadMessages,
-        containerRef,
-        handleSend,
-        handleCancelReply,
-        handleScrollToBottom,
-        handleOpenThread,
-        handleCloseThread,
-        handleSendThreadMessage
-    } = useChatPage();
+    const { currentChannelId, messages } = useChatStore();
+    
+    // 使用专门的hooks
+    const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
+    const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
+    const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
 
     return (
         <ChatLayout

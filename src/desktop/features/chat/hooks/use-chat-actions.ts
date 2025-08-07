@@ -1,19 +1,12 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
-import { useChatStore } from "@/core/stores/chat-store";
-import { useThreadSidebar } from "./use-thread-sidebar";
 
-export const useChatPage = () => {
-    const { currentChannelId, messages } = useChatStore();
-    const containerRef = useRef<HTMLDivElement>(null);
+export const useChatActions = (containerRef: React.RefObject<HTMLDivElement | null>) => {
     const [replyToMessageId, setReplyToMessageId] = useState<string | null>(null);
-
-    // Thread sidebar logic
-    const threadSidebar = useThreadSidebar();
 
     const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll(containerRef, {
         threshold: 30,
-        deps: [currentChannelId, messages.length]
+        deps: [] // 依赖项由外部传入
     });
 
     const handleSend = () => {
@@ -33,22 +26,11 @@ export const useChatPage = () => {
     };
 
     return {
-        // State
-        currentChannelId,
-        messages,
         replyToMessageId,
         isSticky,
-        
-        // Refs
-        containerRef,
-        
-        // Handlers
         handleSend,
         handleCancelReply,
         handleScrollToBottom,
-        setReplyToMessageId,
-        
-        // Thread sidebar
-        ...threadSidebar
+        setReplyToMessageId
     };
 };
