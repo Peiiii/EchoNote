@@ -1,10 +1,14 @@
-import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
+import {
+  ActivityBarGroup,
+  useActivityBarStore,
+} from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Hash, MessageSquare, Plus } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
+import { Navigate } from "react-router-dom";
 
 export const chatExtension = defineExtension({
   manifest: {
@@ -21,8 +25,8 @@ export const chatExtension = defineExtension({
       Disposable.from(
         useIconStore.getState().addIcons({
           "message-square": MessageSquare,
-          "hash": Hash,
-          "plus": Plus,
+          hash: Hash,
+          plus: Plus,
         })
       )
     );
@@ -52,6 +56,13 @@ export const chatExtension = defineExtension({
             element: <ChatPage />,
             order: 1,
           },
+          // default route to chat
+          {
+            id: "chat-default",
+            path: "*",
+            element: <Navigate to="/chat" />,
+            order: 9999,
+          },
         ])
       )
     );
@@ -68,4 +79,4 @@ export const chatExtension = defineExtension({
       )
     );
   },
-}); 
+});

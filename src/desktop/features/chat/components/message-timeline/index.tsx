@@ -21,8 +21,11 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
         <div className="w-full bg-white dark:bg-slate-950">
             <div className="w-full">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => {
-                    // Filter only user messages for display
-                    const userMessages = dayMessages.filter(msg => msg.sender === "user");
+                    // Filter only user messages for display (excluding thread messages)
+                    const userMessages = dayMessages.filter(msg => 
+                        msg.sender === "user" && 
+                        !msg.parentId // 确保只显示主消息，不显示thread消息
+                    );
                     
                     return (
                         <div key={date} className="w-full">

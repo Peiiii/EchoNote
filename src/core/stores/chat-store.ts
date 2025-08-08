@@ -191,5 +191,8 @@ export const useCurrentChannel = () => {
 
 export const useCurrentChannelMessages = () => {
     const { messages, currentChannelId } = useChatStore();
-    return messages.filter((message) => message.channelId === currentChannelId);
+    return messages.filter((message) => 
+        message.channelId === currentChannelId && 
+        !message.parentId // 排除thread消息
+    );
 }; 
