@@ -10,6 +10,8 @@ import { useActivityBarStore } from '@/core/stores/activity-bar.store';
 import { useIconStore } from '@/core/stores/icon.store';
 import { useRouteTreeStore } from '@/core/stores/route-tree.store';
 import { useState, useEffect } from 'react';
+import { AiQuickTest } from '@/desktop/features/demo/components/ai-quick-test';
+import { AiObjectDemo } from '@/desktop/features/demo/components/ai-object-demo';
 
 export function DemoPage() {
   const [counter, setCounter] = useState(0);
@@ -172,6 +174,16 @@ export function DemoPage() {
                           <span className="text-sm text-slate-600 dark:text-slate-400">{progress}%</span>
                         </div>
                         <Progress value={progress} className="h-2" />
+                      </div>
+
+                      {/* AI Quick Test */}
+                      <div>
+                        <AiQuickTest />
+                      </div>
+
+                      {/* AI Object Demo */}
+                      <div>
+                        <AiObjectDemo />
                       </div>
                     </CardContent>
                   </Card>

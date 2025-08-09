@@ -11,6 +11,7 @@
     "deploy": "pnpm build && ossutil cp -r -u dist oss://memol -c ./.ossutilconfig2.local"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.7",
     "@cardos/extension": "0.2.0-beta.3",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -22,16 +23,19 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tailwindcss/vite": "^4.1.11",
+    "ai": "^5.0.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "composite-kit": "^0.6.3",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.536.0",
+    "openai": "^5.12.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
+    "zod": "^4.0.16",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
