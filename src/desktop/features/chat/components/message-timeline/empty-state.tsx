@@ -18,7 +18,7 @@ export const EmptyState = () => {
                 Start Your Thought Journey
             </h3>
             <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed mb-6">
-                Capture your ideas, insights, and reflections. Every thought matters in your creative journey.
+                Capture your ideas, sparks, and reflections. Every thought matters in your creative journey.
             </p>
             
             {/* Interactive elements */}
@@ -39,7 +39,7 @@ export const EmptyState = () => {
                 </span>
                 <span className="flex items-center gap-1">
                     <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
-                    <span>AI-Powered Insights</span>
+                    <span>AI-Powered Sparks</span>
                 </span>
             </div>
         </div>

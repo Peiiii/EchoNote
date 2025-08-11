@@ -5,8 +5,8 @@ import { Button } from '@/common/components/ui/button'
 import { generateText } from '@/common/services/ai/generate-text'
 
 export function AiQuickTest() {
-  const [prompt, setPrompt] = useState('用 3 点总结 EchoNote 当前架构。')
-  const [system, setSystem] = useState<string | undefined>('你是资深前端/全栈工程师，回答要精炼。')
+  const [prompt, setPrompt] = useState('Summarize EchoNote current architecture in 3 points.')
+  const [system, setSystem] = useState<string | undefined>('You are a senior frontend/fullstack engineer, keep answers concise.')
   const [answer, setAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -28,26 +28,26 @@ export function AiQuickTest() {
   return (
     <Card className="border border-slate-200 dark:border-slate-700">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">AI 快速测试</CardTitle>
+        <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">AI Quick Test</CardTitle>
         <CardDescription className="text-slate-600 dark:text-slate-400">
-          直接在前端调用 DashScope（OpenAI 兼容端点）进行快速验证
+          Directly call DashScope (OpenAI compatible endpoint) from frontend for quick validation
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm text-slate-600 dark:text-slate-300">System 指令（可选）</label>
-          <Textarea value={system ?? ''} onChange={e => setSystem(e.target.value || undefined)} placeholder="系统指令，可留空" />
+          <label className="text-sm text-slate-600 dark:text-slate-300">System Instruction (Optional)</label>
+          <Textarea value={system ?? ''} onChange={e => setSystem(e.target.value || undefined)} placeholder="System instruction (optional)" />
         </div>
         <div className="space-y-2">
           <label className="text-sm text-slate-600 dark:text-slate-300">Prompt</label>
-          <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="请输入问题..." />
+          <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Enter your question..." />
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={handleRun} disabled={isLoading}>
-            {isLoading ? '生成中…' : '生成'}
+            {isLoading ? 'Generating...' : 'Generate'}
           </Button>
           {!import.meta.env.VITE_DASHSCOPE_API_KEY && (
-            <span className="text-xs text-amber-600">未检测到 VITE_DASHSCOPE_API_KEY，请在本地 .env 配置</span>
+            <span className="text-xs text-amber-600">VITE_DASHSCOPE_API_KEY not detected, please configure in local .env file</span>
           )}
         </div>
         {error && (

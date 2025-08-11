@@ -1,50 +1,57 @@
 import { generateObject } from '@/common/services/ai/generate-object'
 
-// Define the JSON Schema directly
-const InsightsSchema = {
+// Define the JSON Schema for creative sparks
+const SparksSchema = {
   type: 'object',
   properties: {
-    insights: {
+    sparks: {
       type: 'array',
       items: { type: 'string' },
       minItems: 3,
       maxItems: 3
     }
   },
-  required: ['insights']
+  required: ['sparks']
 }
 
 // Define the expected return type
-interface InsightsResult {
-  insights: string[]
+interface SparksResult {
+  sparks: string[]
 }
 
-export async function generateInsightsForText(content: string): Promise<string[]> {
+export async function generateSparksForText(content: string): Promise<string[]> {
   const prompt = [
-    'Given the text below, generate exactly 3 insightful paragraphs that help with thinking and learning:',
+    'Based on the text below, generate exactly 3 creative sparks - let your imagination run wild!',
     '',
-    '1. **Perspective Shift**: Offer a different angle or viewpoint to reconsider this content',
-    '2. **Knowledge Connections**: Identify connections to existing knowledge or concepts',
-    '3. **Question Generation**: Pose thought-provoking questions that deepen understanding',
+    'These sparks can be anything that comes to mind:',
+    '- A story or narrative that this content inspires',
+    '- A piece of knowledge or historical connection',
+    '- A philosophical reflection or existential thought',
+    '- A creative piece like a poem, metaphor, or analogy',
+    '- A random but somehow connected idea',
+    '- Something abstract, surreal, or seemingly unrelated',
     '',
-    // 'Each paragraph should be 50-100 words, focused on promoting deeper thinking rather than just summarizing.',
+    'Be creative, unexpected, and don\'t worry about being "correct" or "useful".',
+    'The goal is to spark new thoughts, not to provide conventional insights.',
+    'Feel free to be whimsical, profound, or even a bit nonsensical!',
+    '',
     content,
   ].join('\n')
 
-  console.log('Generating insights with schema:', InsightsSchema)
+  console.log('Generating creative sparks with schema:', SparksSchema)
   
   try {
-    const result = await generateObject<InsightsResult>({
-      schema: InsightsSchema,
+    const result = await generateObject<SparksResult>({
+      schema: SparksSchema,
       prompt,
-      temperature: 0.7,
+      temperature: 0.9, // Higher temperature for more creativity
       jsonOnly: true,
     })
     
-    console.log('Successfully generated insights:', result.insights)
-    return result.insights
+    console.log('Successfully generated creative sparks:', result.sparks)
+    return result.sparks
   } catch (error) {
-    console.error('Failed to generate insights:', error)
+    console.error('Failed to generate creative sparks:', error)
     throw error
   }
 }

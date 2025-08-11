@@ -3,7 +3,7 @@ import { MoreHorizontal, Clock, Eye, Bookmark, MessageCircle, Lightbulb } from "
 import { Message, useChatStore } from "@/core/stores/chat-store";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
-import { generateInsightsForText } from "@/desktop/features/chat/services/insights.service";
+import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -19,16 +19,16 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
     const updateMessage = useChatStore(state => state.updateMessage);
 
     const aiAnalysis = message.aiAnalysis;
-    const hasInsights = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
+    const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
 
-    async function handleGenerateInsights() {
+    async function handleGenerateSparks() {
         try {
             setIsGenerating(true);
-            const insights = await generateInsightsForText(message.content);
+            const sparks = await generateSparksForText(message.content);
             updateMessage(message.id, {
                 aiAnalysis: {
                     ...aiAnalysis,
-                    insights,
+                    insights: sparks,
                     // keep optional fields if existed
                     keywords: aiAnalysis?.keywords ?? [],
                     topics: aiAnalysis?.topics ?? [],
@@ -63,7 +63,7 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
                         <button
                             onClick={() => setShowAnalysis(!showAnalysis)}
                             className="p-2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 hover:scale-105"
-                            title="Toggle insights"
+                            title="Toggle sparks"
                         >
                             <Lightbulb className="w-4 h-4" />
                         </button>
@@ -98,34 +98,38 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
                     </div>
                 </div>
 
-                {/* Insights Section */}
+                {/* Sparks Section */}
                 {showAnalysis && (
                     <div className="mb-4 p-4 bg-slate-50/60 dark:bg-slate-800/30 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
                         <div className="space-y-4">
                             {/* Conditional: empty vs populated */}
-                            {!hasInsights ? (
+                            {!hasSparks ? (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">暂无洞察</span>
-                                    <Button onClick={handleGenerateInsights} disabled={isGenerating}>
-                                        {isGenerating ? '生成中…' : '一键生成洞察'}
+                                    <span className="text-sm text-slate-500 dark:text-slate-400">No sparks yet</span>
+                                    <Button onClick={handleGenerateSparks} disabled={isGenerating}>
+                                        {isGenerating ? 'Generating...' : 'Generate Sparks'}
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">AI Insights</span>
-                                        <Button onClick={handleGenerateInsights} variant="outline" disabled={isGenerating}>
-                                            {isGenerating ? '生成中…' : '重新生成'}
+                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                                        <Button onClick={handleGenerateSparks} variant="outline" disabled={isGenerating}>
+                                            {isGenerating ? 'Generating...' : 'Regenerate'}
                                         </Button>
                                     </div>
-                                    <ul className="space-y-2">
-                                        {aiAnalysis!.insights.slice(0,3).map((insight, idx) => (
-                                            <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-2 flex-shrink-0"></span>
-                                                <span>{insight}</span>
-                                            </li>
+                                    <div className="space-y-3">
+                                        {aiAnalysis?.insights?.map((spark, index) => (
+                                            <div key={index} className="p-3 bg-white/60 dark:bg-slate-700/40 rounded-lg border border-slate-200/40 dark:border-slate-600/40">
+                                                <div className="flex items-start gap-2">
+                                                    <div className="w-2 h-2 rounded-full bg-yellow-500/80 mt-2 flex-shrink-0"></div>
+                                                    <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                                                        {spark}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -138,11 +142,11 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
                         <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
                             {message.content.length} characters
                         </span>
-                        {hasInsights && (
+                        {hasSparks && (
                             <>
                                 <span className="text-slate-300 dark:text-slate-600">•</span>
                                 <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
-                                    {aiAnalysis!.insights.length} insights
+                                    {aiAnalysis!.insights.length} sparks
                                 </span>
                             </>
                         )}

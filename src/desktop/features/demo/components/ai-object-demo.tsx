@@ -12,7 +12,7 @@ interface TodoItem {
 }
 
 export function AiObjectDemo() {
-  const [prompt, setPrompt] = useState('生成一个简短的待办事项，包含标题、是否完成、标签数组（2-3个）。')
+  const [prompt, setPrompt] = useState('Generate a short todo item with title, completion status, and tags array (2-3 items).')
   const [result, setResult] = useState<TodoItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -60,22 +60,22 @@ export function AiObjectDemo() {
   return (
     <Card className="border border-slate-200 dark:border-slate-700">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">对象生成 Demo</CardTitle>
+        <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">Object Generation Demo</CardTitle>
         <CardDescription className="text-slate-600 dark:text-slate-400">
-          基于 JSON Schema 约束，前端直连生成并校验结构化对象
+          Generate and validate structured objects using JSON Schema constraints
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm text-slate-600 dark:text-slate-300">Prompt</label>
-          <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="请输入对象生成指令..." />
+          <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Enter object generation instructions..." />
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={handleRun} disabled={isLoading}>
-            {isLoading ? '生成中…' : '生成对象'}
+            {isLoading ? 'Generating...' : 'Generate Object'}
           </Button>
           {!import.meta.env.VITE_DASHSCOPE_API_KEY && (
-            <span className="text-xs text-amber-600">未检测到 VITE_DASHSCOPE_API_KEY，请在本地 .env 配置</span>
+            <span className="text-xs text-amber-600">VITE_DASHSCOPE_API_KEY not detected, please configure in local .env file</span>
           )}
         </div>
         {error && (
