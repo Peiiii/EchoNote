@@ -1,20 +1,41 @@
 import { useMemo, useState } from 'react'
-import { z } from 'zod'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/common/components/ui/card'
 import { Textarea } from '@/common/components/ui/textarea'
 import { Button } from '@/common/components/ui/button'
 import { generateObject } from '@/common/services/ai/generate-object'
 
+// Define the expected return type
+interface TodoItem {
+  title: string
+  done: boolean
+  tags: string[]
+}
+
 export function AiObjectDemo() {
   const [prompt, setPrompt] = useState('生成一个简短的待办事项，包含标题、是否完成、标签数组（2-3个）。')
-  const [result, setResult] = useState<unknown>(null)
+  const [result, setResult] = useState<TodoItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const schema = useMemo(() => z.object({
-    title: z.string().max(30),
-    done: z.boolean().default(false),
-    tags: z.array(z.string()).min(1).max(5),
+  const schema = useMemo(() => ({
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        maxLength: 30
+      },
+      done: {
+        type: 'boolean',
+        default: false
+      },
+      tags: {
+        type: 'array',
+        items: { type: 'string' },
+        minItems: 1,
+        maxItems: 5
+      }
+    },
+    required: ['title', 'done', 'tags']
   }), [])
 
   const handleRun = async () => {
@@ -22,7 +43,12 @@ export function AiObjectDemo() {
     setError(null)
     setResult(null)
     try {
-      const obj = await generateObject({ schema, prompt, temperature: 0.3 })
+      const obj = await generateObject<TodoItem>({ 
+        schema, 
+        prompt, 
+        temperature: 0.3,
+        jsonOnly: true
+      })
       setResult(obj)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -36,7 +62,7 @@ export function AiObjectDemo() {
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">对象生成 Demo</CardTitle>
         <CardDescription className="text-slate-600 dark:text-slate-400">
-          基于 zod 约束，前端直连生成并校验结构化对象
+          基于 JSON Schema 约束，前端直连生成并校验结构化对象
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

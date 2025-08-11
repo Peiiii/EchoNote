@@ -24,7 +24,7 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
     async function handleGenerateInsights() {
         try {
             setIsGenerating(true);
-            const insights = await generateInsightsForText(message.content, 'zh');
+            const insights = await generateInsightsForText(message.content);
             updateMessage(message.id, {
                 aiAnalysis: {
                     ...aiAnalysis,
