@@ -6,7 +6,7 @@ import { generateText } from '@/common/services/ai/generate-text'
 
 export function AiQuickTest() {
   const [prompt, setPrompt] = useState('Summarize EchoNote current architecture in 3 points.')
-  const [system, setSystem] = useState<string | undefined>('You are a senior frontend/fullstack engineer, keep answers concise.')
+  const [system, setSystem] = useState<string | undefined>('You are a creative AI companion in EchoNote, a personal thought recording and reflection application. You help users explore ideas, solve problems, and think creatively. Keep answers concise but insightful.')
   const [answer, setAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

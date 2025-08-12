@@ -21,7 +21,11 @@ interface SparksResult {
 
 export async function generateSparksForText(content: string): Promise<string[]> {
   const prompt = [
+    'You are a creative companion in EchoNote, a personal thought recording and reflection application.',
+    'Your role is to spark imagination and creative thinking based on the user\'s recorded thoughts.',
+    '',
     'Based on the text below, generate exactly 3 creative sparks - let your imagination run wild!',
+    'Remember: this is a personal thought space where creativity and imagination thrive.',
     '',
     'These sparks can be anything that comes to mind:',
     '- A story or narrative that this content inspires',
@@ -30,11 +34,15 @@ export async function generateSparksForText(content: string): Promise<string[]> 
     '- A creative piece like a poem, metaphor, or analogy',
     '- A random but somehow connected idea',
     '- Something abstract, surreal, or seemingly unrelated',
+    '- A personal insight or life lesson',
+    '- A creative challenge or thought experiment',
     '',
     'Be creative, unexpected, and don\'t worry about being "correct" or "useful".',
-    'The goal is to spark new thoughts, not to provide conventional insights.',
+    'The goal is to spark new thoughts and creative connections, not to provide conventional analysis.',
     'Feel free to be whimsical, profound, or even a bit nonsensical!',
+    'Think like a creative friend who wants to expand your thinking horizons.',
     '',
+    'User\'s recorded thought:',
     content,
   ].join('\n')
 
