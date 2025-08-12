@@ -1,9 +1,9 @@
-import { format } from "date-fns";
 import { MoreHorizontal, Clock, Eye, Bookmark, MessageCircle, Lightbulb } from "lucide-react";
 import { Message, useChatStore } from "@/core/stores/chat-store";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
+import { formatTimeForSocial } from "@/common/lib/time-utils";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -17,6 +17,8 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const updateMessage = useChatStore(state => state.updateMessage);
+
+
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
@@ -54,7 +56,7 @@ export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 shadow-sm"></div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
                             <Clock className="w-3 h-3" />
-                            <span>{format(message.timestamp, 'HH:mm')}</span>
+                            <span>{formatTimeForSocial(message.timestamp)}</span>
                         </div>
                     </div>
 

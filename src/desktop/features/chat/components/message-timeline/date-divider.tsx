@@ -5,7 +5,7 @@ interface DateDividerProps {
 }
 
 export const DateDivider = ({ date }: DateDividerProps) => {
-    const formattedDate = format(new Date(date), 'MMMM dd, yyyy');
+    const formattedDate = format(new Date(date), 'MMM dd, yyyy');
     
     return (
         <div className="flex items-center justify-center py-6">

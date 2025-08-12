@@ -1,4 +1,5 @@
 import { PageContainer } from "@/common/components/page-container";
+import { TimeFormatDemo } from "../components/time-format-demo";
 
 export function DemoChatPage() {
   return (
@@ -13,6 +14,9 @@ export function DemoChatPage() {
         <div className="p-4 border rounded">
           <p>Here you can see the chat functionality of the Demo extension</p>
         </div>
+        
+        {/* Time Formatting Demo */}
+        <TimeFormatDemo />
       </div>
     </PageContainer>
   );

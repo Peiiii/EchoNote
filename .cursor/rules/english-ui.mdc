@@ -3,4 +3,4 @@ alwaysApply: true
 description: "English UI Language Rule - Ensures all user interface text is in English"
 ---
 
-Always Use English in UI 
+Always Use English in UI ， Always use English in Coding. The UI should not display Any Chinese by default.
