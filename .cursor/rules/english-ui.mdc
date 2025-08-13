@@ -4,3 +4,5 @@ description: "English UI Language Rule - Ensures all user interface text is in E
 ---
 
 Always Use English in UI ， Always use English in Coding. The UI should not display Any Chinese by default.
+
+这个项目必须用英文开发！！！不能出现中文！！！
