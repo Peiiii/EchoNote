@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true" role="img">
+  <defs>
+    <!-- 主色调渐变 -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    
+    <!-- 辅助色调 -->
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#primaryGradient)"/>
+  
+  <!-- 音符图标 -->
+  <g transform="translate(44, 44)">
+    <!-- 音符头部 -->
+    <rect x="20" y="18" width="16" height="12" rx="6" fill="white"/>
+    
+    <!-- 音符杆 -->
+    <rect x="34" y="18" width="4" height="28" fill="white"/>
+    
+    <!-- 音符尾部 -->
+    <rect x="34" y="46" width="12" height="4" rx="2" fill="white"/>
+  </g>
+  
+  <!-- 回声波纹 -->
+  <g opacity="0.8">
+    <rect x="16" y="16" width="96" height="96" rx="28" fill="none" stroke="url(#secondaryGradient)" stroke-width="3" opacity="0.4"/>
+    <rect x="24" y="24" width="80" height="80" rx="20" fill="none" stroke="url(#secondaryGradient)" stroke-width="2" opacity="0.3"/>
+  </g>
+  
+  <!-- 装饰性元素 -->
+  <g opacity="0.6">
+    <circle cx="32" cy="32" r="3" fill="white"/>
+    <circle cx="96" cy="48" r="2" fill="white"/>
+    <circle cx="80" cy="88" r="2" fill="white"/>
+    <circle cx="48" cy="96" r="3" fill="white"/>
+  </g>
+  
+  <!-- 中心高光 -->
+  <circle cx="64" cy="64" r="20" fill="none" stroke="white" stroke-width="1" opacity="0.3"/>
+</svg>
