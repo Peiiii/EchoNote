@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimeFormatDemo } from '../components/time-format-demo';
+import { TimeFormatDemo } from '@/desktop/features/demo/components/time-format-demo';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Clock } from 'lucide-react';
 

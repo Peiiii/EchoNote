@@ -1,5 +1,5 @@
 import React from 'react';
-import { AiObjectDemo } from '../components/ai-object-demo';
+import { AiObjectDemo } from '@/desktop/features/demo/components/ai-object-demo';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Bot } from 'lucide-react';
 

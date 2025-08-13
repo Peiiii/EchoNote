@@ -1,5 +1,5 @@
 import React from 'react';
-import { AiQuickTest } from '../components/ai-quick-test';
+import { AiQuickTest } from '@/desktop/features/demo/components/ai-quick-test';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Sparkles } from 'lucide-react';
 

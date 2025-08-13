@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SpaceRecord } from '../types';
+import { SpaceRecord } from '@/common/features/space-aware-chat/types';
 
 // 模拟数据 - 实际项目中应该从store获取
 const mockSpaceRecords: Record<string, SpaceRecord[]> = {

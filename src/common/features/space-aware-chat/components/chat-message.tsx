@@ -1,5 +1,5 @@
 import React from 'react';
-import { AIChatMessage } from '../types';
+import { AIChatMessage } from '@/common/features/space-aware-chat/types';
 import { Avatar, AvatarFallback } from '@/common/components/ui/avatar';
 import { Card, CardContent } from '@/common/components/ui/card';
 
