@@ -24,7 +24,7 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
                     // Filter only user messages for display (excluding thread messages)
                     const userMessages = dayMessages.filter(msg => 
                         msg.sender === "user" && 
-                        !msg.parentId // 确保只显示主消息，不显示thread消息
+                        !msg.parentId // Ensure only main messages are shown, not thread messages
                     );
                     
                     return (

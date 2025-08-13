@@ -18,13 +18,13 @@ export const AIAssistantSidebar = ({
     const { channels } = useChatStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
     
-    // 创建HttpAgent实例
+    // Create HttpAgent instance
     const agent = useMemo(() => aiAgentFactory.createAgent(), []);
     
-    // 获取频道相关工具
+    // Get channel-related tools
     const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
     
-    // 获取频道上下文
+    // Get channel context
     const contexts = useMemo(() => [aiAgentFactory.getChannelContext(channelId)], [channelId]);
     if (!isOpen) return null;
 

@@ -16,7 +16,7 @@ import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sideb
 export const ChatPage = () => {
     const { currentChannelId, messages } = useChatStore();
 
-    // 使用专门的hooks
+    // Use specialized hooks
     const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
     const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();

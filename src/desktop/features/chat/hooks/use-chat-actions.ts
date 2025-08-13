@@ -6,7 +6,7 @@ export const useChatActions = (containerRef: React.RefObject<HTMLDivElement | nu
 
     const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll(containerRef, {
         threshold: 30,
-        deps: [] // 依赖项由外部传入
+        deps: [] // Dependencies passed from outside
     });
 
     const handleSend = () => {

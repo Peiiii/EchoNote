@@ -59,7 +59,7 @@ export class AIAgentFactory {
    */
   getChannelContext(channelId: string) {
     
-    // 获取频道和消息数据
+    // Get channel and message data
     const state = useChatStore.getState();
     const channel = state.channels.find(ch => ch.id === channelId);
     const messages = state.messages.filter(msg => msg.channelId === channelId);
@@ -75,7 +75,7 @@ export class AIAgentFactory {
       };
     }
 
-    // 构建完整的频道上下文
+    // Build comprehensive channel context
     const channelContext = {
       channel: {
         id: channel.id,

@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface ChatLayoutProps {
     sidebar: ReactNode;
     content: ReactNode;
-    rightSidebar?: ReactNode; // 新增右侧sidebar
+    rightSidebar?: ReactNode; // Right sidebar
     className?: string;
 }
 

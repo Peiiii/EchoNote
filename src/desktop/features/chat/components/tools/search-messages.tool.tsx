@@ -4,7 +4,7 @@ import { Tool, ToolResult } from "@agent-labs/agent-chat";
 import { ToolInvocation } from "@ai-sdk/ui-utils";
 import { useState } from "react";
 
-// 独立的搜索表单组件
+// Independent search form component
 const SearchForm = ({ 
   toolInvocation, 
   onResult,

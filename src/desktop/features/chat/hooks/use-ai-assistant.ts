@@ -4,11 +4,11 @@ import { useChatStore } from "@/core/stores/chat-store";
 export const useAIAssistant = () => {
     const { currentChannelId } = useChatStore();
     
-    // AI助手侧边栏状态
+    // AI Assistant sidebar state
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
     const [aiAssistantChannelId, setAIAssistantChannelId] = useState<string | null>(null);
 
-    // AI助手处理函数
+    // AI Assistant handler functions
     const handleOpenAIAssistant = (channelId?: string) => {
         const targetChannelId = channelId || currentChannelId;
         if (targetChannelId) {
@@ -22,16 +22,16 @@ export const useAIAssistant = () => {
         setAIAssistantChannelId(null);
     };
 
-    // 当前AI助手频道
+    // Current AI Assistant channel
     const currentAIAssistantChannel = aiAssistantChannelId || currentChannelId;
 
     return {
-        // 状态
+        // State
         isAIAssistantOpen,
         aiAssistantChannelId,
         currentAIAssistantChannel,
         
-        // 处理函数
+        // Handler functions
         handleOpenAIAssistant,
         handleCloseAIAssistant
     };

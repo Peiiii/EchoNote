@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { ToolInvocation } from "@ai-sdk/ui-utils";
 
-// 独立的标签创建组件
+// Independent tag creation component
 const TagCreationForm = ({ 
   toolInvocation, 
   onResult 

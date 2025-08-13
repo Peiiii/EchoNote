@@ -2,7 +2,7 @@ import { useCurrentChannelMessages } from "@/core/stores/chat-store";
 import { format } from "date-fns";
 import { useMemo } from "react";
 
-// 消息分组逻辑hook
+// Message grouping logic hook
 export const useGroupedMessages = () => {
     const messages = useCurrentChannelMessages();
     
