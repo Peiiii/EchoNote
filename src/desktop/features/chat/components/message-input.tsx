@@ -1,14 +1,15 @@
 import { useChatStore } from "@/core/stores/chat-store";
-import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText, Reply } from "lucide-react";
+import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText, Reply, Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface MessageInputProps {
     onSend: () => void;
     replyToMessageId?: string; // ID of the message being replied to
     onCancelReply?: () => void; // Cancel reply
+    onOpenAIAssistant?: () => void; // Open AI Assistant
 }
 
-export const MessageInput = ({ onSend, replyToMessageId, onCancelReply }: MessageInputProps) => {
+export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) => {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -119,6 +120,13 @@ export const MessageInput = ({ onSend, replyToMessageId, onCancelReply }: Messag
                     </button>
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <Mic className="w-4 h-4" />
+                    </button>
+                    <button 
+                        onClick={onOpenAIAssistant}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200"
+                        title="Open AI Assistant"
+                    >
+                        <Bot className="w-4 h-4" />
                     </button>
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <MoreHorizontal className="w-4 h-4" />
