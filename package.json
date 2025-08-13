@@ -11,6 +11,7 @@
     "deploy": "pnpm build && ossutil cp -r -u dist oss://memol -c ./.ossutilconfig2.local"
   },
   "dependencies": {
+    "@agent-labs/agent-chat": "^1.11.0",
     "@ai-sdk/openai": "^2.0.7",
     "@cardos/extension": "0.2.0-beta.3",
     "@radix-ui/react-avatar": "^1.1.10",

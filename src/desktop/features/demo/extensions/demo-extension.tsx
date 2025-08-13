@@ -17,6 +17,10 @@ import { DemoChatPage } from "../pages/demo-chat-page";
 import { DemoDocsPage } from "../pages/demo-docs-page";
 import { DemoPage } from "../pages/demo-page";
 import { DemoSettingsPage } from "../pages/demo-settings-page";
+import { SpaceChatDemoPage } from "../pages/space-chat-demo-page";
+import { AiObjectDemoPage } from "../pages/ai-object-demo-page";
+import { AiQuickTestDemoPage } from "../pages/ai-quick-test-demo-page";
+import { TimeFormatDemoPage } from "../pages/time-format-demo-page";
 
 export const demoExtension = defineExtension({
   manifest: {
@@ -101,6 +105,30 @@ export const demoExtension = defineExtension({
             path: "/demo/chat",
             element: <DemoChatPage />,
             order: 103,
+          },
+          {
+            id: "demo-space-chat-page",
+            path: "/demo/space-chat",
+            element: <SpaceChatDemoPage />,
+            order: 104,
+          },
+          {
+            id: "demo-ai-object-page",
+            path: "/demo/ai-object",
+            element: <AiObjectDemoPage />,
+            order: 105,
+          },
+          {
+            id: "demo-ai-quick-test-page",
+            path: "/demo/ai-quick-test",
+            element: <AiQuickTestDemoPage />,
+            order: 106,
+          },
+          {
+            id: "demo-time-format-page",
+            path: "/demo/time-format",
+            element: <TimeFormatDemoPage />,
+            order: 107,
           },
         ])
       )
