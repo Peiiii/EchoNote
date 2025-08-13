@@ -1,8 +1,8 @@
+import { X, Bot } from "lucide-react";
+import { useMemo } from "react";
 import { useChatStore } from "@/core/stores/chat-store";
-import { AIChatInterface } from "@/desktop/features/chat/components/features/ai-chat-interface";
-import { AIQuickTools } from "@/desktop/features/chat/components/features/ai-quick-tools";
-import { useAIChat } from "@/desktop/features/chat/hooks/use-ai-chat";
-import { Bot, X } from "lucide-react";
+import { AgentChatCore } from "@agent-labs/agent-chat";
+import { aiAgentFactory } from "../services/ai-agent-factory";
 
 interface AIAssistantSidebarProps {
     isOpen: boolean;
@@ -18,7 +18,14 @@ export const AIAssistantSidebar = ({
     const { channels } = useChatStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
     
-    const { messages, isLoading, sendMessage, clearMessages, analyzeChannel } = useAIChat(channelId);
+    // 创建HttpAgent实例
+    const agent = useMemo(() => aiAgentFactory.createAgent(), []);
+    
+    // 获取频道相关工具
+    const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
+    
+    // 获取频道上下文
+    const contexts = useMemo(() => [aiAgentFactory.getChannelContext(channelId)], [channelId]);
 
     if (!isOpen) return null;
 
@@ -43,21 +50,13 @@ export const AIAssistantSidebar = ({
                 </button>
             </div>
 
-            {/* Quick Tools */}
-            <AIQuickTools
-                onAnalyze={analyzeChannel}
-                onClear={clearMessages}
-                isLoading={isLoading}
-            />
-
             {/* AI Chat Interface */}
             <div className="flex-1 overflow-hidden">
-                <AIChatInterface
-                    channelId={channelId}
-                    channelName={currentChannel?.name || 'Unknown'}
-                    onSendMessage={sendMessage}
-                    messages={messages}
-                    isLoading={isLoading}
+                <AgentChatCore
+                    agent={agent}
+                    tools={tools}
+                    contexts={contexts}
+                    className="h-full"
                 />
             </div>
 
@@ -65,7 +64,7 @@ export const AIAssistantSidebar = ({
             <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                 <div className="text-xs text-slate-500 dark:text-slate-400 text-center">
                     <p>AI Assistant understands channel "{currentChannel?.name}"</p>
-                    <p>Ask questions or use quick analysis tools</p>
+                    <p>Ask questions or use available tools</p>
                 </div>
             </div>
         </div>

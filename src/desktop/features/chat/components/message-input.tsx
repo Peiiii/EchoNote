@@ -1,12 +1,12 @@
 import { useChatStore } from "@/core/stores/chat-store";
-import { MoreHorizontal, Phone, Send, Smile, Video, Mic, Image, FileText, Reply, Bot } from "lucide-react";
+import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface MessageInputProps {
     onSend: () => void;
     replyToMessageId?: string; // ID of the message being replied to
     onCancelReply?: () => void; // Cancel reply
-    onOpenAIAssistant?: () => void; // Open AI Assistant
+    onOpenAIAssistant?: (channelId?: string) => void; // Open AI Assistant
 }
 
 export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) => {
@@ -43,7 +43,7 @@ export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAI
 
         setMessage("");
         setIsLoading(true);
-        
+
         // Simulate AI response
         setTimeout(() => {
             if (replyToMessageId) {
@@ -121,8 +121,8 @@ export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAI
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
                         <Mic className="w-4 h-4" />
                     </button>
-                    <button 
-                        onClick={onOpenAIAssistant}
+                    <button
+                        onClick={() => onOpenAIAssistant?.(currentChannelId || undefined)}
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200"
                         title="Open AI Assistant"
                     >
@@ -132,7 +132,7 @@ export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAI
                         <MoreHorizontal className="w-4 h-4" />
                     </button>
                 </div>
-                
+
                 {/* Right call icons - unified style */}
                 <div className="flex items-center gap-1">
                     <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200">
@@ -161,17 +161,16 @@ export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAI
                                 caretColor: '#3b82f6', // Blue cursor
                             }}
                         />
-                        
+
                         {/* Send button - floating on writing area */}
                         <div className="absolute bottom-2 right-2">
                             <button
                                 onClick={handleSend}
                                 disabled={!message.trim() || isLoading}
-                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                                    message.trim() && !isLoading
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${message.trim() && !isLoading
                                         ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
                                         : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
-                                }`}
+                                    }`}
                             >
                                 <Send className="w-4 h-4" />
                             </button>

@@ -3,7 +3,7 @@ import { useChatStore } from "@/core/stores/chat-store";
 import { ChannelList } from "@/desktop/features/chat/components/channel-list";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
-import { AIAssistantSidebar } from "@/desktop/features/chat/components/features/ai-assistant-sidebar";
+import { AIAssistantSidebar } from "@/desktop/features/chat/components/ai-assistant-sidebar";
 import { ThreadSidebar } from "@/desktop/features/chat/components/features/thread-sidebar";
 import { MessageInput } from "@/desktop/features/chat/components/message-input";
 import { MessageTimelineContainer } from "@/desktop/features/chat/components/ui/message-timeline-container";
@@ -21,6 +21,9 @@ export const ChatPage = () => {
     const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
+    console.log("[ChatPage] ", {
+        currentAIAssistantChannel
+    });
 
     return (
         <ChatLayout
