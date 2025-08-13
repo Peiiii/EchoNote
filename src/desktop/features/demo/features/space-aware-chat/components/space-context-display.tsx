@@ -1,7 +1,7 @@
-import React from 'react';
-import { SpaceContext } from '@/common/features/space-aware-chat/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Badge } from '@/common/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { SpaceContext } from '@/desktop/features/demo/features/space-aware-chat/types';
+import React from 'react';
 
 interface SpaceContextDisplayProps {
   spaceContext: SpaceContext;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SpaceAwareChat } from '@/common/features/space-aware-chat';
+import { SpaceAwareChat } from '@/desktop/features/demo/features/space-aware-chat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Button } from '@/common/components/ui/button';
 import { Badge } from '@/common/components/ui/badge';

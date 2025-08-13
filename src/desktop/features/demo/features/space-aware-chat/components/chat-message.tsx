@@ -1,7 +1,7 @@
-import React from 'react';
-import { AIChatMessage } from '@/common/features/space-aware-chat/types';
 import { Avatar, AvatarFallback } from '@/common/components/ui/avatar';
 import { Card, CardContent } from '@/common/components/ui/card';
+import { AIChatMessage } from '@/desktop/features/demo/features/space-aware-chat/types';
+import React from 'react';
 
 interface ChatMessageProps {
   message: AIChatMessage;

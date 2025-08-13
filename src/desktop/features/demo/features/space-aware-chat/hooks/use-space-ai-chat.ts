@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { AIChatMessage, SpaceContext } from '@/common/features/space-aware-chat/types';
+import { AIChatMessage, SpaceContext } from '@/desktop/features/demo/features/space-aware-chat/types';
+import { useCallback, useState } from 'react';
 
 export const useSpaceAIChat = (spaceId: string, spaceContext: SpaceContext) => {
   const [messages, setMessages] = useState<AIChatMessage[]>([]);
