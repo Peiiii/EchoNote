@@ -1,5 +1,5 @@
 import { BaseEvent, EventType, RunAgentInput } from "@ag-ui/core";
-import { IAgent, IObservable } from "@agent-labs/agent-chat";
+import { IAgent } from "@agent-labs/agent-chat";
 import { Observable } from "rxjs";
 import { catchError, filter } from "rxjs/operators";
 import { AgentConfig, OpenAIAgent } from "./agent-utils/openai-agent";
@@ -32,20 +32,20 @@ export class ExperimentalInBrowserAgent implements IAgent {
     this.openaiAgent = new OpenAIAgent(this.currentConfig);
   }
 
-  run(input: RunAgentInput): IObservable<BaseEvent> {
+  run(input: RunAgentInput){
     const createChunkObservable = (generator: AsyncGenerator<string>) =>
-      new Observable<string>(subscriber => {
-        (async () => {
-          try {
-            for await (const chunk of generator) {
-              subscriber.next(chunk);
-            }
-            subscriber.complete();
-          } catch (err) {
-            subscriber.error(err);
+    new Observable<string>(subscriber => {
+      (async () => {
+        try {
+          for await (const chunk of generator) {
+            subscriber.next(chunk);
           }
-        })();
-      });
+          subscriber.complete();
+        } catch (err) {
+          subscriber.error(err);
+        }
+      })();
+    });
 
     return new Observable<BaseEvent>(observer => {
       const process = async () => {
@@ -93,25 +93,25 @@ export class ExperimentalInBrowserAgent implements IAgent {
     });
   }
 
-  // 设置API密钥
-  setApiKey(apiKey: string): void {
-    this.currentConfig.apiKey = apiKey;
-    this.openaiAgent = new OpenAIAgent(this.currentConfig);
-  }
+// 设置API密钥
+setApiKey(apiKey: string): void {
+  this.currentConfig.apiKey = apiKey;
+  this.openaiAgent = new OpenAIAgent(this.currentConfig);
+}
 
-  // 设置模型
-  setModel(model: string): void {
-    this.currentConfig.model = model;
-    this.openaiAgent = new OpenAIAgent(this.currentConfig);
-  }
+// 设置模型
+setModel(model: string): void {
+  this.currentConfig.model = model;
+  this.openaiAgent = new OpenAIAgent(this.currentConfig);
+}
 
-  // 获取当前配置
-  getConfig() {
-    return {
-      model: this.currentConfig.model,
-      hasApiKey: !!this.currentConfig.apiKey,
-      temperature: this.currentConfig.temperature,
-      maxTokens: this.currentConfig.maxTokens,
-    };
-  }
+// 获取当前配置
+getConfig() {
+  return {
+    model: this.currentConfig.model,
+    hasApiKey: !!this.currentConfig.apiKey,
+    temperature: this.currentConfig.temperature,
+    maxTokens: this.currentConfig.maxTokens,
+  };
+}
 }
