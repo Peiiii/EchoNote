@@ -26,7 +26,6 @@ export const AIAssistantSidebar = ({
     
     // 获取频道上下文
     const contexts = useMemo(() => [aiAgentFactory.getChannelContext(channelId)], [channelId]);
-
     if (!isOpen) return null;
 
     return (
