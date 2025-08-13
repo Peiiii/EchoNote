@@ -1,9 +1,9 @@
+import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { createAnalyzeChannelTool } from "@/desktop/features/chat/components/tools/analyze-channel.tool";
 import { createCreateTagTool } from "@/desktop/features/chat/components/tools/create-tag.tool";
 import { createSearchMessagesTool } from "@/desktop/features/chat/components/tools/search-messages.tool";
 import { createSummarizeContentTool } from "@/desktop/features/chat/components/tools/summarize-content.tool";
-import { HttpAgent } from "@ag-ui/client";
-import { Tool } from "@agent-labs/agent-chat";
+import { IAgent, Tool } from "@agent-labs/agent-chat";
 
 export interface AIAgentConfig {
   apiKey?: string;
@@ -27,10 +27,17 @@ export class AIAgentFactory {
   /**
    * Create HttpAgent instance
    */
-  createAgent(): HttpAgent {
-    return new HttpAgent({
-      url: "http://localhost:8000/openai-agent",
-    });
+  createAgent(): IAgent {
+    // return new HttpAgent({
+    //   url: "http://localhost:8000/openai-agent",
+    // });
+    return new ExperimentalInBrowserAgent({
+      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+      model: import.meta.env.VITE_OPENAI_MODEL,
+      temperature: 0.7,
+      maxTokens: 1000,
+      baseURL: import.meta.env.VITE_OPENAI_API_URL,
+    })
   }
 
   /**
