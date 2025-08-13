@@ -3,12 +3,15 @@ import { useChatStore } from "@/core/stores/chat-store";
 import { ChannelList } from "@/desktop/features/chat/components/channel-list";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
-import { ThreadSidebar } from "@/desktop/features/chat/components/features/thread-sidebar";
 import { AIAssistantSidebar } from "@/desktop/features/chat/components/features/ai-assistant-sidebar";
+import { ThreadSidebar } from "@/desktop/features/chat/components/features/thread-sidebar";
 import { MessageInput } from "@/desktop/features/chat/components/message-input";
 import { MessageTimelineContainer } from "@/desktop/features/chat/components/ui/message-timeline-container";
 import { ScrollToBottomButton } from "@/desktop/features/chat/components/ui/scroll-to-bottom-button";
-import { useChatActions, useChatScroll, useThreadSidebar, useAIAssistant } from "../hooks";
+import { useAIAssistant } from "@/desktop/features/chat/hooks/use-ai-assistant";
+import { useChatActions } from "@/desktop/features/chat/hooks/use-chat-actions";
+import { useChatScroll } from "@/desktop/features/chat/hooks/use-chat-scroll";
+import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
 
 export const ChatPage = () => {
     const { currentChannelId, messages } = useChatStore();
