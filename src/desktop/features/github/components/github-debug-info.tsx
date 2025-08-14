@@ -76,7 +76,7 @@ export function GitHubDebugInfo() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>🔍 GitHub Debug Information</span>

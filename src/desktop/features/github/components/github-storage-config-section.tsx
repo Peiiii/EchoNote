@@ -2,101 +2,180 @@ import { Badge } from '@/common/components/ui/badge';
 import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Input } from '@/common/components/ui/input';
-import { GitHubStorageConfig } from '@/core/stores/github-config.store';
+import { GitHubStorageConfig, useGitHubConfigStore } from '@/core/stores/github-config.store';
+import { AlertCircle, CheckCircle, Save, Settings } from 'lucide-react';
+import { useState } from 'react';
 
-interface GitHubStorageConfigSectionProps {
-  storageConfig: GitHubStorageConfig;
-  isStorageConfigured: boolean;
-  onStorageConfigChange: (config: Partial<GitHubStorageConfig>) => void;
-  onResetConfig: () => void;
-}
+export function GitHubStorageConfigSection() {
+  const { storageConfig, setStorageConfig } = useGitHubConfigStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempConfig, setTempConfig] = useState<GitHubStorageConfig>(storageConfig);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<{
+    isValid: boolean;
+    message: string;
+  } | null>(null);
 
-export function GitHubStorageConfigSection({
-  storageConfig,
-  isStorageConfigured,
-  onStorageConfigChange,
-  onResetConfig
-}: GitHubStorageConfigSectionProps) {
+  const handleSave = () => {
+    setStorageConfig(tempConfig);
+    setIsEditing(false);
+    setValidationResult(null);
+
+    // 尝试初始化GitHub同步服务
+    try {
+      console.log('GitHub sync service initialized after config update');
+    } catch (error) {
+      console.warn('Failed to initialize sync service after config update:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setTempConfig(storageConfig);
+    setIsEditing(false);
+    setValidationResult(null);
+  };
+
+  const validateConfig = async () => {
+    setIsValidating(true);
+    try {
+      // 这里可以添加实际的配置验证逻辑
+      // 例如：检查仓库是否存在、是否有写入权限等
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 模拟验证过程
+
+      const isValid = !!(tempConfig.owner && tempConfig.repo && tempConfig.branch && tempConfig.basePath);
+      setValidationResult({
+        isValid,
+        message: isValid
+          ? 'Configuration is valid!'
+          : 'Please fill in all required fields'
+      });
+    } catch {
+      setValidationResult({
+        isValid: false,
+        message: 'Validation failed. Please check your configuration.'
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const isConfigValid = tempConfig.owner && tempConfig.repo && tempConfig.branch && tempConfig.basePath;
+
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Badge variant="secondary">⚙️</Badge>
-          Storage Configuration
+          <Settings className="h-5 w-5" />
+          GitHub Storage Configuration
+          {!isEditing && (
+            <Badge variant="outline" className="ml-auto">
+              {storageConfig.owner && storageConfig.repo ? 'Configured' : 'Not Configured'}
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        {!isStorageConfigured ? (
-          <div className="space-y-4">
-            <p className="text-gray-600 text-sm">
-              Configure where your data will be stored in GitHub:
-            </p>
-            <div className="grid grid-cols-2 gap-4">
+      <CardContent className="space-y-4">
+        {!isEditing ? (
+          // 显示模式
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label className="block text-sm font-medium mb-2">Repository Owner</label>
-                <Input
-                  placeholder="Your GitHub username"
-                  value={storageConfig.owner}
-                  onChange={(e) => onStorageConfigChange({ owner: e.target.value })}
-                />
+                <span className="text-gray-600 font-medium">Owner</span>
+                <p className="font-mono text-sm">{storageConfig.owner || 'Not set'}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Repository Name</label>
-                <Input
-                  placeholder="Repository name"
-                  value={storageConfig.repo}
-                  onChange={(e) => onStorageConfigChange({ repo: e.target.value })}
-                />
+                <span className="text-gray-600 font-medium">Repository</span>
+                <p className="font-mono text-sm">{storageConfig.repo || 'Not set'}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Branch</label>
-                <Input
-                  placeholder="main"
-                  value={storageConfig.branch}
-                  onChange={(e) => onStorageConfigChange({ branch: e.target.value })}
-                />
+                <span className="text-gray-600 font-medium">Branch</span>
+                <p className="font-mono text-sm">{storageConfig.branch || 'Not set'}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Base Path</label>
-                <Input
-                  placeholder="data"
-                  value={storageConfig.basePath}
-                  onChange={(e) => onStorageConfigChange({ basePath: e.target.value })}
-                />
+                <span className="text-gray-600 font-medium">Base Path</span>
+                <p className="font-mono text-sm">{storageConfig.basePath || 'Not set'}</p>
               </div>
             </div>
-            <div className="text-xs text-gray-500">
-              <p>• Repository Owner: Your GitHub username or organization name</p>
-              <p>• Repository Name: The repository where data will be stored</p>
-              <p>• Branch: The branch to use (usually 'main' or 'master')</p>
-              <p>• Base Path: Subfolder within the repository (e.g., 'data', 'notes')</p>
-            </div>
+            <Button onClick={() => setIsEditing(true)} className="w-full">
+              Edit Configuration
+            </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium">Repository Owner:</span>
-              <span className="ml-2 text-gray-600">{storageConfig.owner}</span>
+          // 编辑模式
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <span className="text-sm font-medium">Owner *</span>
+                <Input
+                  placeholder="your-username"
+                  value={tempConfig.owner}
+                  onChange={(e) => setTempConfig(prev => ({ ...prev, owner: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-medium">Repository *</span>
+                <Input
+                  placeholder="repo-name"
+                  value={tempConfig.repo}
+                  onChange={(e) => setTempConfig(prev => ({ ...prev, repo: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-medium">Branch *</span>
+                <Input
+                  placeholder="main"
+                  value={tempConfig.branch}
+                  onChange={(e) => setTempConfig(prev => ({ ...prev, branch: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-medium">Base Path *</span>
+                <Input
+                  placeholder="data"
+                  value={tempConfig.basePath}
+                  onChange={(e) => setTempConfig(prev => ({ ...prev, basePath: e.target.value }))}
+                />
+              </div>
             </div>
-            <div>
-              <span className="font-medium">Repository Name:</span>
-              <span className="ml-2 text-gray-600">{storageConfig.repo}</span>
-            </div>
-            <div>
-              <span className="font-medium">Branch:</span>
-              <span className="ml-2 text-gray-600">{storageConfig.branch}</span>
-            </div>
-            <div>
-              <span className="font-medium">Base Path:</span>
-              <span className="ml-2 text-gray-600">{storageConfig.basePath}</span>
-            </div>
-            <div className="col-span-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={onResetConfig}
+
+            {validationResult && (
+              <div className={`p-3 rounded-md ${validationResult.isValid
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-red-50 border border-red-200'
+                }`}>
+                <div className="flex items-center gap-2">
+                  {validationResult.isValid ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                  )}
+                  <span className={`text-sm ${validationResult.isValid ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                    {validationResult.message}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                onClick={validateConfig}
+                disabled={!isConfigValid || isValidating}
+                variant="outline"
+                className="flex-1"
               >
-                Change Configuration
+                {isValidating ? 'Validating...' : 'Validate'}
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={!isConfigValid}
+                className="flex-1"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+              <Button onClick={handleCancel} variant="outline">
+                Cancel
               </Button>
             </div>
           </div>

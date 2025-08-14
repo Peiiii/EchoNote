@@ -1,6 +1,6 @@
 import { validateGitHubConfig } from '@/common/config/github.config';
 import { getGitHubAuthService } from '@/common/services/github-auth.service';
-import { getGitHubStorageService, initializeGitHubStorage } from '@/common/services/github-storage.service';
+import { githubStorageService } from '@/common/services/github-storage.service';
 import { useGitHubConfigStore } from '@/core/stores/github-config.store';
 import { useEffect, useState } from 'react';
 
@@ -57,15 +57,10 @@ export function useGitHubIntegrationPage() {
         throw new Error('Please configure storage settings first');
       }
 
-      initializeGitHubStorage({
-        owner: storageConfig.owner,
-        repo: storageConfig.repo,
-        basePath: storageConfig.basePath
-      });
-
-      const storage = getGitHubStorageService();
+      const storage = githubStorageService;
       await storage.initialize();
       setStorageService(storage);
+
     } catch (error) {
       console.error('Failed to initialize storage service:', error);
     }
@@ -138,7 +133,7 @@ ${noteContent}
     configErrors,
     storageConfig,
     isStorageConfigured: isStorageConfigured(),
-    
+      
     // Actions
     setNoteContent,
     setNoteTitle,

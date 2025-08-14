@@ -1,3 +1,4 @@
+import { githubSyncService } from "@/common/services/github-sync.service";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -44,22 +45,35 @@ export interface ChatState {
     // User related
     userId: string;
 
+    // GitHub sync related
+    isGitHubEnabled: boolean;
+    syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
+    lastSyncTime: string | null;
+    syncError: string | null;
+
     // Actions
     addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => void;
     setCurrentChannel: (channelId: string) => void;
     addMessage: (message: Omit<Message, "id" | "timestamp">) => void;
     deleteMessage: (messageId: string) => void;
     updateMessage: (messageId: string, updates: Partial<Message>) => void;
-    
+
     // Thread related actions
     addThreadMessage: (parentMessageId: string, message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">) => void;
     toggleThreadExpansion: (messageId: string) => void;
     getThreadMessages: (threadId: string) => Message[];
+
+    // GitHub sync actions
+    enableGitHubSync: () => void;
+    disableGitHubSync: () => void;
+    syncToGitHub: () => Promise<void>;
+    loadFromGitHub: () => Promise<void>;
+    setSyncStatus: (status: 'idle' | 'syncing' | 'synced' | 'error', error?: string) => void;
 }
 
 export const useChatStore = create<ChatState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             // Initial state
             channels: [
                 {
@@ -88,6 +102,12 @@ export const useChatStore = create<ChatState>()(
             messages: [],
             userId: "user-" + Date.now(),
 
+            // GitHub sync initial state
+            isGitHubEnabled: false,
+            syncStatus: 'idle' as const,
+            lastSyncTime: null,
+            syncError: null,
+
             // Actions
             addChannel: (channel) => {
                 const newChannel: Channel = {
@@ -99,6 +119,19 @@ export const useChatStore = create<ChatState>()(
                 set((state) => ({
                     channels: [...state.channels, newChannel],
                 }));
+
+                // 自动同步到 GitHub（如果启用）
+                const state = get();
+                if (state.isGitHubEnabled && state.syncStatus !== 'syncing') {
+                    // 延迟同步，避免频繁调用
+                    setTimeout(async () => {
+                        try {
+                            await githubSyncService.syncToGitHub();
+                        } catch (error) {
+                            console.warn('Auto sync failed:', error);
+                        }
+                    }, 1000);
+                }
             },
 
             setCurrentChannel: (channelId) => {
@@ -120,6 +153,19 @@ export const useChatStore = create<ChatState>()(
                             : channel
                     ),
                 }));
+
+                // 自动同步到 GitHub（如果启用）
+                const state = get();
+                if (state.isGitHubEnabled && state.syncStatus !== 'syncing') {
+                    // 延迟同步，避免频繁调用
+                    setTimeout(async () => {
+                        try {
+                            await githubSyncService.syncToGitHub();
+                        } catch (error) {
+                            console.warn('Auto sync failed:', error);
+                        }
+                    }, 1000);
+                }
             },
 
             deleteMessage: (messageId) => {
@@ -164,8 +210,8 @@ export const useChatStore = create<ChatState>()(
 
             toggleThreadExpansion: (messageId) => {
                 set((state) => ({
-                    messages: state.messages.map((msg: Message) =>
-                        msg.id === messageId 
+                    messages: state.messages.map((msg) =>
+                        msg.id === messageId
                             ? { ...msg, isThreadExpanded: !msg.isThreadExpanded }
                             : msg
                     ),
@@ -174,7 +220,62 @@ export const useChatStore = create<ChatState>()(
 
             getThreadMessages: (threadId: string): Message[] => {
                 const state = useChatStore.getState();
-                return state.messages.filter((msg: Message) => msg.threadId === threadId);
+                return state.messages.filter((msg) => msg.threadId === threadId);
+            },
+
+            // GitHub sync actions
+            enableGitHubSync: () => {
+                set({ isGitHubEnabled: true });
+            },
+
+            disableGitHubSync: () => {
+                set({ isGitHubEnabled: false });
+            },
+
+            syncToGitHub: async () => {
+                console.log('[ChatStore] syncToGitHub');
+                set({ syncStatus: 'syncing' });
+                try {
+                    await githubSyncService.syncToGitHub();
+
+                    set({
+                        syncStatus: 'synced',
+                        lastSyncTime: new Date().toISOString(),
+                        syncError: null
+                    });
+                } catch (error) {
+                    console.log('[ChatStore] syncToGitHub error', error);
+                    set({
+                        syncStatus: 'error',
+                        syncError: error instanceof Error ? error.message : 'Unknown error'
+                    });
+                }
+            },
+
+            loadFromGitHub: async () => {
+                set({ syncStatus: 'syncing' });
+                try {
+                    await githubSyncService.loadFromGitHub();
+
+                    set({
+                        syncStatus: 'synced',
+                        lastSyncTime: new Date().toISOString(),
+                        syncError: null
+                    });
+                } catch (error) {
+                    set({
+                        syncStatus: 'error',
+                        syncError: error instanceof Error ? error.message : 'Unknown error'
+                    });
+                }
+            },
+
+            setSyncStatus: (status, error) => {
+                set({
+                    syncStatus: status,
+                    syncError: error || null,
+                    lastSyncTime: status === 'synced' ? new Date().toISOString() : get().lastSyncTime
+                });
             },
         }),
         {
@@ -191,8 +292,8 @@ export const useCurrentChannel = () => {
 
 export const useCurrentChannelMessages = () => {
     const { messages, currentChannelId } = useChatStore();
-    return messages.filter((message) => 
-        message.channelId === currentChannelId && 
+    return messages.filter((message) =>
+        message.channelId === currentChannelId &&
         !message.parentId // 排除thread消息
     );
 }; 

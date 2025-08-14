@@ -1,5 +1,5 @@
-import { GitFileSystem, GitHubProvider } from '@dimstack/git-provider';
 import { useGitHubConfigStore } from '@/core/stores/github-config.store';
+import { GitFileSystem, GitHubProvider } from '@dimstack/git-provider';
 
 export interface GitHubStorageConfig {
     owner: string;
@@ -19,10 +19,10 @@ export interface StorageOptions {
 export class GitHubStorageService {
     private provider: GitHubProvider | null = null;
     private fs: GitFileSystem | null = null;
-    private config: GitHubStorageConfig;
 
-    constructor(config: GitHubStorageConfig) {
-        this.config = config;
+
+    get config(): GitHubStorageConfig {
+        return useGitHubConfigStore.getState().storageConfig;
     }
 
     /**
@@ -31,7 +31,7 @@ export class GitHubStorageService {
     async initialize(): Promise<void> {
         // Get authentication info from store
         const store = useGitHubConfigStore.getState();
-        
+
         if (!store.isAuthenticated) {
             throw new Error('GitHub authentication failed, please authenticate first');
         }
@@ -188,9 +188,9 @@ export class GitHubStorageService {
         }
     }
 
-      /**
-   * Check if file exists
-   */
+    /**
+ * Check if file exists
+ */
     async fileExists(path: string): Promise<boolean> {
         try {
             await this.readText(path);
@@ -200,9 +200,9 @@ export class GitHubStorageService {
         }
     }
 
-      /**
-   * Get complete file path
-   */
+    /**
+ * Get complete file path
+ */
     private getFullPath(path: string): string {
         if (this.config.basePath) {
             return `${this.config.basePath}/${path}`.replace(/\/+/g, '/');
@@ -210,9 +210,9 @@ export class GitHubStorageService {
         return path;
     }
 
-      /**
-   * Get repository information
-   */
+    /**
+ * Get repository information
+ */
     async getRepositoryInfo() {
         if (!this.provider) {
             throw new Error('Storage service not initialized');
@@ -248,21 +248,4 @@ export class GitHubStorageService {
 }
 
 // Create default instance
-export let githubStorageService: GitHubStorageService;
-
-/**
- * Initialize GitHub storage service
- */
-export function initializeGitHubStorage(config: GitHubStorageConfig): void {
-    githubStorageService = new GitHubStorageService(config);
-}
-
-/**
- * Get GitHub storage service instance
- */
-export function getGitHubStorageService(): GitHubStorageService {
-    if (!githubStorageService) {
-        throw new Error('GitHub storage service not initialized, please call initializeGitHubStorage first');
-    }
-    return githubStorageService;
-}
+export const githubStorageService = new GitHubStorageService();

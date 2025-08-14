@@ -1,0 +1,143 @@
+import { Channel, Message, useChatStore } from '@/core/stores/chat-store';
+import { githubChatStorageService } from './github-chat-storage.service';
+
+export class GitHubSyncService {
+    private chatStorageService = githubChatStorageService;
+
+    // 同步本地数据到 GitHub
+    async syncToGitHub(): Promise<void> {
+        console.log('[GitHubSyncService] syncToGitHub');
+        const store = useChatStore.getState();
+
+        // 同步频道元数据
+        console.log('[GitHubSyncService] syncChannelToGitHub', store.channels);
+        for (const channel of store.channels) {
+            await this.syncChannelToGitHub(channel);
+        }
+
+        // 同步消息数据
+        for (const message of store.messages) {
+            await this.syncMessageToGitHub(message);
+        }
+    }
+
+    // 从 GitHub 加载数据到本地
+    async loadFromGitHub(): Promise<void> {
+        // 获取所有频道
+        const globalIndex = await this.chatStorageService.loadGlobalChannelsIndex();
+        if (!globalIndex) return;
+
+        // 加载频道数据
+        for (const channelSlug of Object.keys(globalIndex.channels)) {
+            await this.loadChannelFromGitHub(channelSlug);
+        }
+    }
+
+    // 同步单个频道到 GitHub
+    private async syncChannelToGitHub(channel: Channel): Promise<void> {
+        console.log('[GitHubSyncService] syncChannelToGitHub', channel);
+        const channelMetadata = {
+            slug: channel.id,
+            name: channel.name,
+            description: channel.description,
+            createdAt: channel.createdAt.toISOString(),
+            lastUpdated: new Date().toISOString()
+        };
+
+        await this.chatStorageService.storeChannelMetadata(channelMetadata);
+    }
+
+    // 同步单个消息到 GitHub
+    private async syncMessageToGitHub(message: Message): Promise<void> {
+        const date = message.timestamp.toISOString().split('T')[0];
+        const channelSlug = message.channelId;
+
+        const chatMessage = {
+            id: message.id,
+            content: message.content,
+            sender: message.sender,
+            timestamp: message.timestamp.toISOString(),
+            channelSlug: message.channelId,
+            tags: message.tags || [],
+            parentId: message.parentId || undefined,
+            threadId: message.threadId || undefined
+        };
+
+        await this.chatStorageService.addMessage(channelSlug, date, chatMessage);
+    }
+
+    // 从 GitHub 加载频道数据
+    private async loadChannelFromGitHub(channelSlug: string): Promise<void> {
+        const metadata = await this.chatStorageService.loadChannelMetadata(channelSlug);
+        if (!metadata) return;
+
+        // 检查频道是否已存在
+        const store = useChatStore.getState();
+        const existingChannel = store.channels.find(ch => ch.id === channelSlug);
+
+        if (!existingChannel) {
+            // 添加新频道
+            const newChannel: Omit<Channel, "id" | "createdAt" | "messageCount"> = {
+                name: metadata.name,
+                description: metadata.description
+            };
+            store.addChannel(newChannel);
+        }
+
+        // 加载频道消息
+        await this.loadChannelMessagesFromGitHub(channelSlug);
+    }
+
+    // 从 GitHub 加载频道消息
+    private async loadChannelMessagesFromGitHub(channelSlug: string): Promise<void> {
+        const messages = await this.chatStorageService.getChannelMessages(channelSlug);
+        const store = useChatStore.getState();
+
+        for (const chatMessage of messages) {
+            // 检查消息是否已存在
+            const existingMessage = store.messages.find(msg => msg.id === chatMessage.id);
+            if (existingMessage) continue;
+
+            // 添加新消息
+            const newMessage: Omit<Message, "id" | "timestamp"> = {
+                content: chatMessage.content,
+                sender: chatMessage.sender,
+                channelId: chatMessage.channelSlug,
+                tags: chatMessage.tags,
+                parentId: chatMessage.parentId || undefined,
+                threadId: chatMessage.threadId || undefined
+            };
+
+            store.addMessage(newMessage);
+        }
+    }
+
+    // 获取同步状态
+    async getSyncStatus(): Promise<{
+        isEnabled: boolean;
+        lastSync: string | null;
+        channelCount: number;
+        messageCount: number;
+    }> {
+        try {
+            const globalIndex = await this.chatStorageService.loadGlobalChannelsIndex();
+
+            return {
+                isEnabled: true,
+                lastSync: globalIndex?.global.lastSync || null,
+                channelCount: globalIndex?.global.totalChannels || 0,
+                messageCount: globalIndex?.global.totalMessages || 0
+            };
+        } catch {
+            return {
+                isEnabled: false,
+                lastSync: null,
+                channelCount: 0,
+                messageCount: 0
+            };
+        }
+    }
+}
+
+// 创建默认实例
+export const githubSyncService = new GitHubSyncService();

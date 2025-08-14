@@ -1,4 +1,4 @@
-import { GitHubStorageService } from './github-storage.service';
+import { githubStorageService, GitHubStorageService } from './github-storage.service';
 
 export interface ChatMessage {
   id: string;
@@ -27,11 +27,69 @@ export interface DailyMessages {
   [key: string]: unknown;
 }
 
+export interface ChannelIndex {
+  channelSlug: string;
+  lastUpdated: string;
+  totalMessages: number;
+  totalDays: number;
+  fileIndex: {
+    [date: string]: {
+      file: string;
+      messageCount: number;
+      firstMessage: string | null;
+      lastMessage: string | null;
+      firstTimestamp: string | null;
+      lastTimestamp: string | null;
+      size: string;
+    };
+  };
+  threads: {
+    [threadId: string]: {
+      firstMessage: string;
+      lastMessage: string;
+      firstTimestamp: string;
+      lastTimestamp: string;
+      messageCount: number;
+    };
+  };
+  [key: string]: unknown;
+}
+
+export interface ChannelOverview {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  lastUpdated: string;
+  totalMessages: number;
+  totalDays: number;
+  status: string;
+  priority: string;
+  lastMessageId: string | null;
+  lastMessageTimestamp: string;
+}
+
+export interface GlobalChannelsIndex {
+  lastUpdated: string;
+  channels: {
+    [channelSlug: string]: ChannelOverview;
+  };
+  global: {
+    totalChannels: number;
+    totalMessages: number;
+    totalDays: number;
+    lastSync: string;
+    storageSize: string;
+  };
+  [key: string]: unknown;
+}
+
 export class GitHubChatStorageService {
   private storageService: GitHubStorageService;
 
-  constructor(storageService: GitHubStorageService) {
-    this.storageService = storageService;
+  constructor() {
+    this.storageService = githubStorageService;
   }
 
   // 存储频道元数据
@@ -77,6 +135,12 @@ export class GitHubChatStorageService {
     const existingMessages = await this.loadDailyMessages(channelSlug, date);
     existingMessages.push(message);
     await this.storeDailyMessages(channelSlug, date, existingMessages);
+
+    // 自动更新频道索引
+    await this.updateChannelIndex(channelSlug, date, existingMessages.length);
+
+    // 自动更新全局频道索引
+    await this.updateGlobalChannelsIndex(channelSlug);
   }
 
   // 获取频道所有消息（简单实现，按日期加载）
@@ -107,24 +171,133 @@ export class GitHubChatStorageService {
 
     return dates;
   }
+
+  // 存储频道索引
+  async storeChannelIndex(channelSlug: string, index: ChannelIndex): Promise<void> {
+    const path = `channels/${channelSlug}/index.json`;
+    await this.storageService.storeJSON(path, index);
+  }
+
+  // 读取频道索引
+  async loadChannelIndex(channelSlug: string): Promise<ChannelIndex | null> {
+    try {
+      const path = `channels/${channelSlug}/index.json`;
+      return await this.storageService.readJSON<ChannelIndex>(path);
+    } catch {
+      return null;
+    }
+  }
+
+  // 更新频道索引（添加新消息后调用）
+  async updateChannelIndex(channelSlug: string, date: string, messageCount: number): Promise<void> {
+    let index = await this.loadChannelIndex(channelSlug);
+
+    if (!index) {
+      index = {
+        channelSlug,
+        lastUpdated: new Date().toISOString(),
+        totalMessages: 0,
+        totalDays: 0,
+        fileIndex: {},
+        threads: {}
+      };
+    }
+
+    // 更新文件索引
+    index.fileIndex[date] = {
+      file: `messages/${date}.json`,
+      messageCount,
+      firstMessage: null, // 简化实现，暂时不记录具体消息ID
+      lastMessage: null,
+      firstTimestamp: null,
+      lastTimestamp: null,
+      size: "0KB" // 简化实现，暂时不计算文件大小
+    };
+
+    // 更新统计信息
+    index.totalMessages = Object.values(index.fileIndex)
+      .reduce((sum, file) => sum + file.messageCount, 0);
+    index.totalDays = Object.keys(index.fileIndex).length;
+    index.lastUpdated = new Date().toISOString();
+
+    await this.storeChannelIndex(channelSlug, index);
+  }
+
+  // 获取频道概览信息
+  async getChannelOverview(channelSlug: string): Promise<ChannelOverview | null> {
+    const metadata = await this.loadChannelMetadata(channelSlug);
+    const index = await this.loadChannelIndex(channelSlug);
+
+    if (!metadata) return null;
+
+    return {
+      id: `channel-${channelSlug}`,
+      slug: channelSlug,
+      name: metadata.name,
+      description: metadata.description,
+      createdAt: metadata.createdAt,
+      lastUpdated: metadata.lastUpdated,
+      totalMessages: index?.totalMessages || 0,
+      totalDays: index?.totalDays || 0,
+      status: "active",
+      priority: "high",
+      lastMessageId: null, // 简化实现
+      lastMessageTimestamp: index?.lastUpdated || metadata.lastUpdated
+    };
+  }
+
+  // 存储全局频道索引
+  async storeGlobalChannelsIndex(index: GlobalChannelsIndex): Promise<void> {
+    const path = `global/channels-index.json`;
+    await this.storageService.storeJSON(path, index);
+  }
+
+  // 读取全局频道索引
+  async loadGlobalChannelsIndex(): Promise<GlobalChannelsIndex | null> {
+    try {
+      const path = `global/channels-index.json`;
+      return await this.storageService.readJSON<GlobalChannelsIndex>(path);
+    } catch {
+      return null;
+    }
+  }
+
+  // 更新全局频道索引
+  async updateGlobalChannelsIndex(channelSlug: string): Promise<void> {
+    const overview = await this.getChannelOverview(channelSlug);
+    if (!overview) return;
+
+    let globalIndex = await this.loadGlobalChannelsIndex();
+
+    if (!globalIndex) {
+      globalIndex = {
+        lastUpdated: new Date().toISOString(),
+        channels: {},
+        global: {
+          totalChannels: 0,
+          totalMessages: 0,
+          totalDays: 0,
+          lastSync: new Date().toISOString(),
+          storageSize: "0MB"
+        }
+      };
+    }
+
+    // 更新频道信息
+    globalIndex.channels[channelSlug] = overview;
+
+    // 重新计算全局统计
+    const channels = Object.values(globalIndex.channels);
+    globalIndex.global.totalChannels = channels.length;
+    globalIndex.global.totalMessages = channels.reduce((sum, ch) => sum + ch.totalMessages, 0);
+    globalIndex.global.totalDays = channels.reduce((sum, ch) => sum + ch.totalDays, 0);
+    globalIndex.global.lastSync = new Date().toISOString();
+    globalIndex.lastUpdated = new Date().toISOString();
+
+    await this.storeGlobalChannelsIndex(globalIndex);
+  }
 }
 
 // 创建默认实例
-export let githubChatStorageService: GitHubChatStorageService;
+export const githubChatStorageService = new GitHubChatStorageService();
 
-/**
- * 初始化 GitHub 聊天存储服务
- */
-export function initializeGitHubChatStorage(storageService: GitHubStorageService): void {
-  githubChatStorageService = new GitHubChatStorageService(storageService);
-}
-
-/**
- * 获取 GitHub 聊天存储服务实例
- */
-export function getGitHubChatStorageService(): GitHubChatStorageService {
-  if (!githubChatStorageService) {
-    throw new Error('GitHub chat storage service not initialized, please call initializeGitHubChatStorage first');
-  }
-  return githubChatStorageService;
-}

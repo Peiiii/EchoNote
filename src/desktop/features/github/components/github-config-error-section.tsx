@@ -7,7 +7,7 @@ interface GitHubConfigErrorSectionProps {
 export function GitHubConfigErrorSection({ configErrors }: GitHubConfigErrorSectionProps) {
   return (
     <div className="p-6">
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-red-600">⚠️ GitHub Configuration Incomplete</CardTitle>
         </CardHeader>
