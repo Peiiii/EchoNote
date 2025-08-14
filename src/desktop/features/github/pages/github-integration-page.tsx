@@ -4,6 +4,7 @@ import { GitHubConfigErrorSection } from '../components/github-config-error-sect
 import { GitHubNoteSyncSection } from '../components/github-note-sync-section';
 import { GitHubStorageConfigSection } from '../components/github-storage-config-section';
 import { GitHubUserInfoSection } from '../components/github-user-info-section';
+import { GitHubDebugInfo } from '../components/github-debug-info';
 import { useGitHubIntegrationPage } from '../hooks/use-github-integration-page';
 
 
@@ -45,6 +46,9 @@ export function GitHubIntegrationPage() {
 
                 {/* Authentication Status */}
                 <GitHubAuthStatusSection />
+                
+                {/* Debug Information */}
+                <GitHubDebugInfo />
 
                 {isAuthenticated && (
                     <>

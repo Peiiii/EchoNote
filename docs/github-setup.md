@@ -16,7 +16,7 @@
 Application name: EchoNote
 Homepage URL: http://localhost:3000
 Application description: EchoNote - Personal Knowledge Management System
-Authorization callback URL: http://localhost:3000/auth/github/callback
+Authorization callback URL: http://localhost:3000
 ```
 
 ### 3. 注册应用
@@ -41,7 +41,7 @@ touch .env.local
 # GitHub OAuth应用配置
 VITE_GITHUB_CLIENT_ID=your_github_client_id_here
 VITE_GITHUB_DEFAULT_OWNER=your_github_username_here
-VITE_GITHUB_REDIRECT_URI=http://localhost:3000/auth/github/callback
+VITE_GITHUB_REDIRECT_URI=http://localhost:3000
 VITE_GITHUB_DEFAULT_REPO=echonote-data
 ```
 

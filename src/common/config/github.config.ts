@@ -3,7 +3,7 @@ export const GITHUB_CONFIG = {
   // OAuth application configuration
   oauth: {
     clientId: import.meta.env.VITE_GITHUB_CLIENT_ID || '',
-    redirectUri: import.meta.env.VITE_GITHUB_REDIRECT_URI || 'http://localhost:3000/#/github/auth/callback',
+    redirectUri: import.meta.env.VITE_GITHUB_REDIRECT_URI || 'http://localhost:3000',
     scopes: ['repo', 'user', 'workflow'], // Required permission scopes
   },
   

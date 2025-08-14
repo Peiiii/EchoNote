@@ -2,10 +2,10 @@ import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-ba
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
+import { handleOAuthCallback } from "@/desktop/features/github/utils/handle-github-callback";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { Github, Cloud, Settings } from "lucide-react";
+import { Cloud, Github, Settings } from "lucide-react";
 import { GitHubIntegrationPage } from "../pages/github-integration-page";
-import { GitHubAuthCallbackPage } from "../pages/github-auth-callback-page";
 
 export const githubExtension = defineExtension({
   manifest: {
@@ -58,6 +58,9 @@ export const githubExtension = defineExtension({
       )
     );
 
+    window.addEventListener('popstate', handleOAuthCallback);
+    handleOAuthCallback();
+
     // Register routes
     subscriptions.push(
       Disposable.from(
@@ -67,12 +70,6 @@ export const githubExtension = defineExtension({
             path: "/github",
             element: <GitHubIntegrationPage />,
             order: 200,
-          },
-          {
-            id: "github-auth-callback",
-            path: "/github/auth/callback",
-            element: <GitHubAuthCallbackPage />,
-            order: 201,
           },
         ])
       )
@@ -92,6 +89,14 @@ export const githubExtension = defineExtension({
           },
         ])
       )
+    );
+
+    // Cleanup function
+    subscriptions.push(
+      Disposable.from(() => {
+        // Remove event listener
+        window.removeEventListener('popstate', handleOAuthCallback);
+      })
     );
   },
 });
