@@ -33,7 +33,7 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
                 {rightSidebar && (
                     <>
                         <ResizableHandle withHandle />
-                        <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+                        <ResizablePanel defaultSize={30} minSize={15} maxSize={40}>
                             <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
                                 {rightSidebar}
                             </div>
