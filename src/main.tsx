@@ -15,6 +15,7 @@ try {
   if (GITHUB_CONFIG.oauth.clientId) {
     initializeGitHubAuth({
       clientId: GITHUB_CONFIG.oauth.clientId,
+      clientSecret: GITHUB_CONFIG.oauth.clientSecret,
       redirectUri: GITHUB_CONFIG.oauth.redirectUri,
       scopes: GITHUB_CONFIG.oauth.scopes
     });

@@ -2,6 +2,7 @@ import { GitAuth, GitHubProvider, generateState, parseAuthCode } from '@dimstack
 
 export interface GitHubAuthConfig {
     clientId: string;
+    clientSecret: string;
     redirectUri: string;
     scopes?: string[];
 }
@@ -27,10 +28,24 @@ export class GitHubAuthService {
     private auth: GitAuth;
 
     constructor(config: GitHubAuthConfig) {
-        const githubProvider = new GitHubProvider();
+        const githubProvider = new GitHubProvider({
+            tokenRequestMethod: "url",
+            httpClient: {
+                fetch: async (url, options) => {
+                    // 对token交换请求使用proxy解决跨域
+                    if (url.includes('github.com/login/oauth/access_token')) {
+                        const proxyUrl = `https://proxy.agentverse.cc/?${url}`;
+                        return fetch(proxyUrl, options);
+                    }
+                    // 其他请求直接使用fetch
+                    return fetch(url, options);
+                }
+            }
+        });
 
         this.auth = new GitAuth(githubProvider, {
             clientId: config.clientId,
+            clientSecret: config.clientSecret,
             redirectUri: config.redirectUri,
             scopes: config.scopes || ['repo', 'user']
         });
@@ -75,7 +90,7 @@ export class GitHubAuthService {
         try {
             // Handle authentication callback
             const result = await this.auth.handleCallback(code, receivedState);
-
+            console.log('[GitHubAuthService][handleCallback] result', result);
             // Clean up temporary state
             sessionStorage.removeItem('github_auth_state');
 
@@ -169,7 +184,7 @@ export let githubAuthService: GitHubAuthService;
  * Initialize GitHub authentication service
  */
 export function initializeGitHubAuth(config: GitHubAuthConfig): void {
-    githubAuthService = new GitHubAuthService(config);
+    githubAuthService = new GitHubAuthService({ ...config });
 }
 
 /**

@@ -30,8 +30,8 @@ importers:
         specifier: 0.2.0-beta.3
         version: 0.2.0-beta.3(rxjs@7.8.2)
       '@dimstack/git-auth':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.0.5
+        version: 1.0.5
       '@dimstack/git-provider':
         specifier: ^0.1.2
         version: 0.1.2
@@ -329,8 +329,8 @@ packages:
     peerDependencies:
       rxjs: ^7.8.1
 
-  '@dimstack/git-auth@1.0.0':
-    resolution: {integrity: sha512-+fg3f1yIc1jQ417vOSM9mF0UG5RF1VfHBOPmjgwdqqt8nI05Fzhsf+bN/bvfKdtYOUZgAhQAHwvpMbz/SQH29w==}
+  '@dimstack/git-auth@1.0.5':
+    resolution: {integrity: sha512-UWpphCo9WSxeUW6HpidwGfpvQTS+ZfGuaO06NjML2CyLhNjKq2vb298uTs2zRHyUkkI5wd0CmnLv3Fm8cEo8WQ==}
 
   '@dimstack/git-provider@0.1.2':
     resolution: {integrity: sha512-YRux0hf7szwTZt90GUtBg7fLb8JF19A/yiiTvEOZ2Cm2x3iv7toJtVBY8lY3h63NXcWiihr9xe4h70P7bmGJ2g==}
@@ -3748,7 +3748,7 @@ snapshots:
     dependencies:
       rxjs: 7.8.2
 
-  '@dimstack/git-auth@1.0.0': {}
+  '@dimstack/git-auth@1.0.5': {}
 
   '@dimstack/git-provider@0.1.2':
     dependencies:

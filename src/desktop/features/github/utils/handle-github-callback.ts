@@ -17,9 +17,9 @@ export const handleOAuthCallback = async () => {
             window.location.hash = '#/github';
         } catch (error) {
             console.error('OAuth callback failed:', error);
-            const cleanUrl = window.location.pathname + window.location.hash;
-            window.history.replaceState({}, document.title, cleanUrl);
-            window.location.hash = '#/github';
+            // const cleanUrl = window.location.pathname + window.location.hash;
+            // window.history.replaceState({}, document.title, cleanUrl);
+            // window.location.hash = '#/github';
         }
     }
 };
