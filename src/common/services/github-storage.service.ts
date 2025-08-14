@@ -1,5 +1,5 @@
 import { GitFileSystem, GitHubProvider } from '@dimstack/git-provider';
-import { getGitHubAuthService } from './github-auth.service';
+import { useGitHubConfigStore } from '@/core/stores/github-config.store';
 
 export interface GitHubStorageConfig {
     owner: string;
@@ -29,15 +29,16 @@ export class GitHubStorageService {
  * Initialize storage service
  */
     async initialize(): Promise<void> {
-        const authService = getGitHubAuthService();
-
-        if (!authService.isAuthenticated()) {
+        // Get authentication info from store
+        const store = useGitHubConfigStore.getState();
+        
+        if (!store.isAuthenticated) {
             throw new Error('GitHub authentication failed, please authenticate first');
         }
 
-        const accessToken = authService.getAccessToken();
+        const accessToken = store.authInfo?.accessToken;
         if (!accessToken) {
-            throw new Error('Cannot get access token');
+            throw new Error('Cannot get access token from store');
         }
 
         // Create GitHub Provider
