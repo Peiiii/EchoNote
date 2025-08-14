@@ -1,18 +1,17 @@
 import { Badge } from '@/common/components/ui/badge';
 import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { getGitHubAuthService } from '@/common/services/github-auth.service';
-import { useEffect, useState } from 'react';
+import { useGitHubConfigStore } from '@/core/stores/github-config.store';
+import { useCallback, useEffect, useState } from 'react';
 
 interface DebugInfo {
-  authStatus: unknown;
+  authInfo: unknown;
   isAuthenticated: boolean;
   hasAccessToken: boolean;
   accessTokenLength: number;
   accessTokenPreview: string;
   userInfo: unknown;
-  localStorageData: unknown;
-  sessionStorageData: string | null;
+  storageConfig: unknown;
   timestamp: string;
   error?: string;
 }
@@ -20,54 +19,52 @@ interface DebugInfo {
 export function GitHubDebugInfo() {
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Get store state
+  const { 
+    authInfo, 
+    userInfo, 
+    isAuthenticated, 
+    storageConfig,
+    clearAuthInfo 
+  } = useGitHubConfigStore();
 
-  useEffect(() => {
-    updateDebugInfo();
-  }, []);
-
-  const updateDebugInfo = () => {
+  const updateDebugInfo = useCallback(() => {
     try {
-      const authService = getGitHubAuthService();
-      const authStatus = authService.getAuthStatus();
-      const isAuth = authService.isAuthenticated();
-      const accessToken = authService.getAccessToken();
-      const userInfo = authService.getUserInfo();
-
-      // Check localStorage directly
-      const localStorageData = localStorage.getItem('github_auth');
-      const sessionStorageData = sessionStorage.getItem('github_auth_state');
-
+      const accessToken = authInfo?.accessToken;
+      
       setDebugInfo({
-        authStatus,
-        isAuthenticated: isAuth,
+        authInfo,
+        isAuthenticated,
         hasAccessToken: !!accessToken,
         accessTokenLength: accessToken ? accessToken.length : 0,
         accessTokenPreview: accessToken ? `${accessToken.substring(0, 10)}...` : 'None',
         userInfo,
-        localStorageData: localStorageData ? JSON.parse(localStorageData) : null,
-        sessionStorageData,
+        storageConfig,
         timestamp: new Date().toISOString()
       });
     } catch (error) {
       setDebugInfo({
-        authStatus: null,
+        authInfo: null,
         isAuthenticated: false,
         hasAccessToken: false,
         accessTokenLength: 0,
         accessTokenPreview: 'None',
         userInfo: null,
-        localStorageData: null,
-        sessionStorageData: null,
+        storageConfig: null,
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
-  };
+  }, [authInfo, userInfo, isAuthenticated, storageConfig]);
 
-  const clearAuth = () => {
+  useEffect(() => {
+    updateDebugInfo();
+  }, [updateDebugInfo]);
+
+  const handleClearAuth = () => {
     try {
-      const authService = getGitHubAuthService();
-      authService.logout();
+      clearAuthInfo();
       updateDebugInfo();
     } catch (error) {
       console.error('Failed to clear auth:', error);
@@ -87,7 +84,7 @@ export function GitHubDebugInfo() {
             <Button size="sm" variant="outline" onClick={updateDebugInfo}>
               Refresh
             </Button>
-            <Button size="sm" variant="destructive" onClick={clearAuth}>
+            <Button size="sm" variant="destructive" onClick={handleClearAuth}>
               Clear Auth
             </Button>
             <Button size="sm" variant="outline" onClick={() => setIsExpanded(!isExpanded)}>
@@ -135,21 +132,21 @@ export function GitHubDebugInfo() {
           {isExpanded && (
             <div className="space-y-2">
               <div>
-                <span className="font-medium">Local Storage Data:</span>
+                <span className="font-medium">Storage Config:</span>
                 <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
-                  {JSON.stringify(debugInfo.localStorageData, null, 2)}
+                  {JSON.stringify(debugInfo.storageConfig, null, 2)}
                 </pre>
               </div>
               <div>
-                <span className="font-medium">Session Storage Data:</span>
+                <span className="font-medium">User Info:</span>
                 <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
-                  {JSON.stringify(debugInfo.sessionStorageData, null, 2)}
+                  {JSON.stringify(debugInfo.userInfo, null, 2)}
                 </pre>
               </div>
               <div>
-                <span className="font-medium">Full Auth Status:</span>
+                <span className="font-medium">Full Auth Info:</span>
                 <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
-                  {JSON.stringify(debugInfo.authStatus, null, 2)}
+                  {JSON.stringify(debugInfo.authInfo, null, 2)}
                 </pre>
               </div>
             </div>
