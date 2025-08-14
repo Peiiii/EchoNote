@@ -1,7 +1,7 @@
 import { Badge } from '@/common/components/ui/badge';
 import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { useGitHubConfigStore } from '@/core/stores/github-config.store';
+import { useGitHubConfigStore, GitHubUserInfo } from '@/core/stores/github-config.store';
 import { useCallback, useEffect, useState } from 'react';
 
 interface DebugInfo {
@@ -10,7 +10,7 @@ interface DebugInfo {
   hasAccessToken: boolean;
   accessTokenLength: number;
   accessTokenPreview: string;
-  userInfo: unknown;
+  userInfo: GitHubUserInfo | null;
   storageConfig: unknown;
   timestamp: string;
   error?: string;
@@ -122,9 +122,13 @@ export function GitHubDebugInfo() {
             <div>
               <span className="font-medium">User Info:</span>
               <div className="ml-2 text-sm">
-                <p>Login: Available</p>
-                <p>ID: Available</p>
-                <p>Name: Available</p>
+                <p>Login: {debugInfo.userInfo?.login || 'N/A'}</p>
+                <p>ID: {debugInfo.userInfo?.id || 'N/A'}</p>
+                <p>Name: {debugInfo.userInfo?.name || 'N/A'}</p>
+                <p>Email: {debugInfo.userInfo?.email || 'N/A'}</p>
+                {debugInfo.userInfo?.avatar_url && (
+                  <p>Avatar: Available</p>
+                )}
               </div>
             </div>
           )}
