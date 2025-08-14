@@ -1,4 +1,5 @@
 import { getGitHubAuthService } from "@/common/services/github-auth.service";
+import { useGitHubConfigStore } from "@/core/stores/github-config.store";
 
 // Handle OAuth callback
 export const handleOAuthCallback = async () => {
@@ -9,7 +10,12 @@ export const handleOAuthCallback = async () => {
     if (code && state) {
         try {
             const authService = getGitHubAuthService();
-            await authService.handleCallback(window.location.href);
+            const result = await authService.handleCallback(window.location.href);
+            console.log('[handleOAuthCallback] result', result);
+
+            // Store authentication result in the store
+            const { setAuthInfo } = useGitHubConfigStore.getState();
+            setAuthInfo(result);
 
             // Clear URL and redirect
             const cleanUrl = window.location.pathname + window.location.hash;
