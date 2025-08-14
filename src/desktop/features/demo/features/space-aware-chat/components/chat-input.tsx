@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { Input } from '@/common/components/ui/input';
-import { Send, Loader2 } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -27,7 +27,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      handleSubmit(e);
     }
   };
 
@@ -41,8 +41,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         disabled={isLoading}
         className="flex-1"
       />
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         disabled={!message.trim() || isLoading}
         size="icon"
       >
