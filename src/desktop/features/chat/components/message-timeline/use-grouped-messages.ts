@@ -1,4 +1,4 @@
-import { useCurrentChannelMessages } from "@/core/stores/chat-data-store";
+import { useCurrentChannelMessages } from "@/desktop/features/chat/hooks/use-current-channel-messages";
 import { Message } from "@/core/stores/chat-data-store";
 import { format } from "date-fns";
 import { useMemo } from "react";
@@ -17,4 +17,4 @@ export function useGroupedMessages() {
             return groups;
         }, {});
     }, [messages]);
-} 
+}

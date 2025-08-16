@@ -1,10 +1,10 @@
 import { useChatDataStore } from "@/core/stores/chat-data-store";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { Message } from "@/core/stores/chat-data-store";
+import { useCurrentChannelMessages } from "@/desktop/features/chat/hooks/use-current-channel-messages";
 import { EmptyState } from "./empty-state";
 import { DateDivider } from "./date-divider";
 import { ThoughtRecord } from "./thought-record";
-import { useGroupedMessages } from "./hooks";
+import { useGroupedMessages } from "./use-grouped-messages";
 
 interface MessageTimelineProps {
     onOpenThread: (messageId: string) => void;
@@ -12,15 +12,8 @@ interface MessageTimelineProps {
 
 export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
     const groupedMessages = useGroupedMessages();
-    const { currentChannelId } = useChatViewStore();
-    const { messages } = useChatDataStore();
+    const currentChannelMessages = useCurrentChannelMessages();
     const { getThreadMessages } = useChatDataStore();
-
-    // Filter messages for current channel and exclude thread messages
-    const currentChannelMessages = messages.filter((message) =>
-        message.channelId === currentChannelId &&
-        !message.parentId
-    );
 
     if (currentChannelMessages.length === 0) {
         return <EmptyState />;

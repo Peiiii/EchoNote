@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { useChatViewStore } from "./chat-view-store";
 
 export interface AIAnalysis {
     keywords: string[];
@@ -161,21 +160,3 @@ export const useChatDataStore = create<ChatDataState>()(
         }
     )
 );
-
-// Computed properties
-export const useCurrentChannelMessages = () => {
-    const { messages } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
-    
-    return messages.filter((message) =>
-        message.channelId === currentChannelId &&
-        !message.parentId // Exclude thread messages
-    );
-};
-
-export const useCurrentChannel = () => {
-    const { channels } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
-    
-    return channels.find((channel) => channel.id === currentChannelId) || null;
-};
