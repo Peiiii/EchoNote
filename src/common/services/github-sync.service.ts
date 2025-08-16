@@ -1,6 +1,6 @@
 import { Channel, Message } from '@/core/stores/chat-data-store';
 import { useChatDataStore } from '@/core/stores/chat-data-store';
-import { useChatViewStore } from '@/core/stores/chat-view-store';
+import { useGitHubSyncStore } from '@/core/stores/github-sync.store';
 import { githubChatStorageService } from './github-chat-storage.service';
 
 export class GitHubSyncService {
@@ -11,9 +11,9 @@ export class GitHubSyncService {
         console.log('[GitHubSyncService] syncToGitHub');
         
         const dataStore = useChatDataStore.getState();
-        const viewStore = useChatViewStore.getState();
+        const syncStore = useGitHubSyncStore.getState();
         
-        if (!viewStore.isGitHubEnabled) {
+        if (!syncStore.isGitHubEnabled) {
             throw new Error('GitHub sync is not enabled');
         }
 
@@ -33,9 +33,9 @@ export class GitHubSyncService {
     async loadFromGitHub(): Promise<void> {
         console.log('[GitHubSyncService] loadFromGitHub');
         
-        const viewStore = useChatViewStore.getState();
+        const syncStore = useGitHubSyncStore.getState();
         
-        if (!viewStore.isGitHubEnabled) {
+        if (!syncStore.isGitHubEnabled) {
             throw new Error('GitHub sync is not enabled');
         }
 

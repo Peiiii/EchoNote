@@ -12,3 +12,4 @@ alwaysApply: true
 
 ## User Rules
 - try not to use `any` type in the code unless there is no other way.
+- avoid over-engineering the code.

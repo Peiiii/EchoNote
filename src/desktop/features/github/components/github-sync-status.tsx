@@ -2,7 +2,7 @@ import { Badge } from '@/common/components/ui/badge';
 import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { githubSyncService } from '@/common/services/github-sync.service';
-import { useChatViewStore } from '@/core/stores/chat-view-store';
+import { useGitHubSyncStore } from '@/core/stores/github-sync.store';
 import { AlertCircle, Download, RefreshCw, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -15,7 +15,7 @@ export function GitHubSyncStatus() {
         syncToGitHub,
         loadFromGitHub,
         enableGitHubSync,
-    } = useChatViewStore();
+    } = useGitHubSyncStore();
 
     const [isServiceAvailable, setIsServiceAvailable] = useState(false);
 

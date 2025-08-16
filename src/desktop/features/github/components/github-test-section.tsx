@@ -2,13 +2,13 @@ import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Badge } from '@/common/components/ui/badge';
 import { useGitHubConfigStore } from '@/core/stores/github-config.store';
-import { useChatViewStore } from '@/core/stores/chat-view-store';
+import { useGitHubSyncStore } from '@/core/stores/github-sync.store';
 import { TestTube, Play, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 
 export function GitHubTestSection() {
   const { isAuthenticated, isStorageConfigured } = useGitHubConfigStore();
-  const { isGitHubEnabled, enableGitHubSync, disableGitHubSync, syncToGitHub } = useChatViewStore();
+  const { isGitHubEnabled, enableGitHubSync, disableGitHubSync, syncToGitHub } = useGitHubSyncStore();
   const [testResults, setTestResults] = useState<{
     config: boolean;
     auth: boolean;
