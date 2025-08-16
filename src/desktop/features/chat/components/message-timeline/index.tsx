@@ -1,6 +1,4 @@
-import { useChatDataStore } from "@/core/stores/chat-data-store";
 import { Message } from "@/core/stores/chat-data-store";
-import { useCurrentChannelMessages } from "@/desktop/features/chat/hooks/use-current-channel-messages";
 import { EmptyState } from "./empty-state";
 import { DateDivider } from "./date-divider";
 import { ThoughtRecord } from "./thought-record";
@@ -8,14 +6,24 @@ import { useGroupedMessages } from "./use-grouped-messages";
 
 interface MessageTimelineProps {
     onOpenThread: (messageId: string) => void;
+    messages?: Message[];
 }
 
-export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
-    const groupedMessages = useGroupedMessages();
-    const currentChannelMessages = useCurrentChannelMessages();
-    const { getThreadMessages } = useChatDataStore();
+export function MessageTimeline({ onOpenThread, messages }: MessageTimelineProps) {
+    const groupedMessages = useGroupedMessages(messages);
+    
+    // 从父组件获取消息数据
+    // 这里我们假设消息已经通过useGroupedMessages正确分组
+    
+    // 检查是否有消息需要显示
+    const hasMessages = Object.values(groupedMessages).some(dayMessages => 
+        (dayMessages as Message[]).some((msg: Message) => 
+            msg.sender === "user" && 
+            !msg.parentId
+        )
+    );
 
-    if (currentChannelMessages.length === 0) {
+    if (!hasMessages) {
         return <EmptyState />;
     }
 
@@ -36,7 +44,9 @@ export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
                             {/* Elegant timeline of thoughts */}
                             <div className="w-full">
                                 {userMessages.map((message: Message, index: number) => {
-                                    const threadMessages = getThreadMessages(message.threadId || message.id);
+                                    const threadMessages = (messages ?? []).filter(msg => 
+                                        msg.threadId === (message.threadId || message.id)
+                                    );
                                     const threadCount = threadMessages.length > 1 ? threadMessages.length - 1 : 0;
                                     
                                     return (
@@ -63,4 +73,4 @@ export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
             </div>
         </div>
     );
-} 
+}

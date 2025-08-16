@@ -12,10 +12,9 @@ interface MessageInputProps {
 
 export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) {
     const [message, setMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { addMessage, addThreadMessage, messages } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
+    const { currentChannelId, isAddingMessage, setIsAddingMessage } = useChatViewStore();
 
     // Get the message being replied to
     const replyToMessage = replyToMessageId ? messages.find(msg => msg.id === replyToMessageId) : null;
@@ -43,7 +42,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
         onSend();
 
         setMessage("");
-        setIsLoading(true);
+        setIsAddingMessage(true);
 
         // Simulate AI response
         setTimeout(() => {
@@ -62,7 +61,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
                     channelId: currentChannelId,
                 });
             }
-            setIsLoading(false);
+            setIsAddingMessage(false);
         }, 1000);
     };
 
@@ -157,7 +156,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
                             onKeyPress={handleKeyPress}
                             placeholder={replyToMessage ? "Reply to this message... (Enter to send, Shift+Enter for new line)" : "Record your thoughts... (Enter to send, Shift+Enter for new line)"}
                             className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
-                            disabled={isLoading}
+                            disabled={isAddingMessage}
                             style={{
                                 caretColor: '#3b82f6', // Blue cursor
                             }}
@@ -167,8 +166,8 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
                         <div className="absolute bottom-2 right-2">
                             <button
                                 onClick={handleSend}
-                                disabled={!message.trim() || isLoading}
-                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${message.trim() && !isLoading
+                                disabled={!message.trim() || isAddingMessage}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${message.trim() && !isAddingMessage
                                         ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
                                         : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                                     }`}
@@ -181,4 +180,4 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
             </div>
         </div>
     );
-}; 
+};

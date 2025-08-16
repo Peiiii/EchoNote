@@ -35,6 +35,7 @@
     "clsx": "^2.1.1",
     "composite-kit": "^0.6.3",
     "date-fns": "^4.1.0",
+    "firebase": "^12.1.0",
     "lucide-react": "^0.536.0",
     "openai": "^5.12.2",
     "react": "^19.1.0",

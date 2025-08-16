@@ -1,5 +1,5 @@
 
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useEffect } from 'react';
 import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { ChannelList } from "@/desktop/features/chat/components/channel-list";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
@@ -13,16 +13,39 @@ import { useAIAssistant } from "@/desktop/features/chat/hooks/use-ai-assistant";
 import { useChatActions } from "@/desktop/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/desktop/features/chat/hooks/use-chat-scroll";
 import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
+import { usePaginatedMessages } from "@/desktop/features/chat/hooks/use-paginated-messages";
 
 export function ChatPage() {
     const { currentChannelId } = useChatViewStore();
-    const { messages } = useChatDataStore();
+    const { messages, hasMore, loadMore } = usePaginatedMessages(20);
 
     // Use specialized hooks
     const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
     const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
+    
+    // 滚动加载更多消息
+    const handleScroll = () => {
+        if (!containerRef.current) return;
+        
+        const { scrollTop } = containerRef.current;
+        
+        // 当滚动到顶部时加载更多消息
+        if (scrollTop === 0 && hasMore) {
+            loadMore();
+        }
+    };
+    
+    // 添加滚动事件监听器
+    useEffect(() => {
+        const container = containerRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll);
+            return () => container.removeEventListener('scroll', handleScroll);
+        }
+    }, [hasMore, loadMore]);
+    
     console.log("[ChatPage] ", {
         currentAIAssistantChannel
     });
@@ -36,6 +59,7 @@ export function ChatPage() {
                         <MessageTimelineContainer
                             containerRef={containerRef}
                             onOpenThread={handleOpenThread}
+                            messages={messages}
                         />
                     }
                     input={
@@ -74,4 +98,4 @@ export function ChatPage() {
             }
         />
     );
-}; 
+};

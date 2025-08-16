@@ -1,14 +1,26 @@
-import { useCurrentChannelMessages } from "@/desktop/features/chat/hooks/use-current-channel-messages";
 import { Message } from "@/core/stores/chat-data-store";
 import { format } from "date-fns";
 import { useMemo } from "react";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatViewStore } from '@/core/stores/chat-view-store';
 
 // Message grouping logic hook
-export function useGroupedMessages() {
-    const messages = useCurrentChannelMessages();
+export function useGroupedMessages(messages?: Message[]) {
+    // 如果没有传入消息，则使用store中的消息
+    const storeMessages = useChatDataStore(state => state.messages);
+    const currentChannelId = useChatViewStore(state => state.currentChannelId);
+    
+    const effectiveMessages = useMemo(() => {
+        if (messages) return messages;
+        
+        // 过滤当前频道的消息
+        return storeMessages.filter(message => 
+            message.channelId === currentChannelId && !message.parentId
+        );
+    }, [messages, storeMessages, currentChannelId]);
 
     return useMemo(() => {
-        return messages.reduce((groups: Record<string, Message[]>, message: Message) => {
+        return effectiveMessages.reduce((groups: Record<string, Message[]>, message: Message) => {
             const date = format(message.timestamp, 'yyyy-MM-dd');
             if (!groups[date]) {
                 groups[date] = [];
@@ -16,5 +28,5 @@ export function useGroupedMessages() {
             groups[date].push(message);
             return groups;
         }, {});
-    }, [messages]);
+    }, [effectiveMessages]);
 }
