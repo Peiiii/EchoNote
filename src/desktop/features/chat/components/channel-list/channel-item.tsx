@@ -1,4 +1,4 @@
-import { Channel } from "@/core/stores/chat-store";
+import { Channel } from "@/core/stores/chat-data-store";
 import { getChannelIcon } from "./channel-icons";
 
 interface ChannelItemProps {

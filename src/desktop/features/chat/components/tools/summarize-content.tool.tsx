@@ -1,5 +1,5 @@
 import { Tool, ToolCall, ToolResult } from "@agent-labs/agent-chat";
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
 
 export const createSummarizeContentTool = (channelId: string): Tool => ({
   name: 'summarizeContent',
@@ -16,7 +16,7 @@ export const createSummarizeContentTool = (channelId: string): Tool => ({
     required: ['timeRange']
   },
   execute: async (toolCall: ToolCall): Promise<ToolResult> => {
-    const state = useChatStore.getState();
+    const state = useChatDataStore.getState();
     const channel = state.channels.find(ch => ch.id === channelId);
     const messages = state.messages.filter(msg => msg.channelId === channelId);
     

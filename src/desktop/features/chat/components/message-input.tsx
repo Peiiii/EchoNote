@@ -1,20 +1,21 @@
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface MessageInputProps {
     onSend: () => void;
-    replyToMessageId?: string; // ID of the message being replied to
-    onCancelReply?: () => void; // Cancel reply
-    onOpenAIAssistant?: (channelId?: string) => void; // Open AI Assistant
+    replyToMessageId?: string;
+    onCancelReply: () => void;
+    onOpenAIAssistant: (channelId?: string) => void;
 }
 
-export const MessageInput = ({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) => {
+export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { addMessage, addThreadMessage, messages } = useChatStore();
-    const { currentChannelId } = useChatStore();
+    const { addMessage, addThreadMessage, messages } = useChatDataStore();
+    const { currentChannelId } = useChatViewStore();
 
     // Get the message being replied to
     const replyToMessage = replyToMessageId ? messages.find(msg => msg.id === replyToMessageId) : null;

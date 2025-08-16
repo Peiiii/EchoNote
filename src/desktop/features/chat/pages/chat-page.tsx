@@ -1,5 +1,6 @@
 
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { ChannelList } from "@/desktop/features/chat/components/channel-list";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
@@ -13,8 +14,9 @@ import { useChatActions } from "@/desktop/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/desktop/features/chat/hooks/use-chat-scroll";
 import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
 
-export const ChatPage = () => {
-    const { currentChannelId, messages } = useChatStore();
+export function ChatPage() {
+    const { currentChannelId } = useChatViewStore();
+    const { messages } = useChatDataStore();
 
     // Use specialized hooks
     const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);

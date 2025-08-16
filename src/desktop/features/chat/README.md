@@ -141,8 +141,8 @@ export { MessageTimeline } from "./message-timeline";
 ## 🔄 State Management
 
 Chat state is managed through:
-- **useChatStore**: Global chat state (messages, channels)
-- **useChatPage**: Page-level state and handlers
+- **useChatDataStore**: Global chat data state (messages, channels)
+- **useChatViewStore**: Global chat view state (current channel, GitHub sync)
 - **useChatAutoScroll**: Scroll behavior management
 
 ## 🎨 Styling

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatViewStore } from "@/core/stores/chat-view-store";
 
-export const useAIAssistant = () => {
-    const { currentChannelId } = useChatStore();
+export function useAIAssistant() {
+    const { currentChannelId } = useChatViewStore();
     
     // AI Assistant sidebar state
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);

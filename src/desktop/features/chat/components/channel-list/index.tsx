@@ -1,9 +1,11 @@
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
 
-export const ChannelList = () => {
-    const { channels, currentChannelId, setCurrentChannel, addChannel } = useChatStore();
+export function ChannelList() {
+    const { channels, addChannel } = useChatDataStore();
+    const { currentChannelId, setCurrentChannel } = useChatViewStore();
 
     const handleAddChannel = (channel: { name: string; description: string }) => {
         addChannel(channel);

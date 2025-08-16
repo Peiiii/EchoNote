@@ -1,4 +1,6 @@
-import { useCurrentChannelMessages, useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatViewStore } from "@/core/stores/chat-view-store";
+import { Message } from "@/core/stores/chat-data-store";
 import { EmptyState } from "./empty-state";
 import { DateDivider } from "./date-divider";
 import { ThoughtRecord } from "./thought-record";
@@ -8,12 +10,19 @@ interface MessageTimelineProps {
     onOpenThread: (messageId: string) => void;
 }
 
-export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
+export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
     const groupedMessages = useGroupedMessages();
-    const messages = useCurrentChannelMessages();
-    const { getThreadMessages } = useChatStore();
+    const { currentChannelId } = useChatViewStore();
+    const { messages } = useChatDataStore();
+    const { getThreadMessages } = useChatDataStore();
 
-    if (messages.length === 0) {
+    // Filter messages for current channel and exclude thread messages
+    const currentChannelMessages = messages.filter((message) =>
+        message.channelId === currentChannelId &&
+        !message.parentId
+    );
+
+    if (currentChannelMessages.length === 0) {
         return <EmptyState />;
     }
 
@@ -22,7 +31,7 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
             <div className="w-full">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => {
                     // Filter only user messages for display (excluding thread messages)
-                    const userMessages = dayMessages.filter(msg => 
+                    const userMessages = (dayMessages as Message[]).filter((msg: Message) => 
                         msg.sender === "user" && 
                         !msg.parentId // Ensure only main messages are shown, not thread messages
                     );
@@ -33,7 +42,7 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
 
                             {/* Elegant timeline of thoughts */}
                             <div className="w-full">
-                                {userMessages.map((message, index) => {
+                                {userMessages.map((message: Message, index: number) => {
                                     const threadMessages = getThreadMessages(message.threadId || message.id);
                                     const threadCount = threadMessages.length > 1 ? threadMessages.length - 1 : 0;
                                     
@@ -41,7 +50,6 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
                                         <div key={message.id} className="w-full">
                                             <ThoughtRecord 
                                                 message={message} 
-                                                isFirstInGroup={index === 0}
                                                 onOpenThread={onOpenThread}
                                                 threadCount={threadCount}
                                             />
@@ -62,4 +70,4 @@ export const MessageTimeline = ({ onOpenThread }: MessageTimelineProps) => {
             </div>
         </div>
     );
-}; 
+} 

@@ -1,5 +1,6 @@
 import { MoreHorizontal, Clock, Eye, Bookmark, MessageCircle, Lightbulb } from "lucide-react";
-import { Message, useChatStore } from "@/core/stores/chat-store";
+import { Message } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
@@ -13,11 +14,10 @@ interface ThoughtRecordProps {
     threadCount?: number;
 }
 
-export const ThoughtRecord = ({ message, onReply, onOpenThread, threadCount = 0 }: ThoughtRecordProps) => {
+export function ThoughtRecord({ message, onReply, onOpenThread, threadCount = 0 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    const updateMessage = useChatStore(state => state.updateMessage);
-
+    const updateMessage = useChatDataStore(state => state.updateMessage);
 
 
     const aiAnalysis = message.aiAnalysis;

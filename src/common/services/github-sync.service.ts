@@ -1,4 +1,6 @@
-import { Channel, Message, useChatStore } from '@/core/stores/chat-store';
+import { Channel, Message } from '@/core/stores/chat-data-store';
+import { useChatDataStore } from '@/core/stores/chat-data-store';
+import { useChatViewStore } from '@/core/stores/chat-view-store';
 import { githubChatStorageService } from './github-chat-storage.service';
 
 export class GitHubSyncService {
@@ -7,22 +9,36 @@ export class GitHubSyncService {
     // 同步本地数据到 GitHub
     async syncToGitHub(): Promise<void> {
         console.log('[GitHubSyncService] syncToGitHub');
-        const store = useChatStore.getState();
+        
+        const dataStore = useChatDataStore.getState();
+        const viewStore = useChatViewStore.getState();
+        
+        if (!viewStore.isGitHubEnabled) {
+            throw new Error('GitHub sync is not enabled');
+        }
 
         // 同步频道元数据
-        console.log('[GitHubSyncService] syncChannelToGitHub', store.channels);
-        for (const channel of store.channels) {
+        console.log('[GitHubSyncService] syncChannelToGitHub', dataStore.channels);
+        for (const channel of dataStore.channels) {
             await this.syncChannelToGitHub(channel);
         }
 
         // 同步消息数据
-        for (const message of store.messages) {
+        for (const message of dataStore.messages) {
             await this.syncMessageToGitHub(message);
         }
     }
 
     // 从 GitHub 加载数据到本地
     async loadFromGitHub(): Promise<void> {
+        console.log('[GitHubSyncService] loadFromGitHub');
+        
+        const viewStore = useChatViewStore.getState();
+        
+        if (!viewStore.isGitHubEnabled) {
+            throw new Error('GitHub sync is not enabled');
+        }
+
         // 获取所有频道
         const globalIndex = await this.chatStorageService.loadGlobalChannelsIndex();
         if (!globalIndex) return;
@@ -72,8 +88,8 @@ export class GitHubSyncService {
         if (!metadata) return;
 
         // 检查频道是否已存在
-        const store = useChatStore.getState();
-        const existingChannel = store.channels.find(ch => ch.id === channelSlug);
+        const dataStore = useChatDataStore.getState();
+        const existingChannel = dataStore.channels.find(ch => ch.id === channelSlug);
 
         if (!existingChannel) {
             // 添加新频道
@@ -81,7 +97,7 @@ export class GitHubSyncService {
                 name: metadata.name,
                 description: metadata.description
             };
-            store.addChannel(newChannel);
+            dataStore.addChannel(newChannel);
         }
 
         // 加载频道消息
@@ -91,11 +107,11 @@ export class GitHubSyncService {
     // 从 GitHub 加载频道消息
     private async loadChannelMessagesFromGitHub(channelSlug: string): Promise<void> {
         const messages = await this.chatStorageService.getChannelMessages(channelSlug);
-        const store = useChatStore.getState();
+        const dataStore = useChatDataStore.getState();
 
         for (const chatMessage of messages) {
             // 检查消息是否已存在
-            const existingMessage = store.messages.find(msg => msg.id === chatMessage.id);
+            const existingMessage = dataStore.messages.find(msg => msg.id === chatMessage.id);
             if (existingMessage) continue;
 
             // 添加新消息
@@ -108,7 +124,7 @@ export class GitHubSyncService {
                 threadId: chatMessage.threadId || undefined
             };
 
-            store.addMessage(newMessage);
+            dataStore.addMessage(newMessage);
         }
     }
 

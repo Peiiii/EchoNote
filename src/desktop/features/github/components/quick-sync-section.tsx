@@ -1,7 +1,7 @@
 import { Button } from '@/common/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Badge } from '@/common/components/ui/badge';
-import { useChatStore } from '@/core/stores/chat-store';
+import { useChatViewStore } from '@/core/stores/chat-view-store';
 import { useGitHubConfigStore } from '@/core/stores/github-config.store';
 import { Upload, Download, RefreshCw, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ export function QuickSyncSection() {
         syncError,
         syncToGitHub,
         loadFromGitHub
-    } = useChatStore();
+    } = useChatViewStore();
 
     const { isAuthenticated, isStorageConfigured } = useGitHubConfigStore();
     const [isManualSyncing, setIsManualSyncing] = useState(false);

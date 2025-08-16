@@ -4,8 +4,8 @@ import { createCreateTagTool } from "@/desktop/features/chat/components/tools/cr
 import { createSearchMessagesTool } from "@/desktop/features/chat/components/tools/search-messages.tool";
 import { createSummarizeContentTool } from "@/desktop/features/chat/components/tools/summarize-content.tool";
 import { IAgent, Tool } from "@agent-labs/agent-chat";
-import { useChatStore } from "@/core/stores/chat-store";
-import type { Message } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { Message } from "@/core/stores/chat-data-store";
 
 export interface AIAgentConfig {
   apiKey?: string;
@@ -60,7 +60,7 @@ export class AIAgentFactory {
   getChannelContext(channelId: string) {
     
     // Get channel and message data
-    const state = useChatStore.getState();
+    const state = useChatDataStore.getState();
     const channel = state.channels.find(ch => ch.id === channelId);
     const messages = state.messages.filter(msg => msg.channelId === channelId);
     

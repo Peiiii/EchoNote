@@ -10,3 +10,5 @@ alwaysApply: true
 - **Documentation Language**: English
 - **UI Language**: English
 
+## User Rules
+- try not to use `any` type in the code unless there is no other way.

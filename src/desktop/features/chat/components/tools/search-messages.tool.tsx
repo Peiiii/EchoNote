@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
 import { Tool, ToolResult } from "@agent-labs/agent-chat";
 import { ToolInvocation } from "@ai-sdk/ui-utils";
 import { useState } from "react";
@@ -18,7 +18,7 @@ const SearchForm = ({
   const [limit, setLimit] = useState(toolInvocation.args.limit || 5);
   
   const handleSearch = () => {
-    const state = useChatStore.getState();
+    const state = useChatDataStore.getState();
     const messages = state.messages.filter(msg => msg.channelId === channelId);
     
     const searchResults = messages

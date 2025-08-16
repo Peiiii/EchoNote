@@ -1,4 +1,7 @@
-import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
+import {
+  ActivityBarGroup,
+  useActivityBarStore,
+} from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -21,8 +24,8 @@ export const githubExtension = defineExtension({
     subscriptions.push(
       Disposable.from(
         useIconStore.getState().addIcons({
-          "github": Github,
-          "cloud": Cloud,
+          github: Github,
+          cloud: Cloud,
           "github-settings": Settings,
         })
       )
@@ -43,22 +46,7 @@ export const githubExtension = defineExtension({
       )
     );
 
-    // Register activity bar items - footer group
-    subscriptions.push(
-      Disposable.from(
-        useActivityBarStore.getState().addItem({
-          id: "github-settings",
-          label: "GitHub Settings",
-          title: "GitHub Configuration",
-          group: ActivityBarGroup.FOOTER,
-          icon: "github-settings",
-          order: 2,
-          iconColor: "text-blue-600 dark:text-blue-400",
-        })
-      )
-    );
-
-    window.addEventListener('popstate', handleOAuthCallback);
+    window.addEventListener("popstate", handleOAuthCallback);
     handleOAuthCallback();
 
     // Register routes
@@ -83,10 +71,6 @@ export const githubExtension = defineExtension({
             activityKey: "github",
             routerPath: "/github",
           },
-          {
-            activityKey: "github-settings",
-            routerPath: "/github",
-          },
         ])
       )
     );
@@ -95,7 +79,7 @@ export const githubExtension = defineExtension({
     subscriptions.push(
       Disposable.from(() => {
         // Remove event listener
-        window.removeEventListener('popstate', handleOAuthCallback);
+        window.removeEventListener("popstate", handleOAuthCallback);
       })
     );
   },

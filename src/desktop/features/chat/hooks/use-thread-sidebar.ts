@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
 
-export const useThreadSidebar = () => {
-    const { messages, getThreadMessages, addThreadMessage } = useChatStore();
+export function useThreadSidebar() {
+    const { messages, getThreadMessages, addThreadMessage } = useChatDataStore();
     
     // Thread sidebar state
     const [isThreadOpen, setIsThreadOpen] = useState(false);

@@ -1,6 +1,6 @@
 import { X, Bot } from "lucide-react";
 import { useMemo } from "react";
-import { useChatStore } from "@/core/stores/chat-store";
+import { useChatDataStore } from "@/core/stores/chat-data-store";
 import { AgentChatCore } from "@agent-labs/agent-chat";
 import { aiAgentFactory } from "../services/ai-agent-factory";
 
@@ -10,12 +10,12 @@ interface AIAssistantSidebarProps {
     channelId: string;
 }
 
-export const AIAssistantSidebar = ({ 
+export function AIAssistantSidebar({ 
     isOpen, 
     onClose, 
     channelId 
-}: AIAssistantSidebarProps) => {
-    const { channels } = useChatStore();
+}: AIAssistantSidebarProps) {
+    const { channels } = useChatDataStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
     
     // Create HttpAgent instance
