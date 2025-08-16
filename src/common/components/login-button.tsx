@@ -1,7 +1,6 @@
-import React from 'react';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 import { Button } from '@/common/components/ui/button';
 import { useFirebaseAuth } from '@/common/hooks/use-firebase-auth';
+import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 
 export const LoginButton = () => {
   const { user } = useFirebaseAuth();

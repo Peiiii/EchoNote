@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
-import { LoginButton } from './login-button';
-import { Button } from '@/common/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
+import { Button } from '@/common/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/common/components/ui/popover';
-import { LogOut, User } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
+import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
+import { LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { LoginButton } from './login-button';
 
 interface UserProfileProps {
   user: any; // Firebase User

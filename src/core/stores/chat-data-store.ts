@@ -1,5 +1,4 @@
 import { firebaseChatService } from "@/common/services/firebase/firebase-chat.service";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { create } from "zustand";
 
 export interface AIAnalysis {

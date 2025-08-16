@@ -1,7 +1,6 @@
-import React from 'react';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 import { Button } from '@/common/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
+import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 import { LogIn } from 'lucide-react';
 
 export const LoginButton = () => {
