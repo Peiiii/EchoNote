@@ -20,7 +20,12 @@ export function useGroupedMessages(messages?: Message[]) {
     }, [messages, storeMessages, currentChannelId]);
 
     return useMemo(() => {
-        return effectiveMessages.reduce((groups: Record<string, Message[]>, message: Message) => {
+        // 按时间排序消息（最早的在前，最新的在后）
+        const sortedMessages = [...effectiveMessages].sort((a, b) => 
+            a.timestamp.getTime() - b.timestamp.getTime()
+        );
+        
+        return sortedMessages.reduce((groups: Record<string, Message[]>, message: Message) => {
             const date = format(message.timestamp, 'yyyy-MM-dd');
             if (!groups[date]) {
                 groups[date] = [];

@@ -98,8 +98,8 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       timestamp: new Date(),
     } as Message;
 
-    // 乐观更新：立即添加消息到状态中
-    set({ messages: [tempMessage, ...messages] });
+    // 乐观更新：立即添加消息到状态中（添加到末尾，显示在底部）
+    set({ messages: [...messages, tempMessage] });
 
     try {
       // 调用Firebase服务创建消息
@@ -109,16 +109,18 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       );
 
       // 用服务器返回的真实ID更新消息
+      const currentMessages = get().messages;
       set({
-        messages: messages.map((msg) =>
+        messages: currentMessages.map((msg) =>
           msg.id === tempId ? { ...tempMessage, id: messageId } : msg
         ),
       });
     } catch (error) {
       console.error("Error creating message:", error);
       // 如果失败，移除临时消息
+      const currentMessages = get().messages;
       set({
-        messages: messages.filter((msg) => msg.id !== tempId),
+        messages: currentMessages.filter((msg) => msg.id !== tempId),
       });
     }
   },
@@ -173,16 +175,46 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       channelId: message.channelId,
     };
 
+    // 生成临时ID和时间戳
+    const tempId = `temp_${Date.now()}`;
+    const tempMessage: Message = {
+      ...messageWithThread,
+      id: tempId,
+      timestamp: new Date(),
+    } as Message;
+
+    // 乐观更新：立即添加消息到状态中（添加到末尾，显示在底部）
+    set({ messages: [...messages, tempMessage] });
+
     try {
-      await firebaseChatService.createMessage(userId, messageWithThread);
+      // 调用Firebase服务创建消息
+      const messageId = await firebaseChatService.createMessage(
+        userId,
+        messageWithThread
+      );
+
+      // 用服务器返回的真实ID更新消息
+      const currentMessages = get().messages;
+      set({
+        messages: currentMessages.map((msg) =>
+          msg.id === tempId ? { ...tempMessage, id: messageId } : msg
+        ),
+      });
     } catch (error) {
       console.error("Error creating thread message:", error);
+      // 如果失败，移除临时消息
+      const currentMessages = get().messages;
+      set({
+        messages: currentMessages.filter((msg) => msg.id !== tempId),
+      });
     }
   },
 
   getThreadMessages: (threadId: string): Message[] => {
     const { messages } = get();
-    return messages.filter((msg) => msg.threadId === threadId);
+    return messages
+      .filter((msg) => msg.threadId === threadId)
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   },
 
   // Firebase integration methods
@@ -201,7 +233,15 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       }
     );
 
-    set({ unsubscribeChannels });
+    // Subscribe to messages for all channels
+    const unsubscribeMessages = firebaseChatService.subscribeToMessages(
+      userId,
+      (messages) => {
+        set({ messages });
+      }
+    );
+
+    set({ unsubscribeChannels, unsubscribeMessages });
   },
 
   cleanupListeners: () => {

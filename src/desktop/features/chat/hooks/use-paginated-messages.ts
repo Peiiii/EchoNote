@@ -1,16 +1,22 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useChatViewStore } from '@/core/stores/chat-view-store';
 import { firebaseChatService } from '@/common/services/firebase/firebase-chat.service';
 import { useChatDataStore } from '@/core/stores/chat-data-store';
-import { Message } from '@/core/stores/chat-data-store';
+import { DocumentSnapshot } from 'firebase/firestore';
 
 export const usePaginatedMessages = (messagesLimit: number = 20) => {
   const { currentChannelId } = useChatViewStore();
-  const { userId } = useChatDataStore();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { userId, messages: allMessages } = useChatDataStore();
+  
+  // 过滤当前频道的消息并按时间排序（最早的在前，最新的在后）
+  const messages = allMessages
+    .filter(msg => msg.channelId === currentChannelId)
+    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  
+  // 分页相关状态
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [lastVisible, setLastVisible] = useState<any>(null);
+  const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
 
   // 获取初始消息
   const fetchInitialMessages = useCallback(async () => {
@@ -24,7 +30,6 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
         messagesLimit
       );
       
-      setMessages(result.messages);
       setLastVisible(result.lastVisible);
       setHasMore(!result.allLoaded);
     } catch (error) {
@@ -47,7 +52,6 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
         lastVisible
       );
       
-      setMessages(prev => [...result.messages, ...prev]);
       setLastVisible(result.lastVisible);
       setHasMore(!result.allLoaded);
     } catch (error) {

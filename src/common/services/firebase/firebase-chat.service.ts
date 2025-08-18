@@ -78,6 +78,30 @@ export const firebaseChatService = {
     return unsubscribe;
   },
 
+  // Message Services - Subscribe to all messages for a user
+  subscribeToMessages: (
+    userId: string,
+    onUpdate: (messages: Message[]) => void
+  ): (() => void) => {
+    const q = query(
+      getMessagesCollectionRef(userId),
+      orderBy("timestamp", "asc")
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const messages = snapshot.docs.map(docToMessage);
+        onUpdate(messages);
+      },
+      (error) => {
+        console.error("Error subscribing to messages:", error);
+      }
+    );
+
+    return unsubscribe;
+  },
+
   createChannel: async (
     userId: string,
     channelData: Omit<Channel, "id" | "createdAt" | "messageCount">
@@ -99,7 +123,7 @@ export const firebaseChatService = {
     const q = query(
       getMessagesCollectionRef(userId),
       where("channelId", "==", channelId),
-      orderBy("timestamp", "desc"),
+      orderBy("timestamp", "asc"),
       limit(messagesLimit)
     );
 
@@ -120,7 +144,7 @@ export const firebaseChatService = {
     const q = query(
       getMessagesCollectionRef(userId),
       where("channelId", "==", channelId),
-      orderBy("timestamp", "desc"),
+      orderBy("timestamp", "asc"),
       startAfter(cursor),
       limit(messagesLimit)
     );
