@@ -14,7 +14,7 @@ export const firebaseAuthService = {
   signInAnonymously: async (): Promise<User> => {
     const result = await signInAnonymously(auth);
     // 初始化数据监听器
-    useChatDataStore.getState().initFirebaseListeners(result.user.uid);
+    await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
     return result.user;
   },
 
@@ -24,7 +24,7 @@ export const firebaseAuthService = {
     try {
       const result = await signInWithPopup(auth, provider);
       // 初始化数据监听器
-      useChatDataStore.getState().initFirebaseListeners(result.user.uid);
+      await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
       return result.user; // 返回用户对象
     } catch (error) {
       // 处理错误，例如用户关闭了弹窗
@@ -42,10 +42,10 @@ export const firebaseAuthService = {
 
   // 监听认证状态变化
   onAuthStateChanged: (callback: (user: User | null) => void): (() => void) => {
-    return onAuthStateChanged(auth, (user) => {
+    return onAuthStateChanged(auth, async (user) => {
       if (user) {
         // 用户已登录，初始化数据监听器
-        useChatDataStore.getState().initFirebaseListeners(user.uid);
+        await useChatDataStore.getState().initFirebaseListeners(user.uid);
       } else {
         // 用户未登录，清理数据监听器
         useChatDataStore.getState().cleanupListeners();

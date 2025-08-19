@@ -1,10 +1,11 @@
-import { MoreHorizontal, Clock, Eye, Bookmark, MessageCircle, Lightbulb } from "lucide-react";
-import { Message } from "@/core/stores/chat-data-store";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
-import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
-import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
+import { Message, useChatDataStore } from "@/core/stores/chat-data-store";
+import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
+import { Bookmark, Clock, Eye, Lightbulb, MessageCircle } from "lucide-react";
+import { useState } from "react";
+
+import { MoreActionsMenu } from "./more-actions-menu";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -15,13 +16,20 @@ interface ThoughtRecordProps {
 }
 
 export function ThoughtRecord({ message, onReply, onOpenThread, threadCount = 0 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
+    console.log('[ThoughtRecord]message', message);
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    const updateMessage = useChatDataStore(state => state.updateMessage);
 
+    const updateMessage = useChatDataStore(state => state.updateMessage);
+    const deleteMessage = useChatDataStore(state => state.deleteMessage);
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
+
+    // 如果消息已被删除，不显示内容
+    if (message.isDeleted) {
+        return null;
+    }
 
     async function handleGenerateSparks() {
         try {
@@ -45,6 +53,47 @@ export function ThoughtRecord({ message, onReply, onOpenThread, threadCount = 0 
             setIsGenerating(false);
         }
     }
+
+
+
+    // 删除方法（使用原生 confirm）
+    const handleDelete = async () => {
+        // 创建更友好的确认消息
+        const messagePreview = message.content.length > 100 
+            ? `${message.content.substring(0, 100)}...` 
+            : message.content;
+            
+        const confirmed = window.confirm(
+            `🗑️ Delete Thought\n\n` +
+            `"${messagePreview}"\n\n` +
+            `⚠️ This action cannot be undone.\n` +
+            `The thought will be moved to trash.\n\n` +
+            `Are you sure you want to continue?`
+        );
+        
+        if (confirmed) {
+            try {
+                console.log('Starting delete process for message:', message.id);
+                
+                // 显示简单的加载提示
+                const loadingMsg = 'Deleting thought...';
+                console.log(loadingMsg);
+                
+                await deleteMessage(message.id, false); // 软删除
+                console.log('Delete completed successfully');
+                
+                // 显示成功提示
+                console.log('Thought deleted successfully and moved to trash');
+                
+            } catch (error) {
+                console.error('Failed to delete message:', error);
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
+            }
+        } else {
+            console.log('Delete operation cancelled by user');
+        }
+    };
 
     return (
         <div className="w-full">
@@ -84,10 +133,16 @@ export function ThoughtRecord({ message, onReply, onOpenThread, threadCount = 0 
                         <button
                             onClick={onReply}
                             className="p-2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 hover:scale-105"
-                            title="Add thought"
+                            title="Reply to thought"
                         >
-                            <MoreHorizontal className="w-4 h-4" />
+                            <MessageCircle className="w-4 h-4" />
                         </button>
+                        {/* 更多操作菜单 */}
+                        <MoreActionsMenu
+                            message={message}
+                            onDelete={handleDelete}
+                            onCopy={() => navigator.clipboard.writeText(message.content)}
+                        />
                     </div>
                 </div>
 
@@ -176,6 +231,8 @@ export function ThoughtRecord({ message, onReply, onOpenThread, threadCount = 0 
                     </div>
                 </div>
             </div>
+            
+
         </div>
     );
 };

@@ -13,9 +13,11 @@ export function useGroupedMessages(messages?: Message[]) {
     const effectiveMessages = useMemo(() => {
         if (messages) return messages;
         
-        // 过滤当前频道的消息
+        // 过滤当前频道的消息，排除已删除的消息和回复消息
         return storeMessages.filter(message => 
-            message.channelId === currentChannelId && !message.parentId
+            message.channelId === currentChannelId && 
+            !message.parentId && 
+            !message.isDeleted // 排除已删除的消息
         );
     }, [messages, storeMessages, currentChannelId]);
 

@@ -44,6 +44,11 @@ const docToMessage = (doc: DocumentSnapshot): Message => {
     isThreadExpanded: data.isThreadExpanded,
     threadCount: data.threadCount,
     aiAnalysis: data.aiAnalysis,
+    // 删除相关字段
+    isDeleted: data.isDeleted || false,
+    deletedAt: data.deletedAt ? (data.deletedAt as Timestamp).toDate() : undefined,
+    deletedBy: data.deletedBy,
+    canRestore: data.canRestore,
   };
 };
 
@@ -102,6 +107,17 @@ export const firebaseChatService = {
     return unsubscribe;
   },
 
+  // 获取频道列表（一次性加载）
+  fetchChannels: async (userId: string): Promise<Channel[]> => {
+    const q = query(
+      getChannelsCollectionRef(userId),
+      orderBy("createdAt", "asc")
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(docToChannel);
+  },
+
   createChannel: async (
     userId: string,
     channelData: Omit<Channel, "id" | "createdAt" | "messageCount">
@@ -115,6 +131,17 @@ export const firebaseChatService = {
   },
 
   // Message Services
+  // 获取所有消息（一次性加载）
+  fetchAllMessages: async (userId: string): Promise<Message[]> => {
+    const q = query(
+      getMessagesCollectionRef(userId),
+      orderBy("timestamp", "asc")
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(docToMessage);
+  },
+
   fetchInitialMessages: async (
     userId: string,
     channelId: string,
@@ -180,5 +207,25 @@ export const firebaseChatService = {
   deleteMessage: async (userId: string, messageId: string): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await deleteDoc(messageRef);
+  },
+
+  // 软删除消息
+  softDeleteMessage: async (userId: string, messageId: string): Promise<void> => {
+    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    await updateDoc(messageRef, {
+      isDeleted: true,
+      deletedAt: serverTimestamp(),
+      deletedBy: userId,
+    });
+  },
+
+  // 恢复消息
+  restoreMessage: async (userId: string, messageId: string): Promise<void> => {
+    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    await updateDoc(messageRef, {
+      isDeleted: false,
+      deletedAt: null,
+      deletedBy: null,
+    });
   },
 };

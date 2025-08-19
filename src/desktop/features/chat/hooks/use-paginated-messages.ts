@@ -8,9 +8,9 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
   const { currentChannelId } = useChatViewStore();
   const { userId, messages: allMessages } = useChatDataStore();
   
-  // 过滤当前频道的消息并按时间排序（最早的在前，最新的在后）
+  // 过滤当前频道的消息并按时间排序（最早的在前，最新的在后），排除已删除的消息
   const messages = allMessages
-    .filter(msg => msg.channelId === currentChannelId)
+    .filter(msg => msg.channelId === currentChannelId && !msg.isDeleted)
     .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   
   // 分页相关状态
