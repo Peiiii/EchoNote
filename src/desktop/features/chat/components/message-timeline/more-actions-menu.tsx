@@ -1,6 +1,6 @@
 import { Message } from "@/core/stores/chat-data-store";
 import { Copy, Edit, Flag, Share2, Trash2 } from "lucide-react";
-import { ActionMenu, ActionMenuItem, ActionMenuGroup } from "@/common/components/ui/action-menu";
+import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/ui/action-menu";
 
 interface MoreActionsMenuProps {
     message: Message;
@@ -28,67 +28,69 @@ export function MoreActionsMenu({
         }
     };
 
+    // 配置驱动的菜单结构
+    const menuGroups: ActionMenuGroupConfig[] = [
+        {
+            id: "primary",
+            showSeparator: false,
+            items: [
+                ...(onEdit ? [{
+                    id: "edit",
+                    icon: <Edit />,
+                    title: "Edit thought",
+                    description: "Modify this thought",
+                    onClick: onEdit,
+                    variant: "default" as const
+                }] : []),
+                {
+                    id: "copy",
+                    icon: <Copy />,
+                    title: "Copy content",
+                    onClick: handleCopy,
+                    variant: "default" as const
+                },
+                ...(onShare ? [{
+                    id: "share",
+                    icon: <Share2 />,
+                    title: "Share thought",
+                    description: "Share with others",
+                    onClick: onShare,
+                    variant: "default" as const
+                }] : [])
+            ]
+        },
+        {
+            id: "advanced",
+            title: "Advanced",
+            variant: "default",
+            items: [
+                ...(onReport ? [{
+                    id: "report",
+                    icon: <Flag />,
+                    title: "Report",
+                    description: "Report inappropriate content",
+                    onClick: onReport,
+                    variant: "warning" as const
+                }] : [])
+            ]
+        },
+        {
+            id: "danger",
+            title: "Danger Zone",
+            variant: "danger",
+            items: [
+                {
+                    id: "delete",
+                    icon: <Trash2 />,
+                    title: "Delete thought",
+                    onClick: onDelete,
+                    variant: "destructive" as const
+                }
+            ]
+        }
+    ];
+
     return (
-        <ActionMenu>
-            {/* 主要操作组 */}
-            <ActionMenuGroup showSeparator={false}>
-                {/* 编辑选项 */}
-                {onEdit && (
-                    <ActionMenuItem
-                        icon={<Edit />}
-                        title="Edit thought"
-                        description="Modify this thought"
-                        onClick={onEdit}
-                        variant="default"
-                    />
-                )}
-
-                {/* 复制选项 */}
-                <ActionMenuItem
-                    icon={<Copy />}
-                    title="Copy content"
-                    description="Copy to clipboard"
-                    onClick={handleCopy}
-                    variant="default"
-                />
-
-                {/* 分享选项 */}
-                {onShare && (
-                    <ActionMenuItem
-                        icon={<Share2 />}
-                        title="Share thought"
-                        description="Share with others"
-                        onClick={onShare}
-                        variant="default"
-                    />
-                )}
-            </ActionMenuGroup>
-
-            {/* 高级操作组 */}
-            <ActionMenuGroup title="Advanced" variant="default">
-                {/* 举报选项 */}
-                {onReport && (
-                    <ActionMenuItem
-                        icon={<Flag />}
-                        title="Report"
-                        description="Report inappropriate content"
-                        onClick={onReport}
-                        variant="warning"
-                    />
-                )}
-            </ActionMenuGroup>
-
-            {/* 危险操作组 */}
-            <ActionMenuGroup title="Danger Zone" variant="danger">
-                {/* 删除选项 */}
-                <ActionMenuItem
-                    icon={<Trash2 />}
-                    title="Delete thought"
-                    description="Move to trash (reversible)"
-                    onClick={onDelete}
-                    variant="destructive"
-                />
-            </ActionMenuGroup>
-        </ActionMenu>
+        <ConfigurableActionMenu groups={menuGroups} />
     );
 }
