@@ -13,7 +13,7 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
         <div className={`flex-1 flex flex-col bg-white dark:bg-slate-900 ${className} overflow-hidden`}>
             <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
                 {/* Left sidebar */}
-                <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+                <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
                     <div className="h-full border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                         {sidebar}
                     </div>
@@ -24,9 +24,9 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
 
                 {/* Center content area */}
                 <ResizablePanel 
-                    defaultSize={rightSidebar ? 65 : 80} 
-                    minSize={45}
-                    maxSize={rightSidebar ? 65 : 80}
+                    defaultSize={rightSidebar ? 60 : 75} 
+                    minSize={40}
+                    maxSize={rightSidebar ? 60 : 75}
                 >
                     <div className="h-full flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
                         {content}
@@ -40,9 +40,9 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
                         <ResizableHandle withHandle />
                         
                         <ResizablePanel 
-                            defaultSize={25} 
-                            minSize={20}
-                            maxSize={35}
+                            defaultSize={35} 
+                            minSize={25}
+                            maxSize={40}
                         >
                             <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
                                 {rightSidebar}
