@@ -1,5 +1,5 @@
+import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/common/components/ui/resizable";
 import { ReactNode } from "react";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/common/components/ui/resizable";
 
 interface ChatLayoutProps {
     sidebar: ReactNode;
@@ -10,7 +10,7 @@ interface ChatLayoutProps {
 
 export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: ChatLayoutProps) => {
     return (
-        <div className={`flex-1 flex flex-col bg-white dark:bg-slate-900 ${className}`}>
+        <div className={`flex-1 flex flex-col bg-white dark:bg-slate-900 ${className} overflow-hidden`}>
             <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
                 {/* Left sidebar */}
                 <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
@@ -23,18 +23,28 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
                 <ResizableHandle withHandle />
 
                 {/* Center content area */}
-                <ResizablePanel defaultSize={rightSidebar ? 60 : 80} minSize={40}>
-                    <div className="h-full flex flex-col bg-white dark:bg-slate-900">
+                <ResizablePanel 
+                    defaultSize={rightSidebar ? 65 : 80} 
+                    minSize={45}
+                    maxSize={rightSidebar ? 65 : 80}
+                >
+                    <div className="h-full flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
                         {content}
                     </div>
                 </ResizablePanel>
 
-                {/* Right sidebar - conditional rendering with resizable */}
+                {/* Right sidebar - force fixed width with strong CSS constraints */}
                 {rightSidebar && (
                     <>
+                        {/* Resizable handle between content and right sidebar */}
                         <ResizableHandle withHandle />
-                        <ResizablePanel defaultSize={30} minSize={15} maxSize={40}>
-                            <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                        
+                        <ResizablePanel 
+                            defaultSize={25} 
+                            minSize={20}
+                            maxSize={35}
+                        >
+                            <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
                                 {rightSidebar}
                             </div>
                         </ResizablePanel>
