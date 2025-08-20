@@ -1,3 +1,7 @@
+---
+alwaysApply: false
+---
+
 # Multi-Solution Comparison & Recommendation System
 
 ## Overview
@@ -144,7 +148,3 @@ For each solution, evaluate:
 - **Implementation approaches** - Different ways to solve the same problem
 - **Refactoring strategies** - Multiple paths to improve existing code
 - **Performance optimization** - Different approaches to improve speed/efficiency
-description:
-globs:
-alwaysApply: false
----

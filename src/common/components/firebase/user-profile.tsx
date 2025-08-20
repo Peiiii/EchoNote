@@ -1,14 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import { useState } from 'react';
+import { User } from 'firebase/auth';
 import { Button } from '@/common/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/common/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 import { LogOut } from 'lucide-react';
-import React, { useState } from 'react';
+import { firebaseAuthService } from '@/common/services/firebase';
 import { LoginButton } from './login-button';
 
 interface UserProfileProps {
-  user: any; // Firebase User
+  user: User | null; // Firebase User
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
