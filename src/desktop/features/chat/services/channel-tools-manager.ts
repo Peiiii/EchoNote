@@ -1,5 +1,6 @@
 import { Tool } from "@agent-labs/agent-chat";
 import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { createListNotesTool } from "@/desktop/features/chat/components/tools/list-notes.tool";
 
 export class ChannelToolsManager {
     /**
@@ -195,41 +196,7 @@ export class ChannelToolsManager {
      * List all notes in the channel
      */
     private listNotesTool(channelId: string): Tool {
-        return {
-            name: 'listNotes',
-            description: 'List all notes in the current channel',
-            parameters: {
-                type: 'object',
-                properties: {
-                    limit: {
-                        type: 'number',
-                        description: 'Maximum number of notes to return (default: 10)'
-                    }
-                },
-                required: []
-            },
-            execute: async (toolCall) => {
-                const state = useChatDataStore.getState();
-                const args = JSON.parse(toolCall.function.arguments);
-                const { limit = 10 } = args;
-
-                const notes = state.messages
-                    .filter(msg => msg.channelId === channelId)
-                    .slice(-limit)
-                    .map(note => ({
-                        id: note.id,
-                        content: note.content.substring(0, 100) + (note.content.length > 100 ? '...' : ''),
-                        timestamp: note.timestamp,
-                        sender: note.sender
-                    }));
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Found ${notes.length} notes:\n\n${notes.map(note => `- ${note.content} (${new Date(note.timestamp).toLocaleString()})`).join('\n')}`,
-                    state: 'result' as const
-                };
-            }
-        };
+        return createListNotesTool(channelId);
     }
 }
 
