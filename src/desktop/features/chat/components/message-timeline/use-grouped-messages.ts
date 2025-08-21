@@ -1,8 +1,8 @@
-import { Message } from "@/core/stores/chat-data-store";
+import { Message } from "@/core/stores/chat-data.store";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
-import { useChatViewStore } from '@/core/stores/chat-view-store';
+import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from '@/core/stores/chat-view.store';
 
 // Message grouping logic hook
 export function useGroupedMessages(messages?: Message[]) {

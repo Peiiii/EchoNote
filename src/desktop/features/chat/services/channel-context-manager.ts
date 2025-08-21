@@ -1,4 +1,4 @@
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 export class ChannelContextManager {
   /**

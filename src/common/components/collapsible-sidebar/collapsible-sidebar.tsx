@@ -1,7 +1,8 @@
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect } from "react";
 import { cn } from "@/common/lib/utils";
 import { PanelLeft } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
+import { useViewStateStore } from "@/core/stores/view-state.store";
 
 // Context for internal communication
 interface CollapsibleSidebarContextType {
@@ -37,16 +38,19 @@ const CollapsibleSidebarRoot = ({
     className = "",
     onCollapseChange
 }: CollapsibleSidebarProps) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const { isLeftSidebarCollapsed, toggleLeftSidebar } = useViewStateStore();
 
     const toggleCollapse = () => {
-        const newCollapsedState = !isCollapsed;
-        setIsCollapsed(newCollapsedState);
-        onCollapseChange?.(newCollapsedState);
+        toggleLeftSidebar();
     };
 
+    // Sync with external onCollapseChange callback
+    useEffect(() => {
+        onCollapseChange?.(isLeftSidebarCollapsed);
+    }, [isLeftSidebarCollapsed, onCollapseChange]);
+
     const contextValue: CollapsibleSidebarContextType = {
-        isCollapsed,
+        isCollapsed: isLeftSidebarCollapsed,
         toggleCollapse,
         onCollapseChange
     };
@@ -56,20 +60,20 @@ const CollapsibleSidebarRoot = ({
             <div 
                 className={cn(
                     "flex-shrink-0 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 transition-all duration-300 ease-in-out overflow-hidden",
-                    isCollapsed ? collapsedWidth : width,
+                    isLeftSidebarCollapsed ? collapsedWidth : width,
                     className
                 )}
             >
                 <div className={cn(
                     "h-full flex flex-col transition-opacity duration-300",
-                    isCollapsed ? "opacity-0" : "opacity-100"
+                    isLeftSidebarCollapsed ? "opacity-0" : "opacity-100"
                 )}>
                     {children}
                 </div>
             </div>
 
             {/* Floating expand button when sidebar is collapsed */}
-            {isCollapsed && <CollapsibleSidebarExpandButton />}
+            {isLeftSidebarCollapsed && <CollapsibleSidebarExpandButton />}
         </CollapsibleSidebarContext.Provider>
     );
 };

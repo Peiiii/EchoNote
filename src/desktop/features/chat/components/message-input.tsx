@@ -1,5 +1,5 @@
-import { useChatDataStore } from "@/core/stores/chat-data-store";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 

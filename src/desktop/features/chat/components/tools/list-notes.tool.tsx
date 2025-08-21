@@ -1,7 +1,7 @@
 import { Tool, ToolCall, ToolResult } from '@agent-labs/agent-chat';
 import { List } from 'lucide-react';
-import { useChatDataStore } from '@/core/stores/chat-data-store';
-import { Message, Channel } from '@/core/stores/chat-data-store';
+import { useChatDataStore } from '@/core/stores/chat-data.store';
+import { Message, Channel } from '@/core/stores/chat-data.store';
 
 // Render component - 极简设计，大道至简
 interface ListNotesToolRenderProps {

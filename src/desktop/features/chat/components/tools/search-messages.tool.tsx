@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { Tool, ToolResult } from "@agent-labs/agent-chat";
 import { ToolInvocation } from "@ai-sdk/ui-utils";
 import { useState } from "react";

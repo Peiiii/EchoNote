@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 export function useThreadSidebar() {
     const { messages, getThreadMessages, addThreadMessage } = useChatDataStore();

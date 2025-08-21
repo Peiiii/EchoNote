@@ -7,7 +7,7 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import { auth } from '@/common/config/firebase.config';
-import { useChatDataStore } from '@/core/stores/chat-data-store';
+import { useChatDataStore } from '@/core/stores/chat-data.store';
 
 export const firebaseAuthService = {
   // 匿名登录

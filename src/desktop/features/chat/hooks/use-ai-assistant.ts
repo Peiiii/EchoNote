@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 
 export function useAIAssistant() {
     const { currentChannelId } = useChatViewStore();

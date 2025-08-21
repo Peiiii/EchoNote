@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Message } from "./chat-data-store";
-import { useChatDataStore } from "./chat-data-store";
+import { Message } from "./chat-data.store";
+import { useChatDataStore } from "./chat-data.store";
 import { User } from "firebase/auth";
 
 export interface ChatViewState {

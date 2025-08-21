@@ -1,6 +1,6 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
 import { useEffect } from "react";
@@ -17,7 +17,7 @@ export const App = () => {
     minDisplayTime: 600, // 最小显示 600ms
   });
 
-  // 同步认证状态到chat-view-store
+  // 同步认证状态到chat-view.store
   useEffect(() => {
     setAuth(user);
   }, [user, setAuth]);

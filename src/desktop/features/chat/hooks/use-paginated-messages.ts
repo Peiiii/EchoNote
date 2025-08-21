@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useChatViewStore } from '@/core/stores/chat-view-store';
+import { useChatViewStore } from '@/core/stores/chat-view.store';
 import { firebaseChatService } from '@/common/services/firebase/firebase-chat.service';
-import { useChatDataStore } from '@/core/stores/chat-data-store';
+import { useChatDataStore } from '@/core/stores/chat-data.store';
 import { DocumentSnapshot } from 'firebase/firestore';
 
 export const usePaginatedMessages = (messagesLimit: number = 20) => {

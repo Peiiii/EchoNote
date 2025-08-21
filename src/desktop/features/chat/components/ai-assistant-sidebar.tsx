@@ -1,6 +1,6 @@
 import { X, Bot } from "lucide-react";
 import { useMemo } from "react";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { AgentChatCore } from "@agent-labs/agent-chat";
 import { aiAgentFactory } from "../services/ai-agent-factory";
 

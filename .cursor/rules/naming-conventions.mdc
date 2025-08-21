@@ -29,7 +29,18 @@
   - ❌ `user-manager.ts`
   - ❌ `apiClientService.ts`
 
-### 3. 文件夹命名规范
+### 3. Store文件特殊规范
+- Store文件必须以 `.store.ts` 结尾
+- 示例：
+  - ✅ `chat-view.store.ts`
+  - ✅ `user-preferences.store.ts`
+  - ✅ `app-layout.store.ts`
+  - ✅ `navigation.store.ts`
+  - ❌ `chat-view-store.ts`
+  - ❌ `chatViewStore.ts`
+  - ❌ `chat-view.ts`
+
+### 4. 文件夹命名规范
 - 文件夹也必须使用 kebab-case
 - 示例：
   - ✅ `user-management/`

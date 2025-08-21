@@ -1,5 +1,5 @@
 import { Tool, ToolCall, ToolResult } from "@agent-labs/agent-chat";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 export const createSummarizeContentTool = (channelId: string): Tool => ({
   name: 'summarizeContent',

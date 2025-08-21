@@ -1,5 +1,5 @@
-import { Channel, Message } from '@/core/stores/chat-data-store';
-import { useChatDataStore } from '@/core/stores/chat-data-store';
+import { Channel, Message } from '@/core/stores/chat-data.store';
+import { useChatDataStore } from '@/core/stores/chat-data.store';
 import { useGitHubSyncStore } from '@/core/stores/github-sync.store';
 import { githubChatStorageService } from './github-chat-storage.service';
 

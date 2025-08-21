@@ -1,5 +1,5 @@
-import { useChatDataStore } from "@/core/stores/chat-data-store";
-import { useChatViewStore } from "@/core/stores/chat-view-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";

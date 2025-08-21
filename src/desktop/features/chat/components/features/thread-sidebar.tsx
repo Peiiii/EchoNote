@@ -1,5 +1,5 @@
 import { X, Send, MessageCircle, User, Bot } from "lucide-react";
-import { Message } from "@/core/stores/chat-data-store";
+import { Message } from "@/core/stores/chat-data.store";
 import { useState } from "react";
 
 interface ThreadSidebarProps {

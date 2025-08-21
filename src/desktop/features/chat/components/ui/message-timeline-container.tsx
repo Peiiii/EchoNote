@@ -1,6 +1,6 @@
 import { RefObject } from "react";
 import { MessageTimeline } from "../message-timeline";
-import { Message } from "@/core/stores/chat-data-store";
+import { Message } from "@/core/stores/chat-data.store";
 
 interface MessageTimelineContainerProps {
     containerRef: RefObject<HTMLDivElement | null>;

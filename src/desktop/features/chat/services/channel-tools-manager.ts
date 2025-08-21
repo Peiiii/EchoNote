@@ -1,5 +1,5 @@
 import { Tool } from "@agent-labs/agent-chat";
-import { useChatDataStore } from "@/core/stores/chat-data-store";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { createListNotesTool } from "@/desktop/features/chat/components/tools/list-notes.tool";
 
 export class ChannelToolsManager {

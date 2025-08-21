@@ -1,4 +1,4 @@
-import { Message } from "@/core/stores/chat-data-store";
+import { Message } from "@/core/stores/chat-data.store";
 import { EmptyState } from "./empty-state";
 import { DateDivider } from "./date-divider";
 import { ThoughtRecord } from "./thought-record";

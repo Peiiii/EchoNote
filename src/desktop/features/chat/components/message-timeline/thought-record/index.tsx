@@ -1,5 +1,5 @@
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { Message, useChatDataStore } from "@/core/stores/chat-data-store";
+import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
 import { Bookmark, Clock, Eye, Lightbulb, MessageCircle } from "lucide-react";
 import { useState } from "react";
 

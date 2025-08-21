@@ -17,7 +17,7 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
-import { Message, Channel } from "@/core/stores/chat-data-store";
+import { Message, Channel } from "@/core/stores/chat-data.store";
 
 // 类型转换辅助函数
 const docToChannel = (doc: DocumentSnapshot): Channel => {
