@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { MoreActionsMenu } from "../more-actions-menu";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
+import { MarkdownContent } from "./markdown-content";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -159,13 +160,7 @@ export function ThoughtRecord({
                 </div>
 
                 {/* Main Content */}
-                <div className="mb-4">
-                    <div className="prose prose-slate dark:prose-invert max-w-none">
-                        <p className="text-base leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words font-normal">
-                            {message.content}
-                        </p>
-                    </div>
-                </div>
+                <MarkdownContent content={message.content} />
 
                 {/* Sparks Section */}
                 <ThoughtRecordSparks

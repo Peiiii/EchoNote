@@ -101,12 +101,18 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.1.1(react@19.1.1)
+      react-markdown:
+        specifier: ^10.1.0
+        version: 10.1.0(@types/react@19.1.9)(react@19.1.1)
       react-resizable-panels:
         specifier: ^3.0.4
         version: 3.0.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-router-dom:
         specifier: ^7.7.1
         version: 7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
