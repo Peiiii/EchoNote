@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   Timestamp,
   DocumentSnapshot,
+  increment,
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/chat-data-store";
@@ -27,6 +28,7 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     description: data.description,
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
     messageCount: data.messageCount || 0,
+    lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),
   };
 };
 
@@ -59,6 +61,53 @@ const getMessagesCollectionRef = (userId: string) =>
   collection(db, `users/${userId}/messages`);
 
 export const firebaseChatService = {
+  // Data migration method for existing channels
+  migrateExistingChannels: async (userId: string): Promise<void> => {
+    try {
+      const channelsSnapshot = await getDocs(getChannelsCollectionRef(userId));
+      
+      for (const channelDoc of channelsSnapshot.docs) {
+        const channelData = channelDoc.data();
+        
+        // 如果频道没有lastMessageTime字段，需要迁移
+        if (!channelData.lastMessageTime) {
+          const channelRef = doc(getChannelsCollectionRef(userId), channelDoc.id);
+          
+          // 获取该频道的最新消息时间
+          const messagesQuery = query(
+            getMessagesCollectionRef(userId),
+            where("channelId", "==", channelDoc.id),
+            orderBy("timestamp", "desc"),
+            limit(1)
+          );
+          
+          const messagesSnapshot = await getDocs(messagesQuery);
+          
+          if (!messagesSnapshot.empty) {
+            // 有消息，使用最新消息时间
+            const latestMessage = messagesSnapshot.docs[0];
+            const latestTimestamp = latestMessage.data().timestamp;
+            
+            await updateDoc(channelRef, {
+              lastMessageTime: latestTimestamp,
+              messageCount: messagesSnapshot.size
+            });
+          } else {
+            // 没有消息，使用创建时间
+            await updateDoc(channelRef, {
+              lastMessageTime: channelData.createdAt || serverTimestamp(),
+              messageCount: 0
+            });
+          }
+        }
+      }
+      
+      console.log('Channel migration completed successfully');
+    } catch (error) {
+      console.error('Error migrating channels:', error);
+    }
+  },
+
   // Channel Services
   subscribeToChannels: (
     userId: string,
@@ -66,7 +115,7 @@ export const firebaseChatService = {
   ): (() => void) => {
     const q = query(
       getChannelsCollectionRef(userId),
-      orderBy("createdAt", "asc")
+      orderBy("lastMessageTime", "desc") // 按最后消息时间降序排序
     );
 
     const unsubscribe = onSnapshot(
@@ -111,7 +160,7 @@ export const firebaseChatService = {
   fetchChannels: async (userId: string): Promise<Channel[]> => {
     const q = query(
       getChannelsCollectionRef(userId),
-      orderBy("createdAt", "asc")
+      orderBy("lastMessageTime", "desc") // 按最后消息时间降序排序
     );
     
     const snapshot = await getDocs(q);
@@ -126,6 +175,7 @@ export const firebaseChatService = {
       ...channelData,
       createdAt: serverTimestamp(),
       messageCount: 0,
+      lastMessageTime: serverTimestamp(), // 初始化最后消息时间为创建时间
     });
     return docRef.id;
   },
@@ -192,6 +242,14 @@ export const firebaseChatService = {
       ...messageData,
       timestamp: serverTimestamp(),
     });
+    
+    // 更新频道的最后消息时间和消息数量
+    const channelRef = doc(getChannelsCollectionRef(userId), messageData.channelId);
+    await updateDoc(channelRef, {
+      lastMessageTime: serverTimestamp(),
+      messageCount: increment(1),
+    });
+    
     return docRef.id;
   },
 

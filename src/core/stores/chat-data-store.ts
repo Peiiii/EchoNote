@@ -36,6 +36,7 @@ export interface Channel {
   description: string;
   createdAt: Date;
   messageCount: number;
+  lastMessageTime?: Date; // 最后消息时间，用于排序
 }
 
 export interface ChatDataState {
@@ -269,6 +270,13 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
     // 先加载初始数据
     await get().fetchInitialData(userId);
+    
+    // 迁移现有频道数据（如果需要）
+    try {
+      await firebaseChatService.migrateExistingChannels(userId);
+    } catch (error) {
+      console.error('Error during channel migration:', error);
+    }
 
     // Subscribe to channels
     const unsubscribeChannels = firebaseChatService.subscribeToChannels(
