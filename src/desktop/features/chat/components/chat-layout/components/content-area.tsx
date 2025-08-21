@@ -1,4 +1,5 @@
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/common/components/ui/resizable";
+import { useViewStateStore } from "@/core/stores/view-state.store";
 import { ReactNode } from "react";
 
 interface ContentAreaProps {
@@ -8,6 +9,17 @@ interface ContentAreaProps {
 }
 
 export const ContentArea = ({ children, rightSidebar, className = "" }: ContentAreaProps) => {
+    const { 
+        rightSidebarSize, 
+        setRightSidebarSize 
+    } = useViewStateStore();
+
+    // Only update store when rightSidebar prop changes
+    // Don't sync visibility state to avoid conflicts with user preferences
+
+    // Calculate content panel size based on right sidebar
+    const contentPanelSize = rightSidebar ? (100 - rightSidebarSize) : 100;
+
     return (
         <ResizablePanelGroup
             direction="horizontal"
@@ -17,7 +29,7 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
             {/* Center content area */}
             <ResizablePanel
                 id="content-panel"
-                defaultSize={rightSidebar ? 65 : 100}
+                defaultSize={contentPanelSize}
                 minSize={20}
             >
                 <div className={`h-full flex flex-col bg-white dark:bg-slate-900 overflow-hidden ${className}`}>
@@ -31,8 +43,12 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
                     <ResizableHandle withHandle />
                     <ResizablePanel
                         id="right-sidebar-panel"
-                        defaultSize={35}
+                        defaultSize={rightSidebarSize}
                         minSize={20}
+                        onResize={(size) => {
+                            // Update store when user resizes the panel
+                            setRightSidebarSize(size);
+                        }}
                     >
                         <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
                             {rightSidebar}
