@@ -180,6 +180,15 @@ export const firebaseChatService = {
     return docRef.id;
   },
 
+  updateChannel: async (
+    userId: string,
+    channelId: string,
+    updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
+  ): Promise<void> => {
+    const channelRef = doc(getChannelsCollectionRef(userId), channelId);
+    await updateDoc(channelRef, updates);
+  },
+
   // Message Services
   // 获取所有消息（一次性加载）
   fetchAllMessages: async (userId: string): Promise<Message[]> => {

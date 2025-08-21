@@ -1,5 +1,8 @@
 import { Channel } from "@/core/stores/chat-data.store";
 import { getChannelIcon } from "./channel-icons";
+import { EditChannelPopover } from "./edit-channel-popover";
+import { Edit2 } from "lucide-react";
+import { Button } from "@/common/components/ui/button";
 
 interface ChannelItemProps {
     channel: Channel;
@@ -9,12 +12,12 @@ interface ChannelItemProps {
 
 export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) => {
     return (
-        <button
-            onClick={onClick}
-            className={`w-full group transition-all duration-200 ${isActive
+        <div 
+            className={`w-full group transition-all duration-200 cursor-pointer ${isActive
                 ? 'transform scale-[1.01]'
                 : 'hover:transform hover:scale-[1.005]'
                 }`}
+            onClick={onClick}
         >
             <div className={`relative p-3 rounded-lg transition-all duration-200 ${isActive
                 ? 'bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 shadow-sm'
@@ -37,15 +40,29 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                                 }`}>
                                 {channel.name}
                             </span>
-
                         </div>
                         <p className={`text-xs line-clamp-2 ${isActive ? 'text-slate-600 dark:text-slate-400' : 'text-slate-500 dark:text-slate-500'
                             }`}>
                             {channel.description}
                         </p>
                     </div>
+
+                    {/* Edit Button - Right side */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <EditChannelPopover channel={channel}>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 hover:bg-slate-200 dark:hover:bg-slate-600"
+                                title="Edit channel"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Edit2 className="h-3 w-3" />
+                            </Button>
+                        </EditChannelPopover>
+                    </div>
                 </div>
             </div>
-        </button>
+        </div>
     );
 };

@@ -48,7 +48,7 @@ export interface ChatDataState {
   // Firebase unsubscribe functions
   unsubscribeChannels: (() => void) | null;
   unsubscribeMessages: (() => void) | null;
-  
+
   // 监听器状态控制
   isListenerEnabled: boolean;
 
@@ -57,6 +57,10 @@ export interface ChatDataState {
     channel: Omit<Channel, "id" | "createdAt" | "messageCount">
   ) => Promise<void>;
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
+  updateChannel: (
+    channelId: string,
+    updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
+  ) => Promise<void>;
   deleteMessage: (messageId: string, hardDelete?: boolean) => Promise<void>;
   updateMessage: (
     messageId: string,
@@ -75,10 +79,10 @@ export interface ChatDataState {
   getDeletedMessages: () => Message[];
   permanentDeleteMessage: (messageId: string) => Promise<void>;
 
-    // Firebase integration methods
+  // Firebase integration methods
   initFirebaseListeners: (userId: string) => Promise<void>;
   cleanupListeners: () => void;
-  
+
   // 初始化加载方法
   fetchInitialData: (userId: string) => Promise<void>;
 }
@@ -104,11 +108,29 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     }
   },
 
+  updateChannel: async (channelId, updates) => {
+    const { userId, channels } = get();
+    if (!userId) return;
+
+    try {
+      set({
+        channels: channels.map((channel) =>
+          channel.id === channelId ? { ...channel, ...updates } : channel
+        ),
+      });
+
+      await firebaseChatService.updateChannel(userId, channelId, updates);
+    } catch (error) {
+      console.error("Error updating channel:", error);
+      set({ channels });
+    }
+  },
+
   addMessage: async (message) => {
     const { userId, messages } = get();
     if (!userId) return;
 
-    // 生成临时ID和时间戳
+    // Generate a temporary ID and timestamp
     const tempId = `temp_${Date.now()}`;
     const tempMessage: Message = {
       ...message,
@@ -116,17 +138,17 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       timestamp: new Date(),
     } as Message;
 
-    // 乐观更新：立即添加消息到状态中（添加到末尾，显示在底部）
+    // Optimistic update: immediately add the message to the state (append to the end, display at the bottom)
     set({ messages: [...messages, tempMessage] });
 
     try {
-      // 调用Firebase服务创建消息
+      // Call Firebase service to create message
       const messageId = await firebaseChatService.createMessage(
         userId,
         message
       );
 
-      // 用服务器返回的真实ID更新消息
+      // Update message with the server-generated ID
       const currentMessages = get().messages;
       set({
         messages: currentMessages.map((msg) =>
@@ -135,7 +157,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       });
     } catch (error) {
       console.error("Error creating message:", error);
-      // 如果失败，移除临时消息
+      // If failed, remove the temporary message
       const currentMessages = get().messages;
       set({
         messages: currentMessages.filter((msg) => msg.id !== tempId),
@@ -148,17 +170,17 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     if (!userId) return;
 
     try {
-      // 暂时禁用监听器，避免冲突
+      // Temporarily disable listeners to avoid conflicts
       set({ isListenerEnabled: false });
-      
+
       if (hardDelete) {
-        // 硬删除：直接从Firebase和本地状态中移除
+        // Hard delete: remove from Firebase and local state
         await firebaseChatService.deleteMessage(userId, messageId);
         set({ messages: messages.filter(msg => msg.id !== messageId) });
       } else {
-        // 软删除：标记为已删除状态
+        // Soft delete: mark as deleted state
         await firebaseChatService.softDeleteMessage(userId, messageId);
-        // 乐观更新：标记消息为已删除
+        // Optimistic update: mark message as deleted
         const updatedMessages = messages.map(msg =>
           msg.id === messageId
             ? { ...msg, isDeleted: true, deletedAt: new Date(), deletedBy: userId }
@@ -166,15 +188,15 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
         );
         set({ messages: updatedMessages });
       }
-      
-      // 延迟重新启用监听器，确保Firebase操作完成
+
+      // Delay re-enabling listeners to ensure Firebase operations complete
       setTimeout(() => {
         set({ isListenerEnabled: true });
       }, 1000);
-      
+
     } catch (error) {
       console.error("Error deleting message:", error);
-      // 如果删除失败，重新启用监听器
+      // If deletion fails, re-enable listeners
       set({ isListenerEnabled: true });
     }
   },
@@ -183,7 +205,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     const { userId, messages } = get();
     if (!userId) return;
 
-    // 乐观更新：立即应用更新到状态中
+    // Optimistic update: immediately apply updates to the state
     set({
       messages: messages.map((msg) =>
         msg.id === messageId ? { ...msg, ...updates } : msg
@@ -191,11 +213,11 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     });
 
     try {
-      // 调用Firebase服务更新消息
+      // Call Firebase service to update message
       await firebaseChatService.updateMessage(userId, messageId, updates);
     } catch (error) {
       console.error("Error updating message:", error);
-      // 如果失败，恢复原始消息
+      // If failed, restore original message
       set({ messages });
     }
   },
@@ -218,7 +240,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       channelId: message.channelId,
     };
 
-    // 生成临时ID和时间戳
+    // Generate temporary ID and timestamp
     const tempId = `temp_${Date.now()}`;
     const tempMessage: Message = {
       ...messageWithThread,
@@ -226,17 +248,17 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       timestamp: new Date(),
     } as Message;
 
-    // 乐观更新：立即添加消息到状态中（添加到末尾，显示在底部）
+    // Optimistic update: immediately add message to the state (append to the end, display at the bottom)
     set({ messages: [...messages, tempMessage] });
 
     try {
-      // 调用Firebase服务创建消息
+      // Call Firebase service to create message
       const messageId = await firebaseChatService.createMessage(
         userId,
         messageWithThread
       );
 
-      // 用服务器返回的真实ID更新消息
+      // Update message with the server-generated ID
       const currentMessages = get().messages;
       set({
         messages: currentMessages.map((msg) =>
@@ -245,7 +267,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       });
     } catch (error) {
       console.error("Error creating thread message:", error);
-      // 如果失败，移除临时消息
+      // If failed, remove the temporary message
       const currentMessages = get().messages;
       set({
         messages: currentMessages.filter((msg) => msg.id !== tempId),
@@ -268,10 +290,10 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     // Set user ID
     set({ userId });
 
-    // 先加载初始数据
+    // First load initial data
     await get().fetchInitialData(userId);
-    
-    // 迁移现有频道数据（如果需要）
+
+    // Migrate existing channels data (if needed)
     try {
       await firebaseChatService.migrateExistingChannels(userId);
     } catch (error) {
@@ -284,7 +306,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       (channels) => {
         const { isListenerEnabled } = get();
         if (!isListenerEnabled) return;
-        
+
         console.log('Channels updated via subscription:', channels.length);
         set({ channels });
       }
@@ -296,9 +318,9 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       (messages) => {
         const { isListenerEnabled } = get();
         if (!isListenerEnabled) return;
-        
+
         console.log('Messages updated via subscription:', messages.length);
-        // 过滤掉已删除的消息，避免状态更新问题
+        // Filter out deleted messages to avoid state update issues
         const activeMessages = messages.filter(msg => !msg.isDeleted);
         set({ messages: activeMessages });
       }
@@ -324,17 +346,18 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     });
   },
 
-  // 删除相关方法
+  // Delete related methods
   restoreMessage: async (messageId) => {
     const { userId, messages } = get();
     if (!userId) return;
 
     try {
-      // 暂时禁用监听器，避免冲突
+      // Temporarily disable listeners to avoid conflicts
       set({ isListenerEnabled: false });
-      
+
+      // Call Firebase service to restore message
       await firebaseChatService.restoreMessage(userId, messageId);
-      // 乐观更新：恢复消息状态
+      // Optimistic update: restore message state
       set({
         messages: messages.map(msg =>
           msg.id === messageId
@@ -342,15 +365,15 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
             : msg
         ),
       });
-      
-      // 延迟重新启用监听器
+
+      // Delay re-enabling listeners
       setTimeout(() => {
         set({ isListenerEnabled: true });
       }, 1000);
-      
+
     } catch (error) {
       console.error("Error restoring message:", error);
-      // 如果恢复失败，重新启用监听器
+      // If restoration fails, re-enable listeners
       set({ isListenerEnabled: true });
     }
   },
@@ -365,40 +388,41 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     if (!userId) return;
 
     try {
-      // 暂时禁用监听器，避免冲突
+      // Temporarily disable listeners to avoid conflicts
       set({ isListenerEnabled: false });
-      
+
+      // Call Firebase service to delete message
       await firebaseChatService.deleteMessage(userId, messageId);
-      // 从本地状态中永久移除
+      // Remove from local state permanently
       set({ messages: messages.filter(msg => msg.id !== messageId) });
-      
-      // 延迟重新启用监听器
+
+      // Delay re-enabling listeners
       setTimeout(() => {
         set({ isListenerEnabled: true });
       }, 1000);
-      
+
     } catch (error) {
       console.error("Error permanently deleting message:", error);
-      // 如果删除失败，重新启用监听器
+      // If deletion fails, re-enable listeners
       set({ isListenerEnabled: true });
     }
   },
 
-  // 初始化加载数据
+  // Initialize loading data
   fetchInitialData: async (userId: string) => {
     try {
       console.log('Fetching initial data for user:', userId);
 
-      // 1. 首先获取频道列表
+      // 1. First get channel list
       const channels = await firebaseChatService.fetchChannels(userId);
       console.log('Initial channels loaded:', channels.length);
       set({ channels });
 
-      // 2. 获取所有消息（不分频道，因为 subscribeToMessages 也是这样做的）
+      // 2. Get all messages (not by channel, because subscribeToMessages also does this)
       const messages = await firebaseChatService.fetchAllMessages(userId);
       console.log('Initial messages loaded:', messages.length);
 
-      // 过滤掉已删除的消息
+      // Filter out deleted messages
       const activeMessages = messages.filter(msg => !msg.isDeleted);
       set({ messages: activeMessages });
 
