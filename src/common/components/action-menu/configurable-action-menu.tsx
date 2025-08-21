@@ -39,7 +39,6 @@ export function ConfigurableActionMenu({
   sideOffset = 8,
   width = "lg"
 }: ConfigurableActionMenuProps) {
-  // 过滤掉隐藏的菜单项和空分组
   const visibleGroups = groups
     .map(group => ({
       ...group,

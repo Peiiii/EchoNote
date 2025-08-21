@@ -2,6 +2,7 @@ import { useChatDataStore } from "@/core/stores/chat-data-store";
 import { useChatViewStore } from "@/core/stores/chat-view-store";
 import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
+import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 
 export function ChannelList() {
     const { channels, addChannel } = useChatDataStore();
@@ -15,12 +16,17 @@ export function ChannelList() {
         <div className="flex flex-col h-full">
             {/* Header */}
             <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
-                    Thought Spaces
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Choose your thinking domain
-                </p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
+                            Thought Spaces
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Choose your thinking domain
+                        </p>
+                    </div>
+                    <CollapsibleSidebar.ToggleButton />
+                </div>
             </div>
             
             {/* Channel List */}
@@ -41,4 +47,4 @@ export function ChannelList() {
             </div>
         </div>
     );
-};
+}
