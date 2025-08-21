@@ -6,6 +6,7 @@ import { useState } from "react";
 import { MoreActionsMenu } from "../more-actions-menu";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
 import { MarkdownContent } from "./markdown-content";
+import { ReadMoreWrapper } from "./read-more-wrapper";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -160,7 +161,9 @@ export function ThoughtRecord({
                 </div>
 
                 {/* Main Content */}
-                <MarkdownContent content={message.content} />
+                <ReadMoreWrapper maxHeight={300} >
+                    <MarkdownContent content={message.content} />
+                </ReadMoreWrapper>
 
                 {/* Sparks Section */}
                 <ThoughtRecordSparks
@@ -198,3 +201,6 @@ export function ThoughtRecord({
         </div>
     );
 }
+
+export { MarkdownContent } from "./markdown-content";
+export { ReadMoreWrapper } from "./read-more-wrapper";
