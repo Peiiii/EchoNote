@@ -13,7 +13,7 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
         <div className={`flex-1 flex flex-col bg-white dark:bg-slate-900 ${className} overflow-hidden`}>
             <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
                 {/* Left sidebar */}
-                <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+                <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
                     <div className="h-full border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                         {sidebar}
                     </div>
