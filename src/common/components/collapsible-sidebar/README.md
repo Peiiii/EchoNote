@@ -74,6 +74,7 @@ function MyLayout() {
 | `width` | `string` | `"w-80"` | Tailwind CSS class for expanded sidebar width |
 | `collapsedWidth` | `string` | `"w-0"` | Tailwind CSS class for collapsed sidebar width |
 | `className` | `string` | `""` | Additional CSS classes for the sidebar container |
+| `collapsed` | `boolean` | `undefined` | External control of collapsed state (controlled component) |
 | `onCollapseChange` | `(collapsed: boolean) => void` | `undefined` | Callback when collapse state changes |
 
 ### CollapsibleSidebar.Header
