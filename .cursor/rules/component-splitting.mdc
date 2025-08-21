@@ -1,0 +1,45 @@
+---
+alwaysApply: true
+---
+
+# Component Splitting Rules
+
+## Split When:
+- **>200 lines** or **>2 responsibilities**
+- **Repeated patterns** that can be extracted
+- **High complexity** affecting readability
+
+## Don't Split When:
+- **<100 lines** and **single responsibility**
+- **Tightly coupled** logic
+- **No reuse** potential
+
+## Splitting Strategy:
+
+### 1. **Current File** - Private, simple components
+```tsx
+function SubComponent() { ... }
+export function MainComponent() { ... }
+```
+
+### 2. **Independent File** - Reusable components
+```tsx
+// components/ui/button.tsx
+export function Button() { ... }
+```
+
+### 3. **Directory** - Complex modules
+```
+component-name/
+├── index.tsx          # Main component
+├── types.ts           # Types
+└── components/        # Sub-components
+```
+
+## Upgrade to Directory When:
+- Multiple related components
+- Independent types/utils
+- Complex functionality
+- Need for testing structure
+
+## Rule: Use `index.tsx` as directory entry point

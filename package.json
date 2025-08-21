@@ -37,6 +37,7 @@
     "composite-kit": "^0.6.3",
     "date-fns": "^4.1.0",
     "firebase": "^12.1.0",
+    "lowlight": "2.8.0",
     "lucide-react": "^0.536.0",
     "openai": "^5.12.2",
     "react": "^19.1.0",
@@ -47,6 +48,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
     "uuid": "^11.1.0",
+    "zenmark-editor": "^0.0.1",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
