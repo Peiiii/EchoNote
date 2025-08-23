@@ -9,9 +9,14 @@ export interface EditState {
   isDirty: boolean;
   isSaving: boolean;
   
+  // Edit mode: inline vs expanded
+  editMode: 'inline' | 'expanded';
+  
   // Editing actions
   startEditing: (messageId: string, content: string) => void;
   updateContent: (content: string) => void;
+  switchToExpandedMode: () => void;
+  switchToInlineMode: () => void;
   save: () => Promise<void>;
   cancel: () => void;
   reset: () => void;
@@ -24,6 +29,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   originalContent: "",
   isDirty: false,
   isSaving: false,
+  editMode: 'inline',
 
   // Start editing a message
   startEditing: (messageId: string, content: string) => {
@@ -33,6 +39,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       originalContent: content,
       isDirty: false,
       isSaving: false,
+      editMode: 'inline', // Default to inline mode
     });
   },
 
@@ -43,6 +50,16 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       editContent: content,
       isDirty: content !== originalContent,
     });
+  },
+
+  // Switch to expanded editing mode
+  switchToExpandedMode: () => {
+    set({ editMode: 'expanded' });
+  },
+
+  // Switch back to inline editing mode
+  switchToInlineMode: () => {
+    set({ editMode: 'inline' });
   },
 
   // Save the edited message
@@ -80,6 +97,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       originalContent: "",
       isDirty: false,
       isSaving: false,
+      editMode: 'inline',
     });
   },
 }));

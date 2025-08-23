@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, Maximize2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 
 interface InlineEditorProps {
   content: string;
   onSave: () => void;
   onCancel: () => void;
+  onExpand: () => void;
   isSaving: boolean;
 }
 
-export function InlineEditor({ content, onSave, onCancel, isSaving }: InlineEditorProps) {
+export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving }: InlineEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateContent } = useEditStateStore();
@@ -93,6 +94,18 @@ export function InlineEditor({ content, onSave, onCancel, isSaving }: InlineEdit
         
         {/* Right side - Action buttons */}
         <div className="flex items-center gap-2">
+          {/* Expand to full-screen editing */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onExpand}
+            disabled={isSaving}
+            className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <Maximize2 className="w-3.5 h-3.5 mr-1.5" />
+            Expand
+          </Button>
+          
           <Button
             variant="ghost"
             size="sm"

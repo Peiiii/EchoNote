@@ -10,6 +10,7 @@ import { MarkdownContent } from "./markdown-content";
 import { ReadMoreWrapper } from "./read-more-wrapper";
 import { InlineEditor } from "./inline-editor";
 
+
 interface ThoughtRecordProps {
     message: Message;
     isFirstInGroup: boolean;
@@ -112,10 +113,12 @@ export function ThoughtRecord({
     const {
         editingMessageId,
         editContent,
+        editMode,
         isSaving,
         startEditing,
         save,
-        cancel
+        cancel,
+        switchToExpandedMode
     } = useEditStateStore();
     
     const isEditing = editingMessageId === message.id;
@@ -169,6 +172,10 @@ export function ThoughtRecord({
         cancel();
     };
 
+    const handleExpand = () => {
+        switchToExpandedMode();
+    };
+
     return (
         <div className="w-full">
             <div className="group relative w-full px-8 py-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all duration-300 ease-out hover:shadow-sm">
@@ -192,12 +199,13 @@ export function ThoughtRecord({
                     />
                 </div>
 
-                {/* Content Area - Show editor or read-only content */}
-                {isEditing ? (
+                {/* Content Area - Show inline editor or read-only content */}
+                {isEditing && editMode === 'inline' ? (
                     <InlineEditor
                         content={editContent}
                         onSave={handleSave}
                         onCancel={handleCancel}
+                        onExpand={handleExpand}
                         isSaving={isSaving}
                     />
                 ) : (
