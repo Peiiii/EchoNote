@@ -11,7 +11,7 @@ interface LeftSidebarProps {
 
 export const LeftSidebar = ({ 
     children, 
-    width = "w-80", 
+    width = "w-70", 
     collapsedWidth = "w-0",
     className = "" 
 }: LeftSidebarProps) => {

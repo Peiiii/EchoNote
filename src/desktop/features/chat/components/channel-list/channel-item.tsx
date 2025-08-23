@@ -34,9 +34,9 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                     </div>
 
                     {/* Channel Info */}
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className={`font-medium ${isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'
+                            <span className={`font-medium truncate ${isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'
                                 }`}>
                                 {channel.name}
                             </span>
