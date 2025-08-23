@@ -1,12 +1,14 @@
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
-import { Bookmark, Clock, Eye, Lightbulb, MessageCircle } from "lucide-react";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { Bookmark, Clock, Eye, Lightbulb, MessageCircle, Edit2 } from "lucide-react";
 import { useState } from "react";
 
 import { MoreActionsMenu } from "../more-actions-menu";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
 import { MarkdownContent } from "./markdown-content";
 import { ReadMoreWrapper } from "./read-more-wrapper";
+import { InlineEditor } from "./inline-editor";
 
 interface ThoughtRecordProps {
     message: Message;
@@ -16,7 +18,7 @@ interface ThoughtRecordProps {
     threadCount?: number;
 }
 
-// 提取可复用的操作按钮组件
+// Reusable action button component
 interface ActionButtonProps {
     icon: React.ComponentType<{ className?: string }>;
     onClick?: () => void;
@@ -37,7 +39,7 @@ function ActionButton({ icon: Icon, onClick, title, disabled }: ActionButtonProp
     );
 }
 
-// 提取线程指示器组件
+// Thread indicator component
 interface ThreadIndicatorProps {
     threadCount: number;
     onOpenThread?: (messageId: string) => void;
@@ -58,30 +60,34 @@ function ThreadIndicator({ threadCount, onOpenThread, messageId }: ThreadIndicat
     );
 }
 
-// 提取操作按钮组
+// Action buttons group
 interface ActionButtonsProps {
     onToggleAnalysis: () => void;
     onReply?: () => void;
+    onEdit: () => void;
     message: Message;
     onDelete: () => void;
+    isEditing: boolean;
 }
 
-function ActionButtons({ onToggleAnalysis, onReply, message, onDelete }: ActionButtonsProps) {
+function ActionButtons({ onToggleAnalysis, onReply, onEdit, message, onDelete, isEditing }: ActionButtonsProps) {
     const actionButtons = [
-        { icon: Lightbulb, onClick: onToggleAnalysis, title: "Toggle sparks" },
-        { icon: Eye, onClick: undefined, title: "View details" },
-        { icon: Bookmark, onClick: undefined, title: "Bookmark" },
-        { icon: MessageCircle, onClick: onReply, title: "Reply to thought" },
+        { icon: Edit2, onClick: onEdit, title: "Edit thought", disabled: isEditing },
+        { icon: Lightbulb, onClick: onToggleAnalysis, title: "Toggle sparks", disabled: isEditing },
+        { icon: Eye, onClick: undefined, title: "View details", disabled: isEditing },
+        { icon: Bookmark, onClick: undefined, title: "Bookmark", disabled: isEditing },
+        { icon: MessageCircle, onClick: onReply, title: "Reply to thought", disabled: isEditing },
     ];
 
     return (
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-            {actionButtons.map(({ icon, onClick, title }) => (
+            {actionButtons.map(({ icon, onClick, title, disabled }) => (
                 <ActionButton
                     key={title}
                     icon={icon}
                     onClick={onClick}
                     title={title}
+                    disabled={disabled}
                 />
             ))}
             <MoreActionsMenu
@@ -101,16 +107,28 @@ export function ThoughtRecord({
 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
     const [showAnalysis, setShowAnalysis] = useState(false);
     const deleteMessage = useChatDataStore(state => state.deleteMessage);
+    
+    // Edit state management
+    const {
+        editingMessageId,
+        editContent,
+        isSaving,
+        startEditing,
+        save,
+        cancel
+    } = useEditStateStore();
+    
+    const isEditing = editingMessageId === message.id;
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
-    // 如果消息已被删除，不显示内容
+    // If message is deleted, don't show it
     if (message.isDeleted) {
         return null;
     }
 
-    // 删除方法（使用原生 confirm）
+    // Delete method (use native confirm)
     const handleDelete = async () => {
         const messagePreview = message.content.length > 100 
             ? `${message.content.substring(0, 100)}...` 
@@ -126,7 +144,7 @@ export function ThoughtRecord({
         
         if (confirmed) {
             try {
-                await deleteMessage(message.id, false); // 软删除
+                await deleteMessage(message.id, false); // Soft delete
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
@@ -136,6 +154,19 @@ export function ThoughtRecord({
 
     const handleToggleAnalysis = () => {
         setShowAnalysis(!showAnalysis);
+    };
+
+    // Edit handlers
+    const handleEdit = () => {
+        startEditing(message.id, message.content);
+    };
+
+    const handleSave = async () => {
+        await save();
+    };
+
+    const handleCancel = () => {
+        cancel();
     };
 
     return (
@@ -154,47 +185,63 @@ export function ThoughtRecord({
                     <ActionButtons
                         onToggleAnalysis={handleToggleAnalysis}
                         onReply={onReply}
+                        onEdit={handleEdit}
                         message={message}
                         onDelete={handleDelete}
+                        isEditing={isEditing}
                     />
                 </div>
 
-                <ReadMoreWrapper maxHeight={300} >
-                    <MarkdownContent content={message.content} />
-                </ReadMoreWrapper>
+                {/* Content Area - Show editor or read-only content */}
+                {isEditing ? (
+                    <InlineEditor
+                        content={editContent}
+                        onSave={handleSave}
+                        onCancel={handleCancel}
+                        isSaving={isSaving}
+                    />
+                ) : (
+                    <ReadMoreWrapper maxHeight={300} >
+                        <MarkdownContent content={message.content} />
+                    </ReadMoreWrapper>
+                )}
 
-                {/* Sparks Section */}
-                <ThoughtRecordSparks
-                    message={message}
-                    showAnalysis={showAnalysis}
-                    onToggleAnalysis={handleToggleAnalysis}
-                />
+                {/* Sparks Section - Hide when editing */}
+                {!isEditing && (
+                    <ThoughtRecordSparks
+                        message={message}
+                        showAnalysis={showAnalysis}
+                        onToggleAnalysis={handleToggleAnalysis}
+                    />
+                )}
 
-                {/* Footer */}
-                <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-4">
-                    <div className="flex items-center gap-4">
-                        <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
-                            {message.content.length} characters
-                        </span>
-                        {hasSparks && (
-                            <>
-                                <span className="text-slate-300 dark:text-slate-600">•</span>
-                                <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
-                                    {aiAnalysis!.insights.length} sparks
-                                </span>
-                            </>
-                        )}
+                {/* Footer - Hide when editing */}
+                {!isEditing && (
+                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-4">
+                        <div className="flex items-center gap-4">
+                            <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
+                                {message.content.length} characters
+                            </span>
+                            {hasSparks && (
+                                <>
+                                    <span className="text-slate-300 dark:text-slate-600">•</span>
+                                    <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
+                                        {aiAnalysis!.insights.length} sparks
+                                    </span>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Thread indicator */}
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                            <ThreadIndicator
+                                threadCount={threadCount}
+                                onOpenThread={onOpenThread}
+                                messageId={message.id}
+                            />
+                        </div>
                     </div>
-
-                    {/* Thread indicator */}
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                        <ThreadIndicator
-                            threadCount={threadCount}
-                            onOpenThread={onOpenThread}
-                            messageId={message.id}
-                        />
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     );
