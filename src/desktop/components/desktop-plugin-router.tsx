@@ -17,7 +17,7 @@ function renderRoutes(nodes: RouteNode[]): React.ReactNode {
     ));
 }
 
-export const PluginRouter: React.FC = () => {
+export const DesktopPluginRouter: React.FC = () => {
   const routes = useRouteTreeStore(state => state.routes);
   return (
     <Routes>

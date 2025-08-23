@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 /**
  * Application breakpoint configuration
- * Consistent with Tailwind CSS default breakpoints
+ * Mobile-first approach with higher mobile threshold for development
  */
 const breakpoints = {
   sm: 640,
@@ -51,8 +51,11 @@ export function BreakpointProvider({ children }: { children: React.ReactNode }) 
 
   const value: BreakpointContextType = {
     currentBreakpoint,
-    isMobile: currentBreakpoint === 'sm',
-    isTablet: currentBreakpoint === 'md' || currentBreakpoint === 'lg',
+    // 移动端：小于768px（包括手机和平板竖屏）
+    isMobile: currentBreakpoint === 'sm' || currentBreakpoint === 'md',
+    // 平板横屏：1024px以下，768px以上
+    isTablet: currentBreakpoint === 'lg',
+    // 桌面端：1280px以上
     isDesktop: currentBreakpoint === 'xl' || currentBreakpoint === '2xl',
   };
 

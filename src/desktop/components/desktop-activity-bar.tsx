@@ -10,11 +10,11 @@ import { ActivityBar } from "composite-kit";
 import { LayoutDashboard } from "lucide-react";
 import { AuthStatus } from "@/common/components/firebase/auth-status";
 
-interface ActivityBarProps {
+interface DesktopActivityBarProps {
   className?: string;
 }
 
-export function ActivityBarComponent({ className }: ActivityBarProps) {
+export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
   const { expanded, setExpanded, activeId, setActiveId, items } =
     useActivityBarStore();
 
@@ -25,7 +25,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     (item) => item.group === ActivityBarGroup.FOOTER
   );
 
-  console.log("[ActivityBarComponent] items", { items });
+  console.log("[DesktopActivityBar] items", { items });
   const handleExpandedChange = (newExpanded: boolean) => {
     setExpanded(newExpanded);
   };
@@ -100,40 +100,34 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
             <AuthStatus />
           </div>
 
-          {footerItems.length > 0 && (
-            <>
-              <ActivityBar.Group>
-                {footerItems.map((item: ActivityItem) => (
-                  <ActivityBar.Item
-                    key={item.id}
-                    id={item.id}
-                    collapsedLabel={item.collapsedLabel}
-                    icon={
-                      <div
-                        data-testid={item.id}
-                        className={cn(
-                          "flex items-center justify-center",
-                          item.iconColor || "text-green-600 dark:text-green-400"
-                        )}
-                      >
-                        <IconRegistry id={item.icon} />
-                      </div>
-                    }
-                    onClick={item.onClick}
-                    label={item.label}
-                    title={item.title}
-                  />
-                ))}
-              </ActivityBar.Group>
-
-              <ActivityBar.Separator className="bg-border" />
-            </>
-          )}
-
-          {/* Theme Toggle - 简洁的主题切换并居中 */}
+          {/* Theme Toggle Section */}
           <div className="px-2 py-2 flex justify-center">
-            <ThemeToggle className="w-full max-w-[120px] bg-card dark:bg-card border border-border rounded-md hover:bg-muted dark:hover:bg-muted transition-colors duration-200" />
+            <ThemeToggle />
           </div>
+
+          {/* Footer Items */}
+          {footerItems.map((item: ActivityItem) => (
+            <ActivityBar.Item
+              key={item.id}
+              id={item.id}
+              className="activity-bar-item"
+              collapsedLabel={item.collapsedLabel}
+              icon={
+                <div
+                  data-testid={item.id}
+                  className={cn(
+                    "flex items-center justify-center",
+                    item.iconColor || "text-slate-600 dark:text-slate-400"
+                  )}
+                >
+                  <IconRegistry id={item.icon} />
+                </div>
+              }
+              onClick={item.onClick}
+              label={item.label}
+              title={item.title}
+            />
+          ))}
         </ActivityBar.Footer>
       </ActivityBar.Root>
     </div>
