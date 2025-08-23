@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Bot, Send } from "lucide-react";
 
-interface MobileAIAssistantSidebarProps {
-    onClose: () => void;
+interface MobileAIAssistantProps {
 }
 
 interface AIMessage {
@@ -13,9 +12,7 @@ interface AIMessage {
     timestamp: Date;
 }
 
-export const MobileAIAssistantSidebar = ({
-    onClose
-}: MobileAIAssistantSidebarProps) => {
+export const MobileAIAssistant = ({}: MobileAIAssistantProps) => {
     const [messages, setMessages] = useState<AIMessage[]>([
         {
             id: '1',
@@ -67,19 +64,11 @@ export const MobileAIAssistantSidebar = ({
     return (
         <div className="h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-start p-4 border-b border-border">
                 <div className="flex items-center gap-2">
                     <Bot className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">AI Assistant</h3>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="h-8 w-8"
-                >
-                    <Bot className="h-4 w-4" />
-                </Button>
             </div>
 
             {/* Messages Area */}

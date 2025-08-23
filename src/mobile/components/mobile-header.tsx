@@ -1,15 +1,17 @@
 import { Button } from "@/common/components/ui/button";
-import { Menu, Bot } from "lucide-react";
+import { Menu, Bot, Settings } from "lucide-react";
 
 interface MobileHeaderProps {
     onOpenChannelList: () => void;
     onOpenAIAssistant: () => void;
+    onOpenSettings: () => void;
     currentChannelName?: string;
 }
 
 export const MobileHeader = ({ 
     onOpenChannelList, 
     onOpenAIAssistant, 
+    onOpenSettings,
     currentChannelName 
 }: MobileHeaderProps) => {
     return (
@@ -32,15 +34,25 @@ export const MobileHeader = ({
                     </h1>
                 </div>
 
-                {/* Right: AI Assistant Button */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onOpenAIAssistant}
-                    className="h-10 w-10"
-                >
-                    <Bot className="h-5 w-5" />
-                </Button>
+                {/* Right: AI Assistant and Settings Buttons */}
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onOpenAIAssistant}
+                        className="h-10 w-10"
+                    >
+                        <Bot className="h-5 w-5" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onOpenSettings}
+                        className="h-10 w-10"
+                    >
+                        <Settings className="h-5 w-5" />
+                    </Button>
+                </div>
             </div>
         </div>
     );

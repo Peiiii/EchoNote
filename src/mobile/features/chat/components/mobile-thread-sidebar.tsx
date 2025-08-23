@@ -1,41 +1,29 @@
 import { Message } from "@/core/stores/chat-data.store";
 import { Button } from "@/common/components/ui/button";
-import { X, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 
 interface MobileThreadSidebarProps {
-    isOpen: boolean;
-    onClose: () => void;
     parentMessage: Message | null;
     threadMessages: Message[];
     onSendMessage: (message: string) => void;
 }
 
 export const MobileThreadSidebar = ({
-    isOpen,
-    onClose,
     parentMessage,
     threadMessages,
     onSendMessage
 }: MobileThreadSidebarProps) => {
-    if (!isOpen || !parentMessage) return null;
+    if (!parentMessage) return null;
 
     return (
         <div className="h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-start p-4 border-b border-border">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">Thread</h3>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="h-8 w-8"
-                >
-                    <X className="h-4 w-4" />
-                </Button>
             </div>
 
             {/* Parent Message */}

@@ -8,6 +8,7 @@ interface MobileMessageInputProps {
     onSend: (message: string) => void;
     replyToMessageId?: string;
     onCancelReply: () => void;
+    isSending?: boolean;
     className?: string;
 }
 
@@ -15,6 +16,7 @@ export const MobileMessageInput = ({
     onSend,
     replyToMessageId,
     onCancelReply,
+    isSending = false,
     className = ""
 }: MobileMessageInputProps) => {
     const [message, setMessage] = useState("");
@@ -85,11 +87,15 @@ export const MobileMessageInput = ({
                 {/* Send button */}
                 <Button
                     onClick={handleSend}
-                    disabled={!message.trim()}
+                    disabled={!message.trim() || isSending}
                     size="icon"
                     className="h-10 w-10 flex-shrink-0"
                 >
-                    <Send className="h-5 w-5" />
+                    {isSending ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                    ) : (
+                        <Send className="h-5 w-5" />
+                    )}
                 </Button>
             </div>
         </div>
