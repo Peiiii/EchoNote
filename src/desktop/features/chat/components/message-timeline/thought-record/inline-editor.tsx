@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
-import { Textarea } from "@/common/components/ui/textarea";
 import { Check, X, Loader2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 
@@ -29,6 +28,14 @@ export function InlineEditor({ content, onSave, onCancel, isSaving }: InlineEdit
     setLocalContent(content);
   }, [content]);
 
+  // Auto-adjust textarea height
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [localContent]);
+
   const handleContentChange = (value: string) => {
     setLocalContent(value);
     updateContent(value);
@@ -53,54 +60,69 @@ export function InlineEditor({ content, onSave, onCancel, isSaving }: InlineEdit
   };
 
   return (
-    <div className="space-y-3">
-      {/* Editor Textarea */}
-      <Textarea
-        ref={textareaRef}
-        value={localContent}
-        onChange={(e) => handleContentChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Edit your thought..."
-        className="min-h-[120px] resize-none border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400"
-        disabled={isSaving}
-      />
-      
-      {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCancel}
+    <div className="space-y-4">
+      {/* Editor Textarea - Borderless, like message input */}
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          value={localContent}
+          onChange={(e) => handleContentChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Edit your thought..."
+          className="w-full min-h-[120px] max-h-[200px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
           disabled={isSaving}
-          className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-        >
-          <X className="w-4 h-4 mr-1" />
-          Cancel
-        </Button>
-        
-        <Button
-          size="sm"
-          onClick={handleSave}
-          disabled={isSaving || !localContent.trim()}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Check className="w-4 h-4 mr-1" />
-              Save
-            </>
-          )}
-        </Button>
+          style={{
+            caretColor: '#3b82f6', // Blue cursor like message input
+          }}
+        />
       </div>
       
-      {/* Keyboard Shortcuts Hint */}
-      <div className="text-xs text-slate-500 dark:text-slate-400 text-center">
-        Press <kbd className="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-xs">⌘+Enter</kbd> to save, <kbd className="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-xs">Esc</kbd> to cancel
+      {/* Action Buttons - Elegant, minimal design */}
+      <div className="flex items-center justify-between">
+        {/* Left side - Keyboard shortcuts hint */}
+        <div className="text-xs text-slate-500 dark:text-slate-400">
+          <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700">
+            ⌘+Enter
+          </kbd>
+          <span className="ml-2">to save,</span>
+          <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700 ml-2">
+            Esc
+          </kbd>
+          <span className="ml-2">to cancel</span>
+        </div>
+        
+        {/* Right side - Action buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCancel}
+            disabled={isSaving}
+            className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <X className="w-3.5 h-3.5 mr-1.5" />
+            Cancel
+          </Button>
+          
+          <Button
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving || !localContent.trim()}
+            className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Check className="w-3.5 h-3.5 mr-1.5" />
+                Save
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
