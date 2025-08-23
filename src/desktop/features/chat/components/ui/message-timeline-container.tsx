@@ -15,14 +15,11 @@ export const MessageTimelineContainer = ({
     messages,
     className = "" 
 }: MessageTimelineContainerProps) => {
-    console.log("[MessageTimelineContainer] ", {
-        messages,
-        containerRef,
-        onOpenThread,
-        className,
-    });
     return (
-        <div ref={containerRef} className={`absolute inset-0 overflow-y-auto ${className}`}>
+        <div 
+            ref={containerRef}
+            className={`flex-1 overflow-y-auto min-h-0 ${className}`}
+        >
             <MessageTimeline onOpenThread={onOpenThread} messages={messages} />
         </div>
     );

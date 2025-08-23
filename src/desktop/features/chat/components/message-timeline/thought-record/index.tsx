@@ -140,7 +140,6 @@ export function ThoughtRecord({
 
     return (
         <div className="w-full">
-            {/* Thought Record Container */}
             <div className="group relative w-full px-8 py-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all duration-300 ease-out hover:shadow-sm">
                 {/* Record Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -160,7 +159,6 @@ export function ThoughtRecord({
                     />
                 </div>
 
-                {/* Main Content */}
                 <ReadMoreWrapper maxHeight={300} >
                     <MarkdownContent content={message.content} />
                 </ReadMoreWrapper>
@@ -173,7 +171,7 @@ export function ThoughtRecord({
                 />
 
                 {/* Footer */}
-                <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-4">
                     <div className="flex items-center gap-4">
                         <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
                             {message.content.length} characters

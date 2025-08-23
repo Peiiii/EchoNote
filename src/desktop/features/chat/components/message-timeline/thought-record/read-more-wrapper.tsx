@@ -10,8 +10,8 @@ interface ReadMoreWrapperProps {
         expand: string;
         collapse: string;
     };
-    maskHeight?: number; // 渐变遮罩高度
-    buttonAlign?: 'left' | 'center'; // 按钮对齐方式
+    maskHeight?: number;
+    buttonAlign?: 'left' | 'center'; 
 }
 
 export function ReadMoreWrapper({ 
@@ -37,7 +37,7 @@ export function ReadMoreWrapper({
             const needsReadMore = contentHeight > maxHeight;
             setShowReadMore(needsReadMore);
         }
-    }, [children, maxHeight]);
+    }, [children, maxHeight, isExpanded]);
 
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
@@ -45,7 +45,6 @@ export function ReadMoreWrapper({
 
     return (
         <div className={className}>
-            {/* Content Container with Gradient Mask */}
             <div className="relative">
                 <div 
                     ref={contentRef}
@@ -53,16 +52,16 @@ export function ReadMoreWrapper({
                         !isExpanded && showReadMore ? 'overflow-hidden' : ''
                     }`}
                     style={{
-                        maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : 'none'
+                        maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : 'none',
+                        height: !isExpanded && showReadMore ? `${maxHeight}px` : 'auto'
                     }}
                 >
                     {children}
                 </div>
 
-                {/* Elegant Gradient Mask for Overflow */}
                 {!isExpanded && showReadMore && (
                     <div 
-                        className="absolute bottom-0 left-0 right-0 pointer-events-none h-16 bg-gradient-to-t from-white via-white/60 to-transparent dark:from-slate-900/80 dark:via-slate-900/40 dark:to-transparent"
+                        className="absolute bottom-0 left-0 right-0 pointer-events-none bg-gradient-to-t from-white via-white/60 to-transparent dark:from-slate-900/80 dark:via-slate-900/40 dark:to-transparent"
                         style={{
                             height: `${maskHeight * 4}px`
                         }}

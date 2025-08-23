@@ -19,7 +19,7 @@ export const DateDivider = ({ date }: DateDividerProps) => {
                 
                 {/* Subtle decorative elements */}
                 <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 w-6 h-px bg-gradient-to-r from-transparent to-slate-300 dark:to-slate-600"></div>
-                <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 w-6 h-px bg-gradient-to-l from-transparent to-slate-300 dark:to-slate-600"></div>
+                <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 w-6 h-px bg-gradient-to-l from-transparent to-slate-300 dark:border-slate-600"></div>
             </div>
         </div>
     );
