@@ -38,9 +38,9 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     <div
       className={cn(
         "relative flex-shrink-0 h-full",
-        // 使用语义化颜色：活动栏最深色
-        "bg-accent dark:bg-accent",
-        "border-r border-border",
+        // 使用基础背景色，让 active item 能够突出显示
+        "bg-card dark:bg-card",
+        "border-border",
         "shadow-sm",
         className
       )}
@@ -62,7 +62,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
           }
           title="EchoNote"
           showSearch={false}
-          className="bg-muted dark:bg-muted border-b border-border"
+          className="bg-muted dark:bg-muted"
         />
 
         {/* Group List - 主要功能区域 */}
