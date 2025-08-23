@@ -32,7 +32,7 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
                 defaultSize={contentPanelSize}
                 minSize={20}
             >
-                <div className={`h-full flex flex-col bg-white dark:bg-slate-900 overflow-hidden ${className}`}>
+                <div className={`h-full flex flex-col bg-background overflow-hidden ${className}`}>
                     {children}
                 </div>
             </ResizablePanel>
@@ -50,7 +50,7 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
                             setRightSidebarSize(size);
                         }}
                     >
-                        <div className="h-full border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+                        <div className="h-full border-l border-border bg-muted overflow-hidden">
                             {rightSidebar}
                         </div>
                     </ResizablePanel>

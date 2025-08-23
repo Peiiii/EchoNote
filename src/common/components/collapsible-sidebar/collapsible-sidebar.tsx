@@ -73,7 +73,7 @@ const CollapsibleSidebarRoot = ({
         <CollapsibleSidebarContext.Provider value={contextValue}>
             <div
                 className={cn(
-                    "flex-shrink-0 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 transition-all duration-300 ease-in-out overflow-hidden",
+                    "flex-shrink-0 border-r border-border bg-card transition-all duration-300 ease-in-out overflow-hidden",
                     isCollapsed ? collapsedWidth : width,
                     className
                 )}
@@ -101,7 +101,7 @@ interface HeaderProps {
 const CollapsibleSidebarHeader = ({ children, className = "" }: HeaderProps) => {
     return (
         <div className={cn(
-            "flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700",
+            "flex items-center justify-between p-3 border-b border-border",
             className
         )}>
             {children}
@@ -124,7 +124,7 @@ const CollapsibleSidebarToggleButton = ({ className = "", children }: ToggleButt
             size="sm"
             onClick={toggleCollapse}
             className={cn(
-                "h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300",
+                "h-8 w-8 hover:bg-accent transition-all duration-300",
                 isCollapsed ? "opacity-0 scale-95" : "opacity-100 scale-100",
                 className
             )}
@@ -145,7 +145,7 @@ const CollapsibleSidebarExpandButton = () => {
                 variant="outline"
                 size="sm"
                 onClick={toggleCollapse}
-                className="h-8 w-8 p-0 rounded-r-md rounded-l-none border-l-0 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-md transition-all duration-300"
+                className="h-8 w-8 p-0 rounded-r-md rounded-l-none border-l-0 bg-card hover:bg-muted shadow-md transition-all duration-300"
                 title="Expand sidebar"
             >
                 <PanelLeft className="h-4 w-4" />

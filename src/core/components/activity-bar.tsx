@@ -38,9 +38,9 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
     <div
       className={cn(
         "relative flex-shrink-0 h-full",
-        // 简约纯净：中性色调，适合记录工具
-        "bg-white dark:bg-slate-900",
-        "border-r border-slate-200 dark:border-slate-700",
+        // 使用语义化颜色：活动栏最深色
+        "bg-accent dark:bg-accent",
+        "border-r border-border",
         "shadow-sm",
         className
       )}
@@ -62,7 +62,7 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
           }
           title="EchoNote"
           showSearch={false}
-          className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700"
+          className="bg-muted dark:bg-muted border-b border-border"
         />
 
         {/* Group List - 主要功能区域 */}
@@ -94,9 +94,9 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
         </ActivityBar.GroupList>
 
         {/* Footer - 设置区域 */}
-        <ActivityBar.Footer className="bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+        <ActivityBar.Footer className="bg-muted dark:bg-muted border-t border-border">
           {/* Auth Status Section - 统一的认证状态显示 */}
-          <div className="px-2 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-center">
+          <div className="px-2 py-2 border-b border-border flex justify-center">
             <AuthStatus />
           </div>
 
@@ -126,13 +126,13 @@ export function ActivityBarComponent({ className }: ActivityBarProps) {
                 ))}
               </ActivityBar.Group>
 
-              <ActivityBar.Separator className="bg-slate-200 dark:border-slate-700" />
+              <ActivityBar.Separator className="bg-border" />
             </>
           )}
 
           {/* Theme Toggle - 简洁的主题切换并居中 */}
           <div className="px-2 py-2 flex justify-center">
-            <ThemeToggle className="w-full max-w-[120px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200" />
+            <ThemeToggle className="w-full max-w-[120px] bg-card dark:bg-card border border-border rounded-md hover:bg-muted dark:hover:bg-muted transition-colors duration-200" />
           </div>
         </ActivityBar.Footer>
       </ActivityBar.Root>

@@ -28,7 +28,7 @@ export function MessageTimeline({ onOpenThread, messages }: MessageTimelineProps
     }
 
     return (
-        <div className="w-full bg-white dark:bg-slate-950">
+        <div className="w-full bg-background">
             <div className="w-full">
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => {
                     // Filter only user messages for display (excluding thread messages)
@@ -60,7 +60,7 @@ export function MessageTimeline({ onOpenThread, messages }: MessageTimelineProps
                                             {/* Elegant separator between thoughts */}
                                             {index < userMessages.length - 1 && (
                                                 <div className="w-full">
-                                                    <div className="border-t border-slate-200/60 dark:border-slate-700/60"></div>
+                                                    <div className="border-t border-border/60"></div>
                                                 </div>
                                             )}
                                         </div>
