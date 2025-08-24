@@ -10,9 +10,15 @@
 - **模块化**: 支持独立开发、测试和部署
 
 ### 暴露方式规则
-- **普通业务子feature**: 通过`index.tsx`暴露组件、hooks、services等
+- **普通业务子feature**: 通过`index.tsx`暴露**一个组合了所有功能的Feature组件**
 - **系统级feature**: 涉及activitybar/router等核心功能的，通过`extensions/`暴露
 - **顶级feature**: 通过`extensions/`暴露给系统
+
+### 子Feature导出规范
+- **严格限制**: 子feature的`index.tsx`只能导出Feature组件，不能导出内部组件、hooks、services
+- **原因**: 保持模块边界清晰，避免不必要的重新导出，维护导入路径的明确性
+- **正确做法**: 只导出`FeatureNameFeature`组件，该组件内部组合了所有功能
+- **错误做法**: 重新导出内部组件、hooks、services，或创建中间层抽象
 
 ### 禁止使用index文件的目录规则
 - **严格禁止**: 在`components/`、`hooks/`、`services/`等业务目录下创建`index.ts`或`index.tsx`文件
@@ -158,12 +164,11 @@ export const EcommerceExtension = () => {
 ### 2. 业务子Feature暴露 (index.tsx方式)
 ```typescript
 // src/desktop/features/ecommerce/features/product-catalog/index.tsx
-export { ProductCard } from './components/product-card';
-export { ProductGrid } from './components/product-grid';
-export { ProductFilter } from './components/product-filter';
-export { useProductSearch } from './hooks/use-product-search';
-export { productService } from './services/product.service';
+// ❌ 错误：不要重新导出内部组件、hooks、services
+// export { ProductCard } from './components/product-card';
+// export { useProductSearch } from './hooks/use-product-search';
 
+// ✅ 正确：只导出Feature组件
 export const ProductCatalogFeature = () => {
   return (
     <div className="product-catalog-feature">
@@ -185,9 +190,14 @@ const systemExtensions = [
 ];
 
 // 在feature内部使用子feature
-import { ProductCard, useProductSearch } from '@/desktop/features/ecommerce/features/product-catalog';
-import { ShoppingCart } from '@/desktop/features/ecommerce/features/shopping-cart';
-import { OrderList } from '@/desktop/features/ecommerce/features/order-management';
+// ✅ 正确：直接导入需要的组件
+import { ProductCard } from '@/desktop/features/ecommerce/features/product-catalog/components/product-card';
+import { useProductSearch } from '@/desktop/features/ecommerce/features/product-catalog/hooks/use-product-search';
+import { ShoppingCart } from '@/desktop/features/ecommerce/features/shopping-cart/components/shopping-cart';
+import { OrderList } from '@/desktop/features/ecommerce/features/order-management/components/order-list';
+
+// ❌ 错误：从子feature的index.tsx导入内部组件
+// import { ProductCard, useProductSearch } from '@/desktop/features/ecommerce/features/product-catalog';
 ```
 
 ## 复用性层次结构
@@ -311,6 +321,14 @@ import { Modal } from '@/common/components/ui/modal';
 - **导入路径明确性**: 所有导入都应该指向具体的文件，而不是抽象的index
 - **依赖关系清晰**: 通过明确的导入路径，保持代码的可读性和可维护性
 - **重构友好性**: 避免通过index文件隐藏真实的依赖关系
+- **子Feature导出规范**: 子feature的index.tsx只能导出Feature组件，不能重新导出内部内容
+
+### 6. 子Feature导出规范检查清单
+- [ ] 子feature的index.tsx只导出Feature组件
+- [ ] 没有重新导出内部组件、hooks、services
+- [ ] 没有创建中间层抽象
+- [ ] 导入路径直接指向具体文件
+- [ ] 保持了模块边界清晰
 
 ## 迁移指导
 
@@ -328,7 +346,15 @@ import { Modal } from '@/common/components/ui/modal';
 4. **删除index文件**: 确认所有导入都已更新后，删除不必要的index文件
 5. **验证功能**: 确保重构后功能正常
 
+### 重构子Feature导出规范的步骤
+1. **识别违规导出**: 检查子feature的index.tsx是否重新导出了内部组件、hooks、services
+2. **清理违规导出**: 删除所有重新导出的内容，只保留Feature组件
+3. **更新导入路径**: 将所有从子feature index.tsx导入的语句改为直接导入具体文件
+4. **验证功能**: 确保重构后功能正常，没有导入错误
+
 #### 重构示例
+
+##### 重构业务目录下的index文件
 ```typescript
 // 重构前：使用index文件
 // src/common/components/action-menu/index.ts
@@ -344,6 +370,32 @@ import { ActionMenu, ActionMenuItem } from '@/common/components/action-menu';
 // 使用方改为
 import { ActionMenu } from '@/common/components/action-menu/action-menu';
 import { ActionMenuItem } from '@/common/components/action-menu/action-menu-item';
+```
+
+##### 重构子Feature导出规范
+```typescript
+// 重构前：违规重新导出内部内容
+// src/desktop/features/chat/features/channel-management/index.tsx
+export { ChannelList } from './components/channel-list';
+export { ChannelItem } from './components/channel-item';
+export { channelToolsManager } from './services/channel-tools-manager';
+
+// 使用方
+import { ChannelList, ChannelItem } from '@/desktop/features/chat/features/channel-management';
+
+// 重构后：只导出Feature组件
+// src/desktop/features/chat/features/channel-management/index.tsx
+export const ChannelManagementFeature = () => {
+  return (
+    <div className="channel-management-feature">
+      <ChannelList />
+    </div>
+  );
+};
+
+// 使用方改为直接导入
+import { ChannelList } from '@/desktop/features/chat/features/channel-management/components/channel-list';
+import { ChannelItem } from '@/desktop/features/chat/features/channel-management/components/channel-item';
 ```
 
 ### 新项目开发建议

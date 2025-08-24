@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useChatViewStore } from "@/core/stores/chat-view.store";
-import { ChannelList } from "@/desktop/features/chat/components/channel-list";
+import { ChannelList } from "@/desktop/features/chat/features/channel-management";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
 import { AIAssistantSidebar } from "@/desktop/features/chat/components/ai-assistant-sidebar";
