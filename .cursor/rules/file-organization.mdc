@@ -1,6 +1,3 @@
----
-alwaysApply: true
----
 
 # 文件组织规则
 
@@ -16,6 +13,13 @@ alwaysApply: true
 - **普通业务子feature**: 通过`index.tsx`暴露组件、hooks、services等
 - **系统级feature**: 涉及activitybar/router等核心功能的，通过`extensions/`暴露
 - **顶级feature**: 通过`extensions/`暴露给系统
+
+### 禁止使用index文件的目录规则
+- **严格禁止**: 在`components/`、`hooks/`、`services/`等业务目录下创建`index.ts`或`index.tsx`文件
+- **原因**: 避免不必要的抽象层，保持组件导入的明确性和可追踪性
+- **例外**: 只有`src/common/components/modal/index.ts`是历史遗留，新组件不应效仿
+- **正确做法**: 直接在需要的地方导入具体文件，如`import { Button } from '@/common/components/ui/button'`
+- **错误做法**: 创建`src/common/components/ui/index.ts`来重新导出所有组件
 
 ## 核心目录结构（示意）
 
@@ -263,6 +267,23 @@ import { Button } from '../../../components/ui/button';
 import { ProductCard } from './components/product-card';
 ```
 
+### 避免index文件重新导出
+```typescript
+// ❌ 错误：创建index文件重新导出
+// src/common/components/ui/index.ts
+export { Button } from './button';
+export { Input } from './input';
+export { Modal } from './modal';
+
+// ❌ 错误：从index文件导入
+import { Button, Input, Modal } from '@/common/components/ui';
+
+// ✅ 正确：直接从具体文件导入
+import { Button } from '@/common/components/ui/button';
+import { Input } from '@/common/components/ui/input';
+import { Modal } from '@/common/components/ui/modal';
+```
+
 ## 最佳实践
 
 ### 1. Feature拆分原则
@@ -285,6 +306,12 @@ import { ProductCard } from './components/product-card';
 - **集成测试**: 测试feature间的协作
 - **Mock策略**: 合理使用mock避免测试依赖
 
+### 5. 代码质量检查点
+- **避免index文件滥用**: 不在业务目录下创建不必要的index文件
+- **导入路径明确性**: 所有导入都应该指向具体的文件，而不是抽象的index
+- **依赖关系清晰**: 通过明确的导入路径，保持代码的可读性和可维护性
+- **重构友好性**: 避免通过index文件隐藏真实的依赖关系
+
 ## 迁移指导
 
 ### 现有项目重构步骤
@@ -294,6 +321,31 @@ import { ProductCard } from './components/product-card';
 4. **更新导入**: 统一使用绝对路径导入
 5. **验证功能**: 确保重构后功能正常
 
+### 重构现有index文件的步骤
+1. **识别违规文件**: 查找在`components/`、`hooks/`、`services/`等目录下的index文件
+2. **分析使用情况**: 检查哪些地方从这些index文件导入
+3. **逐步替换**: 将导入语句改为直接导入具体文件
+4. **删除index文件**: 确认所有导入都已更新后，删除不必要的index文件
+5. **验证功能**: 确保重构后功能正常
+
+#### 重构示例
+```typescript
+// 重构前：使用index文件
+// src/common/components/action-menu/index.ts
+export { ActionMenu } from "./action-menu";
+export { ActionMenuItem } from "./action-menu-item";
+
+// 使用方
+import { ActionMenu, ActionMenuItem } from '@/common/components/action-menu';
+
+// 重构后：直接导入具体文件
+// 删除 src/common/components/action-menu/index.ts
+
+// 使用方改为
+import { ActionMenu } from '@/common/components/action-menu/action-menu';
+import { ActionMenuItem } from '@/common/components/action-menu/action-menu-item';
+```
+
 ### 新项目开发建议
 1. **先设计后开发**: 先规划feature结构再开始编码
 2. **遵循规范**: 严格按照命名和导入规范
@@ -301,5 +353,8 @@ import { ProductCard } from './components/product-card';
 4. **文档维护**: 及时更新架构文档
 
 ---
+
+*本规范适用于大型React项目，支持无限扩展的递归feature结构，提供清晰的模块化边界和灵活的扩展能力。*
+
 
 *本规范适用于大型React项目，支持无限扩展的递归feature结构，提供清晰的模块化边界和灵活的扩展能力。*
