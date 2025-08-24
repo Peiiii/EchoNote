@@ -2,10 +2,11 @@ import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput } from "@/mobile/features/chat/components/mobile-message-input";
 import { MobileMessageTimelineContainer } from "@/mobile/features/chat/components/ui/mobile-message-timeline-container";
 import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/ui/mobile-scroll-to-bottom-button";
+import { Message } from "@/core/stores/chat-data.store";
 
 interface MobileChatLayoutProps {
     currentChannelName?: string;
-    messages: any[];
+    messages: Message[];
     containerRef: React.RefObject<HTMLDivElement | null>;
     isSticky: boolean;
     replyToMessageId?: string | null;

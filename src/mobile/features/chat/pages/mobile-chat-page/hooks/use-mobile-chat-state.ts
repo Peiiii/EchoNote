@@ -18,26 +18,25 @@ export const useMobileChatState = () => {
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { sendMessage, isAddingMessage } = useMessageSender();
     
-    // 滚动加载更多消息
-    const handleScroll = () => {
-        if (!containerRef.current) return;
-        
-        const { scrollTop } = containerRef.current;
-        
-        // 当滚动到顶部时加载更多消息
-        if (scrollTop === 0 && hasMore) {
-            loadMore();
-        }
-    };
-    
     // 添加滚动事件监听器
     useEffect(() => {
+        const handleScroll = () => {
+            if (!containerRef.current) return;
+            
+            const { scrollTop } = containerRef.current;
+            
+            // 当滚动到顶部时加载更多消息
+            if (scrollTop === 0 && hasMore) {
+                loadMore();
+            }
+        };
+        
         const container = containerRef.current;
         if (container) {
             container.addEventListener('scroll', handleScroll);
             return () => container.removeEventListener('scroll', handleScroll);
         }
-    }, [hasMore, loadMore]);
+    }, [hasMore, loadMore, containerRef]);
 
     // 处理消息发送，包括自动滚动到底部
     const handleSendMessage = async (content: string) => {

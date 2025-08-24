@@ -1,4 +1,6 @@
-export interface MobileChatPageProps {}
+export interface MobileChatPageProps {
+    // 预留未来扩展的属性
+}
 
 export interface MobileSidebarState {
     isChannelListOpen: boolean;

@@ -4,11 +4,12 @@ import { MobileAIAssistant } from "@/mobile/features/chat/components/mobile-ai-a
 import { MobileThreadSidebar } from "@/mobile/features/chat/components/mobile-thread-sidebar";
 import { MobileSettingsSidebar } from "./mobile-settings-sidebar";
 import { MobileSidebarState, MobileSidebarActions } from '../types';
+import { Message } from "@/core/stores/chat-data.store";
 
 interface MobileSidebarManagerProps extends MobileSidebarState, MobileSidebarActions {
     isThreadOpen: boolean;
-    currentParentMessage: any;
-    currentThreadMessages: any[];
+    currentParentMessage: Message | null;
+    currentThreadMessages: Message[];
     onSendThreadMessage: (content: string) => void;
     onCloseThread: () => void;
 }

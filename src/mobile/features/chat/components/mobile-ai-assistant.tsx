@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Bot, Send } from "lucide-react";
 
-interface MobileAIAssistantProps {
-}
 
 interface AIMessage {
     id: string;
@@ -12,7 +10,7 @@ interface AIMessage {
     timestamp: Date;
 }
 
-export const MobileAIAssistant = ({}: MobileAIAssistantProps) => {
+export const MobileAIAssistant = () => {
     const [messages, setMessages] = useState<AIMessage[]>([
         {
             id: '1',

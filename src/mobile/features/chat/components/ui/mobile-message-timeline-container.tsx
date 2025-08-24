@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+ import { RefObject } from "react";
 import { Message } from "@/core/stores/chat-data.store";
 import { MessageTimelineContainer as CommonMessageTimelineContainer } from "@/common/features/chat/components/message-timeline/message-timeline-container";
 import { MobileThoughtRecord } from "../message-timeline/thought-record";
@@ -16,6 +16,7 @@ export const MobileMessageTimelineContainer = ({
     messages,
     className = ""
 }: MobileMessageTimelineContainerProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const renderThoughtRecord = (message: Message, _threadCount: number) => (
         <MobileThoughtRecord
             message={message}
