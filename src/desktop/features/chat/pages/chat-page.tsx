@@ -8,10 +8,10 @@ import { AIAssistantSidebar } from "@/desktop/features/chat/components/ai-assist
 import { ThreadSidebar } from "@/desktop/features/chat/components/features/thread-sidebar";
 import { MessageInput } from "@/desktop/features/chat/components/message-input";
 import { MessageTimelineContainer } from "@/desktop/features/chat/components/ui/message-timeline-container";
-import { ScrollToBottomButton } from "@/desktop/features/chat/components/ui/scroll-to-bottom-button";
+import { ScrollToBottomButton } from "@/common/features/chat/components/ui/scroll-to-bottom-button";
 import { useAIAssistant } from "@/desktop/features/chat/hooks/use-ai-assistant";
-import { useChatActions } from "@/desktop/features/chat/hooks/use-chat-actions";
-import { useChatScroll } from "@/desktop/features/chat/hooks/use-chat-scroll";
+import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
+import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
 import { usePaginatedMessages } from "@/desktop/features/chat/hooks/use-paginated-messages";
 
@@ -72,7 +72,10 @@ export function ChatPage() {
                     }
                     scrollButton={
                         !isSticky && (
-                            <ScrollToBottomButton onClick={handleScrollToBottom} />
+                            <ScrollToBottomButton 
+                                onClick={handleScrollToBottom} 
+                                isVisible={!isSticky} 
+                            />
                         )
                     }
                 />
