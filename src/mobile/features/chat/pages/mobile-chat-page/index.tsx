@@ -10,14 +10,6 @@ export function MobileChatPage() {
     
     // Get current channel name for header
     const currentChannel = chatState.channels.find(channel => channel.id === chatState.currentChannelId);
-
-    console.log("[MobileChatPage] ", {
-        currentChannelName: currentChannel?.name,
-        isChannelListOpen: sidebarState.isChannelListOpen,
-        isAIAssistantOpen: sidebarState.isAIAssistantOpen,
-        isAddingMessage: chatState.isAddingMessage
-    });
-
     return (
         <div className="h-full flex flex-col">
             {/* Main Chat Layout */}

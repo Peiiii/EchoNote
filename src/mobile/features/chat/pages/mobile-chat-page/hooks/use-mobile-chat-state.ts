@@ -16,7 +16,7 @@ export const useMobileChatState = () => {
     const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
     const { replyToMessageId, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
-    const { sendMessage, isAddingMessage } = useMessageSender(containerRef, handleScrollToBottom);
+    const { sendMessage, isAddingMessage } = useMessageSender();
     
     // 滚动加载更多消息
     const handleScroll = () => {
@@ -39,22 +39,20 @@ export const useMobileChatState = () => {
         }
     }, [hasMore, loadMore]);
 
-    // 使用公共的消息发送处理
+    // 处理消息发送，包括自动滚动到底部
     const handleSendMessage = async (content: string) => {
-        await sendMessage(content, replyToMessageId || undefined);
+        // 立即滚动到底部，确保用户体验流畅
+        requestAnimationFrame(() => {
+            handleScrollToBottom();
+        });
+        
+        // 发送消息（异步，包含AI响应）
+        sendMessage(content, replyToMessageId || undefined);
         
         // 清除回复状态
         if (replyToMessageId) {
             handleCancelReply();
         }
-        
-        // 发送消息后强制滚动到底部
-        setTimeout(() => {
-            // 强制设置sticky状态并滚动到底部
-            if (containerRef.current) {
-                containerRef.current.scrollTop = containerRef.current.scrollHeight;
-            }
-        }, 100);
     };
 
     return {

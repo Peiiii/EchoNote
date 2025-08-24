@@ -25,15 +25,17 @@ export const MobileMessageTimelineContainer = ({
     return (
         <div
             ref={containerRef}
-            className={`flex-1 overflow-y-auto p-4 space-y-4 ${className}`}
+            className={`flex-1 overflow-y-auto min-h-0 ${className}`}
         >
-            {filteredMessages.map((message) => (
-                <MobileThoughtRecord
-                    key={message.id}
-                    message={message}
-                    onOpenThread={onOpenThread}
-                />
-            ))}
+            <div className="p-4 space-y-4">
+                {filteredMessages.map((message) => (
+                    <MobileThoughtRecord
+                        key={message.id}
+                        message={message}
+                        onOpenThread={onOpenThread}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

@@ -1,19 +1,11 @@
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 
-export const useMessageSender = (
-    containerRef: React.RefObject<HTMLDivElement | null>,
-    onScrollToBottom?: () => void
-) => {
+export const useMessageSender = () => {
     const { addMessage, addThreadMessage } = useChatDataStore();
     const { currentChannelId, isAddingMessage, setIsAddingMessage } = useChatViewStore();
 
-    // Auto-scroll to bottom when new messages arrive
-    const scrollToBottom = () => {
-        if (containerRef.current) {
-            containerRef.current.scrollTop = containerRef.current.scrollHeight;
-        }
-    };
+
 
     const sendMessage = async (content: string, replyToMessageId?: string) => {
         if (!content.trim() || !currentChannelId) return;
@@ -59,16 +51,8 @@ export const useMessageSender = (
                     console.error("Failed to add AI response:", error);
                 } finally {
                     setIsAddingMessage(false);
-                    // AI 响应完成后滚动到底部
-                    if (onScrollToBottom) {
-                        setTimeout(() => {
-                            onScrollToBottom();
-                        }, 100);
-                    }
                 }
             }, 1000);
-
-            // Note: Scrolling is handled by the calling component
 
             return true;
         } catch (error) {
@@ -80,6 +64,5 @@ export const useMessageSender = (
     return {
         sendMessage,
         isAddingMessage,
-        scrollToBottom,
     };
 };

@@ -47,17 +47,15 @@ export const MobileChatLayout = ({
             {/* Main Chat Area - Fixed Layout */}
             <div className="flex-1 flex flex-col min-h-0">
                 {/* Timeline Area - Scrollable */}
-                <div className="flex-1 overflow-y-auto">
-                    <MobileMessageTimelineContainer
-                        containerRef={containerRef}
-                        onOpenThread={onOpenThread}
-                        messages={messages}
-                    />
-                    {/* Scroll to bottom button */}
-                    {!isSticky && (
-                        <MobileScrollToBottomButton onClick={onScrollToBottom} />
-                    )}
-                </div>
+                <MobileMessageTimelineContainer
+                    containerRef={containerRef}
+                    onOpenThread={onOpenThread}
+                    messages={messages}
+                />
+                {/* Scroll to bottom button */}
+                {!isSticky && (
+                    <MobileScrollToBottomButton onClick={onScrollToBottom} />
+                )}
                 
                 {/* Input Area - Fixed at bottom */}
                 <div className="flex-shrink-0">
