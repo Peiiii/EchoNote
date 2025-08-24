@@ -1,6 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
-import { generateSparksForText } from "@/desktop/features/chat/services/insights.service";
+import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { useState } from "react";
 
 interface ThoughtRecordSparksProps {

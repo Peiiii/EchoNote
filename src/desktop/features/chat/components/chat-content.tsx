@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { ExpandedEditor } from "./message-timeline/thought-record/expanded-editor";
+import { ExpandedEditor } from "@/desktop/features/chat/features/message-timeline/components/thought-record/expanded-editor";
 
 interface ChatContentProps {
     timeline: ReactNode;

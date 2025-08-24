@@ -4,7 +4,7 @@ import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
-import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
+import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
 import { useMessageSender } from "@/mobile/features/chat/hooks/use-message-sender";
 
 export const useMobileChatState = () => {

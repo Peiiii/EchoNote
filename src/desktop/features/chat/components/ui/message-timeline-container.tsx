@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import { MessageTimelineContainer as CommonMessageTimelineContainer } from "@/common/features/chat/components/message-timeline/message-timeline-container";
 import { Message } from "@/core/stores/chat-data.store";
-import { ThoughtRecord } from "../message-timeline/thought-record";
+import { ThoughtRecord } from "@/desktop/features/chat/features/message-timeline/components/thought-record";
 
 interface MessageTimelineContainerProps {
     containerRef: RefObject<HTMLDivElement | null>;

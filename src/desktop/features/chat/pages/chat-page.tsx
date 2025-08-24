@@ -1,18 +1,18 @@
 
 import { useEffect } from 'react';
 import { useChatViewStore } from "@/core/stores/chat-view.store";
-import { ChannelList } from "@/desktop/features/chat/features/channel-management";
+import { ChannelList } from "@/desktop/features/chat/features/channel-management/components/channel-list";
 import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
-import { AIAssistantSidebar } from "@/desktop/features/chat/components/ai-assistant-sidebar";
-import { ThreadSidebar } from "@/desktop/features/chat/components/features/thread-sidebar";
+import { AIAssistantSidebar } from "@/desktop/features/chat/features/ai-assistant/components/ai-assistant-sidebar";
+import { ThreadSidebar } from "@/desktop/features/chat/features/thread-management/components/thread-sidebar";
 import { MessageInput } from "@/desktop/features/chat/components/message-input";
 import { MessageTimelineContainer } from "@/desktop/features/chat/components/ui/message-timeline-container";
 import { ScrollToBottomButton } from "@/common/features/chat/components/ui/scroll-to-bottom-button";
-import { useAIAssistant } from "@/desktop/features/chat/hooks/use-ai-assistant";
+import { useAIAssistant } from "@/desktop/features/chat/features/ai-assistant/hooks/use-ai-assistant";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
-import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
+import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
 import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 
 export function ChatPage() {

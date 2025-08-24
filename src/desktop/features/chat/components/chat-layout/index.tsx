@@ -1,6 +1,6 @@
 import { ChatLayoutProps } from "./types";
-import { LeftSidebar } from "./components/left-sidebar";
-import { ContentArea } from "./components/content-area";
+import { LeftSidebar } from "./left-sidebar";
+import { ContentArea } from "./content-area";
 
 export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: ChatLayoutProps) => {
     return (

@@ -1,5 +1,5 @@
 import { MobileChatLayoutProps } from "./types";
-import { MobileContentArea } from "./components/mobile-content-area";
+import { MobileContentArea } from "./mobile-content-area";
 
 export const MobileChatLayout = ({ sidebar, content, rightSidebar, className = "" }: MobileChatLayoutProps) => {
     return (
