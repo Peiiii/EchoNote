@@ -13,7 +13,7 @@ import { useAIAssistant } from "@/desktop/features/chat/hooks/use-ai-assistant";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";
-import { usePaginatedMessages } from "@/desktop/features/chat/hooks/use-paginated-messages";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 
 export function ChatPage() {
     const { currentChannelId } = useChatViewStore();

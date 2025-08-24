@@ -54,7 +54,10 @@ export const MobileChatLayout = ({
                 />
                 {/* Scroll to bottom button */}
                 {!isSticky && (
-                    <MobileScrollToBottomButton onClick={onScrollToBottom} />
+                    <MobileScrollToBottomButton 
+                        onClick={onScrollToBottom} 
+                        isVisible={!isSticky}
+                    />
                 )}
                 
                 {/* Input Area - Fixed at bottom */}

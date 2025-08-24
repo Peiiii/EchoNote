@@ -29,11 +29,11 @@ export const useGroupedMessages = (messages?: Message[]) => {
             grouped[date].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
         });
 
-        // Sort days by timestamp (newest first)
+        // Sort days by timestamp (oldest first - to match message order)
         const sortedDates = Object.keys(grouped).sort((a, b) => {
             const dateA = new Date(grouped[a][0]?.timestamp || 0);
             const dateB = new Date(grouped[b][0]?.timestamp || 0);
-            return dateB.getTime() - dateA.getTime();
+            return dateA.getTime() - dateB.getTime();
         });
 
         const sortedGrouped: Record<string, Message[]> = {};

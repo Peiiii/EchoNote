@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { usePaginatedMessages } from "@/desktop/features/chat/hooks/use-paginated-messages";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useThreadSidebar } from "@/desktop/features/chat/hooks/use-thread-sidebar";

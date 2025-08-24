@@ -1,5 +1,6 @@
 import { RefObject } from "react";
 import { Message } from "@/core/stores/chat-data.store";
+import { MessageTimelineContainer as CommonMessageTimelineContainer } from "@/common/features/chat/components/message-timeline/message-timeline-container";
 import { MobileThoughtRecord } from "../message-timeline/thought-record";
 
 interface MobileMessageTimelineContainerProps {
@@ -15,27 +16,19 @@ export const MobileMessageTimelineContainer = ({
     messages,
     className = ""
 }: MobileMessageTimelineContainerProps) => {
-    // Filter only user messages for display (excluding thread messages)
-    // Same logic as desktop version
-    const filteredMessages = messages.filter((msg: Message) => 
-        msg.sender === "user" && 
-        !msg.parentId // Ensure only main messages are shown, not thread messages
+    const renderThoughtRecord = (message: Message, _threadCount: number) => (
+        <MobileThoughtRecord
+            message={message}
+            onOpenThread={onOpenThread}
+        />
     );
 
     return (
-        <div
-            ref={containerRef}
-            className={`flex-1 overflow-y-auto min-h-0 ${className}`}
-        >
-            <div className="p-4 space-y-4">
-                {filteredMessages.map((message) => (
-                    <MobileThoughtRecord
-                        key={message.id}
-                        message={message}
-                        onOpenThread={onOpenThread}
-                    />
-                ))}
-            </div>
-        </div>
+        <CommonMessageTimelineContainer
+            containerRef={containerRef}
+            messages={messages}
+            className={className}
+            renderThoughtRecord={renderThoughtRecord}
+        />
     );
 };
