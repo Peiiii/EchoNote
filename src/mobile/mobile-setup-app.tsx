@@ -20,9 +20,16 @@ export const MobileSetupApp = (props: MobileSetupAppProps) => {
             </div>
         </div>
     ) : (
-        <div className="h-full flex flex-col bg-background">
+        <div 
+            className="flex flex-col bg-background overflow-hidden" 
+            style={{ 
+                height: '100vh',
+                minHeight: '100vh',
+                maxHeight: '100vh'
+            }}
+        >
             {/* Main Content Area - Header will be managed by individual pages */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-hidden">
                 <MobilePluginRouter />
             </div>
         </div>

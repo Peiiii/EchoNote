@@ -1,7 +1,8 @@
 import { Button } from "@/common/components/ui/button";
-import { Settings } from "lucide-react";
+import { Settings, Info, Code } from "lucide-react";
 import { AuthStatus } from "@/common/components/firebase/auth-status";
 import { ThemeToggle } from "@/common/components/theme";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/common/components/ui/dialog";
 
 export const MobileSettingsSidebar = () => {
     return (
@@ -41,6 +42,50 @@ export const MobileSettingsSidebar = () => {
                     <Button variant="outline" className="w-full justify-start">
                         Import Data
                     </Button>
+                </div>
+
+                {/* Developer Section */}
+                <div className="space-y-3">
+                    <div className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <Code className="w-4 h-4" />
+                        Developer
+                    </div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start">
+                                <Info className="w-4 h-4 mr-2" />
+                                Debug Information
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Debug Information</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span className="font-medium">Version:</span>
+                                        <div className="text-muted-foreground">v1.0.0</div>
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">Build Time:</span>
+                                        <div className="text-muted-foreground">{new Date().toLocaleString()}</div>
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">Environment:</span>
+                                        <div className="text-muted-foreground">Production</div>
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">Platform:</span>
+                                        <div className="text-muted-foreground">Mobile</div>
+                                    </div>
+                                </div>
+                                <div className="text-xs text-muted-foreground border-t pt-3">
+                                    This debug information is only visible to developers and support staff.
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
         </div>
