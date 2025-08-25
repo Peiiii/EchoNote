@@ -45,10 +45,6 @@ export function ChatPage() {
         }
     }, [hasMore, loadMore, containerRef]);
     
-    console.log("[ChatPage] ", {
-        currentAIAssistantChannel
-    });
-
     return (
         <ChatLayout
             sidebar={<ChannelList />}

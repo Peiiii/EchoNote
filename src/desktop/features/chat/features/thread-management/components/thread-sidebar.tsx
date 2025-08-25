@@ -1,4 +1,4 @@
-import { X, Send, MessageCircle, User, Bot } from "lucide-react";
+import { X, Send, MessageCircle, User, Bot, ChevronDown, ChevronUp } from "lucide-react";
 import { Message } from "@/core/stores/chat-data.store";
 import { useState } from "react";
 
@@ -18,6 +18,7 @@ export const ThreadSidebar = ({
     onSendMessage 
 }: ThreadSidebarProps) => {
     const [newMessage, setNewMessage] = useState("");
+    const [isOriginalExpanded, setIsOriginalExpanded] = useState(false);
 
     const handleSend = () => {
         if (newMessage.trim()) {
@@ -33,12 +34,18 @@ export const ThreadSidebar = ({
         }
     };
 
+    // 计算内容截断
+    const getTruncatedContent = (content: string, maxLength: number = 200) => {
+        if (content.length <= maxLength) return content;
+        return content.substring(0, maxLength) + '...';
+    };
+
     if (!isOpen) return null;
 
     return (
         <div className="h-full flex flex-col bg-white dark:bg-slate-900">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+            {/* Header - 固定高度 */}
+            <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2">
                     <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     <h3 className="font-semibold text-slate-800 dark:text-slate-200">Discussion</h3>
@@ -56,63 +63,91 @@ export const ThreadSidebar = ({
                 </button>
             </div>
 
-            {/* Parent Message */}
-            {parentMessage && (
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
-                    <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
-                                Original Thought
-                            </div>
-                            <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {parentMessage.content}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Thread Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {threadMessages.length === 0 ? (
-                    <div className="text-center py-8">
-                        <MessageCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">
-                            No replies yet. Start the discussion!
-                        </p>
-                    </div>
-                ) : (
-                    threadMessages.map((message) => (
-                        <div key={message.id} className="flex items-start gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                message.sender === "user" 
-                                    ? "bg-blue-500" 
-                                    : "bg-slate-500"
-                            }`}>
-                                {message.sender === "user" ? (
-                                    <User className="w-4 h-4 text-white" />
-                                ) : (
-                                    <Bot className="w-4 h-4 text-white" />
-                                )}
+            {/* 中间内容区域 - 可滚动，包含原始内容和讨论消息 */}
+            <div className="flex-1 overflow-y-auto">
+                {/* Parent Message - 展开状态直接平铺 */}
+                {parentMessage && (
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
+                        <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                                <User className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
-                                    {message.sender === "user" ? "You" : "AI Assistant"}
+                                    Original Thought
                                 </div>
+                                
+                                {/* 内容区域 - 展开状态直接平铺，收起状态截断 */}
                                 <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    {message.content}
+                                    {isOriginalExpanded 
+                                        ? parentMessage.content 
+                                        : getTruncatedContent(parentMessage.content)
+                                    }
                                 </div>
+                                
+                                {/* 展开/收起按钮 */}
+                                {parentMessage.content.length > 200 && (
+                                    <button
+                                        onClick={() => setIsOriginalExpanded(!isOriginalExpanded)}
+                                        className="mt-2 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200"
+                                    >
+                                        {isOriginalExpanded ? (
+                                            <>
+                                                <ChevronUp className="w-3 h-3" />
+                                                Show less
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ChevronDown className="w-3 h-3" />
+                                                Show more
+                                            </>
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    ))
+                    </div>
                 )}
+
+                {/* Thread Messages */}
+                <div className="p-4 space-y-4">
+                    {threadMessages.length === 0 ? (
+                        <div className="text-center py-8">
+                            <MessageCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">
+                                No replies yet. Start the discussion!
+                            </p>
+                        </div>
+                    ) : (
+                        threadMessages.map((message) => (
+                            <div key={message.id} className="flex items-start gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                    message.sender === "user" 
+                                        ? "bg-blue-500" 
+                                        : "bg-slate-500"
+                                }`}>
+                                    {message.sender === "user" ? (
+                                        <User className="w-4 h-4 text-white" />
+                                    ) : (
+                                        <Bot className="w-4 h-4 text-white" />
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
+                                        {message.sender === "user" ? "You" : "AI Assistant"}
+                                    </div>
+                                    <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {message.content}
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
 
-            {/* Message Input */}
-            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+            {/* Message Input - 固定底部 */}
+            <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-700">
                 <div className="flex items-end gap-2">
                     <div className="flex-1">
                         <textarea
@@ -120,14 +155,14 @@ export const ThreadSidebar = ({
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder="Add to the discussion..."
-                            className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             rows={2}
                         />
                     </div>
                     <button
                         onClick={handleSend}
                         disabled={!newMessage.trim()}
-                        className="p-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:text-blue-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Send className="w-4 h-4" />
                     </button>
