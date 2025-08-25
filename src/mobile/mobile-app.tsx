@@ -6,9 +6,7 @@ export const MobileApp = () => {
     <div 
       className="flex flex-col bg-background overflow-hidden" 
       style={{ 
-        height: '100vh',
-        minHeight: '100vh',
-        maxHeight: '100vh'
+        height: '100%'
       }}
     >
       <MobileSetupApp extensions={[mobileChatExtension]} />

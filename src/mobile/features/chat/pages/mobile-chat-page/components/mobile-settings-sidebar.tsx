@@ -65,7 +65,7 @@ export const MobileSettingsSidebar = () => {
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
                                         <span className="font-medium">Version:</span>
-                                        <div className="text-muted-foreground">v1.0.0</div>
+                                        <div className="text-muted-foreground">v1.0.1</div>
                                     </div>
                                     <div>
                                         <span className="font-medium">Build Time:</span>

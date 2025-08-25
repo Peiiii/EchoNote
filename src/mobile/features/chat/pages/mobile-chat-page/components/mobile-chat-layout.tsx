@@ -98,9 +98,7 @@ export const MobileChatLayout = ({
         <div 
             className="flex flex-col overflow-hidden" 
             style={{ 
-                height: '100vh',
-                minHeight: '100vh',
-                maxHeight: '100vh'
+                height: '100%'
             }}
         >
             <MobileHeader
