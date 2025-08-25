@@ -1,21 +1,16 @@
-import { RefObject } from "react";
 import { Message } from "@/core/stores/chat-data.store";
-import { MessageTimelineContainer as CommonMessageTimelineContainer } from "@/common/features/chat/components/message-timeline/message-timeline-container";
+import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
 import { MobileThoughtRecord } from "../message-timeline/thought-record";
 
 interface MobileMessageTimelineContainerProps {
-    containerRef: RefObject<HTMLDivElement | null>;
     onOpenThread: (messageId: string) => void;
     messages: Message[];
-    className?: string;
     onReply?: (messageId: string) => void;
 }
 
 export const MobileMessageTimelineContainer = ({
-    containerRef,
     onOpenThread,
     messages,
-    className = "",
     onReply
 }: MobileMessageTimelineContainerProps) => {
     const renderThoughtRecord = (message: Message, threadCount: number) => (
@@ -28,10 +23,8 @@ export const MobileMessageTimelineContainer = ({
     );
 
     return (
-        <CommonMessageTimelineContainer
-            containerRef={containerRef}
-            messages={messages}
-            className={className}
+        <MessageTimeline 
+            messages={messages} 
             renderThoughtRecord={renderThoughtRecord}
         />
     );

@@ -3,7 +3,7 @@ import { MessageTimeline } from "./message-timeline";
 import { Message } from "@/core/stores/chat-data.store";
 
 interface MessageTimelineContainerProps {
-    containerRef: RefObject<HTMLDivElement | null>;
+    containerRef?: RefObject<HTMLDivElement | null>;
     messages?: Message[];
     className?: string;
     renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;

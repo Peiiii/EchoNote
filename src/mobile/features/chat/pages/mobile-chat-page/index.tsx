@@ -16,8 +16,6 @@ export function MobileChatPage() {
             <MobileChatLayout
                 currentChannelName={currentChannel?.name}
                 messages={chatState.messages}
-                containerRef={chatState.containerRef}
-                isSticky={chatState.isSticky}
                 replyToMessageId={chatState.replyToMessageId}
                 isAddingMessage={chatState.isAddingMessage}
                 onOpenChannelList={sidebarState.openChannelList}
@@ -26,7 +24,6 @@ export function MobileChatPage() {
                 onOpenThread={chatState.handleOpenThread}
                 onSendMessage={chatState.handleSendMessage}
                 onCancelReply={chatState.handleCancelReply}
-                onScrollToBottom={chatState.handleScrollToBottom}
                 setReplyToMessageId={chatState.setReplyToMessageId}
             />
             
