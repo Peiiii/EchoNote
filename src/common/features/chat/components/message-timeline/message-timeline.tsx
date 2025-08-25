@@ -48,7 +48,7 @@ export function MessageTimeline({
                         <DateDivider date={date} />
 
                         {/* Elegant timeline of thoughts */}
-                        {userMessages.map((message: Message, index: number) => {
+                        {userMessages.map((message: Message) => {
                             const threadMessages = (messages ?? []).filter(msg => 
                                 msg.threadId === (message.threadId || message.id)
                             );
@@ -57,11 +57,6 @@ export function MessageTimeline({
                             return (
                                 <div key={message.id} className="w-full" style={{ height: 'auto', minHeight: 'auto' }}>
                                     {renderThoughtRecord(message, threadCount)}
-                                    
-                                    {/* Elegant separator between thoughts */}
-                                    {index < userMessages.length - 1 && (
-                                        <div className="border-t border-border/60" style={{ height: '1px', minHeight: '1px' }}></div>
-                                    )}
                                 </div>
                             );
                         })}

@@ -1,15 +1,20 @@
 import { Message } from "@/core/stores/chat-data.store";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { Clock } from "lucide-react";
+import { MoreHorizontal, Edit2, MessageCircle, Lightbulb, Eye, Bookmark, Copy, Trash2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useState } from "react";
 import { MobileMarkdownContent } from "./mobile-markdown-content";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
-import { MobileActionButtons } from "./mobile-action-buttons";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
 import { MobileInlineEditor } from "./mobile-inline-editor";
+import { Button } from "@/common/components/ui/button";
+import { 
+    Popover, 
+    PopoverContent, 
+    PopoverTrigger 
+} from "@/common/components/ui/popover";
 
 interface MobileThoughtRecordProps {
     message: Message;
@@ -26,6 +31,7 @@ export const MobileThoughtRecord = ({
 }: MobileThoughtRecordProps) => {
     const { deleteMessage } = useChatDataStore();
     const [showAnalysis, setShowAnalysis] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
 
     // Edit state management
     const {
@@ -51,6 +57,7 @@ export const MobileThoughtRecord = ({
 
     const handleEdit = () => {
         startEdit(message.id, message.content);
+        setPopoverOpen(false);
     };
 
     const handleDelete = async () => {
@@ -74,18 +81,27 @@ export const MobileThoughtRecord = ({
                 alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
             }
         }
+        setPopoverOpen(false);
     };
 
     const handleToggleAnalysis = () => {
         setShowAnalysis(!showAnalysis);
+        setPopoverOpen(false);
     };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(message.content);
+        setPopoverOpen(false);
     };
 
     const handleOpenThread = () => {
         onOpenThread(message.id);
+        setPopoverOpen(false);
+    };
+
+    const handleReply = () => {
+        onReply?.();
+        setPopoverOpen(false);
     };
 
     // Edit handlers
@@ -102,28 +118,119 @@ export const MobileThoughtRecord = ({
     };
 
     return (
-        <div className="w-full">
-            <div className="relative w-full px-4 py-4 bg-card border border-border rounded-lg hover:shadow-sm transition-all duration-300 ease-out">
-                {/* Record Header */}
-                <div className="flex items-center justify-between mb-3">
+        <div className="w-full mb-6 px-4">
+            <div className="relative w-full px-5 py-5 bg-card rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out">
+                {/* Record Header - Ultra Simplified */}
+                <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 shadow-sm"></div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                            <Clock className="w-3 h-3" />
-                            <span>{formatTimeForSocial(message.timestamp)}</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50"></div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            {formatTimeForSocial(message.timestamp)}
                         </div>
                     </div>
 
-                    <MobileActionButtons
-                        onToggleAnalysis={handleToggleAnalysis}
-                        onReply={onReply}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onCopy={handleCopy}
-                        message={message}
-                        isEditing={isEditing}
-                        hasSparks={hasSparks}
-                    />
+                    {/* More Actions Popover */}
+                    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+                            >
+                                <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent 
+                            className="w-56 p-2" 
+                            align="end"
+                            side="bottom"
+                        >
+                            <div className="space-y-1">
+                                {/* Primary Actions */}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleEdit}
+                                    disabled={isEditing}
+                                    className="w-full justify-start h-9 px-3 text-sm"
+                                >
+                                    <Edit2 className="w-4 h-4 mr-2" />
+                                    Edit
+                                </Button>
+                                
+                                {onReply && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleReply}
+                                        disabled={isEditing}
+                                        className="w-full justify-start h-9 px-3 text-sm"
+                                    >
+                                        <MessageCircle className="w-4 h-4 mr-2" />
+                                        Reply
+                                    </Button>
+                                )}
+
+                                {/* Secondary Actions */}
+                                {hasSparks && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleToggleAnalysis}
+                                        disabled={isEditing}
+                                        className="w-full justify-start h-9 px-3 text-sm"
+                                    >
+                                        <Lightbulb className="w-4 h-4 mr-2" />
+                                        {showAnalysis ? 'Hide Sparks' : 'Show Sparks'}
+                                    </Button>
+                                )}
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {}}
+                                    disabled={isEditing}
+                                    className="w-full justify-start h-9 px-3 text-sm"
+                                >
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    View Details
+                                </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {}}
+                                    disabled={isEditing}
+                                    className="w-full justify-start h-9 px-3 text-sm"
+                                >
+                                    <Bookmark className="w-4 h-4 mr-2" />
+                                    Bookmark
+                                </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleCopy}
+                                    className="w-full justify-start h-9 px-3 text-sm"
+                                >
+                                    <Copy className="w-4 h-4 mr-2" />
+                                    Copy
+                                </Button>
+
+                                {/* Destructive Action */}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleDelete}
+                                    disabled={isEditing}
+                                    className="w-full justify-start h-9 px-3 text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                </Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                 </div>
 
                 {/* Content Area - Show inline editor or read-only content */}
@@ -150,24 +257,9 @@ export const MobileThoughtRecord = ({
                     />
                 )}
 
-                {/* Footer - Hide when editing */}
-                {!isEditing && (
-                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-4 pt-3 border-t border-border/50">
-                        <div className="flex items-center gap-3">
-                            <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200">
-                                {message.content.length} characters
-                            </span>
-                            {hasSparks && (
-                                <>
-                                    <span className="text-slate-300 dark:text-slate-600">•</span>
-                                    <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200">
-                                        {aiAnalysis!.insights.length} sparks
-                                    </span>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Thread indicator */}
+                {/* Footer - Ultra Simplified, only thread indicator */}
+                {!isEditing && threadCount > 0 && (
+                    <div className="flex justify-end mt-4">
                         <MobileThreadIndicator
                             threadCount={threadCount}
                             onOpenThread={handleOpenThread}

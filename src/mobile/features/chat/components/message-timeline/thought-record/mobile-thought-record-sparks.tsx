@@ -1,4 +1,4 @@
-import { Lightbulb, Sparkles } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import { Button } from '@/common/components/ui/button';
 import { Message } from '@/core/stores/chat-data.store';
 
@@ -21,35 +21,29 @@ export function MobileThoughtRecordSparks({
     }
 
     return (
-        <div className="mt-4">
-            {/* Toggle Button */}
+        <div className="mt-3">
+            {/* Toggle Button - Simplified */}
             <Button
                 variant="ghost"
                 size="sm"
                 onClick={onToggleAnalysis}
-                className="h-8 px-3 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 mb-3"
+                className="h-7 px-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
             >
                 <Lightbulb className="w-3 h-3 mr-1" />
-                {showAnalysis ? 'Hide Sparks' : `Show ${aiAnalysis!.insights.length} Sparks`}
+                {showAnalysis ? 'Hide' : `${aiAnalysis!.insights.length} Sparks`}
             </Button>
 
-            {/* Sparks Content */}
+            {/* Sparks Content - Simplified */}
             {showAnalysis && (
-                <div className="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/50 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center gap-2 text-xs font-medium text-blue-700 dark:text-blue-300">
-                        <Sparkles className="w-3 h-3" />
-                        AI Insights
-                    </div>
-                    <div className="space-y-2">
-                        {aiAnalysis!.insights.map((insight: string, index: number) => (
-                            <div
-                                key={index}
-                                className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed p-2 bg-white/50 dark:bg-slate-800/50 rounded border border-blue-200/30 dark:border-blue-600/30"
-                            >
-                                {insight}
-                            </div>
-                        ))}
-                    </div>
+                <div className="mt-2 space-y-2">
+                    {aiAnalysis!.insights.map((insight: string, index: number) => (
+                        <div
+                            key={index}
+                            className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
+                        >
+                            {insight}
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

@@ -18,6 +18,7 @@ interface MobileChatLayoutProps {
     onSendMessage: (content: string) => void;
     onCancelReply: () => void;
     onScrollToBottom: () => void;
+    setReplyToMessageId: (messageId: string | null) => void;
 }
 
 export const MobileChatLayout = ({
@@ -34,7 +35,13 @@ export const MobileChatLayout = ({
     onSendMessage,
     onCancelReply,
     onScrollToBottom,
+    setReplyToMessageId,
 }: MobileChatLayoutProps) => {
+    // Create reply handler that sets the reply message ID
+    const handleReply = (messageId: string) => {
+        setReplyToMessageId(messageId);
+    };
+
     return (
         <div className="h-full flex flex-col">
             {/* Mobile Header */}
@@ -52,6 +59,7 @@ export const MobileChatLayout = ({
                     containerRef={containerRef}
                     onOpenThread={onOpenThread}
                     messages={messages}
+                    onReply={handleReply}
                 />
                 {/* Scroll to bottom button */}
                 {!isSticky && (

@@ -14,7 +14,7 @@ export const useMobileChatState = () => {
     
     // Use specialized hooks
     const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
-    const { replyToMessageId, handleCancelReply } = useChatActions(containerRef);
+    const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { sendMessage, isAddingMessage } = useMessageSender();
     
@@ -77,5 +77,6 @@ export const useMobileChatState = () => {
         handleCloseThread,
         handleSendThreadMessage,
         handleScrollToBottom,
+        setReplyToMessageId,
     };
 };

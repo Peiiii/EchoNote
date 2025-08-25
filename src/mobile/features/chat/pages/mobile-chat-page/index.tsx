@@ -27,6 +27,7 @@ export function MobileChatPage() {
                 onSendMessage={chatState.handleSendMessage}
                 onCancelReply={chatState.handleCancelReply}
                 onScrollToBottom={chatState.handleScrollToBottom}
+                setReplyToMessageId={chatState.setReplyToMessageId}
             />
             
             {/* Sidebar Manager */}
