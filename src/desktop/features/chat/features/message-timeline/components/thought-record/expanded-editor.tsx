@@ -137,8 +137,8 @@ export function ExpandedEditor({
         )}
 
         {/* Editor panel (right) */}
-        <div className={`${showOriginal ? 'w-1/2' : 'w-full'} flex flex-col`}>
-          <div className="flex-1 p-6">
+        <div className={`${showOriginal ? 'w-1/2' : 'w-full'} flex flex-col overflow-hidden`}>
+          <div className="flex-1 p-6 overflow-y-auto">
             <div className="mb-4">
               <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
                 Edit Content
