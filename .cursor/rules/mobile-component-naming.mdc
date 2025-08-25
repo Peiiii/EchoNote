@@ -1,0 +1,132 @@
+---
+alwaysApply: false
+---
+# Mobile Component Naming Conventions
+
+## Core Principle: No "Mobile" Prefix
+
+Mobile components should **NOT** use the `mobile-` prefix in their names. Instead, use descriptive names that indicate their purpose and context.
+
+## Naming Rules
+
+### ✅ **Correct Naming**
+```tsx
+// Good: Descriptive names without mobile prefix
+export const ChatLayout = () => { ... }
+export const MessageInput = () => { ... }
+export const ThoughtRecord = () => { ... }
+export const ScrollToBottomButton = () => { ... }
+export const ChannelList = () => { ... }
+```
+
+### ❌ **Incorrect Naming**
+```tsx
+// Bad: Unnecessary mobile prefix
+export const MobileChatLayout = () => { ... }
+export const MobileMessageInput = () => { ... }
+export const MobileThoughtRecord = () => { ... }
+export const MobileScrollToBottomButton = () => { ... }
+export const MobileChannelList = () => { ... }
+```
+
+## File Naming
+
+### ✅ **Correct File Names**
+```
+chat-layout.tsx
+message-input.tsx
+thought-record.tsx
+scroll-to-bottom-button.tsx
+channel-list.tsx
+```
+
+### ❌ **Incorrect File Names**
+```
+mobile-chat-layout.tsx
+mobile-message-input.tsx
+mobile-thought-record.tsx
+mobile-scroll-to-bottom-button.tsx
+mobile-channel-list.tsx
+```
+
+## Context-Based Naming
+
+Since mobile components are already located in `src/mobile/`, the directory structure provides the necessary context:
+
+```
+src/mobile/
+├── features/
+│   └── chat/
+│       ├── components/
+│       │   ├── chat-layout.tsx          # ✅ Clear context
+│       │   ├── message-input.tsx        # ✅ Clear context
+│       │   └── thought-record.tsx       # ✅ Clear context
+│       └── pages/
+│           └── chat-page.tsx            # ✅ Clear context
+```
+
+## Import Statements
+
+### ✅ **Correct Imports**
+```tsx
+import { ChatLayout } from "@/mobile/features/chat/components/chat-layout";
+import { MessageInput } from "@/mobile/features/chat/components/message-input";
+import { ThoughtRecord } from "@/mobile/features/chat/components/thought-record";
+```
+
+### ❌ **Incorrect Imports**
+```tsx
+import { MobileChatLayout } from "@/mobile/features/chat/components/mobile-chat-layout";
+import { MobileMessageInput } from "@/mobile/features/chat/components/mobile-message-input";
+import { MobileThoughtRecord } from "@/mobile/features/chat/components/mobile-thought-record";
+```
+
+## Benefits of This Approach
+
+1. **Cleaner Names**: Component names are more concise and readable
+2. **Better Semantics**: Names focus on functionality, not platform
+3. **Easier Refactoring**: No need to rename when moving between platforms
+4. **Consistent with Desktop**: Follows the same naming pattern as desktop components
+5. **Clear Context**: Directory structure already indicates mobile context
+
+## Migration Strategy
+
+When refactoring existing components:
+
+1. **Rename Component**: Remove `Mobile` prefix from component name
+2. **Rename File**: Remove `mobile-` prefix from file name
+3. **Update Imports**: Update all import statements
+4. **Update Exports**: Ensure index files export the new names
+5. **Test**: Verify all functionality works correctly
+
+## Examples from Codebase
+
+### Current (Needs Refactoring)
+```tsx
+// src/mobile/features/chat/components/mobile-message-input.tsx
+export const MobileMessageInput = () => { ... }
+
+// src/mobile/features/chat/pages/mobile-chat-page/components/mobile-chat-layout.tsx
+export const MobileChatLayout = () => { ... }
+```
+
+### Target (After Refactoring)
+```tsx
+// src/mobile/features/chat/components/message-input.tsx
+export const MessageInput = () => { ... }
+
+// src/mobile/features/chat/pages/chat-page/components/chat-layout.tsx
+export const ChatLayout = () => { ... }
+```
+
+## Rule Enforcement
+
+- **Always** use descriptive names without platform prefixes
+- **Never** add `mobile-` or `Mobile` to component names
+- **Consider** the component's purpose when naming
+- **Use** the directory structure to provide context
+- **Follow** the same naming conventions as desktop components
+
+---
+
+*This rule ensures mobile components have clean, semantic names that focus on functionality rather than platform.*
