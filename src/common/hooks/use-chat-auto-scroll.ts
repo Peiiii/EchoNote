@@ -12,11 +12,20 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
   const [isSticky, setIsSticky] = useState(true)
   const lastScrollHeight = useRef(0)
 
-  // Scroll to bottom
-  const scrollToBottom = useCallback(() => {
+  // Scroll to bottom with optional smooth animation
+  const scrollToBottom = useCallback((options: { smooth?: boolean } = {}) => {
     const el = containerRef.current
     if (el) {
-      el.scrollTop = el.scrollHeight
+      if (options.smooth) {
+        // 使用 smooth 滚动行为，提供优雅的过渡效果
+        el.scrollTo({
+          top: el.scrollHeight,
+          behavior: 'smooth'
+        })
+      } else {
+        // 默认行为：直接跳转到底部
+        el.scrollTop = el.scrollHeight
+      }
     }
   }, [containerRef])
 

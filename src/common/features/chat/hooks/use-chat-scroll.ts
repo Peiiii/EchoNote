@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
 
-export const useChatScroll = (deps: unknown[] = []) => {
+export const useChatScroll = (deps: unknown[] = [], options: { smoothScroll?: boolean } = {}) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll(containerRef, {
@@ -11,7 +11,7 @@ export const useChatScroll = (deps: unknown[] = []) => {
 
     const handleScrollToBottom = () => {
         setSticky(true);
-        scrollToBottom();
+        scrollToBottom({ smooth: options.smoothScroll });
     };
 
     return {

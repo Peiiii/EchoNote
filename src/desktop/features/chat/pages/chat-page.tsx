@@ -20,7 +20,7 @@ export function ChatPage() {
     const { messages, hasMore, loadMore } = usePaginatedMessages(20);
 
     // Use specialized hooks
-    const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length]);
+    const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length], { smoothScroll: true });
     const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();

@@ -38,7 +38,7 @@ export const ChatContent = ({ timeline, input, scrollButton, className = "" }: C
     return (
         <div data-component="chat-content" className={`relative flex-1 flex flex-col h-full ${className}`}>
             {/* Normal content - timeline and input */}
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex flex-col min-h-0 relative">
                 {timeline}
                 {scrollButton}
             </div>
