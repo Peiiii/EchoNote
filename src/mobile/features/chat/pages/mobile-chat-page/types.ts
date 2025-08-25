@@ -1,5 +1,6 @@
 export interface MobileChatPageProps {
     // 预留未来扩展的属性
+    _placeholder?: never;
 }
 
 export interface MobileSidebarState {

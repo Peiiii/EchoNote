@@ -1,78 +1,34 @@
 
-import { useEffect } from 'react';
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { ChannelList } from "@/desktop/features/chat/features/channel-management/components/channel-list";
-import { ChatContent } from "@/desktop/features/chat/components/chat-content";
 import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
 import { AIAssistantSidebar } from "@/desktop/features/chat/features/ai-assistant/components/ai-assistant-sidebar";
 import { ThreadSidebar } from "@/desktop/features/chat/features/thread-management/components/thread-sidebar";
-import { MessageInput } from "@/desktop/features/chat/components/message-input";
-import { MessageTimelineContainer } from "@/desktop/features/chat/components/ui/message-timeline-container";
-import { ScrollToBottomButton } from "@/common/features/chat/components/ui/scroll-to-bottom-button";
+import { MessageTimelineFeature } from "@/desktop/features/chat/features/message-timeline";
 import { useAIAssistant } from "@/desktop/features/chat/features/ai-assistant/hooks/use-ai-assistant";
-import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
-import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
 import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 
 export function ChatPage() {
     const { currentChannelId } = useChatViewStore();
-    const { messages, hasMore, loadMore } = usePaginatedMessages(20);
+    const { messages } = usePaginatedMessages(20);
 
     // Use specialized hooks
-    const { containerRef, isSticky, handleScrollToBottom } = useChatScroll([currentChannelId, messages.length], { smoothScroll: true });
-    const { replyToMessageId, handleSend, handleCancelReply } = useChatActions(containerRef);
     const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
     
-    // 滚动加载更多消息
-    useEffect(() => {
-        const handleScroll = () => {
-            if (!containerRef.current) return;
-            
-            const { scrollTop } = containerRef.current;
-            
-            // 当滚动到顶部时加载更多消息
-            if (scrollTop === 0 && hasMore) {
-                loadMore();
-            }
-        };
-        
-        const container = containerRef.current;
-        if (container) {
-            container.addEventListener('scroll', handleScroll);
-            return () => container.removeEventListener('scroll', handleScroll);
-        }
-    }, [hasMore, loadMore, containerRef]);
+    // TODO: 滚动加载更多消息的逻辑需要从MessageTimelineFeature内部获取containerRef
+    // 暂时注释掉，等重构完成后再处理
     
     return (
         <ChatLayout
             sidebar={<ChannelList />}
             content={
-                <ChatContent
-                    timeline={
-                        <MessageTimelineContainer
-                            containerRef={containerRef}
-                            onOpenThread={handleOpenThread}
-                            messages={messages}
-                        />
-                    }
-                    input={
-                        <MessageInput
-                            onSend={handleSend}
-                            replyToMessageId={replyToMessageId || undefined}
-                            onCancelReply={handleCancelReply}
-                            onOpenAIAssistant={handleOpenAIAssistant}
-                        />
-                    }
-                    scrollButton={
-                        !isSticky && (
-                            <ScrollToBottomButton 
-                                onClick={handleScrollToBottom} 
-                                isVisible={!isSticky} 
-                            />
-                        )
-                    }
+                <MessageTimelineFeature
+                    messages={messages}
+                    currentChannelId={currentChannelId || ''}
+                    onOpenThread={handleOpenThread}
+                    onOpenAIAssistant={handleOpenAIAssistant}
                 />
             }
             rightSidebar={

@@ -1,4 +1,4 @@
-import { ScrollToBottomButton as CommonScrollToBottomButton } from "@/common/features/chat/components/ui/scroll-to-bottom-button";
+import { ScrollToBottomButton as CommonScrollToBottomButton } from "@/desktop/features/chat/features/message-timeline";
 
 interface MobileScrollToBottomButtonProps {
     onClick: () => void;
