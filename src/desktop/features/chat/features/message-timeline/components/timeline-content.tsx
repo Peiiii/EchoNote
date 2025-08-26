@@ -3,18 +3,19 @@ import { MessageTimeline, MessageTimelineRef } from "@/common/features/chat/comp
 import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
 import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { Message } from "@/core/stores/chat-data.store";
-import { useRef } from "react";
+import { forwardRef } from "react";
 
 interface TimelineContentProps {
     renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
     className?: string;
 }
 
-export const TimelineContent = ({
+
+
+export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(({
     renderThoughtRecord,
     className = ""
-}: TimelineContentProps) => {
-    const messageTimelineRef = useRef<MessageTimelineRef>(null);
+}, ref) => {
 
     const { messages, loading } = usePaginatedMessages(20);
 
@@ -27,11 +28,11 @@ export const TimelineContent = ({
     return (
         <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
             <MessageTimeline
-                ref={messageTimelineRef}
+                ref={ref}
                 renderThoughtRecord={renderThoughtRecord}
                 groupedMessages={groupedMessages}
                 messages={messages}
             />
         </div>
     );
-};
+});

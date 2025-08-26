@@ -1,10 +1,12 @@
+import { MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
 import { Message } from "@/core/stores/chat-data.store";
-import { TimelineLayout } from "@/desktop/features/chat/features/message-timeline/components/timeline-layout";
-import { TimelineContent } from "@/desktop/features/chat/features/message-timeline/components/timeline-content";
-import { TimelineActions } from "@/desktop/features/chat/features/message-timeline/components/timeline-actions";
 import { ExpandedEditorOverlay } from "@/desktop/features/chat/features/message-timeline/components/expanded-editor-overlay";
 import { ThoughtRecord } from "@/desktop/features/chat/features/message-timeline/components/thought-record";
+import { TimelineActions } from "@/desktop/features/chat/features/message-timeline/components/timeline-actions";
+import { TimelineContent } from "@/desktop/features/chat/features/message-timeline/components/timeline-content";
+import { TimelineLayout } from "@/desktop/features/chat/features/message-timeline/components/timeline-layout";
 import { useTimelineState } from "@/desktop/features/chat/features/message-timeline/hooks/use-timeline-state";
+import { useRef } from "react";
 
 interface MessageTimelineFeatureProps {
     onOpenThread: (messageId: string) => void;
@@ -25,10 +27,12 @@ export const MessageTimelineFeature = ({
         isExpandedEditing
     } = useTimelineState();
 
+    const timelineContentRef = useRef<MessageTimelineRef>(null);
+
     // Render thought record function
     const renderThoughtRecord = (message: Message, threadCount: number) => (
-        <ThoughtRecord 
-            message={message} 
+        <ThoughtRecord
+            message={message}
             onOpenThread={onOpenThread}
             threadCount={threadCount}
         />
@@ -36,6 +40,7 @@ export const MessageTimelineFeature = ({
 
     // Create wrapper function for onSend to match MessageInput interface
     const handleSendMessage = () => {
+        timelineContentRef.current?.scrollToBottom({ behavior: 'instant' });
         chatActions.handleSend();
     };
 
@@ -45,6 +50,7 @@ export const MessageTimelineFeature = ({
             <TimelineLayout
                 content={
                     <TimelineContent
+                        ref={timelineContentRef}
                         renderThoughtRecord={renderThoughtRecord}
                     />
                 }
