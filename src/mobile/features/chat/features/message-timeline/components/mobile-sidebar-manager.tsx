@@ -28,6 +28,7 @@ interface MobileSidebarManagerProps extends MobileSidebarState, MobileSidebarAct
     currentThreadMessages: Message[];
     onSendThreadMessage: (content: string) => void;
     onCloseThread: () => void;
+    currentChannelId: string | null;
 }
 
 export const MobileSidebarManager = ({
@@ -50,6 +51,7 @@ export const MobileSidebarManager = ({
     
     // Channel selection
     handleChannelSelect,
+    currentChannelId,
 }: MobileSidebarManagerProps) => {
     return (
         <>
@@ -61,14 +63,20 @@ export const MobileSidebarManager = ({
             />
 
             {/* AI Assistant - Bottom Sheet */}
-            <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
-                <SheetContent 
-                    side="bottom" 
-                    className="h-[80vh] p-0 border-t border-border"
-                >
-                    <MobileAIAssistant />
-                </SheetContent>
-            </Sheet>
+            {currentChannelId && (
+                <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
+                    <SheetContent 
+                        side="bottom" 
+                        className="h-[80vh] p-0 border-t border-border"
+                    >
+                        <MobileAIAssistant 
+                            channelId={currentChannelId}
+                            isOpen={isAIAssistantOpen}
+                            onClose={closeAIAssistant}
+                        />
+                    </SheetContent>
+                </Sheet>
+            )}
 
             {/* Thread Sidebar */}
             {isThreadOpen && (

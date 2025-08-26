@@ -34,6 +34,7 @@ export function MobileChatPage() {
                 currentThreadMessages={chatState.currentThreadMessages}
                 onSendThreadMessage={chatState.handleSendThreadMessage}
                 onCloseThread={chatState.handleCloseThread}
+                currentChannelId={chatState.currentChannelId}
             />
         </div>
     );

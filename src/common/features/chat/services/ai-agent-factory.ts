@@ -1,7 +1,7 @@
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { IAgent } from "@agent-labs/agent-chat";
-import { channelToolsManager } from "@/desktop/features/chat/features/channel-management/services/channel-tools-manager";
-import { channelContextManager } from "@/desktop/features/chat/services/channel-context-manager";
+import { channelToolsManager } from "@/common/features/chat/services/channel-tools-manager";
+import { channelContextManager } from "@/common/features/chat/services/channel-context-manager";
 
 export interface AIAgentConfig {
   apiKey?: string;

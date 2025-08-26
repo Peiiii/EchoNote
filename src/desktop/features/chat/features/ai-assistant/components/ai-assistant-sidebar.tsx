@@ -2,7 +2,7 @@ import { X, Bot } from "lucide-react";
 import { useMemo } from "react";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { AgentChatCore } from "@agent-labs/agent-chat";
-import { aiAgentFactory } from "@/desktop/features/chat/features/ai-assistant/services/ai-agent-factory";
+import { aiAgentFactory } from "@/common/features/chat/services/ai-agent-factory";
 
 interface AIAssistantSidebarProps {
     isOpen: boolean;
