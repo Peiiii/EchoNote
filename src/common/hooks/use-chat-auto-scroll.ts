@@ -9,7 +9,7 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
   threshold = 30,
   deps = [],
 }: UseChatAutoScrollOptions = {}) {
-  const [isSticky, setIsSticky] = useState(true)
+  const [isSticky, setIsSticky] = useState(false) // 改为 false，让滚动按钮默认显示
   const lastScrollHeight = useRef(0)
 
   // Scroll to bottom with optional smooth animation
