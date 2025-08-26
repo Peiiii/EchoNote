@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, ChevronUp } from 'lucide-react';
+import { cn } from '@/common/lib/utils';
 
 // 可复用的按钮组件
 interface ReadMoreButtonProps {
@@ -31,9 +32,9 @@ interface ReadMoreWrapperProps {
     };
 }
 
-export function ReadMoreWrapper({ 
-    children, 
-    maxHeight = 300, 
+export function ReadMoreWrapper({
+    children,
+    maxHeight = 300,
     className = "",
     buttonText = {
         expand: "Expand Thoughts",
@@ -58,13 +59,12 @@ export function ReadMoreWrapper({
     };
 
     return (
-        <div className={className}>
+        <div className={cn(className, "flex flex-col overflow-hidden")}>
             <div className="relative">
-                <div 
+                <div
                     ref={contentRef}
-                    className={`transition-all duration-500 ease-out ${
-                        !isExpanded && showReadMore ? 'overflow-hidden' : ''
-                    }`}
+                    className={`transition-all duration-500 ease-out ${!isExpanded && showReadMore ? 'overflow-hidden' : ''
+                        }`}
                     style={{
                         maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : 'none',
                         height: !isExpanded && showReadMore ? `${maxHeight}px` : 'auto'
@@ -77,7 +77,7 @@ export function ReadMoreWrapper({
                 {!isExpanded && showReadMore && (
                     <div className="absolute inset-0 pointer-events-none">
                         {/* 适中的渐变遮罩：可见但优雅，呈现哲学般的宁静美感 */}
-                        <div 
+                        <div
                             className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/70 via-white/40 to-transparent dark:from-slate-950/60 dark:via-slate-950/35 dark:to-transparent"
                         />
                         {/* 展开按钮容器：苹果风格的安静设计 */}

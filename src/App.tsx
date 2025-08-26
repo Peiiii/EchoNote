@@ -7,7 +7,7 @@ import { MobileApp } from "@/mobile/mobile-app";
 import { useEffect } from "react";
 
 export const App = () => {
-  const { isMobile } = useBreakpoint();
+  const { currentBreakpoint } = useBreakpoint();
   const { user } = useFirebaseAuth();
   const setChatViewAuth = useChatViewStore((state) => state.setAuth);
 
@@ -22,5 +22,5 @@ export const App = () => {
   }
 
   // 加载完成，显示应用
-  return isMobile ? <MobileApp /> : <DesktopApp />;
+  return currentBreakpoint === 'sm' ? <MobileApp /> : <DesktopApp />;
 };

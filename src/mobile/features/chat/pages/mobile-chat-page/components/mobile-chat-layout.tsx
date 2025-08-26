@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput } from "@/mobile/features/chat/components/mobile-message-input";
-import { MobileMessageTimelineContainer } from "@/mobile/features/chat/components/ui/mobile-message-timeline-container";
+import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
 import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/ui/mobile-scroll-to-bottom-button";
+import { MobileThoughtRecord } from "@/mobile/features/chat/components/message-timeline/thought-record";
+import { Message } from "@/core/stores/chat-data.store";
 
 // Custom hook for viewport height management
 const useViewportHeight = () => {
@@ -85,6 +87,15 @@ export const MobileChatLayout = ({
         setReplyToMessageId(messageId);
     }, [setReplyToMessageId]);
 
+    const renderThoughtRecord = useCallback((message: Message, threadCount: number) => (
+        <MobileThoughtRecord
+            message={message}
+            onOpenThread={onOpenThread}
+            onReply={handleReply ? () => handleReply(message.id) : undefined}
+            threadCount={threadCount}
+        />
+    ), [onOpenThread, handleReply]);
+
     const handleScrollToBottom = useCallback((options: { behavior: 'smooth' | 'instant' }) => {
         if (timelineContainerRef.current && isRefReady) {
             timelineContainerRef.current.scrollTo({
@@ -160,9 +171,10 @@ export const MobileChatLayout = ({
                 ref={timelineContainerRef}
                 className="h-full overflow-y-auto overflow-x-hidden"
             >
-                <MobileMessageTimelineContainer
-                    onOpenThread={onOpenThread}
-                    onReply={handleReply}
+                <MessageTimeline
+                    containerRef={timelineContainerRef}
+                    className="h-full"
+                    renderThoughtRecord={renderThoughtRecord}
                 />
             </div>
             {renderScrollButton()}

@@ -9,6 +9,7 @@ export const useChatScroll = (deps: unknown[] = [], options: { smoothScroll?: bo
         deps
     });
 
+
     const handleScrollToBottom = () => {
         setSticky(true);
         scrollToBottom({ smooth: options.smoothScroll });
