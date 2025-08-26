@@ -1,10 +1,26 @@
+import { MobileAIAssistant } from "@/mobile/features/chat/features/ai-assistant";
+import { MobileChannelList } from "@/mobile/features/chat/features/channel-management";
+import { MobileSettingsSidebar } from "@/mobile/features/chat/components/mobile-settings-sidebar";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
-import { MobileChannelList } from "@/mobile/features/chat/components/mobile-channel-list";
-import { MobileAIAssistant } from "@/mobile/features/chat/components/mobile-ai-assistant";
-import { MobileThreadSidebar } from "@/mobile/features/chat/components/mobile-thread-sidebar";
-import { MobileSettingsSidebar } from "./mobile-settings-sidebar";
-import { MobileSidebarState, MobileSidebarActions } from '../types';
+import { MobileThreadSidebar } from "@/mobile/features/chat/features/thread-management";
 import { Message } from "@/core/stores/chat-data.store";
+
+// Types
+interface MobileSidebarState {
+    isChannelListOpen: boolean;
+    isAIAssistantOpen: boolean;
+    isSettingsOpen: boolean;
+}
+
+interface MobileSidebarActions {
+    openChannelList: () => void;
+    closeChannelList: () => void;
+    openAIAssistant: () => void;
+    closeAIAssistant: () => void;
+    openSettings: () => void;
+    closeSettings: () => void;
+    handleChannelSelect: (channelId: string) => void;
+}
 
 interface MobileSidebarManagerProps extends MobileSidebarState, MobileSidebarActions {
     isThreadOpen: boolean;

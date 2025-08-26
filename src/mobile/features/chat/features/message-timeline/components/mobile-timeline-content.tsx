@@ -1,7 +1,7 @@
 import { Message } from "@/core/stores/chat-data.store";
 import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
 import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/ui/mobile-scroll-to-bottom-button";
-import { MobileThoughtRecord } from "./thought-record";
+import { MobileThoughtRecord } from "@/mobile/features/chat/features/message-timeline";
 import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from "react";
 
 // 定义透出的方法接口

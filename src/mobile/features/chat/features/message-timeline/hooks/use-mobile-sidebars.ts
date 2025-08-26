@@ -1,6 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useChatViewStore } from "@/core/stores/chat-view.store";
-import { MobileSidebarState, MobileSidebarActions } from '../types';
+import { useState } from "react";
+
+// Types
+interface MobileSidebarState {
+    isChannelListOpen: boolean;
+    isAIAssistantOpen: boolean;
+    isSettingsOpen: boolean;
+}
+
+interface MobileSidebarActions {
+    openChannelList: () => void;
+    closeChannelList: () => void;
+    openAIAssistant: () => void;
+    closeAIAssistant: () => void;
+    openSettings: () => void;
+    closeSettings: () => void;
+    handleChannelSelect: (channelId: string) => void;
+}
 
 export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions => {
     const [isChannelListOpen, setIsChannelListOpen] = useState(false);
@@ -8,16 +23,9 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     // 移动端特有的处理：关闭频道列表当选择频道后
-    const handleChannelSelect = (channelId: string) => {
-        useChatViewStore.getState().setCurrentChannel(channelId);
+    const handleChannelSelect = () => {
         setIsChannelListOpen(false);
     };
-
-    // 移动端特有的处理：关闭侧边栏当打开线程后
-    useEffect(() => {
-        // 这里可以添加线程相关的逻辑
-        // 暂时保持空实现，后续可以扩展
-    }, []);
 
     return {
         // State

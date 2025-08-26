@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { MobileExpandedEditor } from "./message-timeline/thought-record/mobile-expanded-editor";
+import { MobileExpandedEditor } from "./thought-record/mobile-expanded-editor";
 
 interface MobileChatContentProps {
     timeline: ReactNode;
