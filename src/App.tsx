@@ -8,21 +8,16 @@ import { useEffect } from "react";
 
 export const App = () => {
   const { isMobile } = useBreakpoint();
-  const { loading, user } = useFirebaseAuth();
-  const setAuth = useChatViewStore((state) => state.setAuth);
+  const { user } = useFirebaseAuth();
+  const setChatViewAuth = useChatViewStore((state) => state.setAuth);
 
-  // 使用智能 Loading 系统
-  // const { shouldShowSkeleton } = useSmartLoading(loading, {
-  //   minDisplayTime: 0, // 最小显示 600ms
-  // });
-
-  // 同步认证状态到chat-view.store
+  // 同步认证状态到 chat-view store (保持向后兼容)
   useEffect(() => {
-    setAuth(user);
-  }, [user, setAuth]);
+    setChatViewAuth(user);
+  }, [user, setChatViewAuth]);
 
   // 显示骨架屏或应用
-  if (loading) {
+  if (!user) {
     return <AppSkeleton />;
   }
 

@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
-import { User } from 'firebase/auth';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/core/stores/auth.store';
 
 export const useFirebaseAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    currentUser,
+    isInitializing,
+    isRefreshing,
+    initAuthListener
+  } = useAuthStore();
 
   useEffect(() => {
-    // 监听认证状态变化
-    const unsubscribe = firebaseAuthService.onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    // 清理订阅
+    const unsubscribe = initAuthListener();
     return () => unsubscribe();
-  }, []);
+  }, [initAuthListener]);
 
-  return { user, loading };
+  return {
+    user: currentUser,
+    isInitializing,
+    isRefreshing,
+  };
 };

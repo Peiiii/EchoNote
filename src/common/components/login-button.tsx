@@ -1,29 +1,21 @@
 import { Button } from '@/common/components/ui/button';
-import { useFirebaseAuth } from '@/common/hooks/use-firebase-auth';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
+import { useAuthStore } from '@/core/stores/auth.store';
 
 export const LoginButton = () => {
-  const { user } = useFirebaseAuth();
+  const { currentUser, signInWithGoogle, signOut } = useAuthStore();
 
   const handleLogin = async () => {
-    const user = await firebaseAuthService.signInWithGoogle();
-    if (user) {
-      console.log(`Welcome, ${user.displayName}!`);
-      // 登录成功后你什么都不用做！
-      // 我们的 onAuthStateChanged 监听器会自动检测到状态变化，
-      // 并调用 Zustand store 的 setAuth action，
-      // 从而触发整个应用的更新。
-    }
+    await signInWithGoogle();
   };
 
   const handleLogout = async () => {
-    await firebaseAuthService.signOut();
+    await signOut();
   };
 
-  if (user) {
+  if (currentUser) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm">Hello, {user.displayName}</span>
+        <span className="text-sm">Hello, {currentUser.displayName}</span>
         <Button onClick={handleLogout} variant="outline" size="sm">
           Logout
         </Button>
