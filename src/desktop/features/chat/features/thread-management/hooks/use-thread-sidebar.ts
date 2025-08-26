@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 export function useThreadSidebar() {
-    const { messages, getThreadMessages, addThreadMessage } = useChatDataStore();
+    const { messages } = usePaginatedMessages(20);
+    const { addThreadMessage } = useChatDataStore();
     
     // Thread sidebar state
     const [isThreadOpen, setIsThreadOpen] = useState(false);
@@ -34,7 +36,7 @@ export function useThreadSidebar() {
         : null;
     
     const currentThreadMessages = currentThreadId 
-        ? getThreadMessages(currentThreadId)
+        ? messages.filter(m => m.threadId === currentThreadId)
         : [];
 
     return {
@@ -48,4 +50,4 @@ export function useThreadSidebar() {
         handleCloseThread,
         handleSendThreadMessage
     };
-};
+}

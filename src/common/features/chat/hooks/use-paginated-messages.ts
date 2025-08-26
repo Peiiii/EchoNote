@@ -1,47 +1,57 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useChatViewStore } from '@/core/stores/chat-view.store';
 import { firebaseChatService } from '@/common/services/firebase/firebase-chat.service';
 import { useChatDataStore } from '@/core/stores/chat-data.store';
 import { DocumentSnapshot } from 'firebase/firestore';
+import { Message } from '@/core/stores/chat-data.store';
 
 export const usePaginatedMessages = (messagesLimit: number = 20) => {
   const { currentChannelId } = useChatViewStore();
-  const { userId, messages: allMessages } = useChatDataStore();
+  const { userId } = useChatDataStore();
   
-  // 过滤当前频道的消息并按时间排序（最早的在前，最新的在后），排除已删除的消息
-  const messages = allMessages
-    .filter(msg => msg.channelId === currentChannelId && !msg.isDeleted)
-    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-  
-  // 分页相关状态
+  // Local state for current channel messages
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
+  
+  // Ref to track current subscription
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
-  // 获取初始消息
-  const fetchInitialMessages = useCallback(async () => {
-    if (!userId || !currentChannelId) return;
+  // Subscribe to channel messages
+  const subscribeToChannel = useCallback((channelId: string) => {
+    if (!userId || !channelId) return;
     
-    setLoading(true);
-    try {
-      const result = await firebaseChatService.fetchInitialMessages(
-        userId, 
-        currentChannelId, 
-        messagesLimit
-      );
-      
-      setLastVisible(result.lastVisible);
-      setHasMore(!result.allLoaded);
-    } catch (error) {
-      console.error('Error fetching initial messages:', error);
-    } finally {
-      setLoading(false);
+    // Clean up previous subscription
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
     }
-  }, [userId, currentChannelId, messagesLimit]);
+    
+    // Reset state for new channel
+    setMessages([]);
+    setHasMore(true);
+    setLastVisible(null);
+    setLoading(true);
+    
+    // Subscribe to channel messages
+    const unsubscribe = firebaseChatService.subscribeToChannelMessages(
+      userId,
+      channelId,
+      messagesLimit,
+      (newMessages, hasMoreMessages) => {
+        setMessages(newMessages);
+        setHasMore(hasMoreMessages);
+        setLoading(false);
+      }
+    );
+    
+    unsubscribeRef.current = unsubscribe;
+  }, [userId, messagesLimit]);
 
-  // 加载更多消息
+  // Load more messages (for pagination)
   const loadMoreMessages = useCallback(async () => {
-    if (!userId || !currentChannelId || !hasMore || !lastVisible) return;
+    if (!userId || !currentChannelId || !hasMore || !lastVisible || loading) return;
     
     setLoading(true);
     try {
@@ -52,6 +62,8 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
         lastVisible
       );
       
+      // Append new messages to existing ones
+      setMessages(prev => [...prev, ...result.messages]);
       setLastVisible(result.lastVisible);
       setHasMore(!result.allLoaded);
     } catch (error) {
@@ -59,18 +71,44 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, currentChannelId, hasMore, lastVisible, messagesLimit]);
+  }, [userId, currentChannelId, hasMore, lastVisible, loading, messagesLimit]);
 
-  // 监听当前频道变化
+  // Refresh messages for current channel
+  const refresh = useCallback(() => {
+    if (currentChannelId) {
+      subscribeToChannel(currentChannelId);
+    }
+  }, [currentChannelId, subscribeToChannel]);
+
+  // Subscribe to channel when it changes
   useEffect(() => {
-    fetchInitialMessages();
-  }, [fetchInitialMessages]);
+    if (currentChannelId) {
+      subscribeToChannel(currentChannelId);
+    }
+    
+    // Cleanup subscription on unmount or channel change
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
+  }, [currentChannelId, subscribeToChannel]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, []);
 
   return {
     messages,
     loading,
     hasMore,
     loadMore: loadMoreMessages,
-    refresh: fetchInitialMessages
+    refresh
   };
 };

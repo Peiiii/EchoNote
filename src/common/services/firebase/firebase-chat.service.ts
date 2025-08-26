@@ -62,57 +62,61 @@ const getMessagesCollectionRef = (userId: string) =>
 
 export const firebaseChatService = {
   // Data migration method for existing channels
-  migrateExistingChannels: async (userId: string): Promise<void> => {
-    try {
-      const channelsSnapshot = await getDocs(getChannelsCollectionRef(userId));
+  // migrateExistingChannels: async (userId: string): Promise<void> => {
+  //   try {
+  //     const channelsSnapshot = await getDocs(getChannelsCollectionRef(userId));
       
-      for (const channelDoc of channelsSnapshot.docs) {
-        const channelData = channelDoc.data();
+  //     for (const channelDoc of channelsSnapshot.docs) {
+  //       const channelData = channelDoc.data();
         
-        // 如果频道没有lastMessageTime字段，需要迁移
-        if (!channelData.lastMessageTime) {
-          const channelRef = doc(getChannelsCollectionRef(userId), channelDoc.id);
+  //       // 如果频道没有lastMessageTime字段，需要迁移
+  //       if (!channelData.lastMessageTime) {
+  //         const channelRef = doc(getChannelsCollectionRef(userId), channelDoc.id);
           
-          // 获取该频道的最新消息时间
-          const messagesQuery = query(
-            getMessagesCollectionRef(userId),
-            where("channelId", "==", channelDoc.id),
-            orderBy("timestamp", "desc"),
-            limit(1)
-          );
+  //         // 获取该频道的最新消息时间
+  //         const messagesQuery = query(
+  //           getMessagesCollectionRef(userId),
+  //           where("channelId", "==", channelDoc.id),
+  //           orderBy("timestamp", "desc"),
+  //           limit(1)
+  //         );
           
-          const messagesSnapshot = await getDocs(messagesQuery);
+  //         const messagesSnapshot = await getDocs(messagesQuery);
           
-          if (!messagesSnapshot.empty) {
-            // 有消息，使用最新消息时间
-            const latestMessage = messagesSnapshot.docs[0];
-            const latestTimestamp = latestMessage.data().timestamp;
+  //         if (!messagesSnapshot.empty) {
+  //           // 有消息，使用最新消息时间
+  //           const latestMessage = messagesSnapshot.docs[0];
+  //           const latestTimestamp = latestMessage.data().timestamp;
             
-            await updateDoc(channelRef, {
-              lastMessageTime: latestTimestamp,
-              messageCount: messagesSnapshot.size
-            });
-          } else {
-            // 没有消息，使用创建时间
-            await updateDoc(channelRef, {
-              lastMessageTime: channelData.createdAt || serverTimestamp(),
-              messageCount: 0
-            });
-          }
-        }
-      }
+  //           await updateDoc(channelRef, {
+  //             lastMessageTime: latestTimestamp,
+  //             messageCount: messagesSnapshot.size
+  //           });
+  //         } else {
+  //           // 没有消息，使用创建时间
+  //           await updateDoc(channelRef, {
+  //             lastMessageTime: channelData.createdAt || serverTimestamp(),
+  //             messageCount: 0
+  //           });
+  //         }
+  //       }
+  //     }
       
-      console.log('Channel migration completed successfully');
-    } catch (error) {
-      console.error('Error migrating channels:', error);
-    }
-  },
+  //     console.log('Channel migration completed successfully');
+  //   } catch (error) {
+  //     console.error('Error migrating channels:', error);
+  //   }
+  // },
 
   // Channel Services
   subscribeToChannels: (
     userId: string,
     onUpdate: (channels: Channel[]) => void
   ): (() => void) => {
+    console.log("🔔 [Firebase] [subscribeToChannels]:", {
+      userId,
+      timestamp: new Date().toISOString()
+    });
     const q = query(
       getChannelsCollectionRef(userId),
       orderBy("lastMessageTime", "desc") // 按最后消息时间降序排序
@@ -132,24 +136,36 @@ export const firebaseChatService = {
     return unsubscribe;
   },
 
-  // Message Services - Subscribe to all messages for a user
-  subscribeToMessages: (
+  // Message Services - Subscribe to messages for a specific channel only
+  subscribeToChannelMessages: (
     userId: string,
-    onUpdate: (messages: Message[]) => void
+    channelId: string,
+    messagesLimit: number,
+    onUpdate: (messages: Message[], hasMore: boolean) => void
   ): (() => void) => {
+    console.log("🔔 [Firebase] [subscribeToChannelMessages]:", {
+      userId,
+      channelId,
+      messagesLimit,
+      timestamp: new Date().toISOString()
+    });
+    
     const q = query(
       getMessagesCollectionRef(userId),
-      orderBy("timestamp", "asc")
+      where("channelId", "==", channelId),
+      orderBy("timestamp", "asc"),
+      limit(messagesLimit)
     );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
         const messages = snapshot.docs.map(docToMessage);
-        onUpdate(messages);
+        const hasMore = messages.length >= messagesLimit;
+        onUpdate(messages, hasMore);
       },
       (error) => {
-        console.error("Error subscribing to messages:", error);
+        console.error("Error subscribing to channel messages:", error);
       }
     );
 
@@ -189,18 +205,6 @@ export const firebaseChatService = {
     await updateDoc(channelRef, updates);
   },
 
-  // Message Services
-  // 获取所有消息（一次性加载）
-  fetchAllMessages: async (userId: string): Promise<Message[]> => {
-    const q = query(
-      getMessagesCollectionRef(userId),
-      orderBy("timestamp", "asc")
-    );
-    
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(docToMessage);
-  },
-
   fetchInitialMessages: async (
     userId: string,
     channelId: string,
@@ -227,6 +231,13 @@ export const firebaseChatService = {
     messagesLimit: number,
     cursor: DocumentSnapshot
   ) => {
+    console.log("🔔 [Firebase] [fetchMoreMessages]:", {
+      userId,
+      channelId,
+      messagesLimit,
+      cursor: cursor.id,
+      timestamp: new Date().toISOString()
+    });
     const q = query(
       getMessagesCollectionRef(userId),
       where("channelId", "==", channelId),
@@ -271,7 +282,10 @@ export const firebaseChatService = {
     await updateDoc(messageRef, updates);
   },
 
-  deleteMessage: async (userId: string, messageId: string): Promise<void> => {
+  deleteMessage: async (
+    userId: string,
+    messageId: string
+  ): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await deleteDoc(messageRef);
   },

@@ -47,7 +47,6 @@ export interface ChatDataState {
 
   // Firebase unsubscribe functions
   unsubscribeChannels: (() => void) | null;
-  unsubscribeMessages: (() => void) | null;
 
   // 监听器状态控制
   isListenerEnabled: boolean;
@@ -93,7 +92,6 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   messages: [],
   userId: null,
   unsubscribeChannels: null,
-  unsubscribeMessages: null,
   isListenerEnabled: true,
 
   // Data actions with Firebase integration
@@ -127,159 +125,81 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   },
 
   addMessage: async (message) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
-
-    // Generate a temporary ID and timestamp
-    const tempId = `temp_${Date.now()}`;
-    const tempMessage: Message = {
-      ...message,
-      id: tempId,
-      timestamp: new Date(),
-    } as Message;
-
-    // Optimistic update: immediately add the message to the state (append to the end, display at the bottom)
-    set({ messages: [...messages, tempMessage] });
 
     try {
       // Call Firebase service to create message
-      const messageId = await firebaseChatService.createMessage(
+      await firebaseChatService.createMessage(
         userId,
         message
       );
-
-      // Update message with the server-generated ID
-      const currentMessages = get().messages;
-      set({
-        messages: currentMessages.map((msg) =>
-          msg.id === tempId ? { ...tempMessage, id: messageId } : msg
-        ),
-      });
+      
+      // Message will be automatically added to the channel via subscription
+      // No need to manually update local state
+      
     } catch (error) {
       console.error("Error creating message:", error);
-      // If failed, remove the temporary message
-      const currentMessages = get().messages;
-      set({
-        messages: currentMessages.filter((msg) => msg.id !== tempId),
-      });
     }
   },
 
   deleteMessage: async (messageId, hardDelete = false) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
 
     try {
-      // Temporarily disable listeners to avoid conflicts
-      set({ isListenerEnabled: false });
-
       if (hardDelete) {
-        // Hard delete: remove from Firebase and local state
+        // Hard delete: remove from Firebase
         await firebaseChatService.deleteMessage(userId, messageId);
-        set({ messages: messages.filter(msg => msg.id !== messageId) });
+        // Message will be automatically removed via subscription
       } else {
         // Soft delete: mark as deleted state
         await firebaseChatService.softDeleteMessage(userId, messageId);
-        // Optimistic update: mark message as deleted
-        const updatedMessages = messages.map(msg =>
-          msg.id === messageId
-            ? { ...msg, isDeleted: true, deletedAt: new Date(), deletedBy: userId }
-            : msg
-        );
-        set({ messages: updatedMessages });
+        // Message state will be automatically updated via subscription
       }
-
-      // Delay re-enabling listeners to ensure Firebase operations complete
-      setTimeout(() => {
-        set({ isListenerEnabled: true });
-      }, 1000);
-
     } catch (error) {
       console.error("Error deleting message:", error);
-      // If deletion fails, re-enable listeners
-      set({ isListenerEnabled: true });
     }
   },
 
   updateMessage: async (messageId, updates) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
-
-    // Optimistic update: immediately apply updates to the state
-    set({
-      messages: messages.map((msg) =>
-        msg.id === messageId ? { ...msg, ...updates } : msg
-      ),
-    });
 
     try {
       // Call Firebase service to update message
       await firebaseChatService.updateMessage(userId, messageId, updates);
+      // Message will be automatically updated via subscription
     } catch (error) {
       console.error("Error updating message:", error);
-      // If failed, restore original message
-      set({ messages });
     }
   },
 
   // Thread related actions
   addThreadMessage: async (parentMessageId, message) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
 
-    const parentMessage = messages.find(
-      (msg: Message) => msg.id === parentMessageId
-    );
-    if (!parentMessage) return;
-
-    const threadId = parentMessage.threadId || parentMessageId;
-    const messageWithThread: Omit<Message, "id" | "timestamp"> = {
-      ...message,
-      parentId: parentMessageId,
-      threadId: threadId,
-      channelId: message.channelId,
-    };
-
-    // Generate temporary ID and timestamp
-    const tempId = `temp_${Date.now()}`;
-    const tempMessage: Message = {
-      ...messageWithThread,
-      id: tempId,
-      timestamp: new Date(),
-    } as Message;
-
-    // Optimistic update: immediately add message to the state (append to the end, display at the bottom)
-    set({ messages: [...messages, tempMessage] });
-
     try {
-      // Call Firebase service to create message
-      const messageId = await firebaseChatService.createMessage(
-        userId,
-        messageWithThread
-      );
-
-      // Update message with the server-generated ID
-      const currentMessages = get().messages;
-      set({
-        messages: currentMessages.map((msg) =>
-          msg.id === tempId ? { ...tempMessage, id: messageId } : msg
-        ),
+      // Call Firebase service to create thread message
+      await firebaseChatService.createMessage(userId, {
+        ...message,
+        parentId: parentMessageId,
+        threadId: parentMessageId, // Use parentMessageId as threadId
       });
+      // Thread message will be automatically added via subscription
     } catch (error) {
       console.error("Error creating thread message:", error);
-      // If failed, remove the temporary message
-      const currentMessages = get().messages;
-      set({
-        messages: currentMessages.filter((msg) => msg.id !== tempId),
-      });
     }
   },
 
-  getThreadMessages: (threadId: string): Message[] => {
-    const { messages } = get();
-    return messages
-      .filter((msg) => msg.threadId === threadId)
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  getThreadMessages: (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _threadId: string
+  ): Message[] => {
+    // This method is no longer needed as thread messages are handled per-channel
+    // Return empty array - thread messages are now managed by usePaginatedMessages
+    return [];
   },
 
   // Firebase integration methods
@@ -294,13 +214,13 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     await get().fetchInitialData(userId);
 
     // Migrate existing channels data (if needed)
-    try {
-      await firebaseChatService.migrateExistingChannels(userId);
-    } catch (error) {
-      console.error('Error during channel migration:', error);
-    }
+    // try {
+    //   await firebaseChatService.migrateExistingChannels(userId);
+    // } catch (error) {
+    //   console.error('Error during channel migration:', error);
+    // }
 
-    // Subscribe to channels
+    // Subscribe to channels only (messages are now handled per-channel)
     const unsubscribeChannels = firebaseChatService.subscribeToChannels(
       userId,
       (channels) => {
@@ -312,119 +232,71 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       }
     );
 
-    // Subscribe to messages for all channels
-    const unsubscribeMessages = firebaseChatService.subscribeToMessages(
-      userId,
-      (messages) => {
-        const { isListenerEnabled } = get();
-        if (!isListenerEnabled) return;
-
-        console.log('Messages updated via subscription:', messages.length);
-        // Filter out deleted messages to avoid state update issues
-        const activeMessages = messages.filter(msg => !msg.isDeleted);
-        set({ messages: activeMessages });
-      }
-    );
-
-    set({ unsubscribeChannels, unsubscribeMessages });
+    set({ unsubscribeChannels });
   },
 
   cleanupListeners: () => {
-    const { unsubscribeChannels, unsubscribeMessages } = get();
+    const { unsubscribeChannels } = get();
     if (unsubscribeChannels) {
       unsubscribeChannels();
     }
-    if (unsubscribeMessages) {
-      unsubscribeMessages();
-    }
     set({
       unsubscribeChannels: null,
-      unsubscribeMessages: null,
       channels: [],
-      messages: [],
+      messages: [], // Clear messages when cleaning up
       userId: null,
     });
   },
 
   // Delete related methods
   restoreMessage: async (messageId) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
 
     try {
-      // Temporarily disable listeners to avoid conflicts
-      set({ isListenerEnabled: false });
-
       // Call Firebase service to restore message
       await firebaseChatService.restoreMessage(userId, messageId);
-      // Optimistic update: restore message state
-      set({
-        messages: messages.map(msg =>
-          msg.id === messageId
-            ? { ...msg, isDeleted: false, deletedAt: undefined, deletedBy: undefined }
-            : msg
-        ),
-      });
-
-      // Delay re-enabling listeners
-      setTimeout(() => {
-        set({ isListenerEnabled: true });
-      }, 1000);
-
+      // Message will be automatically updated via subscription
     } catch (error) {
       console.error("Error restoring message:", error);
-      // If restoration fails, re-enable listeners
-      set({ isListenerEnabled: true });
     }
   },
 
   getDeletedMessages: () => {
-    const { messages } = get();
-    return messages.filter(msg => msg.isDeleted);
+    // This method is no longer needed as messages are handled per-channel
+    // Return empty array - deleted messages are now managed by usePaginatedMessages
+    return [];
   },
 
   permanentDeleteMessage: async (messageId) => {
-    const { userId, messages } = get();
+    const { userId } = get();
     if (!userId) return;
 
     try {
-      // Temporarily disable listeners to avoid conflicts
-      set({ isListenerEnabled: false });
-
       // Call Firebase service to delete message
       await firebaseChatService.deleteMessage(userId, messageId);
-      // Remove from local state permanently
-      set({ messages: messages.filter(msg => msg.id !== messageId) });
-
-      // Delay re-enabling listeners
-      setTimeout(() => {
-        set({ isListenerEnabled: true });
-      }, 1000);
-
+      // Message will be automatically removed via subscription
     } catch (error) {
       console.error("Error permanently deleting message:", error);
-      // If deletion fails, re-enable listeners
-      set({ isListenerEnabled: true });
     }
   },
 
   // Initialize loading data
   fetchInitialData: async (userId: string) => {
+    console.log("🔔 [ChatDataStore] [fetchInitialData]:", {
+      userId,
+      timestamp: new Date().toISOString()
+    });
     try {
       console.log('Fetching initial data for user:', userId);
 
-      // 1. First get channel list
+      // Only load channels - messages are now loaded per-channel via subscriptions
       const channels = await firebaseChatService.fetchChannels(userId);
       console.log('Initial channels loaded:', channels.length);
       set({ channels });
 
-      // 2. Get all messages (not by channel, because subscribeToMessages also does this)
-      const messages = await firebaseChatService.fetchAllMessages(userId);
-      console.log('Initial messages loaded:', messages.length);
-
-      // Filter out deleted messages
-      const activeMessages = messages.filter(msg => !msg.isDeleted);
-      set({ messages: activeMessages });
+      // Messages are no longer loaded globally - they are loaded per-channel
+      // when the user navigates to a specific channel
 
     } catch (error) {
       console.error("Error fetching initial data:", error);

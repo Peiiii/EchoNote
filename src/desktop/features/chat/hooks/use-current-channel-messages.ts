@@ -1,12 +1,8 @@
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 
 export function useCurrentChannelMessages() {
-    const { messages } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
+    const { messages } = usePaginatedMessages(20);
     
-    return messages.filter((message) =>
-        message.channelId === currentChannelId &&
-        !message.parentId // Exclude thread messages
-    );
+    // Filter out thread messages (keep only parent messages)
+    return messages.filter((message) => !message.parentId);
 }

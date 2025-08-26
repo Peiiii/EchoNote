@@ -9,7 +9,7 @@ export const useSmartLoading = (
   options: UseSmartLoadingOptions = {}
 ) => {
   const {
-    minDisplayTime = 600,
+    minDisplayTime = 0,
   } = options;
 
   const [shouldShowSkeleton, setShouldShowSkeleton] = useState(false);
