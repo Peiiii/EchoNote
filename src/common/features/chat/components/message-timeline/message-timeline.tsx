@@ -44,10 +44,9 @@ export function MessageTimeline({
             ref={containerRef}
             className={`w-full bg-background flex-1 overflow-y-auto min-h-0 ${className}`}
             style={{
-                height: 'auto',
-                minHeight: 'auto',
-                maxHeight: 'none',
-                overflow: 'auto'
+                height: '100%',
+                minHeight: '100%',
+                maxHeight: '100%'
             }}
         >
             {Object.entries(groupedMessages).map(([date, dayMessages]) => {

@@ -1,52 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput } from "@/mobile/features/chat/components/mobile-message-input";
-import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
-import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/ui/mobile-scroll-to-bottom-button";
-import { MobileThoughtRecord } from "@/mobile/features/chat/components/message-timeline/thought-record";
-import { Message } from "@/core/stores/chat-data.store";
-
-// Custom hook for viewport height management
-const useViewportHeight = () => {
-    const [viewportHeight, setViewportHeight] = useState<string>('100vh');
-    
-    useEffect(() => {
-        const updateViewportHeight = () => {
-            const newHeight = `${window.innerHeight}px`;
-            setViewportHeight(newHeight);
-            
-            // Set CSS custom property for global use
-            document.documentElement.style.setProperty('--mobile-vh', newHeight);
-        };
-
-        // Initial setup
-        updateViewportHeight();
-
-        // Event listeners for different viewport change scenarios
-        const events = ['resize', 'orientationchange'] as const;
-        events.forEach(event => {
-            window.addEventListener(event, updateViewportHeight);
-        });
-
-        // Chrome mobile specific: visual viewport API
-        if ('visualViewport' in window && window.visualViewport) {
-            window.visualViewport.addEventListener('resize', updateViewportHeight);
-        }
-
-        // Cleanup function
-        return () => {
-            events.forEach(event => {
-                window.removeEventListener(event, updateViewportHeight);
-            });
-            
-            if ('visualViewport' in window && window.visualViewport) {
-                window.visualViewport.removeEventListener('resize', updateViewportHeight);
-            }
-        };
-    }, []);
-
-    return viewportHeight;
-};
+import { MobileTimelineContent, MobileTimelineContentRef } from "./mobile-timeline-content";
+import { useMobileTimelineState } from "../hooks/use-mobile-timeline-state";
+import { useMobileViewportHeight } from "../hooks/use-mobile-viewport-height";
+import { useRef } from "react";
 
 interface MobileChatLayoutProps {
     currentChannelName?: string;
@@ -73,124 +30,25 @@ export const MobileChatLayout = ({
     onCancelReply,
     setReplyToMessageId,
 }: MobileChatLayoutProps) => {
-    const [isRefReady, setIsRefReady] = useState<boolean>(false);
-    const [shouldShowScrollButton, setShouldShowScrollButton] = useState<boolean>(false);
+    // Use custom hooks for state management
+    const timelineState = useMobileTimelineState({
+        onSendMessage,
+        setReplyToMessageId
+    });
     
-    // Refs
-    const timelineContainerRef = useRef<HTMLDivElement>(null);
+    const viewportHeight = useMobileViewportHeight();
     
-    // Custom hooks
-    const viewportHeight = useViewportHeight();
+    // Ref to access timeline content methods
+    const timelineContentRef = useRef<MobileTimelineContentRef>(null);
     
-    // Event handlers
-    const handleReply = useCallback((messageId: string) => {
-        setReplyToMessageId(messageId);
-    }, [setReplyToMessageId]);
-
-    const renderThoughtRecord = useCallback((message: Message, threadCount: number) => (
-        <MobileThoughtRecord
-            message={message}
-            onOpenThread={onOpenThread}
-            onReply={handleReply ? () => handleReply(message.id) : undefined}
-            threadCount={threadCount}
-        />
-    ), [onOpenThread, handleReply]);
-
-    const handleScrollToBottom = useCallback((options: { behavior: 'smooth' | 'instant' }) => {
-        if (timelineContainerRef.current && isRefReady) {
-            timelineContainerRef.current.scrollTo({
-                top: timelineContainerRef.current.scrollHeight,
-                behavior: options.behavior
-            });
-        }
-    }, [isRefReady]);
-
-    const handleSendMessage = useCallback((content: string) => {
-        onSendMessage(content);
-        
-        // Auto-scroll after sending message
-        requestAnimationFrame(() => {
-            handleScrollToBottom({ behavior: 'instant' });
-        });
-    }, [onSendMessage, handleScrollToBottom]);
-
-    // Effects
-    useEffect(() => {
-        if (timelineContainerRef.current) {
-            setIsRefReady(true);
-        }
-    }, []);
-
-    // Scroll position detection
-    useEffect(() => {
-        if (!isRefReady) return;
-        
-        const container = timelineContainerRef.current;
-        if (!container) return;
-
-        const handleScroll = () => {
-            const { scrollTop, scrollHeight, clientHeight } = container;
-            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-            const threshold = 100; // 100px threshold for showing scroll button
-            
-            setShouldShowScrollButton(distanceFromBottom > threshold);
-        };
-
-        container.addEventListener('scroll', handleScroll);
-        handleScroll(); // Initial check
-        
-        return () => container.removeEventListener('scroll', handleScroll);
-    }, [isRefReady]);
-
-    // Auto-scroll on new messages
-    useEffect(() => {
-        if (isRefReady) {
-            requestAnimationFrame(() => {
-                handleScrollToBottom({ behavior: 'instant' });
-            });
-        }
-    }, [isRefReady, handleScrollToBottom]);
-
-    // Render methods
-    const renderScrollButton = () => {
-        if (!isRefReady || !shouldShowScrollButton) return null;
-        
-        return (
-            <div className="absolute bottom-2 right-2 z-20">
-                <MobileScrollToBottomButton 
-                    onClick={() => handleScrollToBottom({ behavior: 'smooth' })} 
-                    isVisible={true}
-                />
-            </div>
-        );
+    // Enhanced send message handler that scrolls to bottom after sending
+    const handleSendMessage = (content: string) => {
+        timelineState.handleSendMessage(content);
+        // Auto-scroll to bottom after sending message
+        setTimeout(() => {
+            timelineContentRef.current?.scrollToBottom({ behavior: 'instant' });
+        }, 100);
     };
-
-    const renderTimelineArea = () => (
-        <div className="flex-1 min-h-0 relative overflow-hidden">
-            <div 
-                ref={timelineContainerRef}
-                className="h-full overflow-y-auto overflow-x-hidden"
-            >
-                <MessageTimeline
-                    containerRef={timelineContainerRef}
-                    className="h-full"
-                    renderThoughtRecord={renderThoughtRecord}
-                />
-            </div>
-            {renderScrollButton()}
-        </div>
-    );
-
-    const renderInputArea = () => (
-        <div className="flex-shrink-0">
-            <MobileMessageInput
-                onSend={handleSendMessage}
-                replyToMessageId={replyToMessageId || undefined}
-                onCancelReply={onCancelReply}
-                isSending={isAddingMessage}
-            />
-        </div>
-    );
 
     return (
         <div 
@@ -201,6 +59,7 @@ export const MobileChatLayout = ({
                 maxHeight: viewportHeight
             }}
         >
+            {/* Header */}
             <MobileHeader
                 onOpenChannelList={onOpenChannelList}
                 onOpenAIAssistant={onOpenAIAssistant}
@@ -208,9 +67,24 @@ export const MobileChatLayout = ({
                 currentChannelName={currentChannelName}
             />
             
+            {/* Main content area */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                {renderTimelineArea()}
-                {renderInputArea()}
+                {/* Timeline content */}
+                <MobileTimelineContent
+                    ref={timelineContentRef}
+                    onOpenThread={onOpenThread}
+                    onReply={timelineState.handleReply}
+                />
+                
+                {/* Input area */}
+                <div className="flex-shrink-0">
+                    <MobileMessageInput
+                        onSend={handleSendMessage}
+                        replyToMessageId={replyToMessageId || undefined}
+                        onCancelReply={onCancelReply}
+                        isSending={isAddingMessage}
+                    />
+                </div>
             </div>
         </div>
     );

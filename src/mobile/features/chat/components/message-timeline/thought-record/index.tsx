@@ -118,7 +118,7 @@ export const MobileThoughtRecord = ({
     };
 
     return (
-        <div className="w-full mb-6 px-4">
+        <div className="w-full mb-6 px-4 flex flex-col overflow-hidden">
             <div className="relative w-full px-5 py-5 bg-card rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out">
                 {/* Record Header - Ultra Simplified */}
                 <div className="flex items-center justify-between mb-4">
