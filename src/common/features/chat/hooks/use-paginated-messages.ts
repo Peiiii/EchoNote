@@ -11,7 +11,7 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
   
   // Local state for current channel messages
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
   

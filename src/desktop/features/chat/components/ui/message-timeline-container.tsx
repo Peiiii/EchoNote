@@ -6,14 +6,12 @@ import { ThoughtRecord } from "@/desktop/features/chat/features/message-timeline
 interface MessageTimelineContainerProps {
     containerRef: RefObject<HTMLDivElement | null>;
     onOpenThread: (messageId: string) => void;
-    messages?: Message[];
     className?: string;
 }
 
 export const MessageTimelineContainer = ({ 
     containerRef, 
     onOpenThread, 
-    messages,
     className = "" 
 }: MessageTimelineContainerProps) => {
     const renderThoughtRecord = (message: Message, threadCount: number) => (
@@ -27,7 +25,6 @@ export const MessageTimelineContainer = ({
     return (
         <CommonMessageTimelineContainer
             containerRef={containerRef}
-            messages={messages}
             className={className}
             renderThoughtRecord={renderThoughtRecord}
         />

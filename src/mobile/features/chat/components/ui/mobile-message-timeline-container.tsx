@@ -4,13 +4,11 @@ import { MobileThoughtRecord } from "../message-timeline/thought-record";
 
 interface MobileMessageTimelineContainerProps {
     onOpenThread: (messageId: string) => void;
-    messages: Message[];
     onReply?: (messageId: string) => void;
 }
 
 export const MobileMessageTimelineContainer = ({
     onOpenThread,
-    messages,
     onReply
 }: MobileMessageTimelineContainerProps) => {
     const renderThoughtRecord = (message: Message, threadCount: number) => (
@@ -24,7 +22,6 @@ export const MobileMessageTimelineContainer = ({
 
     return (
         <MessageTimeline 
-            messages={messages} 
             renderThoughtRecord={renderThoughtRecord}
         />
     );

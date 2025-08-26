@@ -3,7 +3,6 @@ import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput } from "@/mobile/features/chat/components/mobile-message-input";
 import { MobileMessageTimelineContainer } from "@/mobile/features/chat/components/ui/mobile-message-timeline-container";
 import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/ui/mobile-scroll-to-bottom-button";
-import { Message } from "@/core/stores/chat-data.store";
 
 // Custom hook for viewport height management
 const useViewportHeight = () => {
@@ -49,7 +48,6 @@ const useViewportHeight = () => {
 
 interface MobileChatLayoutProps {
     currentChannelName?: string;
-    messages: Message[];
     replyToMessageId?: string | null;
     isAddingMessage: boolean;
     onOpenChannelList: () => void;
@@ -63,7 +61,6 @@ interface MobileChatLayoutProps {
 
 export const MobileChatLayout = ({
     currentChannelName,
-    messages,
     replyToMessageId,
     isAddingMessage,
     onOpenChannelList,
@@ -141,7 +138,7 @@ export const MobileChatLayout = ({
                 handleScrollToBottom({ behavior: 'instant' });
             });
         }
-    }, [messages.length, isRefReady, handleScrollToBottom]);
+    }, [isRefReady, handleScrollToBottom]);
 
     // Render methods
     const renderScrollButton = () => {
@@ -165,7 +162,6 @@ export const MobileChatLayout = ({
             >
                 <MobileMessageTimelineContainer
                     onOpenThread={onOpenThread}
-                    messages={messages}
                     onReply={handleReply}
                 />
             </div>

@@ -60,7 +60,6 @@ export const MessageTimelineFeature = ({
                     <MessageTimelineContainer
                         containerRef={containerRef}
                         onOpenThread={onOpenThread}
-                        messages={messages}
                     />
                 }
                 input={

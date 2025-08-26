@@ -4,14 +4,12 @@ import { Message } from "@/core/stores/chat-data.store";
 
 interface MessageTimelineContainerProps {
     containerRef?: RefObject<HTMLDivElement | null>;
-    messages?: Message[];
     className?: string;
     renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
 }
 
 export const MessageTimelineContainer = ({ 
     containerRef, 
-    messages,
     className = "",
     renderThoughtRecord
 }: MessageTimelineContainerProps) => {
@@ -21,7 +19,6 @@ export const MessageTimelineContainer = ({
             className={`flex-1 overflow-y-auto min-h-0 ${className}`}
         >
             <MessageTimeline 
-                messages={messages} 
                 renderThoughtRecord={renderThoughtRecord}
             />
         </div>

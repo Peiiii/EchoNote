@@ -4,10 +4,9 @@ import { ThoughtRecord } from "./thought-record";
 
 interface MessageTimelineProps {
     onOpenThread: (messageId: string) => void;
-    messages?: Message[];
 }
 
-export function MessageTimeline({ onOpenThread, messages }: MessageTimelineProps) {
+export function MessageTimeline({ onOpenThread }: MessageTimelineProps) {
     const renderThoughtRecord = (message: Message, threadCount: number) => (
         <ThoughtRecord 
             message={message} 
@@ -18,7 +17,6 @@ export function MessageTimeline({ onOpenThread, messages }: MessageTimelineProps
 
     return (
         <CommonMessageTimeline
-            messages={messages}
             renderThoughtRecord={renderThoughtRecord}
         />
     );

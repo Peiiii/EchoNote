@@ -15,7 +15,6 @@ export function MobileChatPage() {
             {/* Main Chat Layout */}
             <MobileChatLayout
                 currentChannelName={currentChannel?.name}
-                messages={chatState.messages}
                 replyToMessageId={chatState.replyToMessageId}
                 isAddingMessage={chatState.isAddingMessage}
                 onOpenChannelList={sidebarState.openChannelList}
