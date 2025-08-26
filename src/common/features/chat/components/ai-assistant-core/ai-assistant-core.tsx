@@ -1,11 +1,10 @@
-import { Bot, X } from "lucide-react";
+import { Bot } from "lucide-react";
 import { AgentChatCore } from "@agent-labs/agent-chat";
 import { IAgent } from "@agent-labs/agent-chat";
 import { Tool } from "@agent-labs/agent-chat";
 
 interface AIAssistantCoreProps {
     isOpen: boolean;
-    onClose?: () => void;
     channelName?: string;
     agent: IAgent;
     tools: Tool[];
@@ -18,7 +17,6 @@ interface AIAssistantCoreProps {
 
 export function AIAssistantCore({
     isOpen,
-    onClose,
     channelName,
     agent,
     tools,
@@ -30,7 +28,7 @@ export function AIAssistantCore({
 }: AIAssistantCoreProps) {
     if (!isOpen) return null;
 
-    const containerClasses = variant === 'sidebar' 
+    const containerClasses = variant === 'sidebar'
         ? "h-full flex flex-col bg-card dark:bg-card w-full"
         : "h-full flex flex-col bg-background w-full";
 
@@ -58,14 +56,6 @@ export function AIAssistantCore({
                             </span>
                         )}
                     </div>
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-accent flex-shrink-0"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    )}
                 </div>
             )}
 
@@ -92,7 +82,7 @@ export function AIAssistantCore({
                 <div className={footerClasses}>
                     <div className="text-xs text-muted-foreground text-center">
                         <p className="truncate">
-                            {channelName 
+                            {channelName
                                 ? `AI Assistant understands channel "${channelName}"`
                                 : "AI Assistant is ready to help"
                             }

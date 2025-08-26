@@ -6,13 +6,11 @@ import { aiAgentFactory } from "@/common/features/chat/services/ai-agent-factory
 interface MobileAIAssistantProps {
     channelId: string;
     isOpen: boolean;
-    onClose?: () => void;
 }
 
 export const MobileAIAssistant = ({ 
     channelId, 
     isOpen, 
-    onClose 
 }: MobileAIAssistantProps) => {
     const { channels } = useChatDataStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
@@ -32,7 +30,6 @@ export const MobileAIAssistant = ({
     return (
         <AIAssistantCore
             isOpen={isOpen}
-            onClose={onClose}
             channelName={currentChannel?.name}
             agent={agent}
             tools={tools}

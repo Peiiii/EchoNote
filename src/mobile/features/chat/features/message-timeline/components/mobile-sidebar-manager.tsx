@@ -37,18 +37,18 @@ export const MobileSidebarManager = ({
     isAIAssistantOpen,
     isSettingsOpen,
     isThreadOpen,
-    
+
     // Sidebar actions
     closeChannelList,
     closeAIAssistant,
     closeSettings,
-    
+
     // Thread data
     currentParentMessage,
     currentThreadMessages,
     onSendThreadMessage,
     onCloseThread,
-    
+
     // Channel selection
     handleChannelSelect,
     currentChannelId,
@@ -56,7 +56,7 @@ export const MobileSidebarManager = ({
     return (
         <>
             {/* Channel List Sidebar */}
-            <MobileChannelList 
+            <MobileChannelList
                 isOpen={isChannelListOpen}
                 onClose={closeChannelList}
                 onChannelSelect={handleChannelSelect}
@@ -65,14 +65,13 @@ export const MobileSidebarManager = ({
             {/* AI Assistant - Bottom Sheet */}
             {currentChannelId && (
                 <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
-                    <SheetContent 
-                        side="bottom" 
+                    <SheetContent
+                        side="bottom"
                         className="h-[80vh] p-0 border-t border-border"
                     >
-                        <MobileAIAssistant 
+                        <MobileAIAssistant
                             channelId={currentChannelId}
                             isOpen={isAIAssistantOpen}
-                            onClose={closeAIAssistant}
                         />
                     </SheetContent>
                 </Sheet>
@@ -81,8 +80,8 @@ export const MobileSidebarManager = ({
             {/* Thread Sidebar */}
             {isThreadOpen && (
                 <Sheet open={isThreadOpen} onOpenChange={onCloseThread}>
-                    <SheetContent 
-                        side="right" 
+                    <SheetContent
+                        side="right"
                         className="w-full max-w-md p-0 border-l border-border"
                     >
                         <MobileThreadSidebar
@@ -96,8 +95,8 @@ export const MobileSidebarManager = ({
 
             {/* Settings Sidebar */}
             <Sheet open={isSettingsOpen} onOpenChange={closeSettings}>
-                <SheetContent 
-                    side="right" 
+                <SheetContent
+                    side="right"
                     className="w-full max-w-md p-0 border-l border-border"
                 >
                     <MobileSettingsSidebar />
