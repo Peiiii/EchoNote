@@ -7,16 +7,12 @@ import { ThoughtRecord } from "./thought-record";
 import { useTimelineState } from "../hooks/use-timeline-state";
 
 interface MessageTimelineFeatureProps {
-    messages: Message[];
-    currentChannelId: string;
     onOpenThread: (messageId: string) => void;
     onOpenAIAssistant: (channelId?: string) => void;
     className?: string;
 }
 
 export const MessageTimelineFeature = ({
-    messages,
-    currentChannelId,
     onOpenThread,
     onOpenAIAssistant,
     className = ""
@@ -24,11 +20,10 @@ export const MessageTimelineFeature = ({
     // Use unified timeline state management
     const {
         editState,
-        scrollState,
         chatActions,
         editActions,
         isExpandedEditing
-    } = useTimelineState(currentChannelId, messages.length);
+    } = useTimelineState();
 
     // Render thought record function
     const renderThoughtRecord = (message: Message, threadCount: number) => (
@@ -50,10 +45,7 @@ export const MessageTimelineFeature = ({
             <TimelineLayout
                 content={
                     <TimelineContent
-                        containerRef={scrollState.containerRef}
                         renderThoughtRecord={renderThoughtRecord}
-                        isSticky={scrollState.isSticky}
-                        onScrollToBottom={scrollState.handleScrollToBottom}
                     />
                 }
                 actions={

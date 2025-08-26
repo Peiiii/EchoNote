@@ -1,37 +1,37 @@
+import { MessageTimelineSkeleton } from "@/common/features/chat/components/message-timeline/message-skeleton";
+import { MessageTimeline, MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
+import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { Message } from "@/core/stores/chat-data.store";
-import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
-import { ScrollToBottomButton } from "./scroll-to-bottom-button";
+import { useRef } from "react";
 
 interface TimelineContentProps {
-    containerRef: React.RefObject<HTMLDivElement | null>;
     renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
-    isSticky: boolean;
-    onScrollToBottom: () => void;
     className?: string;
 }
 
 export const TimelineContent = ({
-    containerRef,
     renderThoughtRecord,
-    isSticky,
-    onScrollToBottom,
     className = ""
 }: TimelineContentProps) => {
+    const messageTimelineRef = useRef<MessageTimelineRef>(null);
+
+    const { messages, loading } = usePaginatedMessages(20);
+
+    const groupedMessages = useGroupedMessages(messages);
+
+    if (loading) {
+        return <MessageTimelineSkeleton count={5} />;
+    }
+
     return (
         <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
-            {/* Message timeline */}
             <MessageTimeline
-                containerRef={containerRef}
+                ref={messageTimelineRef}
                 renderThoughtRecord={renderThoughtRecord}
+                groupedMessages={groupedMessages}
+                messages={messages}
             />
-            
-            {/* Scroll to bottom button */}
-            {!isSticky && (
-                <ScrollToBottomButton
-                    onClick={onScrollToBottom}
-                    isVisible={!isSticky}
-                />
-            )}
         </div>
     );
 };

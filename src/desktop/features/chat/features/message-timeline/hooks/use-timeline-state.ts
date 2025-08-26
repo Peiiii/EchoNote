@@ -1,17 +1,16 @@
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
-import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
-export const useTimelineState = (currentChannelId: string, messagesLength: number) => {
+export const useTimelineState = () => {
     // Edit state management
     const editState = useEditStateStore();
     
-    // Scroll state management
-    const scrollState = useChatScroll([currentChannelId, messagesLength], { smoothScroll: true });
+    // Container ref for chat actions (still needed for some actions)
+    const containerRef = useRef<HTMLDivElement>(null);
     
     // Chat actions management
-    const chatActions = useChatActions(scrollState.containerRef);
+    const chatActions = useChatActions(containerRef);
     
     // Edit actions - memoized to prevent unnecessary re-renders
     const editActions = useMemo(() => ({
@@ -47,16 +46,6 @@ export const useTimelineState = (currentChannelId: string, messagesLength: numbe
         editState.isSaving
     ]);
     
-    const memoizedScrollState = useMemo(() => ({
-        containerRef: scrollState.containerRef,
-        isSticky: scrollState.isSticky,
-        handleScrollToBottom: scrollState.handleScrollToBottom,
-    }), [
-        scrollState.containerRef,
-        scrollState.isSticky,
-        scrollState.handleScrollToBottom
-    ]);
-    
     const memoizedChatActions = useMemo(() => ({
         replyToMessageId: chatActions.replyToMessageId,
         handleSend: chatActions.handleSend,
@@ -71,7 +60,6 @@ export const useTimelineState = (currentChannelId: string, messagesLength: numbe
     
     return {
         editState: memoizedEditState,
-        scrollState: memoizedScrollState,
         chatActions: memoizedChatActions,
         editActions,
         isExpandedEditing,

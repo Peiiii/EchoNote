@@ -1,8 +1,11 @@
+import { EmptyState } from "@/common/features/chat/components/message-timeline/empty-state";
+import { MessageTimelineSkeleton } from "@/common/features/chat/components/message-timeline/message-skeleton";
+import { MessageTimeline, MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
+import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
+import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
 import { Message } from "@/core/stores/chat-data.store";
-import { MessageTimeline } from "@/common/features/chat/components/message-timeline/message-timeline";
-import { MobileScrollToBottomButton } from "@/mobile/features/chat/components/mobile-scroll-to-bottom-button";
 import { MobileThoughtRecord } from "@/mobile/features/chat/features/message-timeline";
-import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
 // 定义透出的方法接口
 export interface MobileTimelineContentRef {
@@ -20,57 +23,21 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
     onReply,
     className = ""
 }, ref) => {
-    // Internal ref - completely self-contained
-    const timelineContainerRef = useRef<HTMLDivElement>(null);
-    
-    // Internal scroll state management
-    const [shouldShowScrollButton, setShouldShowScrollButton] = useState<boolean>(false);
-    const [isRefReady, setIsRefReady] = useState<boolean>(false);
-    
-    // Internal scroll to bottom function - completely self-contained
-    const handleScrollToBottom = useCallback((options: { behavior?: 'smooth' | 'instant' } = {}) => {
-        if (timelineContainerRef.current && isRefReady) {
-            const container = timelineContainerRef.current;
-            const scrollOptions: ScrollToOptions = {
-                top: container.scrollHeight,
-                behavior: options.behavior || 'instant'
-            };
-            container.scrollTo(scrollOptions);
-        }
-    }, [isRefReady]);
-    
-    // Expose scrollToBottom method to parent component
+    // 使用 MessageTimeline 的 ref
+    const messageTimelineRef = useRef<MessageTimelineRef>(null);
+
+
+    // 直接在组件内部调用 hook，自包含数据获取逻辑
+    const { messages, loading } = usePaginatedMessages(20);
+
+    const groupedMessages = useGroupedMessages(messages);
+
     useImperativeHandle(ref, () => ({
-        scrollToBottom: handleScrollToBottom
-    }), [handleScrollToBottom]);
-    
-    // Check if ref is ready
-    useEffect(() => {
-        if (timelineContainerRef.current) {
-            setIsRefReady(true);
+        scrollToBottom: (options?: { behavior?: 'smooth' | 'instant' }) => {
+            messageTimelineRef.current?.scrollToBottom(options);
         }
-    }, []);
+    }), [messageTimelineRef]);
 
-    // Scroll position detection - completely internal to this component
-    useEffect(() => {
-        if (!isRefReady) return;
-        
-        const container = timelineContainerRef.current;
-        if (!container) return;
-
-        const handleScroll = () => {
-            const { scrollTop, scrollHeight, clientHeight } = container;
-            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-            const threshold = 100; // 100px threshold for showing scroll button
-            
-            setShouldShowScrollButton(distanceFromBottom > threshold);
-        };
-
-        container.addEventListener('scroll', handleScroll);
-        handleScroll(); // Initial check
-        
-        return () => container.removeEventListener('scroll', handleScroll);
-    }, [isRefReady]);
 
     const renderThoughtRecord = (message: Message, threadCount: number) => (
         <MobileThoughtRecord
@@ -81,32 +48,35 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
         />
     );
 
-    // Internal computed value
-    const canShowScrollButton = isRefReady && shouldShowScrollButton;
+
+
+    // 检查是否有消息需要显示
+    const hasMessages = Object.values(groupedMessages).some(dayMessages =>
+        (dayMessages as Message[]).some((msg: Message) =>
+            msg.sender === "user" &&
+            !msg.parentId
+        )
+    );
+
+    // 显示加载骨架屏
+    if (loading) {
+        return <MessageTimelineSkeleton count={5} />;
+    }
+
+    if (!hasMessages) {
+        return <EmptyState />;
+    }
 
     return (
         <div className={`flex-1 min-h-0 relative overflow-hidden ${className}`}>
-            {/* Timeline container - no overflow here, let MessageTimeline handle scrolling */}
-            <div 
-                ref={timelineContainerRef}
+            {/* MessageTimeline 自己管理滚动 */}
+            <MessageTimeline
+                ref={messageTimelineRef}
                 className="h-full"
-            >
-                <MessageTimeline
-                    containerRef={timelineContainerRef}
-                    className="h-full"
-                    renderThoughtRecord={renderThoughtRecord}
-                />
-            </div>
-            
-            {/* Scroll to bottom button - completely self-contained */}
-            {canShowScrollButton && (
-                <div className="absolute bottom-2 right-2 z-20">
-                    <MobileScrollToBottomButton 
-                        onClick={() => handleScrollToBottom({ behavior: 'smooth' })} 
-                        isVisible={true}
-                    />
-                </div>
-            )}
+                renderThoughtRecord={renderThoughtRecord}
+                groupedMessages={groupedMessages}
+                messages={messages}
+            />
         </div>
     );
 });

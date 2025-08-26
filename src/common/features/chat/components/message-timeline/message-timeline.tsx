@@ -1,90 +1,91 @@
-import { RefObject } from "react";
+import { ScrollToBottomButton } from "@/common/features/chat/components/scroll-to-bottom-button";
+import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { Message } from "@/core/stores/chat-data.store";
-import { useGroupedMessages } from "../../hooks/use-grouped-messages";
-import { usePaginatedMessages } from "../../hooks/use-paginated-messages";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { DateDivider } from "./date-divider";
-import { EmptyState } from "./empty-state";
-import { MessageTimelineSkeleton } from "./message-skeleton";
 
 interface MessageTimelineProps {
     renderThoughtRecord?: (message: Message, threadCount: number) => React.ReactNode;
-    containerRef?: RefObject<HTMLDivElement | null>;
     className?: string;
+    groupedMessages: Record<string, Message[]>;
+    messages: Message[];
 }
 
-export function MessageTimeline({
+export interface MessageTimelineRef {
+    scrollToBottom: (options?: { behavior?: 'smooth' | 'instant' }) => void;
+}
+
+export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelineProps>(({
     renderThoughtRecord,
-    containerRef,
-    className = ""
-}: MessageTimelineProps) {
-    // 直接在组件内部调用 hook，自包含数据获取逻辑
-    const { messages, loading } = usePaginatedMessages(20);
+    className = "",
+    groupedMessages,
+    messages
+}, ref) => {
 
-    const groupedMessages = useGroupedMessages(messages);
+    const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll([], { smoothScroll: true });
 
-    // 检查是否有消息需要显示
-    const hasMessages = Object.values(groupedMessages).some(dayMessages =>
-        (dayMessages as Message[]).some((msg: Message) =>
-            msg.sender === "user" &&
-            !msg.parentId
-        )
-    );
+    useImperativeHandle(ref, () => ({
+        scrollToBottom: scrollToBottom,
+    }), [scrollToBottom]);
 
-    // 显示加载骨架屏
-    if (loading) {
-        return <MessageTimelineSkeleton count={5} />;
-    }
-
-    if (!hasMessages) {
-        return <EmptyState />;
-    }
+    useEffect(() => {
+        scrollToBottom({ behavior: 'instant' });
+    }, []);
 
     return (
-        <div data-component="message-timeline"
-            ref={containerRef}
-            className={`w-full bg-background flex-1 overflow-y-auto min-h-0 ${className}`}
-            style={{
-                height: '100%',
-                minHeight: '100%',
-                maxHeight: '100%'
-            }}
-        >
-            {Object.entries(groupedMessages).map(([date, dayMessages]) => {
-                // Filter only user messages for display (excluding thread messages)
-                const userMessages = (dayMessages as Message[]).filter((msg: Message) =>
-                    msg.sender === "user" &&
-                    !msg.parentId // Ensure only main messages are shown, not thread messages
-                );
+        <>
+            <div data-component="message-timeline"
+                ref={containerRef}
+                className={`w-full bg-background flex-1 overflow-y-auto min-h-0 ${className}`}
+                style={{
+                    height: '100%',
+                    minHeight: '100%',
+                    maxHeight: '100%'
+                }}
+            >
+                {Object.entries(groupedMessages).map(([date, dayMessages]) => {
+                    // Filter only user messages for display (excluding thread messages)
+                    const userMessages = (dayMessages as Message[]).filter((msg: Message) =>
+                        msg.sender === "user" &&
+                        !msg.parentId // Ensure only main messages are shown, not thread messages
+                    );
 
-                return (
-                    <div key={date} className="w-full" style={{ height: 'auto', minHeight: 'auto' }}>
-                        <DateDivider date={date} />
+                    return (
+                        <div key={date} className="w-full" style={{ height: 'auto', minHeight: 'auto' }}>
+                            <DateDivider date={date} />
 
-                        {/* Elegant timeline of thoughts */}
-                        {userMessages.map((message: Message) => {
-                            const threadMessages = (messages ?? []).filter(msg =>
-                                msg.threadId === (message.threadId || message.id)
-                            );
-                            const threadCount = threadMessages.length > 1 ? threadMessages.length - 1 : 0;
+                            {/* Elegant timeline of thoughts */}
+                            {userMessages.map((message: Message) => {
+                                const threadMessages = (messages ?? []).filter(msg =>
+                                    msg.threadId === (message.threadId || message.id)
+                                );
+                                const threadCount = threadMessages.length > 1 ? threadMessages.length - 1 : 0;
 
-                            return (
-                                <div key={message.id} className="w-full" style={{ height: 'auto', minHeight: 'auto' }}>
-                                    {renderThoughtRecord ? renderThoughtRecord(message, threadCount) : (
-                                        <div className="p-4">
-                                            <div className="text-sm text-muted-foreground">
-                                                Message: {message.content}
+                                return (
+                                    <div key={message.id} className="w-full" style={{ height: 'auto', minHeight: 'auto' }}>
+                                        {renderThoughtRecord ? renderThoughtRecord(message, threadCount) : (
+                                            <div className="p-4">
+                                                <div className="text-sm text-muted-foreground">
+                                                    Message: {message.content}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    Thread count: {threadCount}
+                                                </div>
                                             </div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                Thread count: {threadCount}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                );
-            })}
-        </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="absolute bottom-2 right-2 z-20">
+                <ScrollToBottomButton
+                    onClick={() => scrollToBottom({ behavior: 'smooth' })}
+                    isVisible={canScrollToBottom}
+                />
+            </div>
+        </>
     );
-}
+});

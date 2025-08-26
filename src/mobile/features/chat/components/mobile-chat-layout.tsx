@@ -1,6 +1,5 @@
 import { MobileHeader } from "@/mobile/components/mobile-header";
-import { MobileMessageInput } from "@/mobile/features/chat/features/message-timeline";
-import { MobileTimelineContent, MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
+import { MobileMessageInput, MobileTimelineContent, type MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
 import { useMobileTimelineState } from "@/mobile/features/chat/features/message-timeline";
 import { useMobileViewportHeight } from "@/mobile/features/chat/features/message-timeline";
 import { useRef } from "react";
