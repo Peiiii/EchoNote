@@ -1,7 +1,7 @@
 import { Subject } from "rxjs";
 
 export class RxEvent<T = void> extends Subject<T> {
-  fire(value: T) {
+  emit(value: T) {
     this.next(value);
   }
 

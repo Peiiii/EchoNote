@@ -1,14 +1,16 @@
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { Bookmark, Clock, Eye, Lightbulb, MessageCircle, Edit2 } from "lucide-react";
+import { Bookmark, Clock, Edit2, Eye, Lightbulb, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { MoreActionsMenu } from "../more-actions-menu";
-import { ThoughtRecordSparks } from "./thought-record-sparks";
+import { InlineEditor } from "./inline-editor";
 import { MarkdownContent } from "./markdown-content";
 import { ReadMoreWrapper } from "./read-more-wrapper";
-import { InlineEditor } from "./inline-editor";
+import { ThoughtRecordSparks } from "./thought-record-sparks";
 
 
 interface ThoughtRecordProps {
@@ -49,7 +51,7 @@ interface ThreadIndicatorProps {
 
 function ThreadIndicator({ threadCount, onOpenThread, messageId }: ThreadIndicatorProps) {
     const displayText = threadCount > 0 ? `${threadCount} replies` : 'Start discussion';
-    
+
     return (
         <button
             onClick={() => onOpenThread?.(messageId)}
@@ -100,15 +102,16 @@ function ActionButtons({ onToggleAnalysis, onReply, onEdit, message, onDelete, i
     );
 }
 
-export function ThoughtRecord({ 
-    message, 
-    onReply, 
-    onOpenThread, 
-    threadCount = 0 
+export function ThoughtRecord({
+    message,
+    onReply,
+    onOpenThread,
+    threadCount = 0
 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
+    const { currentChannelId } = useChatViewStore();
     const [showAnalysis, setShowAnalysis] = useState(false);
-    const deleteMessage = useChatDataStore(state => state.deleteMessage);
-    
+    const deleteMessage = channelMessageService.deleteMessage;
+
     // Edit state management
     const {
         editingMessageId,
@@ -120,7 +123,7 @@ export function ThoughtRecord({
         cancel,
         switchToExpandedMode
     } = useEditStateStore();
-    
+
     const isEditing = editingMessageId === message.id;
 
     const aiAnalysis = message.aiAnalysis;
@@ -133,10 +136,10 @@ export function ThoughtRecord({
 
     // Delete method (use native confirm)
     const handleDelete = async () => {
-        const messagePreview = message.content.length > 100 
-            ? `${message.content.substring(0, 100)}...` 
+        const messagePreview = message.content.length > 100
+            ? `${message.content.substring(0, 100)}...`
             : message.content;
-            
+
         const confirmed = window.confirm(
             `🗑️ Delete Thought\n\n` +
             `"${messagePreview}"\n\n` +
@@ -144,10 +147,10 @@ export function ThoughtRecord({
             `The thought will be moved to trash.\n\n` +
             `Are you sure you want to continue?`
         );
-        
+
         if (confirmed) {
             try {
-                await deleteMessage(message.id, false); // Soft delete
+                await deleteMessage({ messageId: message.id, hardDelete: false, channelId: currentChannelId! }); // Soft delete
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
@@ -257,3 +260,4 @@ export function ThoughtRecord({
 
 export { MarkdownContent } from "./markdown-content";
 export { ReadMoreWrapper } from "./read-more-wrapper";
+

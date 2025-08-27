@@ -5,6 +5,7 @@ import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-mes
 import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { forwardRef } from "react";
 
 interface TimelineContentProps {
@@ -17,6 +18,8 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     className = ""
 }, ref) => {
 
+    const { currentChannelId } = useChatViewStore();
+
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
     const {
@@ -24,22 +27,17 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
         loading,
         hasMore,
         loadMore,
-        hasMoreRef,
-        loadingRef,
-        loadingMoreRef,
+        getChannelState,
     } = useChannelMessages({
-        messagesLimit: 20,
         onHistoryMessagesChange: (messages) => {
-            onHistoryMessagesLoadedEvent$.fire(messages);
+            onHistoryMessagesLoadedEvent$.emit(messages);
         }
     });
 
     const { handleScroll } = useLazyLoading({
-        onTrigger: loadMore,
-        canTrigger: hasMore && !loading,
-        hasMoreRef,
-        loadingRef,
-        loadingMoreRef
+        onTrigger: () => currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
+        canTrigger: !!hasMore && !loading,
+        getState: getChannelState,
     });
 
     const groupedMessages = useGroupedMessages(messages);
@@ -51,14 +49,14 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
 
     return (
         <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
-            <MessageTimeline
+          {messages && <MessageTimeline
                 ref={ref}
                 renderThoughtRecord={renderThoughtRecord}
                 groupedMessages={groupedMessages}
                 messages={messages}
                 onScroll={handleScroll}
                 onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
-            />
+            />}
         </div>
     );
 });

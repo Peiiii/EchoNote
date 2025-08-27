@@ -1,31 +1,31 @@
-import { RefObject, useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface UseLazyLoadingProps {
   onTrigger: () => void;
   canTrigger: boolean;
   threshold?: number;
-  hasMoreRef: RefObject<boolean>;
-  loadingRef: RefObject<boolean>;
-  loadingMoreRef: RefObject<boolean>;
+  getState: () => {
+    hasMore: boolean;
+    loading: boolean;
+    loadingMore: boolean;
+  };
 }
 
 export const useLazyLoading = ({
   onTrigger,
   canTrigger,
   threshold = 0.2,
-  hasMoreRef,
-  loadingRef,
-  loadingMoreRef
+  getState
 }: UseLazyLoadingProps) => {
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    if (!canTrigger || !hasMoreRef.current || loadingRef.current || loadingMoreRef.current) return;
+    if (!canTrigger || !getState().hasMore || getState().loading || getState().loadingMore) return;
 
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const scrollPercentage = scrollTop / (scrollHeight - clientHeight);
     if (scrollPercentage < threshold) {
       onTrigger();
     }
-  }, [canTrigger, hasMoreRef, loadingRef, loadingMoreRef, threshold, onTrigger]);
+  }, [canTrigger, getState, threshold, onTrigger]);
 
   return { handleScroll };
 };

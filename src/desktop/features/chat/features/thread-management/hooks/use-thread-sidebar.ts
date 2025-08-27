@@ -4,26 +4,26 @@ import { useChatViewStore } from "@/core/stores/chat-view.store";
 
 export function useThreadSidebar() {
     const { currentChannelId } = useChatViewStore();
-    const { addThreadMessage } = useChatDataStore();
+    const addThreadMessage = useChatDataStore(state => state.addThreadMessage);
 
-    // 直接从store获取当前channel的消息，避免重复订阅
-    const { messages } = useChatDataStore(state =>
-        currentChannelId ? state.messagesByChannel[currentChannelId] || {
-            messages: [],
-            loading: false,
-            hasMore: true,
-            lastVisible: null
-        } : {
-            messages: [],
-            loading: false,
-            hasMore: true,
-            lastVisible: null
-        }
-    );
+    // // 直接从store获取当前channel的消息，避免重复订阅
+    // const { messages } = useChatDataStore(state =>
+    //     currentChannelId ? state.messagesByChannel[currentChannelId] || {
+    //         messages: [],
+    //         loading: false,
+    //         hasMore: true,
+    //         lastVisible: null
+    //     } : {
+    //         messages: [],
+    //         loading: false,
+    //         hasMore: true,
+    //         lastVisible: null
+    //     }
+    // );
 
     // Thread sidebar state
     const [isThreadOpen, setIsThreadOpen] = useState(false);
-    const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+    const [currentThreadId, setCurrentThreadId] = useState<string | undefined>(undefined);
 
     // Thread handlers
     const handleOpenThread = (messageId: string) => {
@@ -33,7 +33,7 @@ export function useThreadSidebar() {
 
     const handleCloseThread = () => {
         setIsThreadOpen(false);
-        setCurrentThreadId(null);
+        setCurrentThreadId(undefined);
     };
 
     const handleSendThreadMessage = (content: string) => {
@@ -41,24 +41,25 @@ export function useThreadSidebar() {
             addThreadMessage(currentThreadId, {
                 content,
                 sender: "user" as const,
-                channelId: messages[0]?.channelId || "",
+                channelId: currentChannelId || "",
             });
         }
     };
 
-    const currentParentMessage = currentThreadId
-        ? messages.find(m => m.id === currentThreadId) || null
-        : null;
+    // const currentParentMessage = currentThreadId
+    //     ? messages.find(m => m.id === currentThreadId) || null
+    //     : null;
 
-    const currentThreadMessages = currentThreadId
-        ? messages.filter(m => m.threadId === currentThreadId)
-        : [];
+    // const currentThreadMessages = currentThreadId
+    //     ? messages.filter(m => m.threadId === currentThreadId)
+    //     : [];
 
     return {
         // State
         isThreadOpen,
-        currentParentMessage,
-        currentThreadMessages,
+        currentThreadId,
+        // currentParentMessage,
+        // currentThreadMessages,
 
         // Handlers
         handleOpenThread,

@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 
 export interface ChatLayoutProps {
-    sidebar: ReactNode;
-    content: ReactNode;
+    sidebar?: ReactNode;
+    content?: ReactNode;
     rightSidebar?: ReactNode; // Right sidebar
     className?: string;
 }

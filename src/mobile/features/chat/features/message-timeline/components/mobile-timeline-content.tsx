@@ -6,10 +6,10 @@ import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-mes
 import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { MobileThoughtRecord } from "@/mobile/features/chat/features/message-timeline";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
-// 定义透出的方法接口
 export interface MobileTimelineContentRef {
     scrollToBottom: (options?: { behavior?: 'smooth' | 'instant' }) => void;
 }
@@ -25,36 +25,31 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
     onReply,
     className = ""
 }, ref) => {
-    // 使用 MessageTimeline 的 ref
+    const { currentChannelId } = useChatViewStore();
     const messageTimelineRef = useRef<MessageTimelineRef>(null);
 
-    // 创建历史消息加载事件
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
-    // 使用 useChannelMessages 替代 usePaginatedMessages
     const {
-        messages,
+        messages = [],
         loading,
         hasMore,
         loadMore,
-        hasMoreRef,
-        loadingRef,
-        loadingMoreRef,
+        getChannelState,
     } = useChannelMessages({
-        messagesLimit: 20,
         onHistoryMessagesChange: (messages) => {
-            // 当历史消息变化时，触发事件
-            onHistoryMessagesLoadedEvent$.fire(messages);
+            onHistoryMessagesLoadedEvent$.emit(messages);
         }
     });
 
-    // 集成懒加载功能
     const { handleScroll } = useLazyLoading({
-        onTrigger: loadMore,
-        canTrigger: hasMore && !loading,
-        hasMoreRef,
-        loadingRef,
-        loadingMoreRef
+        onTrigger: () => {
+            if (currentChannelId) {
+                loadMore({ channelId: currentChannelId, messagesLimit: 20 });
+            }
+        },
+        canTrigger: !!hasMore && !loading,
+        getState: getChannelState,
     });
 
     const groupedMessages = useGroupedMessages(messages);
@@ -74,7 +69,6 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
         />
     );
 
-    // 检查是否有消息需要显示
     const hasMessages = Object.values(groupedMessages).some(dayMessages =>
         (dayMessages as Message[]).some((msg: Message) =>
             msg.sender === "user" &&
@@ -82,7 +76,6 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
         )
     );
 
-    // 显示加载骨架屏
     if (loading) {
         return <MessageTimelineSkeleton count={5} />;
     }
@@ -93,7 +86,6 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
 
     return (
         <div className={`flex-1 min-h-0 relative overflow-hidden ${className}`}>
-            {/* MessageTimeline 自己管理滚动 */}
             <MessageTimeline
                 ref={messageTimelineRef}
                 className="h-full"

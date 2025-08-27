@@ -9,9 +9,8 @@ import { useThreadSidebar } from "@/desktop/features/chat/features/thread-manage
 
 export function ChatPage() {
     // Use specialized hooks
-    const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
+    const { isThreadOpen, currentThreadId, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
-    
     return (
         <ChatLayout
             sidebar={<ChannelList />}
@@ -27,9 +26,8 @@ export function ChatPage() {
                         <ThreadSidebar
                             isOpen={isThreadOpen}
                             onClose={handleCloseThread}
-                            parentMessage={currentParentMessage}
-                            threadMessages={currentThreadMessages}
                             onSendMessage={handleSendThreadMessage}
+                            currentThreadId={currentThreadId}
                         />
                     ) : (
                         <AIAssistantSidebar

@@ -1,4 +1,6 @@
 
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
@@ -16,31 +18,32 @@ interface MessageInputProps {
 export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const addMessage = useChatDataStore(state => state.addMessage);
+    const { sendMessage } = channelMessageService
     const addThreadMessage = useChatDataStore(state => state.addThreadMessage);
     const { currentChannelId, isAddingMessage } = useChatViewStore();
 
     // 遵循Zustand最佳实践：分别订阅不同的状态
-    const {messages: channelMessages} = useChatDataStore(state => 
-        currentChannelId ? state.messagesByChannel[currentChannelId] || {
-            messages: [],
-            loading: false,
-            hasMore: true,
-            lastVisible: null
-        } : {
-            messages: [],
-            loading: false,
-            hasMore: true,
-            lastVisible: null
-        }
-    );
-    
+    // const {messages: channelMessages} = useChatDataStore(state => 
+    //     currentChannelId ? state.messagesByChannel[currentChannelId] || {
+    //         messages: [],
+    //         loading: false,
+    //         hasMore: true,
+    //         lastVisible: null
+    //     } : {
+    //         messages: [],
+    //         loading: false,
+    //         hasMore: true,
+    //         lastVisible: null
+    //     }
+    // );
+    const { messages: channelMessages = [] } = useChannelMessages({});
+
     // 使用useMemo避免每次渲染都重新计算
-    const replyToMessage = useMemo(() => 
-        replyToMessageId && channelMessages.length > 0 
-            ? channelMessages.find(msg => msg.id === replyToMessageId) 
+    const replyToMessage = useMemo(() =>
+        replyToMessageId && channelMessages.length > 0
+            ? channelMessages.find(msg => msg.id === replyToMessageId)
             : null
-    , [replyToMessageId, channelMessages]);
+        , [replyToMessageId, channelMessages]);
 
     const handleSend = async () => {
         if (!message.trim() || !currentChannelId) return;
@@ -54,7 +57,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
             });
         } else {
             // Regular message
-            addMessage({
+            sendMessage({
                 content: message.trim(),
                 sender: "user" as const,
                 channelId: currentChannelId,

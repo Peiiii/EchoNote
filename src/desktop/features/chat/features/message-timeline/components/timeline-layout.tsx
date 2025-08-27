@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 
 interface TimelineLayoutProps {
-    content: ReactNode;
-    actions: ReactNode;
+    content?: ReactNode;
+    actions?: ReactNode;
     className?: string;
 }
 

@@ -1,22 +1,29 @@
-import { X, Send, MessageCircle, User, Bot, ChevronDown, ChevronUp } from "lucide-react";
-import { Message } from "@/core/stores/chat-data.store";
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { Bot, ChevronDown, ChevronUp, MessageCircle, Send, User, X } from "lucide-react";
 import { useState } from "react";
 
 interface ThreadSidebarProps {
     isOpen: boolean;
     onClose: () => void;
-    parentMessage: Message | null;
-    threadMessages: Message[];
     onSendMessage: (content: string) => void;
+    currentThreadId?: string;
 }
 
-export const ThreadSidebar = ({ 
-    isOpen, 
-    onClose, 
-    parentMessage, 
-    threadMessages, 
-    onSendMessage 
+export const ThreadSidebar = ({
+    isOpen,
+    onClose,
+    onSendMessage,
+    currentThreadId
 }: ThreadSidebarProps) => {
+    const { messages } = useChannelMessages({});
+    const parentMessage = currentThreadId
+        ? messages?.find(m => m.id === currentThreadId) || null
+        : null;
+
+    const threadMessages = currentThreadId
+        ? messages?.filter(m => m.threadId === currentThreadId) || []
+        : [];
+
     const [newMessage, setNewMessage] = useState("");
     const [isOriginalExpanded, setIsOriginalExpanded] = useState(false);
 
@@ -76,15 +83,15 @@ export const ThreadSidebar = ({
                                 <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
                                     Original Thought
                                 </div>
-                                
+
                                 {/* 内容区域 - 展开状态直接平铺，收起状态截断 */}
                                 <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    {isOriginalExpanded 
-                                        ? parentMessage.content 
+                                    {isOriginalExpanded
+                                        ? parentMessage.content
                                         : getTruncatedContent(parentMessage.content)
                                     }
                                 </div>
-                                
+
                                 {/* 展开/收起按钮 */}
                                 {parentMessage.content.length > 200 && (
                                     <button
@@ -121,11 +128,10 @@ export const ThreadSidebar = ({
                     ) : (
                         threadMessages.map((message) => (
                             <div key={message.id} className="flex items-start gap-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                    message.sender === "user" 
-                                        ? "bg-blue-500" 
-                                        : "bg-slate-500"
-                                }`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === "user"
+                                    ? "bg-blue-500"
+                                    : "bg-slate-500"
+                                    }`}>
                                     {message.sender === "user" ? (
                                         <User className="w-4 h-4 text-white" />
                                     ) : (
