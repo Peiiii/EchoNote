@@ -2,8 +2,7 @@ import { firebaseChatService } from '@/common/services/firebase/firebase-chat.se
 import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
 import { useChatViewStore } from '@/core/stores/chat-view.store';
 import { useMemoizedFn } from 'ahooks';
-import { DocumentSnapshot } from 'firebase/firestore';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useStateWithRef = <T>(initialValue: T) => {
     const [value, _setValue] = useState(initialValue);
@@ -28,32 +27,39 @@ export const useChannelMessages = ({
 }: UseChannelMessagesOptions) => {
     const { currentChannelId } = useChatViewStore();
     const { userId } = useChatDataStore();
+    
+    // 使用Zustand的推荐用法：选择器模式
+    const channelState = useChatDataStore(state => 
+        state.messagesByChannel[currentChannelId || ''] || {
+            messages: [],
+            loading: false,
+            hasMore: true,
+            lastVisible: null
+        }
+    );
+    
+    // 获取actions，避免在useEffect依赖中
+    const setChannelMessages = useChatDataStore(state => state.setChannelMessages);
+    const setChannelLoading = useChatDataStore(state => state.setChannelLoading);
+    const setChannelHasMore = useChatDataStore(state => state.setChannelHasMore);
+    const setChannelLastVisible = useChatDataStore(state => state.setChannelLastVisible);
+    const addChannelMessage = useChatDataStore(state => state.addChannelMessage);
+    const clearChannelMessages = useChatDataStore(state => state.clearChannelMessages);
 
-    // 1. 初始消息（最新N条）
-    const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+    // 解构状态，保持现有API兼容性
+    const { messages, loading, hasMore, lastVisible } = channelState;
 
-    // 2. 新消息（实时订阅）
-    const [newMessages, setNewMessages] = useState<Message[]>([]);
-
-    // 3. 历史消息（分页获取）
-    const [historyMessages, setHistoryMessages] = useState<Message[]>([]);
-
-    // 状态管理
-    const [loading, setLoading, loadingRef] = useStateWithRef(true);
-    const [, setLoadingMore, loadingMoreRef] = useStateWithRef(false);
-    const [hasMoreHistory, setHasMoreHistory, setHasMoreHistoryRef] = useStateWithRef(true);
-    const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
-
-    // Refs
+    // Refs for internal state management (保持现有逻辑)
+    const loadingRef = useRef(loading);
+    const loadingMoreRef = useRef(false);
+    const hasMoreRef = useRef(hasMore);
     const newMessagesUnsubscribeRef = useRef<(() => void) | null>(null);
 
-    // 合并所有消息
-    const allMessages = useMemo(() => {
-        return [...historyMessages, ...initialMessages, ...newMessages].sort(
-            (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
-        );
-    }, [historyMessages, initialMessages, newMessages]);
-
+    // 同步refs和store状态
+    useEffect(() => {
+        loadingRef.current = loading;
+        hasMoreRef.current = hasMore;
+    }, [loading, hasMore]);
 
     // 订阅新消息
     const subscribeToNewMessages = useCallback((channelId: string, afterTimestamp: Date) => {
@@ -67,19 +73,22 @@ export const useChannelMessages = ({
             userId,
             channelId,
             afterTimestamp,
-            (messages) => {
-                setNewMessages(messages);
+            (newMessages) => {
+                // 使用store方法添加新消息
+                newMessages.forEach(message => {
+                    addChannelMessage(channelId, message);
+                });
             }
         );
 
         newMessagesUnsubscribeRef.current = unsubscribe;
-    }, [userId]);
+    }, [userId, addChannelMessage]);
 
     // 加载初始消息
     const loadInitialMessages = useCallback(async (channelId: string) => {
         if (!userId || !channelId) return;
 
-        setLoading(true);
+        setChannelLoading(channelId, true);
         try {
             const result = await firebaseChatService.fetchInitialMessages(
                 userId,
@@ -87,9 +96,9 @@ export const useChannelMessages = ({
                 messagesLimit
             );
 
-            setInitialMessages(result.messages);
-            setLastVisible(result.lastVisible);
-            setHasMoreHistory(!result.allLoaded);
+            setChannelMessages(channelId, result.messages);
+            setChannelLastVisible(channelId, result.lastVisible);
+            setChannelHasMore(channelId, !result.allLoaded);
 
             if (result.messages.length > 0) {
                 const latestTimestamp = result.messages[0].timestamp;
@@ -99,55 +108,60 @@ export const useChannelMessages = ({
         } catch (error) {
             console.error('Error loading initial messages:', error);
         } finally {
-            setLoading(false);
+            setChannelLoading(channelId, false);
         }
-    }, [userId, setLoading, messagesLimit, setHasMoreHistory, subscribeToNewMessages]);
+    }, [userId, messagesLimit, subscribeToNewMessages, setChannelMessages, setChannelLoading, setChannelHasMore, setChannelLastVisible]);
 
     const loadMoreHistory = useCallback(async () => {
-        if (!userId || !currentChannelId || !hasMoreHistory || !lastVisible || loadingRef.current || loadingMoreRef.current) return;
+        if (!userId || !currentChannelId || !hasMore || !lastVisible || loadingRef.current || loadingMoreRef.current) return;
 
         // 记录加载前的滚动位置
-        // recordScrollPosition();
         onBeforeLoadMore?.();
 
-        setLoadingMore(true);
-        const result = await firebaseChatService.fetchMoreMessages(
-            userId,
-            currentChannelId,
-            messagesLimit,
-            lastVisible
-        );
-        if (result.messages.length > 0) {
-            setHistoryMessages(prev => [...prev, ...result.messages]);
-            setLastVisible(result.lastVisible);
+        loadingMoreRef.current = true;
+        try {
+            const result = await firebaseChatService.fetchMoreMessages(
+                userId,
+                currentChannelId,
+                messagesLimit,
+                lastVisible
+            );
+            
+            if (result.messages.length > 0) {
+                // 合并历史消息到现有消息
+                const currentMessages = channelState.messages;
+                const updatedMessages = [...result.messages, ...currentMessages];
+                setChannelMessages(currentChannelId, updatedMessages);
+                setChannelLastVisible(currentChannelId, result.lastVisible);
+            }
+            
+            setChannelHasMore(currentChannelId, !result.allLoaded);
+        } catch (error) {
+            console.error('Error loading more messages:', error);
+        } finally {
+            loadingMoreRef.current = false;
         }
-        setHasMoreHistory(!result.allLoaded);
-        setLoadingMore(false);
-    }, [userId, currentChannelId, hasMoreHistory, lastVisible, loadingRef, loadingMoreRef, onBeforeLoadMore, setLoadingMore, messagesLimit, setHasMoreHistory]);
+    }, [userId, currentChannelId, hasMore, lastVisible, loadingRef, loadingMoreRef, onBeforeLoadMore, messagesLimit, channelState.messages, setChannelMessages, setChannelHasMore, setChannelLastVisible]);
 
     useEffect(() => {
-        onHistoryMessagesChange?.(historyMessages);
-    }, [historyMessages, onHistoryMessagesChange]);
+        onHistoryMessagesChange?.(messages);
+    }, [messages, onHistoryMessagesChange]);
 
     const refresh = useCallback(() => {
         if (currentChannelId) {
-            setInitialMessages([]);
-            setNewMessages([]);
-            setHistoryMessages([]);
-            setLastVisible(null);
-            setHasMoreHistory(true);
+            // 清除channel消息并重新加载
+            clearChannelMessages(currentChannelId);
+            setChannelHasMore(currentChannelId, true);
             loadInitialMessages(currentChannelId);
         }
-    }, [currentChannelId, loadInitialMessages, setHasMoreHistory]);
+    }, [currentChannelId, loadInitialMessages, clearChannelMessages, setChannelHasMore]);
 
     useEffect(() => {
         if (currentChannelId) {
-            setInitialMessages([]);
-            setNewMessages([]);
-            setHistoryMessages([]);
-            setLastVisible(null);
-            setHasMoreHistory(true);
-            loadInitialMessages(currentChannelId)
+            // 清除channel消息并重新加载
+            clearChannelMessages(currentChannelId);
+            setChannelHasMore(currentChannelId, true);
+            loadInitialMessages(currentChannelId);
         }
 
         return () => {
@@ -156,7 +170,7 @@ export const useChannelMessages = ({
                 newMessagesUnsubscribeRef.current = null;
             }
         };
-    }, [currentChannelId, loadInitialMessages, setHasMoreHistory]);
+    }, [currentChannelId, loadInitialMessages, clearChannelMessages, setChannelHasMore]);
 
     useEffect(() => {
         return () => {
@@ -167,10 +181,10 @@ export const useChannelMessages = ({
     }, []);
 
     return {
-        messages: allMessages,
+        messages,
         loading,
-        hasMore: hasMoreHistory,
-        hasMoreRef: setHasMoreHistoryRef,
+        hasMore,
+        hasMoreRef,
         loadingRef,
         loadMore: loadMoreHistory,
         loadingMoreRef,

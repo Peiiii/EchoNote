@@ -11,11 +11,11 @@ interface ListNotesToolRenderProps {
 
 export function ListNotesToolRender({ limit, channelId }: ListNotesToolRenderProps) {
     const chatDataStore = useChatDataStore();
-    
+
     // 获取channel名称
     const channel = chatDataStore.channels.find((ch: Channel) => ch.id === channelId);
     const channelName = channel?.name || channelId;
-    
+
     return (
         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
             <List className="w-4 h-4" />
@@ -44,28 +44,28 @@ export function createListNotesTool(channelId: string): Tool {
             try {
                 const args = JSON.parse(toolCall.function.arguments);
                 const { limit = 10 } = args;
-                
+
                 const chatDataStore = useChatDataStore.getState();
-                
+
                 // 获取channel名称
                 const channel = chatDataStore.channels.find((ch: Channel) => ch.id === channelId);
                 const channelName = channel?.name || channelId;
-                
+
                 const notes = chatDataStore.messages
                     .filter((msg: Message) => msg.channelId === channelId)
                     .slice(-limit);
-                
+                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, messages: chatDataStore.messages, channels: chatDataStore.channels ,chatDataStore});
                 // 简洁的结果格式，使用channel名称
-                const resultText = `Found ${notes.length} notes in ${channelName}:\n${notes.map((note: Message) => 
+                const resultText = `Found ${notes.length} notes in ${channelName}:\n${notes.map((note: Message) =>
                     `• ${note.content.substring(0, 60)}${note.content.length > 60 ? '...' : ''}`
                 ).join('\n')}`;
-                
+
                 return {
                     toolCallId: toolCall.id,
                     result: resultText,
                     state: 'result' as const
                 };
-                
+
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 return {
@@ -79,7 +79,7 @@ export function createListNotesTool(channelId: string): Tool {
         render: (toolInvocation) => {
             const args = toolInvocation.args as { limit?: number };
             const { limit = 10 } = args;
-            
+
             return (
                 <ListNotesToolRender
                     limit={limit}

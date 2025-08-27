@@ -1,6 +1,7 @@
 import { firebaseChatService } from "@/common/services/firebase/firebase-chat.service";
 import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
+import { DocumentSnapshot } from "firebase/firestore";
 
 export interface AIAnalysis {
   keywords: string[];
@@ -39,12 +40,23 @@ export interface Channel {
   lastMessageTime?: Date;
 }
 
+// 新增：Channel级别的消息状态类型
+export interface ChannelMessageState {
+  messages: Message[];
+  loading: boolean;
+  hasMore: boolean;
+  lastVisible: DocumentSnapshot | null;
+}
+
 export interface ChatDataState {
   channels: Channel[];
   messages: Message[]; // Keep for backward compatibility
   userId: string | null;
   unsubscribeChannels: (() => void) | null;
   isListenerEnabled: boolean;
+
+  // 新增：channel级别的消息管理
+  messagesByChannel: Record<string, ChannelMessageState>;
 
   // Actions
   addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => Promise<void>;
@@ -55,6 +67,14 @@ export interface ChatDataState {
   addThreadMessage: (parentMessageId: string, message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">) => Promise<void>;
   restoreMessage: (messageId: string) => Promise<void>;
   permanentDeleteMessage: (messageId: string) => Promise<void>;
+
+  // 新增：channel消息管理actions
+  setChannelMessages: (channelId: string, messages: Message[]) => void;
+  addChannelMessage: (channelId: string, message: Message) => void;
+  setChannelLoading: (channelId: string, loading: boolean) => void;
+  setChannelHasMore: (channelId: string, hasMore: boolean) => void;
+  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
+  clearChannelMessages: (channelId: string) => void;
 
   // Firebase integration
   initFirebaseListeners: (userId: string) => Promise<void>;
@@ -84,6 +104,9 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   userId: null,
   unsubscribeChannels: null,
   isListenerEnabled: true,
+
+  // 新增：channel级别的消息管理
+  messagesByChannel: {},
 
   addChannel: withUserValidation(async (userId, channel) => {
     await withErrorHandling(
@@ -153,6 +176,81 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     );
   }),
 
+  // 新增：channel消息管理actions
+  setChannelMessages: (channelId: string, messages: Message[]) => {
+    set(state => ({
+      messagesByChannel: {
+        ...state.messagesByChannel,
+        [channelId]: {
+          ...state.messagesByChannel[channelId],
+          messages,
+          loading: false
+        }
+      }
+    }));
+  },
+
+  addChannelMessage: (channelId: string, message: Message) => {
+    set(state => {
+      const currentChannel = state.messagesByChannel[channelId];
+      if (!currentChannel) return state;
+
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [channelId]: {
+            ...currentChannel,
+            messages: [...currentChannel.messages, message]
+          }
+        }
+      };
+    });
+  },
+
+  setChannelLoading: (channelId: string, loading: boolean) => {
+    set(state => ({
+      messagesByChannel: {
+        ...state.messagesByChannel,
+        [channelId]: {
+          ...state.messagesByChannel[channelId],
+          loading
+        }
+      }
+    }));
+  },
+
+  setChannelHasMore: (channelId: string, hasMore: boolean) => {
+    set(state => ({
+      messagesByChannel: {
+        ...state.messagesByChannel,
+        [channelId]: {
+          ...state.messagesByChannel[channelId],
+          hasMore
+        }
+      }
+    }));
+  },
+
+  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => {
+    set(state => ({
+      messagesByChannel: {
+        ...state.messagesByChannel,
+        [channelId]: {
+          ...state.messagesByChannel[channelId],
+          lastVisible
+        }
+      }
+    }));
+  },
+
+  clearChannelMessages: (channelId: string) => {
+    set(state => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [channelId]: removed, ...rest } = state.messagesByChannel;
+      return { messagesByChannel: rest };
+    });
+  },
+
   initFirebaseListeners: async (userId: string) => {
     get().cleanupListeners();
     set({ userId });
@@ -183,7 +281,9 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     set({
       unsubscribeChannels: null,
       channels: [],
+      messages: [], // Clear messages when cleaning up
       userId: null,
+      messagesByChannel: {}, // Clear channel messages when cleaning up
     });
   },
 
