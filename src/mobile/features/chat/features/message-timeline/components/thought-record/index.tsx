@@ -1,20 +1,20 @@
-import { Message } from "@/core/stores/chat-data.store";
+import { Button } from "@/common/components/ui/button";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger
+} from "@/common/components/ui/popover";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { MoreHorizontal, Edit2, MessageCircle, Lightbulb, Eye, Bookmark, Copy, Trash2 } from "lucide-react";
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { MobileInlineEditor } from "./mobile-inline-editor";
 import { MobileMarkdownContent } from "./mobile-markdown-content";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
-import { MobileInlineEditor } from "./mobile-inline-editor";
-import { Button } from "@/common/components/ui/button";
-import { 
-    Popover, 
-    PopoverContent, 
-    PopoverTrigger 
-} from "@/common/components/ui/popover";
 
 interface MobileThoughtRecordProps {
     message: Message;
@@ -23,13 +23,13 @@ interface MobileThoughtRecordProps {
     threadCount?: number;
 }
 
-export const MobileThoughtRecord = ({ 
-    message, 
-    onOpenThread, 
+export const MobileThoughtRecord = ({
+    message,
+    onOpenThread,
     onReply,
-    threadCount = 0 
+    threadCount = 0
 }: MobileThoughtRecordProps) => {
-    const { deleteMessage } = useChatDataStore();
+    const { deleteMessage } = channelMessageService;
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -44,7 +44,7 @@ export const MobileThoughtRecord = ({
         cancel,
         switchToExpandedMode
     } = useEditStateStore();
-    
+
     const isEditing = editingMessageId === message.id;
 
     const aiAnalysis = message.aiAnalysis;
@@ -61,10 +61,10 @@ export const MobileThoughtRecord = ({
     };
 
     const handleDelete = async () => {
-        const messagePreview = message.content.length > 100 
-            ? `${message.content.substring(0, 100)}...` 
+        const messagePreview = message.content.length > 100
+            ? `${message.content.substring(0, 100)}...`
             : message.content;
-            
+
         const confirmed = window.confirm(
             `🗑️ Delete Thought\n\n` +
             `"${messagePreview}"\n\n` +
@@ -72,10 +72,13 @@ export const MobileThoughtRecord = ({
             `The thought will be moved to trash.\n\n` +
             `Are you sure you want to continue?`
         );
-        
+
         if (confirmed) {
             try {
-                await deleteMessage(message.id, false); // Soft delete
+                await deleteMessage({
+                    messageId: message.id,
+                    channelId: message.channelId,
+                });
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
@@ -140,8 +143,8 @@ export const MobileThoughtRecord = ({
                                 <MoreHorizontal className="w-4 h-4" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent 
-                            className="w-56 p-2" 
+                        <PopoverContent
+                            className="w-56 p-2"
                             align="end"
                             side="bottom"
                         >
@@ -157,7 +160,7 @@ export const MobileThoughtRecord = ({
                                     <Edit2 className="w-4 h-4 mr-2" />
                                     Edit
                                 </Button>
-                                
+
                                 {onReply && (
                                     <Button
                                         variant="ghost"
@@ -188,7 +191,7 @@ export const MobileThoughtRecord = ({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => {}}
+                                    onClick={() => { }}
                                     disabled={isEditing}
                                     className="w-full justify-start h-9 px-3 text-sm"
                                 >
@@ -199,7 +202,7 @@ export const MobileThoughtRecord = ({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => {}}
+                                    onClick={() => { }}
                                     disabled={isEditing}
                                     className="w-full justify-start h-9 px-3 text-sm"
                                 >
