@@ -14,9 +14,6 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
         setRightSidebarSize 
     } = useViewStateStore();
 
-    // Only update store when rightSidebar prop changes
-    // Don't sync visibility state to avoid conflicts with user preferences
-
     // Calculate content panel size based on right sidebar
     const contentPanelSize = rightSidebar ? (100 - rightSidebarSize) : 100;
 
@@ -24,7 +21,6 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
         <ResizablePanelGroup
             direction="horizontal"
             className="flex-1 min-h-0"
-            key={rightSidebar ? 'with-sidebar' : 'without-sidebar'}
         >
             {/* Center content area */}
             <ResizablePanel
