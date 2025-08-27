@@ -1,14 +1,16 @@
 import { Channel } from "@/core/stores/chat-data.store";
 import { Hash } from "lucide-react";
 import { cn } from "@/common/lib/utils";
+import { MobileChannelMoreActionsMenu } from "./mobile-channel-more-actions-menu";
 
 interface MobileChannelItemProps {
     channel: Channel;
     isActive: boolean;
     onClick: () => void;
+    onDelete?: () => void;
 }
 
-export function MobileChannelItem({ channel, isActive, onClick }: MobileChannelItemProps) {
+export function MobileChannelItem({ channel, isActive, onClick, onDelete }: MobileChannelItemProps) {
     return (
         <button
             onClick={onClick}
@@ -42,6 +44,16 @@ export function MobileChannelItem({ channel, isActive, onClick }: MobileChannelI
                     </div>
                 )}
             </div>
+
+            {/* More Actions Button - Always visible on mobile */}
+            {onDelete && (
+                <div className="flex-shrink-0">
+                    <MobileChannelMoreActionsMenu 
+                        channel={channel}
+                        onDelete={onDelete}
+                    />
+                </div>
+            )}
         </button>
     );
 }

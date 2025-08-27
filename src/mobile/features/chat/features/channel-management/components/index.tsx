@@ -11,8 +11,8 @@ interface MobileChannelListProps {
 }
 
 export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileChannelListProps) {
-    const { channels, addChannel } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
+    const { channels, addChannel, deleteChannel } = useChatDataStore();
+    const { currentChannelId, setCurrentChannel } = useChatViewStore();
 
     const handleAddChannel = (channel: { name: string; description: string }) => {
         addChannel(channel);
@@ -20,6 +20,36 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
 
     const handleChannelClick = (channelId: string) => {
         onChannelSelect(channelId);
+    };
+
+    const handleDeleteChannel = async (channelId: string) => {
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel) return;
+
+        const confirmed = window.confirm(
+            `🗑️ Delete Channel\n\n` +
+            `"${channel.name}"\n\n` +
+            `⚠️ This action cannot be undone.\n` +
+            `The channel and all its messages will be moved to trash.\n\n` +
+            `Are you sure you want to continue?`
+        );
+
+        if (confirmed) {
+            try {
+                await deleteChannel(channelId);
+                // If the deleted channel was the current channel, switch to first available channel
+                if (currentChannelId === channelId && channels.length > 1) {
+                    const remainingChannels = channels.filter(c => c.id !== channelId);
+                    if (remainingChannels.length > 0) {
+                        setCurrentChannel(remainingChannels[0].id);
+                        onChannelSelect(remainingChannels[0].id);
+                    }
+                }
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
+            }
+        }
     };
 
     return (
@@ -49,6 +79,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
                                 channel={channel}
                                 isActive={currentChannelId === channel.id}
                                 onClick={() => handleChannelClick(channel.id)}
+                                onDelete={() => handleDeleteChannel(channel.id)}
                             />
                         ))}
                     </div>
