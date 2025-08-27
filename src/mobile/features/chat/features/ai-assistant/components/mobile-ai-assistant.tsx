@@ -24,7 +24,7 @@ export const MobileAIAssistant = ({
     // Get channel context
     const contexts = useMemo(() => {
         const context = aiAgentFactory.getChannelContext(channelId);
-        return context ? [context] : [];
+        return context;
     }, [channelId]);
 
     return (
