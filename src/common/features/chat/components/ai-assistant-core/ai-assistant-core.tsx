@@ -13,6 +13,7 @@ interface AIAssistantCoreProps {
     showHeader?: boolean;
     showFooter?: boolean;
     variant?: 'sidebar' | 'fullscreen';
+    extra?: React.ReactNode;
 }
 
 export function AIAssistantCore({
@@ -24,7 +25,8 @@ export function AIAssistantCore({
     className = "",
     showHeader = true,
     showFooter = true,
-    variant = 'sidebar'
+    variant = 'sidebar',
+    extra
 }: AIAssistantCoreProps) {
     if (!isOpen) return null;
 
@@ -56,6 +58,8 @@ export function AIAssistantCore({
                             </span>
                         )}
                     </div>
+                    {/* Custom header content (e.g., close button) */}
+                    {extra}
                 </div>
             )}
 
