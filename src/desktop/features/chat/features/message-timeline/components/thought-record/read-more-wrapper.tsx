@@ -59,7 +59,7 @@ export function ReadMoreWrapper({
     };
 
     return (
-        <div className={cn(className, "flex flex-col overflow-hidden")}>
+        <div data-testid="read-more-wrapper" className={cn(className, "flex flex-col overflow-hidden pb-3")}>
             <div className="relative">
                 <div
                     ref={contentRef}
@@ -94,7 +94,7 @@ export function ReadMoreWrapper({
 
                 {/* 收起按钮：与展开按钮保持苹果风格的一致性 */}
                 {isExpanded && showReadMore && (
-                    <div className="flex justify-center mt-3">
+                    <div className="flex justify-center">
                         <ReadMoreButton
                             onClick={toggleExpanded}
                             icon={<ChevronUp className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-y-0.5" />}

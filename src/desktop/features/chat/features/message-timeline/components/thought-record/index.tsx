@@ -228,7 +228,7 @@ export function ThoughtRecord({
 
                 {/* Footer - Hide when editing */}
                 {!isEditing && (
-                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-4">
+                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
                         <div className="flex items-center gap-4">
                             <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
                                 {message.content.length} characters
