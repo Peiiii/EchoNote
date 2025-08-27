@@ -1,6 +1,6 @@
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
-import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 export const useMobileChatState = () => {
     const { currentChannelId } = useChatViewStore();
     const { channels } = useChatDataStore();
-    const { messages, hasMore, loadMore } = usePaginatedMessages(20);
+    const { messages, hasMore, loadMore } = useChannelMessages({ messagesLimit: 20 });
     
     // Use specialized hooks
     const { containerRef, isSticky, scrollToBottom } = useChatScroll([currentChannelId, messages.length]);

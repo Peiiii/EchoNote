@@ -199,7 +199,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     _threadId: string
   ): Message[] => {
     // This method is no longer needed as thread messages are handled per-channel
-    // Return empty array - thread messages are now managed by usePaginatedMessages
+    // Return empty array - thread messages are now managed by useChannelMessages
     return [];
   },
 
@@ -264,7 +264,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   getDeletedMessages: () => {
     // This method is no longer needed as messages are handled per-channel
-    // Return empty array - deleted messages are now managed by usePaginatedMessages
+    // Return empty array - deleted messages are now managed by useChannelMessages
     return [];
   },
 

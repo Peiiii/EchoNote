@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 export function useThreadSidebar() {
-    const { messages } = usePaginatedMessages(20);
+    const { messages } = useChannelMessages({ messagesLimit: 20 });
     const { addThreadMessage } = useChatDataStore();
     
     // Thread sidebar state
