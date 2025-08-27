@@ -118,4 +118,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Hide scrollbars for channel list to prevent flashing */
+  .channel-list-content::-webkit-scrollbar {
+    display: none;
+  }
 }

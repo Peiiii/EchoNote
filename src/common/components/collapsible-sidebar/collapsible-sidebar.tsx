@@ -72,6 +72,7 @@ const CollapsibleSidebarRoot = ({
     return (
         <CollapsibleSidebarContext.Provider value={contextValue}>
             <div
+                data-component="collapsible-sidebar"
                 className={cn(
                     "flex-shrink-0 border-r border-border bg-card transition-all duration-300 ease-in-out overflow-hidden",
                     isCollapsed ? collapsedWidth : width,
@@ -162,7 +163,7 @@ interface ContentProps {
 
 const CollapsibleSidebarContent = ({ children, className = "" }: ContentProps) => {
     return (
-        <div className={cn("flex-1", className)}>
+        <div data-component="collapsible-sidebar-content" className={cn("flex-1 overflow-hidden", className)}>
             {children}
         </div>
     );
