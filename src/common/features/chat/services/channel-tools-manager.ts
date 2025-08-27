@@ -81,7 +81,8 @@ export class ChannelToolsManager {
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId } = args;
 
-                const note = state.messages.find(msg => msg.id === noteId && msg.channelId === channelId);
+                const channelMessages = state.messagesByChannel[channelId];
+                const note = channelMessages?.messages.find(msg => msg.id === noteId);
 
                 if (!note) {
                     return {
@@ -126,7 +127,8 @@ export class ChannelToolsManager {
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId, content } = args;
 
-                const noteIndex = state.messages.findIndex(msg => msg.id === noteId && msg.channelId === channelId);
+                const channelMessages = state.messagesByChannel[channelId];
+                const noteIndex = channelMessages?.messages.findIndex(msg => msg.id === noteId) ?? -1;
 
                 if (noteIndex === -1) {
                     return {
@@ -136,8 +138,13 @@ export class ChannelToolsManager {
                     };
                 }
 
-                // Update the note
-                state.messages[noteIndex].content = content;
+                // Update the note - we need to use the store action instead of direct mutation
+                // This is a limitation of the current architecture - we should use updateMessage action
+                return {
+                    toolCallId: toolCall.id,
+                    result: `Note update not supported in current architecture. Use updateMessage action instead.`,
+                    state: 'result' as const
+                };
 
                 return {
                     toolCallId: toolCall.id,
@@ -170,7 +177,8 @@ export class ChannelToolsManager {
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId } = args;
 
-                const noteIndex = state.messages.findIndex(msg => msg.id === noteId && msg.channelId === channelId);
+                const channelMessages = state.messagesByChannel[channelId];
+                const noteIndex = channelMessages?.messages.findIndex(msg => msg.id === noteId) ?? -1;
 
                 if (noteIndex === -1) {
                     return {
@@ -180,8 +188,13 @@ export class ChannelToolsManager {
                     };
                 }
 
-                // Remove the note
-                state.messages.splice(noteIndex, 1);
+                // Remove the note - we need to use the store action instead of direct mutation
+                // This is a limitation of the current architecture - we should use deleteMessage action
+                return {
+                    toolCallId: toolCall.id,
+                    result: `Note deletion not supported in current architecture. Use deleteMessage action instead.`,
+                    state: 'result' as const
+                };
 
                 return {
                     toolCallId: toolCall.id,

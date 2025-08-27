@@ -11,7 +11,8 @@ export class ChannelContextManager {
     // Get channel and message data
     const state = useChatDataStore.getState();
     const channel = state.channels.find(ch => ch.id === channelId);
-    const messages = state.messages.filter(msg => msg.channelId === channelId);
+    const channelMessages = state.messagesByChannel[channelId];
+    const messages = channelMessages?.messages || [];
     
     if (!channel) {
       return {

@@ -50,12 +50,11 @@ export interface ChannelMessageState {
 
 export interface ChatDataState {
   channels: Channel[];
-  messages: Message[]; // Keep for backward compatibility
   userId: string | null;
   unsubscribeChannels: (() => void) | null;
   isListenerEnabled: boolean;
 
-  // 新增：channel级别的消息管理
+  // Channel级别的消息管理
   messagesByChannel: Record<string, ChannelMessageState>;
 
   // Actions
@@ -100,12 +99,11 @@ const withErrorHandling = async <T>(operation: () => Promise<T>, operationName: 
 
 export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   channels: [],
-  messages: [], // Keep for backward compatibility
   userId: null,
   unsubscribeChannels: null,
   isListenerEnabled: true,
 
-  // 新增：channel级别的消息管理
+  // Channel级别的消息管理
   messagesByChannel: {},
 
   addChannel: withUserValidation(async (userId, channel) => {
@@ -273,19 +271,18 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     set({ unsubscribeChannels });
   },
 
-  cleanupListeners: () => {
-    const { unsubscribeChannels } = get();
-    if (unsubscribeChannels) {
-      unsubscribeChannels();
-    }
-    set({
-      unsubscribeChannels: null,
-      channels: [],
-      messages: [], // Clear messages when cleaning up
-      userId: null,
-      messagesByChannel: {}, // Clear channel messages when cleaning up
-    });
-  },
+          cleanupListeners: () => {
+          const { unsubscribeChannels } = get();
+          if (unsubscribeChannels) {
+            unsubscribeChannels();
+          }
+          set({
+            unsubscribeChannels: null,
+            channels: [],
+            userId: null,
+            messagesByChannel: {}, // Clear channel messages when cleaning up
+          });
+        },
 
   fetchInitialData: async (userId: string) => {
     await withErrorHandling(async () => {

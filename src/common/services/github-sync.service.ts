@@ -23,9 +23,12 @@ export class GitHubSyncService {
             await this.syncChannelToGitHub(channel);
         }
 
-        // 同步消息数据
-        for (const message of dataStore.messages) {
-            await this.syncMessageToGitHub(message);
+        // 同步消息数据 - 遍历所有channel的消息
+        for (const channelId in dataStore.messagesByChannel) {
+            const channelMessages = dataStore.messagesByChannel[channelId];
+            for (const message of channelMessages.messages) {
+                await this.syncMessageToGitHub(message);
+            }
         }
     }
 
@@ -110,8 +113,13 @@ export class GitHubSyncService {
         const dataStore = useChatDataStore.getState();
 
         for (const chatMessage of messages) {
-            // 检查消息是否已存在
-            const existingMessage = dataStore.messages.find(msg => msg.id === chatMessage.id);
+            // 检查消息是否已存在 - 在所有channel中查找
+            let existingMessage = null;
+            for (const channelId in dataStore.messagesByChannel) {
+                const channelMessages = dataStore.messagesByChannel[channelId];
+                existingMessage = channelMessages.messages.find(msg => msg.id === chatMessage.id);
+                if (existingMessage) break;
+            }
             if (existingMessage) continue;
 
             // 添加新消息

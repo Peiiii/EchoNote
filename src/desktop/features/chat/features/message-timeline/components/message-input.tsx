@@ -1,7 +1,10 @@
+
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+
 
 interface MessageInputProps {
     onSend: () => void;
@@ -13,11 +16,31 @@ interface MessageInputProps {
 export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { addMessage, addThreadMessage, messages } = useChatDataStore();
+    const addMessage = useChatDataStore(state => state.addMessage);
+    const addThreadMessage = useChatDataStore(state => state.addThreadMessage);
     const { currentChannelId, isAddingMessage } = useChatViewStore();
 
-    // Get the message being replied to
-    const replyToMessage = replyToMessageId ? messages.find(msg => msg.id === replyToMessageId) : null;
+    // 遵循Zustand最佳实践：分别订阅不同的状态
+    const {messages: channelMessages} = useChatDataStore(state => 
+        currentChannelId ? state.messagesByChannel[currentChannelId] || {
+            messages: [],
+            loading: false,
+            hasMore: true,
+            lastVisible: null
+        } : {
+            messages: [],
+            loading: false,
+            hasMore: true,
+            lastVisible: null
+        }
+    );
+    
+    // 使用useMemo避免每次渲染都重新计算
+    const replyToMessage = useMemo(() => 
+        replyToMessageId && channelMessages.length > 0 
+            ? channelMessages.find(msg => msg.id === replyToMessageId) 
+            : null
+    , [replyToMessageId, channelMessages]);
 
     const handleSend = async () => {
         if (!message.trim() || !currentChannelId) return;

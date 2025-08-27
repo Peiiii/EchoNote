@@ -51,10 +51,9 @@ export function createListNotesTool(channelId: string): Tool {
                 const channel = chatDataStore.channels.find((ch: Channel) => ch.id === channelId);
                 const channelName = channel?.name || channelId;
 
-                const notes = chatDataStore.messages
-                    .filter((msg: Message) => msg.channelId === channelId)
-                    .slice(-limit);
-                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, messages: chatDataStore.messages, channels: chatDataStore.channels ,chatDataStore});
+                const channelMessages = chatDataStore.messagesByChannel[channelId];
+                const notes = channelMessages?.messages || [];
+                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, channelMessages, channels: chatDataStore.channels, chatDataStore });
                 // 简洁的结果格式，使用channel名称
                 const resultText = `Found ${notes.length} notes in ${channelName}:\n${notes.map((note: Message) =>
                     `• ${note.content.substring(0, 60)}${note.content.length > 60 ? '...' : ''}`
