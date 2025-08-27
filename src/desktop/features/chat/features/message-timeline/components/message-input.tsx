@@ -14,7 +14,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { addMessage, addThreadMessage, messages } = useChatDataStore();
-    const { currentChannelId, isAddingMessage, setIsAddingMessage } = useChatViewStore();
+    const { currentChannelId, isAddingMessage } = useChatViewStore();
 
     // Get the message being replied to
     const replyToMessage = replyToMessageId ? messages.find(msg => msg.id === replyToMessageId) : null;
@@ -42,27 +42,6 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
         onSend();
 
         setMessage("");
-        setIsAddingMessage(true);
-
-        // Simulate AI response
-        setTimeout(() => {
-            if (replyToMessageId) {
-                // Add to thread
-                addThreadMessage(replyToMessageId, {
-                    content: "This is an AI response as an annotation to your message.",
-                    sender: "ai" as const,
-                    channelId: currentChannelId,
-                });
-            } else {
-                // Regular AI response
-                addMessage({
-                    content: "This is an AI response as an annotation to your content.",
-                    sender: "ai" as const,
-                    channelId: currentChannelId,
-                });
-            }
-            setIsAddingMessage(false);
-        }, 1000);
     };
 
 
@@ -168,8 +147,8 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
                                 onClick={handleSend}
                                 disabled={!message.trim() || isAddingMessage}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${message.trim() && !isAddingMessage
-                                        ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
-                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
+                                    ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
+                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                                     }`}
                             >
                                 <Send className="w-4 h-4" />

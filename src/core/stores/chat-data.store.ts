@@ -1,4 +1,5 @@
 import { firebaseChatService } from "@/common/services/firebase/firebase-chat.service";
+import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
 
 export interface AIAnalysis {
@@ -213,12 +214,13 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     // First load initial data
     await get().fetchInitialData(userId);
 
-    // Migrate existing channels data (if needed)
-    // try {
-    //   await firebaseChatService.migrateExistingChannels(userId);
-    // } catch (error) {
-    //   console.error('Error during channel migration:', error);
-    // }
+    // Migrate existing data to ensure data model consistency
+    try {
+      await firebaseMigrateService.runAllMigrations(userId);
+      console.log('All migrations completed successfully');
+    } catch (error) {
+      console.error('Error during migrations:', error);
+    }
 
     // Subscribe to channels only (messages are now handled per-channel)
     const unsubscribeChannels = firebaseChatService.subscribeToChannels(

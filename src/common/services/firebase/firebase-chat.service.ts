@@ -19,7 +19,30 @@ import {
 import { db } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/chat-data.store";
 
-// 类型转换辅助函数
+/**
+ * Firebase Chat Service - Handle Firebase operations related to chat
+ * 
+ * Important notes about the isDeleted field:
+ * 
+ * 1. Data model standardization:
+ *    - All new messages will automatically include isDeleted: false
+ *    - Use where("isDeleted", "==", false) to query non-deleted messages
+ *    - This allows efficient use of Firestore indexes, optimal performance
+ * 
+ * 2. Data migration:
+ *    - Use migrateMessagesForIsDeleted() to add isDeleted field to existing messages
+ *    - It is recommended to execute this once when the application starts
+ * 
+ * 3. Query optimization:
+ *    - Avoid using where("isDeleted", "!=", true), because it will exclude documents without the field
+ *    - Use where("isDeleted", "==", false) to ensure only non-deleted messages are returned
+ * 
+ * 4. Soft delete process:
+ *    - Call softDeleteMessage() to set isDeleted: true
+ *    - Call restoreMessage() to restore messages
+ *    - Call permanentDeleteMessage() to permanently delete messages
+ */
+// Type conversion helper functions
 const docToChannel = (doc: DocumentSnapshot): Channel => {
   const data = doc.data()!;
   return {
@@ -46,7 +69,7 @@ const docToMessage = (doc: DocumentSnapshot): Message => {
     isThreadExpanded: data.isThreadExpanded,
     threadCount: data.threadCount,
     aiAnalysis: data.aiAnalysis,
-    // 删除相关字段
+    // Deletion related fields
     isDeleted: data.isDeleted || false,
     deletedAt: data.deletedAt ? (data.deletedAt as Timestamp).toDate() : undefined,
     deletedBy: data.deletedBy,
@@ -54,72 +77,21 @@ const docToMessage = (doc: DocumentSnapshot): Message => {
   };
 };
 
-// 获取集合引用的辅助函数
+// Helper functions to get collection references
 const getChannelsCollectionRef = (userId: string) =>
   collection(db, `users/${userId}/channels`);
 const getMessagesCollectionRef = (userId: string) =>
   collection(db, `users/${userId}/messages`);
 
 export const firebaseChatService = {
-  // Data migration method for existing channels
-  // migrateExistingChannels: async (userId: string): Promise<void> => {
-  //   try {
-  //     const channelsSnapshot = await getDocs(getChannelsCollectionRef(userId));
-      
-  //     for (const channelDoc of channelsSnapshot.docs) {
-  //       const channelData = channelDoc.data();
-        
-  //       // 如果频道没有lastMessageTime字段，需要迁移
-  //       if (!channelData.lastMessageTime) {
-  //         const channelRef = doc(getChannelsCollectionRef(userId), channelDoc.id);
-          
-  //         // 获取该频道的最新消息时间
-  //         const messagesQuery = query(
-  //           getMessagesCollectionRef(userId),
-  //           where("channelId", "==", channelDoc.id),
-  //           orderBy("timestamp", "desc"),
-  //           limit(1)
-  //         );
-          
-  //         const messagesSnapshot = await getDocs(messagesQuery);
-          
-  //         if (!messagesSnapshot.empty) {
-  //           // 有消息，使用最新消息时间
-  //           const latestMessage = messagesSnapshot.docs[0];
-  //           const latestTimestamp = latestMessage.data().timestamp;
-            
-  //           await updateDoc(channelRef, {
-  //             lastMessageTime: latestTimestamp,
-  //             messageCount: messagesSnapshot.size
-  //           });
-  //         } else {
-  //           // 没有消息，使用创建时间
-  //           await updateDoc(channelRef, {
-  //             lastMessageTime: channelData.createdAt || serverTimestamp(),
-  //             messageCount: 0
-  //           });
-  //         }
-  //       }
-  //     }
-      
-  //     console.log('Channel migration completed successfully');
-  //   } catch (error) {
-  //     console.error('Error migrating channels:', error);
-  //   }
-  // },
-
   // Channel Services
   subscribeToChannels: (
     userId: string,
     onUpdate: (channels: Channel[]) => void
   ): (() => void) => {
-    console.log("🔔 [Firebase] [subscribeToChannels]:", {
-      userId,
-      timestamp: new Date().toISOString()
-    });
     const q = query(
       getChannelsCollectionRef(userId),
-      orderBy("lastMessageTime", "desc") // 按最后消息时间降序排序
+      orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
     );
 
     const unsubscribe = onSnapshot(
@@ -143,16 +115,14 @@ export const firebaseChatService = {
     messagesLimit: number,
     onUpdate: (messages: Message[], hasMore: boolean) => void
   ): (() => void) => {
-    console.log("🔔 [Firebase] [subscribeToChannelMessages]:", {
-      userId,
-      channelId,
-      messagesLimit,
-      timestamp: new Date().toISOString()
-    });
-    
+
+
+    // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
+      where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
+      where("sender", "==", "user"),
       orderBy("timestamp", "asc"),
       limit(messagesLimit)
     );
@@ -172,13 +142,12 @@ export const firebaseChatService = {
     return unsubscribe;
   },
 
-  // 获取频道列表（一次性加载）
   fetchChannels: async (userId: string): Promise<Channel[]> => {
     const q = query(
       getChannelsCollectionRef(userId),
-      orderBy("lastMessageTime", "desc") // 按最后消息时间降序排序
+      orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(docToChannel);
   },
@@ -191,7 +160,7 @@ export const firebaseChatService = {
       ...channelData,
       createdAt: serverTimestamp(),
       messageCount: 0,
-      lastMessageTime: serverTimestamp(), // 初始化最后消息时间为创建时间
+      lastMessageTime: serverTimestamp(), // Initialize last message time
     });
     return docRef.id;
   },
@@ -210,9 +179,12 @@ export const firebaseChatService = {
     channelId: string,
     messagesLimit: number
   ) => {
+    // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
+      where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
+      where("sender", "==", "user"),
       orderBy("timestamp", "asc"),
       limit(messagesLimit)
     );
@@ -231,16 +203,13 @@ export const firebaseChatService = {
     messagesLimit: number,
     cursor: DocumentSnapshot
   ) => {
-    console.log("🔔 [Firebase] [fetchMoreMessages]:", {
-      userId,
-      channelId,
-      messagesLimit,
-      cursor: cursor.id,
-      timestamp: new Date().toISOString()
-    });
+
+    // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
+      where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
+      where("sender", "==", "user"),
       orderBy("timestamp", "asc"),
       startAfter(cursor),
       limit(messagesLimit)
@@ -261,15 +230,16 @@ export const firebaseChatService = {
     const docRef = await addDoc(getMessagesCollectionRef(userId), {
       ...messageData,
       timestamp: serverTimestamp(),
+      isDeleted: false, // Ensure new messages have isDeleted field
     });
-    
-    // 更新频道的最后消息时间和消息数量
+
+    // Update channel's last message time and message count
     const channelRef = doc(getChannelsCollectionRef(userId), messageData.channelId);
     await updateDoc(channelRef, {
       lastMessageTime: serverTimestamp(),
       messageCount: increment(1),
     });
-    
+
     return docRef.id;
   },
 
@@ -290,7 +260,7 @@ export const firebaseChatService = {
     await deleteDoc(messageRef);
   },
 
-  // 软删除消息
+  // Soft delete message
   softDeleteMessage: async (userId: string, messageId: string): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
@@ -300,7 +270,7 @@ export const firebaseChatService = {
     });
   },
 
-  // 恢复消息
+  // Restore message
   restoreMessage: async (userId: string, messageId: string): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
@@ -308,5 +278,32 @@ export const firebaseChatService = {
       deletedAt: null,
       deletedBy: null,
     });
+  },
+
+  // Get deleted messages (for management interface)
+  getDeletedMessages: async (userId: string, channelId?: string): Promise<Message[]> => {
+    try {
+      let q = query(
+        getMessagesCollectionRef(userId),
+        where("isDeleted", "==", true),
+        orderBy("deletedAt", "desc")
+      );
+
+      if (channelId) {
+        q = query(
+          getMessagesCollectionRef(userId),
+          where("isDeleted", "==", true),
+          where("channelId", "==", channelId),
+          where("sender", "==", "user"),
+          orderBy("deletedAt", "desc")
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(docToMessage);
+    } catch (error) {
+      console.error("🔔 [Firebase] [getDeletedMessages]: Error fetching deleted messages:", error);
+      return [];
+    }
   },
 };

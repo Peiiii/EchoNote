@@ -40,6 +40,11 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
       channelId,
       messagesLimit,
       (newMessages, hasMoreMessages) => {
+        console.log("🔔 [Firebase] [subscribeToChannelMessages]:", {
+          newMessages,
+          hasMoreMessages,
+          timestamp: new Date().toISOString()
+        });
         setMessages(newMessages);
         setHasMore(hasMoreMessages);
         setLoading(false);
