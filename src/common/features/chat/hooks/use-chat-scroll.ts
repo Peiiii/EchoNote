@@ -1,4 +1,5 @@
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
+import { useMemoizedFn } from "ahooks";
 import { useEffect, useRef, useState } from "react";
 
 export const checkCanScrollToBottom = (element: HTMLElement | null, threshold: number = 5) => {
@@ -37,10 +38,10 @@ export const useChatScroll = (deps: unknown[] = [], options: { smoothScroll?: bo
 
 
 
-    const handleScrollToBottom = (options?: { behavior?: 'smooth' | 'instant' }) => {
+    const handleScrollToBottom = useMemoizedFn((options?: { behavior?: 'smooth' | 'instant' }) => {
         setSticky(true);
         scrollToBottom({ smooth: options?.behavior === 'smooth' });
-    };
+    });
 
     return {
         containerRef,

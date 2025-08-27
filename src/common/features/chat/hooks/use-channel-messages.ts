@@ -5,7 +5,6 @@ import { useMemoizedFn } from 'ahooks';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-
 export const useStateWithRef = <T>(initialValue: T) => {
     const [value, _setValue] = useState(initialValue);
     const ref = useRef(initialValue);
@@ -16,7 +15,17 @@ export const useStateWithRef = <T>(initialValue: T) => {
     return [value, setValue, ref] as const;
 }
 
-export const useChannelMessages = (messagesLimit: number = 20) => {
+export interface UseChannelMessagesOptions {
+    messagesLimit?: number;
+    onBeforeLoadMore?: () => void;
+    onHistoryMessagesChange?: (messages: Message[]) => void;
+}
+
+export const useChannelMessages = ({
+    messagesLimit = 20,
+    onBeforeLoadMore,
+    onHistoryMessagesChange,
+}: UseChannelMessagesOptions) => {
     const { currentChannelId } = useChatViewStore();
     const { userId } = useChatDataStore();
 
@@ -32,7 +41,7 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
     // 状态管理
     const [loading, setLoading, loadingRef] = useStateWithRef(true);
     const [, setLoadingMore, loadingMoreRef] = useStateWithRef(false);
-    const [hasMoreHistory, setHasMoreHistory, hasMoreHistoryRef] = useStateWithRef(true);
+    const [hasMoreHistory, setHasMoreHistory, setHasMoreHistoryRef] = useStateWithRef(true);
     const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
 
     // Refs
@@ -44,6 +53,7 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
             (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
         );
     }, [historyMessages, initialMessages, newMessages]);
+
 
     // 订阅新消息
     const subscribeToNewMessages = useCallback((channelId: string, afterTimestamp: Date) => {
@@ -94,7 +104,11 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
     }, [userId, setLoading, messagesLimit, setHasMoreHistory, subscribeToNewMessages]);
 
     const loadMoreHistory = useCallback(async () => {
-        if (!userId || !currentChannelId || !hasMoreHistoryRef.current || !lastVisible || loadingRef.current || loadingMoreRef.current) return;
+        if (!userId || !currentChannelId || !hasMoreHistory || !lastVisible || loadingRef.current || loadingMoreRef.current) return;
+
+        // 记录加载前的滚动位置
+        // recordScrollPosition();
+        onBeforeLoadMore?.();
 
         setLoadingMore(true);
         const result = await firebaseChatService.fetchMoreMessages(
@@ -103,14 +117,17 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
             messagesLimit,
             lastVisible
         );
-
         if (result.messages.length > 0) {
             setHistoryMessages(prev => [...prev, ...result.messages]);
             setLastVisible(result.lastVisible);
         }
         setHasMoreHistory(!result.allLoaded);
         setLoadingMore(false);
-    }, [userId, currentChannelId, hasMoreHistoryRef, lastVisible, loadingRef, loadingMoreRef, setLoadingMore, messagesLimit, setHasMoreHistory]);
+    }, [userId, currentChannelId, hasMoreHistory, lastVisible, loadingRef, loadingMoreRef, onBeforeLoadMore, setLoadingMore, messagesLimit, setHasMoreHistory]);
+
+    useEffect(() => {
+        onHistoryMessagesChange?.(historyMessages);
+    }, [historyMessages, onHistoryMessagesChange]);
 
     const refresh = useCallback(() => {
         if (currentChannelId) {
@@ -123,7 +140,6 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
         }
     }, [currentChannelId, loadInitialMessages, setHasMoreHistory]);
 
-
     useEffect(() => {
         if (currentChannelId) {
             setInitialMessages([]);
@@ -131,7 +147,7 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
             setHistoryMessages([]);
             setLastVisible(null);
             setHasMoreHistory(true);
-            loadInitialMessages(currentChannelId);
+            loadInitialMessages(currentChannelId)
         }
 
         return () => {
@@ -154,10 +170,10 @@ export const useChannelMessages = (messagesLimit: number = 20) => {
         messages: allMessages,
         loading,
         hasMore: hasMoreHistory,
-        hasMoreRef: hasMoreHistoryRef,
+        hasMoreRef: setHasMoreHistoryRef,
         loadingRef,
         loadMore: loadMoreHistory,
         loadingMoreRef,
-        refresh
+        refresh,
     };
 };

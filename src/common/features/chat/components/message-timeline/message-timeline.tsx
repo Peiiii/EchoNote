@@ -1,7 +1,9 @@
 import { ScrollToBottomButton } from "@/common/features/chat/components/scroll-to-bottom-button";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
+import { useLazyLoadingScrollControl } from "@/common/features/chat/hooks/use-lazy-loading";
+import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/chat-data.store";
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { DateDivider } from "./date-divider";
 
 interface MessageTimelineProps {
@@ -10,6 +12,8 @@ interface MessageTimelineProps {
     groupedMessages: Record<string, Message[]>;
     messages: Message[];
     onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
+    containerRef?: React.RefObject<HTMLDivElement | null>;
+    onHistoryMessagesLoadedEvent$?: RxEvent<Message[]>;
 }
 
 export interface MessageTimelineRef {
@@ -21,10 +25,27 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
     className = "",
     groupedMessages,
     messages,
-    onScroll
+    onScroll,
+    onHistoryMessagesLoadedEvent$,
 }, ref) => {
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll([], { smoothScroll: true });
+    const { recordScrollPosition, restoreScrollPosition } = useLazyLoadingScrollControl({ containerRef });
+
+    const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+        onScroll?.(e);
+        recordScrollPosition();
+    }, [onScroll, recordScrollPosition]);
+
+
+
+    useEffect(() => {
+        return onHistoryMessagesLoadedEvent$?.listen(() => {
+            restoreScrollPosition();
+        });
+    }, [onHistoryMessagesLoadedEvent$, restoreScrollPosition]);
+
+
 
     useImperativeHandle(ref, () => ({
         scrollToBottom: scrollToBottom,
@@ -32,7 +53,8 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
 
     useEffect(() => {
         scrollToBottom({ behavior: 'instant' });
-    }, []);
+    }, [scrollToBottom]);
+
 
     return (
         <>
@@ -44,7 +66,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
                     minHeight: '100%',
                     maxHeight: '100%'
                 }}
-                onScroll={onScroll}
+                onScroll={handleScroll}
             >
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => {
                     // Filter only user messages for display (excluding thread messages)
