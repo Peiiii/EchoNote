@@ -1,4 +1,5 @@
 import { Tool } from "@agent-labs/agent-chat";
+import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { createListNotesTool } from "@/common/features/chat/components/tools/list-notes.tool";
 
@@ -34,27 +35,28 @@ export class ChannelToolsManager {
                 required: ['content']
             },
             execute: async (toolCall) => {
-                const state = useChatDataStore.getState();
                 const args = JSON.parse(toolCall.function.arguments);
                 const { content } = args;
 
-                // Create new note
-                const newNote = {
-                    id: `note_${Date.now()}`,
-                    content,
-                    timestamp: new Date().toISOString(),
-                    sender: 'user' as const,
-                    channelId
-                };
+                try {
+                    await channelMessageService.sendMessage({
+                        content,
+                        sender: 'user',
+                        channelId
+                    });
 
-                // Add to store
-                state.addMessage(newNote);
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Successfully created note: ${content.substring(0, 50)}...`,
-                    state: 'result' as const
-                };
+                    return {
+                        toolCallId: toolCall.id,
+                        result: `Successfully created note: ${content.substring(0, 50)}...`,
+                        state: 'result' as const
+                    };
+                } catch (error) {
+                    return {
+                        toolCallId: toolCall.id,
+                        result: `Failed to create note: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                        state: 'result' as const
+                    };
+                }
             }
         };
     }
@@ -77,26 +79,33 @@ export class ChannelToolsManager {
                 required: ['noteId']
             },
             execute: async (toolCall) => {
-                const state = useChatDataStore.getState();
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId } = args;
 
-                const channelMessages = state.messagesByChannel[channelId];
-                const note = channelMessages?.messages.find(msg => msg.id === noteId);
+                try {
+                    const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
+                    const note = channelState?.messages.find(msg => msg.id === noteId);
 
-                if (!note) {
+                    if (!note) {
+                        return {
+                            toolCallId: toolCall.id,
+                            result: `Note with ID ${noteId} not found`,
+                            state: 'result' as const
+                        };
+                    }
+
                     return {
                         toolCallId: toolCall.id,
-                        result: `Note with ID ${noteId} not found`,
+                        result: `Note: ${note.content}`,
+                        state: 'result' as const
+                    };
+                } catch (error) {
+                    return {
+                        toolCallId: toolCall.id,
+                        result: `Failed to read note: ${error instanceof Error ? error.message : 'Unknown error'}`,
                         state: 'result' as const
                     };
                 }
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Note: ${note.content}`,
-                    state: 'result' as const
-                };
             }
         };
     }
@@ -123,34 +132,38 @@ export class ChannelToolsManager {
                 required: ['noteId', 'content']
             },
             execute: async (toolCall) => {
-                const state = useChatDataStore.getState();
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId, content } = args;
 
-                const channelMessages = state.messagesByChannel[channelId];
-                const noteIndex = channelMessages?.messages.findIndex(msg => msg.id === noteId) ?? -1;
+                try {
+                    const { userId } = useChatDataStore.getState();
+                    if (!userId) {
+                        return {
+                            toolCallId: toolCall.id,
+                            result: `User not authenticated`,
+                            state: 'result' as const
+                        };
+                    }
 
-                if (noteIndex === -1) {
+                    await channelMessageService.updateMessage({
+                        messageId: noteId,
+                        channelId,
+                        updates: { content },
+                        userId
+                    });
+
                     return {
                         toolCallId: toolCall.id,
-                        result: `Note with ID ${noteId} not found`,
+                        result: `Successfully updated note ${noteId}: ${content.substring(0, 50)}...`,
+                        state: 'result' as const
+                    };
+                } catch (error) {
+                    return {
+                        toolCallId: toolCall.id,
+                        result: `Failed to update note: ${error instanceof Error ? error.message : 'Unknown error'}`,
                         state: 'result' as const
                     };
                 }
-
-                // Update the note - we need to use the store action instead of direct mutation
-                // This is a limitation of the current architecture - we should use updateMessage action
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Note update not supported in current architecture. Use updateMessage action instead.`,
-                    state: 'result' as const
-                };
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Successfully updated note ${noteId}: ${content.substring(0, 50)}...`,
-                    state: 'result' as const
-                };
             }
         };
     }
@@ -173,34 +186,28 @@ export class ChannelToolsManager {
                 required: ['noteId']
             },
             execute: async (toolCall) => {
-                const state = useChatDataStore.getState();
                 const args = JSON.parse(toolCall.function.arguments);
                 const { noteId } = args;
 
-                const channelMessages = state.messagesByChannel[channelId];
-                const noteIndex = channelMessages?.messages.findIndex(msg => msg.id === noteId) ?? -1;
+                try {
+                    await channelMessageService.deleteMessage({
+                        messageId: noteId,
+                        channelId,
+                        hardDelete: false
+                    });
 
-                if (noteIndex === -1) {
                     return {
                         toolCallId: toolCall.id,
-                        result: `Note with ID ${noteId} not found`,
+                        result: `Successfully deleted note ${noteId}`,
+                        state: 'result' as const
+                    };
+                } catch (error) {
+                    return {
+                        toolCallId: toolCall.id,
+                        result: `Failed to delete note: ${error instanceof Error ? error.message : 'Unknown error'}`,
                         state: 'result' as const
                     };
                 }
-
-                // Remove the note - we need to use the store action instead of direct mutation
-                // This is a limitation of the current architecture - we should use deleteMessage action
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Note deletion not supported in current architecture. Use deleteMessage action instead.`,
-                    state: 'result' as const
-                };
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Successfully deleted note ${noteId}`,
-                    state: 'result' as const
-                };
             }
         };
     }
