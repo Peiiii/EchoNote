@@ -25,8 +25,10 @@ export function AIAssistantSidebar({
     const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
 
     // Get channel context
-    const contexts = useMemo(() => [aiAgentFactory.getChannelContext(channelId)], [channelId]);
+    const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
     if (!isOpen) return null;
+
+    console.log("[AIAssistantSidebar] contexts", { contexts, tools, agent });
 
     return (
         <AIAssistantCore
