@@ -60,6 +60,7 @@ export interface ChatDataState {
   // Actions
   addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => Promise<void>;
   updateChannel: (channelId: string, updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>) => Promise<void>;
+  deleteChannel: (channelId: string) => Promise<void>;
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
   deleteMessage: (messageId: string, hardDelete?: boolean) => Promise<void>;
   updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
@@ -126,6 +127,31 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       () => firebaseChatService.updateChannel(userId, channelId, updates),
       'updateChannel'
     );
+  }),
+
+  deleteChannel: withUserValidation(async (userId, channelId) => {
+    // 调用 Firebase 服务删除 channel
+    await withErrorHandling(
+      () => firebaseChatService.deleteChannel(userId, channelId),
+      'deleteChannel'
+    );
+    
+    // 更新本地 store 状态
+    const { channels, messagesByChannel } = get();
+    
+    // 从 channels 数组中移除被删除的 channel
+    const updatedChannels = channels.filter(channel => channel.id !== channelId);
+    set({ channels: updatedChannels });
+    
+    // 从 messagesByChannel 中移除被删除 channel 的消息
+    const { [channelId]: removedChannel, ...remainingChannels } = messagesByChannel;
+    set({ messagesByChannel: remainingChannels });
+    
+    console.log('🔔 [deleteChannel] 成功删除 channel 并更新本地状态', { 
+      channelId, 
+      remainingChannelsCount: Object.keys(remainingChannels).length,
+      removedChannelMessageCount: removedChannel?.messages?.length || 0
+    });
   }),
 
   addMessage: withUserValidation(async (userId, message) => {

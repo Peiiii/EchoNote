@@ -10,13 +10,42 @@ interface ChannelListProps {
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-    const { channels, addChannel } = useChatDataStore();
+    const { channels, addChannel, deleteChannel } = useChatDataStore();
     const { currentChannelId, setCurrentChannel } = useChatViewStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasScroll, setHasScroll] = useState(false);
 
     const handleAddChannel = (channel: { name: string; description: string }) => {
         addChannel(channel);
+    };
+
+    const handleDeleteChannel = async (channelId: string) => {
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel) return;
+
+        const confirmed = window.confirm(
+            `🗑️ Delete Channel\n\n` +
+            `"${channel.name}"\n\n` +
+            `⚠️ This action cannot be undone.\n` +
+            `The channel and all its messages will be moved to trash.\n\n` +
+            `Are you sure you want to continue?`
+        );
+
+        if (confirmed) {
+            try {
+                await deleteChannel(channelId);
+                // If the deleted channel was the current channel, switch to first available channel
+                if (currentChannelId === channelId && channels.length > 1) {
+                    const remainingChannels = channels.filter(c => c.id !== channelId);
+                    if (remainingChannels.length > 0) {
+                        setCurrentChannel(remainingChannels[0].id);
+                    }
+                }
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
+            }
+        }
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,6 +89,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                         channel={channel}
                         isActive={currentChannelId === channel.id}
                         onClick={() => setCurrentChannel(channel.id)}
+                        onDelete={() => handleDeleteChannel(channel.id)}
                     />
                 ))}
                 {/* Fade effect overlay */}

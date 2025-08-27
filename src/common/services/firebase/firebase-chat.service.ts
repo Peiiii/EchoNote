@@ -92,6 +92,7 @@ export const firebaseChatService = {
     console.log("🔔 [firebaseChatService][subscribeToChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
+      where("isDeleted", "==", false), // Only get non-deleted channels
       orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
     );
 
@@ -147,6 +148,7 @@ export const firebaseChatService = {
     console.log("🔔 [firebaseChatService][fetchChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
+      where("isDeleted", "==", false), // Only get non-deleted channels
       orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
     );
 
@@ -174,6 +176,106 @@ export const firebaseChatService = {
   ): Promise<void> => {
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
     await updateDoc(channelRef, updates);
+  },
+
+  deleteChannel: async (
+    userId: string,
+    channelId: string
+  ): Promise<void> => {
+    console.log("🔔 [firebaseChatService][deleteChannel]:", { userId, channelId });
+    
+    // Soft delete the channel document
+    const channelRef = doc(getChannelsCollectionRef(userId), channelId);
+    await updateDoc(channelRef, {
+      isDeleted: true,
+      deletedAt: serverTimestamp(),
+      deletedBy: userId,
+    });
+    
+    // Soft delete all messages in this channel
+    try {
+      const messagesQuery = query(
+        getMessagesCollectionRef(userId),
+        where("channelId", "==", channelId),
+        where("isDeleted", "==", false) // Only get non-deleted messages
+      );
+      const messagesSnapshot = await getDocs(messagesQuery);
+      
+      // Soft delete messages in batches
+      const batchSize = 500;
+      for (let i = 0; i < messagesSnapshot.docs.length; i += batchSize) {
+        const batch = messagesSnapshot.docs.slice(i, i + batchSize);
+        const softDeletePromises = batch.map(doc => 
+          updateDoc(doc.ref, {
+            isDeleted: true,
+            deletedAt: serverTimestamp(),
+            deletedBy: userId,
+            deletedChannelId: channelId, // Track which channel was deleted
+          })
+        );
+        await Promise.all(softDeletePromises);
+      }
+      
+      console.log("🔔 [firebaseChatService][deleteChannel]: Successfully soft deleted channel and messages", { 
+        channelId, 
+        messageCount: messagesSnapshot.docs.length 
+      });
+    } catch (error) {
+      console.error("🔔 [firebaseChatService][deleteChannel]: Error soft deleting messages:", error);
+      // Even if message soft deletion fails, the channel is already soft deleted
+      throw new Error(`Channel soft deleted but failed to soft delete associated messages: ${error}`);
+    }
+  },
+
+  // Restore soft deleted channel
+  restoreChannel: async (
+    userId: string,
+    channelId: string
+  ): Promise<void> => {
+    console.log("🔔 [firebaseChatService][restoreChannel]:", { userId, channelId });
+    
+    // Restore the channel document
+    const channelRef = doc(getChannelsCollectionRef(userId), channelId);
+    await updateDoc(channelRef, {
+      isDeleted: false,
+      deletedAt: null,
+      deletedBy: null,
+    });
+    
+    // Restore all messages in this channel
+    try {
+      const messagesQuery = query(
+        getMessagesCollectionRef(userId),
+        where("channelId", "==", channelId),
+        where("isDeleted", "==", true),
+        where("deletedChannelId", "==", channelId) // Only restore messages deleted with this channel
+      );
+      const messagesSnapshot = await getDocs(messagesQuery);
+      
+      // Restore messages in batches
+      const batchSize = 500;
+      for (let i = 0; i < messagesSnapshot.docs.length; i += batchSize) {
+        const batch = messagesSnapshot.docs.slice(i, i + batchSize);
+        const restorePromises = batch.map(doc => 
+          updateDoc(doc.ref, {
+            isDeleted: false,
+            deletedAt: null,
+            deletedBy: null,
+            deletedChannelId: null,
+          })
+        );
+        await Promise.all(restorePromises);
+      }
+      
+      console.log("🔔 [firebaseChatService][restoreChannel]: Successfully restored channel and messages", { 
+        channelId, 
+        messageCount: messagesSnapshot.docs.length 
+      });
+    } catch (error) {
+      console.error("🔔 [firebaseChatService][restoreChannel]: Error restoring messages:", error);
+      // Even if message restoration fails, the channel is already restored
+      throw new Error(`Channel restored but failed to restore associated messages: ${error}`);
+    }
   },
 
   fetchInitialMessages: async (

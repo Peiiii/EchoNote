@@ -1,18 +1,20 @@
+import { Button } from "@/common/components/ui/button";
 import { Channel } from "@/core/stores/chat-data.store";
+import { Edit2 } from "lucide-react";
 import { getChannelIcon } from "./channel-icons";
 import { EditChannelPopover } from "./edit-channel-popover";
-import { Edit2 } from "lucide-react";
-import { Button } from "@/common/components/ui/button";
+import { ChannelMoreActionsMenu } from "./channel-more-actions-menu";
 
 interface ChannelItemProps {
     channel: Channel;
     isActive: boolean;
     onClick: () => void;
+    onDelete: () => void;
 }
 
-export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) => {
+export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelItemProps) => {
     return (
-        <div 
+        <div
             className={`w-full group transition-all duration-200 cursor-pointer ${isActive
                 ? 'transform scale-[1.01]'
                 : 'hover:transform hover:scale-[1.005]'
@@ -47,8 +49,9 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                         </p>
                     </div>
 
-                    {/* Edit Button - Right side */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Action Buttons - Right side */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        {/* Edit Button */}
                         <EditChannelPopover channel={channel}>
                             <Button
                                 size="sm"
@@ -60,6 +63,12 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                                 <Edit2 className="h-3 w-3" />
                             </Button>
                         </EditChannelPopover>
+
+                        {/* More Actions Button */}
+                        <ChannelMoreActionsMenu 
+                            channel={channel}
+                            onDelete={onDelete}
+                        />
                     </div>
                 </div>
             </div>

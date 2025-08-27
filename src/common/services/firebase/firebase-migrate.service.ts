@@ -11,6 +11,7 @@ import { MigrationExecutor, UserMigrationState } from "./migrations/types";
 import {
   AddIsDeletedToMessagesMigration,
   AddLastMessageTimeToChannelsMigration,
+  AddIsDeletedToChannelsMigration,
 } from "./migrations";
 import { MigrationLogger } from "./migrations/migration-logger";
 
@@ -97,6 +98,7 @@ class MigrationExecutorManager {
   private migrations: MigrationExecutor[] = [
     new AddIsDeletedToMessagesMigration(),
     new AddLastMessageTimeToChannelsMigration(),
+    new AddIsDeletedToChannelsMigration(),
   ];
 
   getAllMigrations(): MigrationExecutor[] {

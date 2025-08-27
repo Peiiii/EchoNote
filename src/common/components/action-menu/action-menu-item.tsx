@@ -55,10 +55,10 @@ export function ActionMenuItem({
           {icon}
         </div>
       </div>
-      <div className="flex-1">
-        <div className="font-medium text-sm">{title}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-medium text-sm truncate">{title}</div>
         {description && (
-          <div className="text-xs text-slate-500 dark:text-slate-400">{description}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{description}</div>
         )}
       </div>
     </DropdownMenuItem>
