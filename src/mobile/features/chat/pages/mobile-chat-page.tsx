@@ -30,8 +30,6 @@ export function MobileChatPage() {
             <MobileSidebarManager
                 {...sidebarState}
                 isThreadOpen={chatState.isThreadOpen}
-                currentParentMessage={chatState.currentParentMessage}
-                currentThreadMessages={chatState.currentThreadMessages}
                 onSendThreadMessage={chatState.handleSendThreadMessage}
                 onCloseThread={chatState.handleCloseThread}
                 currentChannelId={chatState.currentChannelId}

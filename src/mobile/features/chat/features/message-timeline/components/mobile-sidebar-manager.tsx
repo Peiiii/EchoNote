@@ -3,7 +3,6 @@ import { MobileChannelList } from "@/mobile/features/chat/features/channel-manag
 import { MobileSettingsSidebar } from "@/mobile/features/chat/components/mobile-settings-sidebar";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { MobileThreadSidebar } from "@/mobile/features/chat/features/thread-management";
-import { Message } from "@/core/stores/chat-data.store";
 
 // Types
 interface MobileSidebarState {
@@ -24,8 +23,6 @@ interface MobileSidebarActions {
 
 interface MobileSidebarManagerProps extends MobileSidebarState, MobileSidebarActions {
     isThreadOpen: boolean;
-    currentParentMessage: Message | null;
-    currentThreadMessages: Message[];
     onSendThreadMessage: (content: string) => void;
     onCloseThread: () => void;
     currentChannelId: string | null;
@@ -44,8 +41,6 @@ export const MobileSidebarManager = ({
     closeSettings,
 
     // Thread data
-    currentParentMessage,
-    currentThreadMessages,
     onSendThreadMessage,
     onCloseThread,
 
@@ -85,8 +80,6 @@ export const MobileSidebarManager = ({
                         className="w-full max-w-md p-0 border-l border-border"
                     >
                         <MobileThreadSidebar
-                            parentMessage={currentParentMessage}
-                            threadMessages={currentThreadMessages}
                             onSendMessage={onSendThreadMessage}
                         />
                     </SheetContent>

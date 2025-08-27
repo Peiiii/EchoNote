@@ -1,6 +1,6 @@
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
@@ -10,40 +10,40 @@ import { useEffect } from 'react';
 export const useMobileChatState = () => {
     const { currentChannelId } = useChatViewStore();
     const { channels } = useChatDataStore();
-    const { messages, hasMore, loadMore } = useChannelMessages({ messagesLimit: 20 });
-    
+    const { messages, hasMore, loadMore } = useChannelMessages({});
+
     // Use specialized hooks
     const { containerRef, isSticky, scrollToBottom } = useChatScroll([currentChannelId, messages.length]);
     const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions(containerRef);
-    const { isThreadOpen, currentParentMessage, currentThreadMessages, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
+    const { isThreadOpen, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { sendMessage, isAddingMessage } = useMessageSender();
-    
+
 
     useEffect(() => {
         const handleScroll = () => {
             if (!containerRef.current) return;
-            
+
             const { scrollTop } = containerRef.current;
-            
-            if (scrollTop === 0 && hasMore) {
-                loadMore();
+
+            if (scrollTop === 0 && hasMore && currentChannelId) {
+                loadMore({ channelId: currentChannelId, messagesLimit: 20 });
             }
         };
-        
+
         const container = containerRef.current;
         if (container) {
             container.addEventListener('scroll', handleScroll);
             return () => container.removeEventListener('scroll', handleScroll);
         }
-    }, [hasMore, loadMore, containerRef]);
+    }, [hasMore, loadMore, containerRef, currentChannelId]);
 
     const handleSendMessage = async (content: string) => {
         requestAnimationFrame(() => {
             scrollToBottom({ behavior: 'instant' });
         });
-        
+
         sendMessage(content, replyToMessageId || undefined);
-        
+
         if (replyToMessageId) {
             handleCancelReply();
         }
@@ -58,13 +58,11 @@ export const useMobileChatState = () => {
         isSticky,
         replyToMessageId,
         isThreadOpen,
-        currentParentMessage,
-        currentThreadMessages,
         isAddingMessage,
-        
+
         // Refs
         containerRef,
-        
+
         // Actions
         handleSendMessage,
         handleCancelReply,

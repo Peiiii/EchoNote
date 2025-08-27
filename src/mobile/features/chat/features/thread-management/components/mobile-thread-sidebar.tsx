@@ -1,20 +1,21 @@
-import { Message } from "@/core/stores/chat-data.store";
+
 import { Button } from "@/common/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 
 interface MobileThreadSidebarProps {
-    parentMessage: Message | null;
-    threadMessages: Message[];
     onSendMessage: (message: string) => void;
 }
 
 export const MobileThreadSidebar = ({
-    parentMessage,
-    threadMessages,
     onSendMessage
 }: MobileThreadSidebarProps) => {
-    if (!parentMessage) return null;
+    const { currentChannelId } = useChatViewStore();
+    const { messages } = useChannelMessages({});
+    const parentMessage = currentChannelId ? messages.find(m => m.id === currentChannelId) : null;
+    const threadMessages = currentChannelId ? messages.filter(m => m.threadId === currentChannelId) || [] : [];
 
     return (
         <div className="h-full flex flex-col bg-background">
@@ -30,10 +31,10 @@ export const MobileThreadSidebar = ({
             <div className="p-4 border-b border-border bg-muted/50">
                 <div className="text-sm text-muted-foreground mb-2">Parent Message</div>
                 <div className="text-sm text-foreground leading-relaxed">
-                    {parentMessage.content}
+                    {parentMessage?.content}
                 </div>
                 <div className="text-xs text-muted-foreground mt-2">
-                    {formatTimeForSocial(parentMessage.timestamp)}
+                    {formatTimeForSocial(parentMessage?.timestamp || new Date())}
                 </div>
             </div>
 
