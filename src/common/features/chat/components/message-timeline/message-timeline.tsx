@@ -9,6 +9,7 @@ interface MessageTimelineProps {
     className?: string;
     groupedMessages: Record<string, Message[]>;
     messages: Message[];
+    onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
 export interface MessageTimelineRef {
@@ -19,7 +20,8 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
     renderThoughtRecord,
     className = "",
     groupedMessages,
-    messages
+    messages,
+    onScroll
 }, ref) => {
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll([], { smoothScroll: true });
@@ -42,6 +44,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
                     minHeight: '100%',
                     maxHeight: '100%'
                 }}
+                onScroll={onScroll}
             >
                 {Object.entries(groupedMessages).map(([date, dayMessages]) => {
                     // Filter only user messages for display (excluding thread messages)

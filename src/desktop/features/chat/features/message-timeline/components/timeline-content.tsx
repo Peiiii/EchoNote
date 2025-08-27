@@ -1,7 +1,8 @@
 import { MessageTimelineSkeleton } from "@/common/features/chat/components/message-timeline/message-skeleton";
 import { MessageTimeline, MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
+import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
-import { usePaginatedMessages } from "@/common/features/chat/hooks/use-paginated-messages";
+import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { Message } from "@/core/stores/chat-data.store";
 import { forwardRef } from "react";
 
@@ -17,7 +18,14 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     className = ""
 }, ref) => {
 
-    const { messages, loading } = usePaginatedMessages(20);
+    const { messages, loading, hasMore, loadMore, hasMoreRef, loadingRef, loadingMoreRef } = useChannelMessages(20);
+    const { handleScroll } = useLazyLoading({
+        onTrigger: loadMore,
+        canTrigger: hasMore && !loading,
+        hasMoreRef,
+        loadingRef,
+        loadingMoreRef
+    });
 
     const groupedMessages = useGroupedMessages(messages);
 
@@ -32,6 +40,7 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
                 renderThoughtRecord={renderThoughtRecord}
                 groupedMessages={groupedMessages}
                 messages={messages}
+                onScroll={handleScroll}
             />
         </div>
     );

@@ -25,7 +25,6 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
     (item) => item.group === ActivityBarGroup.FOOTER
   );
 
-  console.log("[DesktopActivityBar] items", { items });
   const handleExpandedChange = (newExpanded: boolean) => {
     setExpanded(newExpanded);
   };

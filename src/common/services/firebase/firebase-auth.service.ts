@@ -1,22 +1,14 @@
-import {
-  signInAnonymously,
-  signOut,
-  onAuthStateChanged,
-  User,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'firebase/auth';
 import { auth } from '@/common/config/firebase.config';
 import { useChatDataStore } from '@/core/stores/chat-data.store';
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  User
+} from 'firebase/auth';
 
 export const firebaseAuthService = {
-  // 匿名登录
-  signInAnonymously: async (): Promise<User> => {
-    const result = await signInAnonymously(auth);
-    // 初始化数据监听器
-    await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
-    return result.user;
-  },
 
   // Google登录
   signInWithGoogle: async (): Promise<User | null> => {

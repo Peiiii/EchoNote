@@ -8,32 +8,32 @@ import { Message } from '@/core/stores/chat-data.store';
 export const usePaginatedMessages = (messagesLimit: number = 20) => {
   const { currentChannelId } = useChatViewStore();
   const { userId } = useChatDataStore();
-  
+
   // Local state for current channel messages
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
-  
+
   // Ref to track current subscription
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Subscribe to channel messages
   const subscribeToChannel = useCallback((channelId: string) => {
     if (!userId || !channelId) return;
-    
+
     // Clean up previous subscription
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
-    
+
     // Reset state for new channel
     setMessages([]);
     setHasMore(true);
     setLastVisible(null);
     setLoading(true);
-    
+
     // Subscribe to channel messages
     const unsubscribe = firebaseChatService.subscribeToChannelMessages(
       userId,
@@ -45,23 +45,24 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
         setLoading(false);
       }
     );
-    
+
     unsubscribeRef.current = unsubscribe;
   }, [userId, messagesLimit]);
 
   // Load more messages (for pagination)
   const loadMoreMessages = useCallback(async () => {
+    console.log("🔔 [loadMoreMessages]:", { userId, hasMore, currentChannelId, lastVisible, loading, messages });
     if (!userId || !currentChannelId || !hasMore || !lastVisible || loading) return;
-    
+
     setLoading(true);
     try {
       const result = await firebaseChatService.fetchMoreMessages(
-        userId, 
-        currentChannelId, 
+        userId,
+        currentChannelId,
         messagesLimit,
         lastVisible
       );
-      
+
       // Append new messages to existing ones
       setMessages(prev => [...prev, ...result.messages]);
       setLastVisible(result.lastVisible);
@@ -71,7 +72,7 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, currentChannelId, hasMore, lastVisible, loading, messagesLimit]);
+  }, [userId, hasMore, currentChannelId, lastVisible, loading, messages, messagesLimit]);
 
   // Refresh messages for current channel
   const refresh = useCallback(() => {
@@ -85,7 +86,7 @@ export const usePaginatedMessages = (messagesLimit: number = 20) => {
     if (currentChannelId) {
       subscribeToChannel(currentChannelId);
     }
-    
+
     // Cleanup subscription on unmount or channel change
     return () => {
       if (unsubscribeRef.current) {

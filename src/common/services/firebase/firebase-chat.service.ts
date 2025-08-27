@@ -89,6 +89,7 @@ export const firebaseChatService = {
     userId: string,
     onUpdate: (channels: Channel[]) => void
   ): (() => void) => {
+    console.log("🔔 [firebaseChatService][subscribeToChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
       orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
@@ -115,7 +116,7 @@ export const firebaseChatService = {
     messagesLimit: number,
     onUpdate: (messages: Message[], hasMore: boolean) => void
   ): (() => void) => {
-
+    console.log("🔔 [firebaseChatService][subscribeToChannelMessages]:", { userId, channelId, messagesLimit });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -123,7 +124,7 @@ export const firebaseChatService = {
       where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
       where("sender", "==", "user"),
-      orderBy("timestamp", "asc"),
+      orderBy("timestamp", "desc"),
       limit(messagesLimit)
     );
 
@@ -143,6 +144,7 @@ export const firebaseChatService = {
   },
 
   fetchChannels: async (userId: string): Promise<Channel[]> => {
+    console.log("🔔 [firebaseChatService][fetchChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
       orderBy("lastMessageTime", "desc") // Sort by last message time in descending order
@@ -179,13 +181,14 @@ export const firebaseChatService = {
     channelId: string,
     messagesLimit: number
   ) => {
+    console.log("🔔 [firebaseChatService][fetchInitialMessages]:", { userId, channelId, messagesLimit });
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
       where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
       where("sender", "==", "user"),
-      orderBy("timestamp", "asc"),
+      orderBy("timestamp", "desc"),
       limit(messagesLimit)
     );
 
@@ -203,6 +206,7 @@ export const firebaseChatService = {
     messagesLimit: number,
     cursor: DocumentSnapshot
   ) => {
+    console.log("🔔 [firebaseChatService][fetchMoreMessages]:", { userId, channelId, messagesLimit, cursor });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -210,7 +214,7 @@ export const firebaseChatService = {
       where("isDeleted", "==", false), // Query non-deleted messages
       where("channelId", "==", channelId),
       where("sender", "==", "user"),
-      orderBy("timestamp", "asc"),
+      orderBy("timestamp", "desc"),
       startAfter(cursor),
       limit(messagesLimit)
     );
@@ -221,6 +225,37 @@ export const firebaseChatService = {
     const allLoaded = messages.length < messagesLimit;
 
     return { messages, lastVisible, allLoaded };
+  },
+
+  // Subscribe to new messages after a specific timestamp
+  subscribeToNewMessages: (
+    userId: string,
+    channelId: string,
+    afterTimestamp: Date,
+    onUpdate: (newMessages: Message[]) => void
+  ): (() => void) => {
+    console.log("🔔 [firebaseChatService][subscribeToNewMessages]:", { userId, channelId, afterTimestamp });
+    const q = query(
+      getMessagesCollectionRef(userId),
+      where("isDeleted", "==", false),
+      where("channelId", "==", channelId),
+      where("sender", "==", "user"),
+      where("timestamp", ">", afterTimestamp),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const newMessages = snapshot.docs.map(docToMessage);
+        onUpdate(newMessages);
+      },
+      (error) => {
+        console.error("Error subscribing to new messages:", error);
+      }
+    );
+
+    return unsubscribe;
   },
 
   createMessage: async (
@@ -282,6 +317,7 @@ export const firebaseChatService = {
 
   // Get deleted messages (for management interface)
   getDeletedMessages: async (userId: string, channelId?: string): Promise<Message[]> => {
+    console.log("🔔 [firebaseChatService][getDeletedMessages]:", { userId, channelId });
     try {
       let q = query(
         getMessagesCollectionRef(userId),

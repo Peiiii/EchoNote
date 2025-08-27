@@ -13,7 +13,6 @@ export interface AuthState {
   isAuthenticating: boolean;  // 正在登录/登出
   
   // 公共方法
-  signInAnonymously: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   
@@ -37,16 +36,6 @@ export const useAuthStore = create<AuthState>()(
       isInitializing: false,
       isRefreshing: false,
       isAuthenticating: false,
-
-      // 公共方法
-      signInAnonymously: async () => {
-        set({ isAuthenticating: true });
-        try {
-          await firebaseAuthService.signInAnonymously();
-        } finally {
-          set({ isAuthenticating: false });
-        }
-      },
 
       signInWithGoogle: async () => {
         set({ isAuthenticating: true });
