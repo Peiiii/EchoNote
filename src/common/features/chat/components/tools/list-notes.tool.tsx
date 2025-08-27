@@ -1,7 +1,6 @@
 import { Tool, ToolCall, ToolResult } from '@agent-labs/agent-chat';
 import { List } from 'lucide-react';
-import { useChatDataStore } from '@/core/stores/chat-data.store';
-import { Message, Channel } from '@/core/stores/chat-data.store';
+import { channelMessageService } from '@/core/services/channel-message.service';
 
 // Render component - 极简设计，大道至简
 interface ListNotesToolRenderProps {
@@ -10,16 +9,10 @@ interface ListNotesToolRenderProps {
 }
 
 export function ListNotesToolRender({ limit, channelId }: ListNotesToolRenderProps) {
-    const chatDataStore = useChatDataStore();
-
-    // 获取channel名称
-    const channel = chatDataStore.channels.find((ch: Channel) => ch.id === channelId);
-    const channelName = channel?.name || channelId;
-
     return (
         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
             <List className="w-4 h-4" />
-            <span>Listing {limit} notes from {channelName}</span>
+            <span>Listing {limit} notes from channel {channelId}</span>
         </div>
     );
 }
@@ -45,17 +38,13 @@ export function createListNotesTool(channelId: string): Tool {
                 const args = JSON.parse(toolCall.function.arguments);
                 const { limit = 10 } = args;
 
-                const chatDataStore = useChatDataStore.getState();
-
-                // 获取channel名称
-                const channel = chatDataStore.channels.find((ch: Channel) => ch.id === channelId);
-                const channelName = channel?.name || channelId;
-
-                const channelMessages = chatDataStore.messagesByChannel[channelId];
-                const notes = channelMessages?.messages || [];
-                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, channelMessages, channels: chatDataStore.channels, chatDataStore });
-                // 简洁的结果格式，使用channel名称
-                const resultText = `Found ${notes.length} notes in ${channelName}:\n${notes.map((note: Message) =>
+                const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
+                const notes = channelState?.messages || [];
+                
+                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, channelState });
+                
+                // 简洁的结果格式
+                const resultText = `Found ${notes.length} notes in channel ${channelId}:\n${notes.map((note) =>
                     `• ${note.content.substring(0, 60)}${note.content.length > 60 ? '...' : ''}`
                 ).join('\n')}`;
 
