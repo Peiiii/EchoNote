@@ -72,8 +72,9 @@ export interface ChatDataState {
   addChannelMessage: (channelId: string, message: Message) => void;
   setChannelLoading: (channelId: string, loading: boolean) => void;
   setChannelHasMore: (channelId: string, hasMore: boolean) => void;
-  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
-  clearChannelMessages: (channelId: string) => void;
+          setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
+        clearChannelMessages: (channelId: string) => void;
+        removeChannelMessage: (channelId: string, messageId: string) => void;
 
   // Firebase integration
   initFirebaseListeners: (userId: string) => Promise<void>;
@@ -140,6 +141,19 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       : () => firebaseChatService.softDeleteMessage(userId, messageId);
     
     await withErrorHandling(operation, hardDelete ? 'deleteMessage' : 'softDeleteMessage');
+    
+    // 更新本地store状态 - 修复逻辑：遍历所有channel找到包含该消息的channel
+    const { messagesByChannel } = get();
+    console.log('🔔 [deleteMessage] 开始查找消息', { messageId, messagesByChannel });
+    
+    for (const [channelId, channelState] of Object.entries(messagesByChannel)) {
+      const messageExists = channelState.messages.some(msg => msg.id === messageId);
+      if (messageExists) {
+        console.log('🔔 [deleteMessage] 找到消息，准备删除', { channelId, messageId });
+        get().removeChannelMessage(channelId, messageId);
+        break; // 找到后立即退出循环
+      }
+    }
   }),
 
   updateMessage: withUserValidation(async (userId, messageId, updates) => {
@@ -192,6 +206,15 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     set(state => {
       const currentChannel = state.messagesByChannel[channelId];
       if (!currentChannel) return state;
+
+      // ✅ 新增：检查消息是否已存在，防止重复添加
+      const messageExists = currentChannel.messages.some(msg => msg.id === message.id);
+      if (messageExists) {
+        console.log('🔔 [addChannelMessage] 消息已存在，跳过添加', { messageId: message.id, channelId });
+        return state; // 消息已存在，不重复添加
+      }
+
+      console.log('🔔 [addChannelMessage] 添加新消息', { messageId: message.id, channelId });
 
       return {
         messagesByChannel: {
@@ -246,6 +269,33 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [channelId]: removed, ...rest } = state.messagesByChannel;
       return { messagesByChannel: rest };
+    });
+  },
+
+  // 新增：从特定channel中删除消息
+  removeChannelMessage: (channelId: string, messageId: string) => {
+    set(state => {
+      const currentChannel = state.messagesByChannel[channelId];
+      if (!currentChannel) return state;
+
+      const updatedMessages = currentChannel.messages.filter(msg => msg.id !== messageId);
+      
+      console.log('🔔 [removeChannelMessage]', { 
+        channelId, 
+        messageId, 
+        beforeCount: currentChannel.messages.length, 
+        afterCount: updatedMessages.length 
+      });
+      
+      return {
+        messagesByChannel: {
+          ...state.messagesByChannel,
+          [channelId]: {
+            ...currentChannel,
+            messages: updatedMessages
+          }
+        }
+      };
     });
   },
 

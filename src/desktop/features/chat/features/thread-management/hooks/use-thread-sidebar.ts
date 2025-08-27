@@ -1,11 +1,26 @@
 import { useState } from "react";
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 
 export function useThreadSidebar() {
-    const { messages } = useChannelMessages({ messagesLimit: 20 });
+    const { currentChannelId } = useChatViewStore();
     const { addThreadMessage } = useChatDataStore();
-    
+
+    // 直接从store获取当前channel的消息，避免重复订阅
+    const { messages } = useChatDataStore(state =>
+        currentChannelId ? state.messagesByChannel[currentChannelId] || {
+            messages: [],
+            loading: false,
+            hasMore: true,
+            lastVisible: null
+        } : {
+            messages: [],
+            loading: false,
+            hasMore: true,
+            lastVisible: null
+        }
+    );
+
     // Thread sidebar state
     const [isThreadOpen, setIsThreadOpen] = useState(false);
     const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
@@ -31,11 +46,11 @@ export function useThreadSidebar() {
         }
     };
 
-    const currentParentMessage = currentThreadId 
+    const currentParentMessage = currentThreadId
         ? messages.find(m => m.id === currentThreadId) || null
         : null;
-    
-    const currentThreadMessages = currentThreadId 
+
+    const currentThreadMessages = currentThreadId
         ? messages.filter(m => m.threadId === currentThreadId)
         : [];
 
@@ -44,7 +59,7 @@ export function useThreadSidebar() {
         isThreadOpen,
         currentParentMessage,
         currentThreadMessages,
-        
+
         // Handlers
         handleOpenThread,
         handleCloseThread,

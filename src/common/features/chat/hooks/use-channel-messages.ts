@@ -27,9 +27,9 @@ export const useChannelMessages = ({
 }: UseChannelMessagesOptions) => {
     const { currentChannelId } = useChatViewStore();
     const { userId } = useChatDataStore();
-    
+
     // 使用Zustand的推荐用法：选择器模式
-    const channelState = useChatDataStore(state => 
+    const channelState = useChatDataStore(state =>
         state.messagesByChannel[currentChannelId || ''] || {
             messages: [],
             loading: false,
@@ -37,7 +37,7 @@ export const useChannelMessages = ({
             lastVisible: null
         }
     );
-    
+
     // 获取actions，避免在useEffect依赖中
     const setChannelMessages = useChatDataStore(state => state.setChannelMessages);
     const setChannelLoading = useChatDataStore(state => state.setChannelLoading);
@@ -61,19 +61,34 @@ export const useChannelMessages = ({
         hasMoreRef.current = hasMore;
     }, [loading, hasMore]);
 
+    useEffect(() => {
+        console.log("[useChannelMessages] [useEffectOnce]")
+    }, []);
+
     // 订阅新消息
     const subscribeToNewMessages = useCallback((channelId: string, afterTimestamp: Date) => {
         if (!userId) return;
 
+        // ✅ 防止重复订阅：如果已经订阅了同一个channel，先取消
         if (newMessagesUnsubscribeRef.current) {
+            console.log('🔔 [subscribeToNewMessages] 取消之前的订阅');
             newMessagesUnsubscribeRef.current();
+            newMessagesUnsubscribeRef.current = null;
         }
+
+        console.log('🔔 [subscribeToNewMessages] 开始订阅新消息', { channelId, afterTimestamp });
 
         const unsubscribe = firebaseChatService.subscribeToNewMessages(
             userId,
             channelId,
             afterTimestamp,
             (newMessages) => {
+                console.log('🔔 [subscribeToNewMessages] 收到新消息', { 
+                    channelId, 
+                    messageCount: newMessages.length,
+                    messageIds: newMessages.map(m => m.id)
+                });
+                
                 // 使用store方法添加新消息
                 newMessages.forEach(message => {
                     addChannelMessage(channelId, message);
@@ -126,7 +141,7 @@ export const useChannelMessages = ({
                 messagesLimit,
                 lastVisible
             );
-            
+
             if (result.messages.length > 0) {
                 // 合并历史消息到现有消息
                 const currentMessages = channelState.messages;
@@ -134,7 +149,7 @@ export const useChannelMessages = ({
                 setChannelMessages(currentChannelId, updatedMessages);
                 setChannelLastVisible(currentChannelId, result.lastVisible);
             }
-            
+
             setChannelHasMore(currentChannelId, !result.allLoaded);
         } catch (error) {
             console.error('Error loading more messages:', error);
@@ -149,7 +164,10 @@ export const useChannelMessages = ({
 
     const refresh = useCallback(() => {
         if (currentChannelId) {
-            // 清除channel消息并重新加载
+            if (newMessagesUnsubscribeRef.current) {
+                newMessagesUnsubscribeRef.current();
+                newMessagesUnsubscribeRef.current = null;
+            }
             clearChannelMessages(currentChannelId);
             setChannelHasMore(currentChannelId, true);
             loadInitialMessages(currentChannelId);
