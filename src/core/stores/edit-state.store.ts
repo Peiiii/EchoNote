@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { useChatDataStore } from "./chat-data.store";
+import { useChatViewStore } from "./chat-view.store";
+import { channelMessageService } from "../services/channel-message.service";
 
 export interface EditState {
   // Editing state
@@ -70,15 +72,26 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
     set({ isSaving: true });
 
     try {
-      // Use existing ChatDataStore to update message
-      const updateMessage = useChatDataStore.getState().updateMessage;
-      await updateMessage(editingMessageId, { content: editContent.trim() });
+      const { userId } = useChatDataStore.getState();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const { currentChannelId } = useChatViewStore.getState();
+      if (!currentChannelId) {
+        throw new Error('No current channel selected');
+      }
+
+      await channelMessageService.updateMessage({
+        messageId: editingMessageId,
+        channelId: currentChannelId,
+        updates: { content: editContent.trim() },
+        userId
+      });
       
-      // Clear editing state on success
       get().reset();
     } catch (error) {
       console.error("Failed to save message:", error);
-      // Keep editing state on error so user can retry
     } finally {
       set({ isSaving: false });
     }

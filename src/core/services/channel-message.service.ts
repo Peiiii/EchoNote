@@ -64,18 +64,12 @@ export class ChannelMessageService {
             const prevMessages = getChannelState().messages || [];
             setMessages(prevMessages.filter(m => m.id !== messageId));
         }
-        const updateMessage = (id: string, message: Partial<Message>) => {
-            const prevMessages = getChannelState().messages || [];
-            setMessages(prevMessages.map(m => m.id === id ? { ...m, ...message } : m));
-        }
         const fixFakeMessage = (fakeId: string, realId: string) => {
             const prevMessages = getChannelState().messages || [];
             const realMessage = prevMessages.find(m => m.id === realId);
             if (realMessage) {
-                // remove fake message
                 setMessages(prevMessages.filter(m => m.id !== fakeId));
             } else {
-                // update fake message
                 setMessages(prevMessages.map(m => m.id === fakeId ? { ...m, id: realId } : m));
             }
         }
@@ -84,7 +78,7 @@ export class ChannelMessageService {
             setLoading,
             setLoadingMore,
             addMessage,
-            updateMessage,
+            updateMessage: this.updateMessage,
             setMessages,
             setLastVisible,
             setHasMore,
@@ -214,6 +208,40 @@ export class ChannelMessageService {
         addMessage(tmpMessage);
         const realMsgId = await firebaseChatService.createMessage(userId, message);
         fixFakeMessage(tmpMessage.id, realMsgId);
+    }
+
+    updateMessage = async ({ messageId, channelId, updates, userId }: { 
+        messageId: string, 
+        channelId: string, 
+        updates: Partial<Message>,
+        userId: string 
+    }) => {
+        const { getChannelState, setMessages } = this.getChannelStateControl(channelId);
+        const { messages } = getChannelState();
+        
+        const messageToUpdate = messages.find(m => m.id === messageId);
+        if (!messageToUpdate) {
+            throw new Error('Message not found');
+        }
+        
+        if (messageToUpdate.sender !== "user") {
+            throw new Error('You can only edit user messages, not AI messages');
+        }
+        
+        const updatedMessage = { ...messageToUpdate, ...updates };
+        
+        try {
+            setMessages(messages.map(m => m.id === messageId ? updatedMessage : m));
+            
+            await firebaseChatService.updateMessage(userId, messageId, updates);
+            
+            console.log('Message updated successfully:', { messageId, channelId, updates });
+            
+        } catch (error) {
+            setMessages(messages.map(m => m.id === messageId ? messageToUpdate : m));
+            console.error('Failed to update message:', error);
+            throw error;
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
 import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
+import { channelMessageService } from "@/core/services/channel-message.service";
 import { useState } from "react";
 
 interface ThoughtRecordSparksProps {
@@ -15,7 +16,6 @@ export function ThoughtRecordSparks({
     onToggleAnalysis,
 }: ThoughtRecordSparksProps) {
     const [isGenerating, setIsGenerating] = useState(false);
-    const updateMessage = useChatDataStore(state => state.updateMessage);
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
@@ -24,19 +24,30 @@ export function ThoughtRecordSparks({
         try {
             setIsGenerating(true);
             const sparks = await generateSparksForText(message.content);
-            updateMessage(message.id, {
-                aiAnalysis: {
-                    ...aiAnalysis,
-                    insights: sparks,
-                    // keep optional fields if existed
-                    keywords: aiAnalysis?.keywords ?? [],
-                    topics: aiAnalysis?.topics ?? [],
-                    sentiment: aiAnalysis?.sentiment ?? 'neutral',
-                    summary: aiAnalysis?.summary ?? '',
-                    tags: aiAnalysis?.tags ?? [],
-                    relatedTopics: aiAnalysis?.relatedTopics ?? [],
+            
+            const { userId } = useChatDataStore.getState();
+            if (!userId) {
+                throw new Error('User not authenticated');
+            }
+
+            await channelMessageService.updateMessage({
+                messageId: message.id,
+                channelId: message.channelId,
+                updates: {
+                    aiAnalysis: {
+                        ...aiAnalysis,
+                        insights: sparks,
+                        keywords: aiAnalysis?.keywords ?? [],
+                        topics: aiAnalysis?.topics ?? [],
+                        sentiment: aiAnalysis?.sentiment ?? 'neutral',
+                        summary: aiAnalysis?.summary ?? '',
+                        tags: aiAnalysis?.tags ?? [],
+                        relatedTopics: aiAnalysis?.relatedTopics ?? [],
+                    },
                 },
+                userId
             });
+            
             onToggleAnalysis();
         } finally {
             setIsGenerating(false);
