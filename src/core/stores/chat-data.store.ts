@@ -135,10 +135,10 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
         userId,
         message
       );
-      
+
       // Message will be automatically added to the channel via subscription
       // No need to manually update local state
-      
+
     } catch (error) {
       console.error("Error creating message:", error);
     }
@@ -217,7 +217,6 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     // Migrate existing data to ensure data model consistency
     try {
       await firebaseMigrateService.runAllMigrations(userId);
-      console.log('All migrations completed successfully');
     } catch (error) {
       console.error('Error during migrations:', error);
     }
@@ -229,7 +228,6 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
         const { isListenerEnabled } = get();
         if (!isListenerEnabled) return;
 
-        console.log('Channels updated via subscription:', channels.length);
         set({ channels });
       }
     );
@@ -285,16 +283,10 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   // Initialize loading data
   fetchInitialData: async (userId: string) => {
-    console.log("🔔 [ChatDataStore] [fetchInitialData]:", {
-      userId,
-      timestamp: new Date().toISOString()
-    });
     try {
-      console.log('Fetching initial data for user:', userId);
 
       // Only load channels - messages are now loaded per-channel via subscriptions
       const channels = await firebaseChatService.fetchChannels(userId);
-      console.log('Initial channels loaded:', channels.length);
       set({ channels });
 
       // Messages are no longer loaded globally - they are loaded per-channel

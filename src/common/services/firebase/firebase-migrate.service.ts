@@ -40,7 +40,7 @@ class MigrationStateManager {
         version: "1.0.0",
       };
     } catch (error) {
-      console.error("Error getting migration state:", error);
+      MigrationLogger.printStateError("Failed to get migration state", error);
       return {
         userId,
         completedMigrations: [],
@@ -63,8 +63,9 @@ class MigrationStateManager {
         lastMigrationCheck: serverTimestamp(),
         version,
       });
+      MigrationLogger.printStateInfo(`Updated migration state for user ${userId}`);
     } catch (error) {
-      console.error("Error updating migration state:", error);
+      MigrationLogger.printStateError("Failed to update migration state", error);
       throw error;
     }
   }
@@ -74,8 +75,9 @@ class MigrationStateManager {
       const currentState = await this.getUserMigrationState(userId);
       const updatedMigrations = [...new Set([...currentState.completedMigrations, migrationVersion])];
       await this.updateUserMigrationState(userId, updatedMigrations, currentState.version);
+      MigrationLogger.printStateInfo(`Migration ${migrationVersion} marked as completed for user ${userId}`);
     } catch (error) {
-      console.error("Error marking migration completed:", error);
+      MigrationLogger.printStateError("Failed to mark migration as completed", error);
       throw error;
     }
   }
@@ -83,8 +85,9 @@ class MigrationStateManager {
   async resetMigrationState(userId: string): Promise<void> {
     try {
       await this.updateUserMigrationState(userId, [], "1.0.0");
+      MigrationLogger.printStateInfo(`Migration state reset for user ${userId}`);
     } catch (error) {
-      console.error("Error resetting migration state:", error);
+      MigrationLogger.printStateError("Failed to reset migration state", error);
       throw error;
     }
   }
@@ -108,15 +111,18 @@ class MigrationExecutorManager {
 
   async executeMigration(migration: MigrationExecutor, userId: string): Promise<void> {
     try {
+      MigrationLogger.printExecutorInfo(`Starting migration ${migration.version}: ${migration.name}`);
       await migration.execute(userId);
+      MigrationLogger.printExecutorInfo(`Migration ${migration.version} completed successfully`);
     } catch (error) {
-      console.error(`Migration ${migration.version} failed:`, error);
+      MigrationLogger.printExecutorError(`Migration ${migration.version} failed`, error);
       throw error;
     }
   }
 
   addMigration(migration: MigrationExecutor): void {
     this.migrations.push(migration);
+    MigrationLogger.printExecutorInfo(`Added new migration: ${migration.version} - ${migration.name}`);
   }
 }
 
@@ -198,7 +204,7 @@ class FirebaseMigrateService {
         doc => !doc.data().lastMessageTime
       ).length;
 
-      console.log(`Migration status: ${pendingMigrations.length} pending, ${messagesNeedMigration} messages, ${channelsNeedMigration} channels need migration`);
+      MigrationLogger.printServiceInfo(`Status check: ${pendingMigrations.length} pending, ${messagesNeedMigration} messages, ${channelsNeedMigration} channels need migration`);
 
       return {
         messagesNeedMigration,
@@ -210,17 +216,19 @@ class FirebaseMigrateService {
         skippedMigrations: skippedMigrations.length,
       };
     } catch (error) {
-      console.error("Error checking migration status:", error);
+      MigrationLogger.printServiceError("Failed to check migration status", error);
       throw error;
     }
   }
 
   async forceRerunAllMigrations(userId: string): Promise<void> {
     try {
+      MigrationLogger.printServiceInfo(`Force rerunning all migrations for user: ${userId}`);
       await this.stateManager.resetMigrationState(userId);
       await this.runAllMigrations(userId);
+      MigrationLogger.printServiceInfo("Force rerun completed successfully");
     } catch (error) {
-      console.error("Error during force rerun:", error);
+      MigrationLogger.printServiceError("Force rerun failed", error);
       throw error;
     }
   }
