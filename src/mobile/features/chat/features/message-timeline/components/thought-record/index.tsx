@@ -61,30 +61,35 @@ export const MobileThoughtRecord = ({
     };
 
     const handleDelete = async () => {
-        const messagePreview = message.content.length > 100
-            ? `${message.content.substring(0, 100)}...`
-            : message.content;
-
-        const confirmed = window.confirm(
-            `🗑️ Delete Thought\n\n` +
-            `"${messagePreview}"\n\n` +
-            `⚠️ This action cannot be undone.\n` +
-            `The thought will be moved to trash.\n\n` +
-            `Are you sure you want to continue?`
-        );
-
-        if (confirmed) {
-            try {
-                await deleteMessage({
-                    messageId: message.id,
-                    channelId: message.channelId,
-                });
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
-            }
-        }
+        // Close popover immediately when delete button is clicked
         setPopoverOpen(false);
+        
+        // Use setTimeout to ensure React has time to re-render before showing confirm
+        setTimeout(async () => {
+            const messagePreview = message.content.length > 100
+                ? `${message.content.substring(0, 100)}...`
+                : message.content;
+
+            const confirmed = window.confirm(
+                `🗑️ Delete Thought\n\n` +
+                `"${messagePreview}"\n\n` +
+                `⚠️ This action cannot be undone.\n` +
+                `The thought will be moved to trash.\n\n` +
+                `Are you sure you want to continue?`
+            );
+
+            if (confirmed) {
+                try {
+                    await deleteMessage({
+                        messageId: message.id,
+                        channelId: message.channelId,
+                    });
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                    alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
+                }
+            }
+        }, 0);
     };
 
     const handleToggleAnalysis = () => {

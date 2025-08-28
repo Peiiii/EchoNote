@@ -7,6 +7,21 @@ import { createDataContainer, createSlice } from 'rx-nested-bean';
 import { distinctUntilChanged, filter, ReplaySubject, switchMap } from 'rxjs';
 import { v4 } from 'uuid';
 
+const withOptimisticUpdate = async (
+    optimisticAction: () => void,
+    remoteOperation: () => Promise<void>,
+    rollbackAction: () => void
+): Promise<void> => {
+    optimisticAction();
+    
+    try {
+        await remoteOperation();
+    } catch (error) {
+        rollbackAction();
+        throw error;
+    }
+};
+
 export type ChannelState = {
     messages: Message[];
     loading: boolean;
@@ -17,7 +32,6 @@ export type ChannelState = {
         unsubscribe: () => void;
     };
 }
-
 
 export class ChannelMessageService {
 
@@ -155,7 +169,6 @@ export class ChannelMessageService {
             );
 
             if (result.messages.length > 0) {
-                // 合并历史消息到现有消息
                 const updatedMessages = [...result.messages, ...messages];
                 setMessages(updatedMessages);
                 setLastVisible(result.lastVisible);
@@ -179,7 +192,6 @@ export class ChannelMessageService {
             setSubscription
         } = this.getChannelStateControl(channelId);
         const { subscription: prevSubscription } = getChannelState();
-        // ✅ 防止重复订阅：如果已经订阅了同一个channel，先取消
         if (prevSubscription) {
             console.log('🔔 [subscribeToNewMessages] 取消之前的订阅');
             prevSubscription.unsubscribe();
@@ -205,13 +217,25 @@ export class ChannelMessageService {
     deleteMessage = async ({ messageId, hardDelete, channelId }: { messageId: string, hardDelete?: boolean, channelId: string }) => {
         const { userId } = useChatDataStore.getState();
         if (!userId) return;
-        if (hardDelete) {
-            await firebaseChatService.deleteMessage(userId, messageId);
-        } else {
-            await firebaseChatService.softDeleteMessage(userId, messageId);
-        }
-        const { removeMessage } = this.getChannelStateControl(channelId);
-        removeMessage(messageId);
+        
+        const { removeMessage, getChannelState, setMessages } = this.getChannelStateControl(channelId);
+        const originalMessages = getChannelState().messages;
+        
+        await withOptimisticUpdate(
+            () => removeMessage(messageId),
+            async () => {
+                if (hardDelete) {
+                    await firebaseChatService.deleteMessage(userId, messageId);
+                } else {
+                    await firebaseChatService.softDeleteMessage(userId, messageId);
+                }
+                console.log('Message deleted successfully:', { messageId, channelId, hardDelete });
+            },
+            () => {
+                setMessages(originalMessages);
+                console.error('Failed to delete message, rolling back:', { messageId, channelId });
+            }
+        );
     }
 
     sendMessage = async (message: Omit<Message, 'id' | 'timestamp'>) => {
@@ -244,18 +268,17 @@ export class ChannelMessageService {
 
         const updatedMessage = { ...messageToUpdate, ...updates };
 
-        try {
-            setMessages(messages.map(m => m.id === messageId ? updatedMessage : m));
-
-            await firebaseChatService.updateMessage(userId, messageId, updates);
-
-            console.log('Message updated successfully:', { messageId, channelId, updates });
-
-        } catch (error) {
-            setMessages(messages.map(m => m.id === messageId ? messageToUpdate : m));
-            console.error('Failed to update message:', error);
-            throw error;
-        }
+        await withOptimisticUpdate(
+            () => setMessages(messages.map(m => m.id === messageId ? updatedMessage : m)),
+            async () => {
+                await firebaseChatService.updateMessage(userId, messageId, updates);
+                console.log('Message updated successfully:', { messageId, channelId, updates });
+            },
+            () => {
+                setMessages(messages.map(m => m.id === messageId ? messageToUpdate : m));
+                console.error('Failed to update message, rolling back:', { messageId, channelId });
+            }
+        );
     }
 }
 
