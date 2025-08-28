@@ -28,8 +28,8 @@ export const MobileHeader = ({
                 </Button>
 
                 {/* Center: Current Channel Name */}
-                <div className="flex-1 text-center">
-                    <h1 className="text-lg font-semibold text-foreground truncate px-2">
+                <div className="flex-1 text-center min-w-0">
+                    <h1 className="text-lg font-semibold text-foreground truncate px-2 max-w-full">
                         {currentChannelName || "EchoNote"}
                     </h1>
                 </div>

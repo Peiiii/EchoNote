@@ -40,10 +40,8 @@ export const useChannelMessages = ({
     useEffect(() => {
         return channelMessageService.connectToRequestWorkflow();
     }, []);
-
     useEffect(() => {
         if (currentChannelId) {
-            // channelMessageService.loadInitialMessages({ channelId: currentChannelId, messagesLimit: 20 });
             channelMessageService.requestLoadInitialMessages$.next(currentChannelId);
         }
     }, [currentChannelId]);
