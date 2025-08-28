@@ -37,12 +37,18 @@ export const useChannelMessages = ({
     } = {}, get: getChannelState } = useDataContainerState(slice);
 
     useEffect(() => channelMessageService.moreMessageLoadedEvent$.listen(({ messages }) => onHistoryMessagesChange?.(messages)), []);
+    useEffect(() => {
+        return channelMessageService.connectToRequestWorkflow();
+    }, []);
 
     useEffect(() => {
         if (currentChannelId) {
-            channelMessageService.loadInitialMessages({ channelId: currentChannelId, messagesLimit: 20 });
+            // channelMessageService.loadInitialMessages({ channelId: currentChannelId, messagesLimit: 20 });
+            channelMessageService.requestLoadInitialMessages$.next(currentChannelId);
         }
     }, [currentChannelId]);
+
+
 
     return {
         messages,

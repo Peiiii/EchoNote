@@ -4,6 +4,7 @@ import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
 import { useChatViewStore } from '@/core/stores/chat-view.store';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { createDataContainer, createSlice } from 'rx-nested-bean';
+import { distinctUntilChanged, filter, ReplaySubject, switchMap } from 'rxjs';
 import { v4 } from 'uuid';
 
 export type ChannelState = {
@@ -22,11 +23,24 @@ export class ChannelMessageService {
 
     moreMessageLoadedEvent$ = new RxEvent<{ channelId: string, messages: Message[] }>();
 
+    requestLoadInitialMessages$ = new ReplaySubject<string>(1);
+
     dataContainer = createDataContainer<{
         messageByChannel: Record<string, ChannelState>;
     }>({
         messageByChannel: {}
     });
+
+    handleRequestWorkflow$ = this.requestLoadInitialMessages$.pipe(
+        distinctUntilChanged(),
+        filter(cId => !this.dataContainer.get().messageByChannel[cId]),
+        switchMap(cId => this.loadInitialMessages({ channelId: cId, messagesLimit: 20 }))
+    )
+
+    connectToRequestWorkflow = () => {
+        const subscription = this.handleRequestWorkflow$.subscribe();
+        return () => subscription.unsubscribe();
+    }
 
     getChannelStateControl = (channelId: string) => {
         const control = createSlice(this.dataContainer, `messageByChannel.${channelId}`);
@@ -210,33 +224,33 @@ export class ChannelMessageService {
         fixFakeMessage(tmpMessage.id, realMsgId);
     }
 
-    updateMessage = async ({ messageId, channelId, updates, userId }: { 
-        messageId: string, 
-        channelId: string, 
+    updateMessage = async ({ messageId, channelId, updates, userId }: {
+        messageId: string,
+        channelId: string,
         updates: Partial<Message>,
-        userId: string 
+        userId: string
     }) => {
         const { getChannelState, setMessages } = this.getChannelStateControl(channelId);
         const { messages } = getChannelState();
-        
+
         const messageToUpdate = messages.find(m => m.id === messageId);
         if (!messageToUpdate) {
             throw new Error('Message not found');
         }
-        
+
         if (messageToUpdate.sender !== "user") {
             throw new Error('You can only edit user messages, not AI messages');
         }
-        
+
         const updatedMessage = { ...messageToUpdate, ...updates };
-        
+
         try {
             setMessages(messages.map(m => m.id === messageId ? updatedMessage : m));
-            
+
             await firebaseChatService.updateMessage(userId, messageId, updates);
-            
+
             console.log('Message updated successfully:', { messageId, channelId, updates });
-            
+
         } catch (error) {
             setMessages(messages.map(m => m.id === messageId ? messageToUpdate : m));
             console.error('Failed to update message:', error);
