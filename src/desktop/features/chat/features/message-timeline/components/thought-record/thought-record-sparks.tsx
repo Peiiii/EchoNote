@@ -7,13 +7,11 @@ import { useState } from "react";
 interface ThoughtRecordSparksProps {
     message: Message;
     showAnalysis: boolean;
-    onToggleAnalysis: () => void;
 }
 
 export function ThoughtRecordSparks({
     message,
     showAnalysis,
-    onToggleAnalysis,
 }: ThoughtRecordSparksProps) {
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -48,7 +46,8 @@ export function ThoughtRecordSparks({
                 userId
             });
             
-            onToggleAnalysis();
+            // Remove this line to keep the panel open after generating sparks
+            // onToggleAnalysis();
         } finally {
             setIsGenerating(false);
         }

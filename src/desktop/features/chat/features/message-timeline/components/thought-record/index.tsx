@@ -225,7 +225,6 @@ export function ThoughtRecord({
                     <ThoughtRecordSparks
                         message={message}
                         showAnalysis={showAnalysis}
-                        onToggleAnalysis={handleToggleAnalysis}
                     />
                 )}
 
