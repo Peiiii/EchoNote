@@ -1,7 +1,7 @@
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
-import { MobileMessageInput, MobileTimelineContent, type MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
-import { useMobileTimelineState } from "@/mobile/features/chat/features/message-timeline";
-import { useMobileViewportHeight } from "@/mobile/features/chat/features/message-timeline";
+import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
 import { useRef } from "react";
 
 interface MobileChatLayoutProps {
@@ -34,15 +34,20 @@ export const MobileChatLayout = ({
         onSendMessage,
         setReplyToMessageId
     });
-    
+
     const viewportHeight = useMobileViewportHeight();
-    
+
     // Ref to access timeline content methods
     const timelineContentRef = useRef<MobileTimelineContentRef>(null);
-    
+
     // Enhanced send message handler that scrolls to bottom after sending
     const handleSendMessage = (content: string) => {
-        timelineState.handleSendMessage(content);
+        // timelineState.handleSendMessage(content);
+        channelMessageService.sendMessage({
+            channelId: useChatViewStore.getState().currentChannelId!,
+            content: content,
+            sender: "user",
+        });
         // Auto-scroll to bottom after sending message
         setTimeout(() => {
             timelineContentRef.current?.scrollToBottom({ behavior: 'instant' });
@@ -50,9 +55,9 @@ export const MobileChatLayout = ({
     };
 
     return (
-        <div 
-            className="flex flex-col overflow-hidden" 
-            style={{ 
+        <div
+            className="flex flex-col overflow-hidden"
+            style={{
                 height: viewportHeight,
                 minHeight: viewportHeight,
                 maxHeight: viewportHeight
@@ -65,7 +70,7 @@ export const MobileChatLayout = ({
                 onOpenSettings={onOpenSettings}
                 currentChannelName={currentChannelName}
             />
-            
+
             {/* Main content area */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {/* Timeline content */}
@@ -74,7 +79,7 @@ export const MobileChatLayout = ({
                     onOpenThread={onOpenThread}
                     onReply={timelineState.handleReply}
                 />
-                
+
                 {/* Input area */}
                 <div className="flex-shrink-0">
                     <MobileMessageInput

@@ -13,7 +13,7 @@ const withOptimisticUpdate = async (
     rollbackAction: () => void
 ): Promise<void> => {
     optimisticAction();
-    
+
     try {
         await remoteOperation();
     } catch (error) {
@@ -86,7 +86,12 @@ export class ChannelMessageService {
             if (prevMessages.find(m => m.id === message.id)) {
                 return;
             }
-            setMessages([...prevMessages, message]);
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            if (lastMessage && lastMessage.content === message.content) {
+                setMessages([...prevMessages.slice(0, -1), message]);
+            } else {
+                setMessages([...prevMessages, message]);
+            }
         }
         const removeMessage = (messageId: string) => {
             const prevMessages = getChannelState().messages || [];
@@ -217,10 +222,10 @@ export class ChannelMessageService {
     deleteMessage = async ({ messageId, hardDelete, channelId }: { messageId: string, hardDelete?: boolean, channelId: string }) => {
         const { userId } = useChatDataStore.getState();
         if (!userId) return;
-        
+
         const { removeMessage, getChannelState, setMessages } = this.getChannelStateControl(channelId);
         const originalMessages = getChannelState().messages;
-        
+
         await withOptimisticUpdate(
             () => removeMessage(messageId),
             async () => {
