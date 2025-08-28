@@ -4,7 +4,6 @@
 export { MobileTimelineContent, type MobileTimelineContentRef } from './components/mobile-timeline-content';
 export { MobileThoughtRecord } from './components/thought-record';
 export { MobileMessageInput } from './components/mobile-message-input';
-export { MobileChatContent } from './components/mobile-chat-content';
 export { MobileSidebarManager } from './components/mobile-sidebar-manager';
 
 // Hooks

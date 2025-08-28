@@ -4,12 +4,13 @@ import {
     PopoverContent,
     PopoverTrigger
 } from "@/common/components/ui/popover";
+import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, MoreHorizontal, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileInlineEditor } from "./mobile-inline-editor";
 import { MobileMarkdownContent } from "./mobile-markdown-content";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
@@ -32,19 +33,30 @@ export const MobileThoughtRecord = ({
     const { deleteMessage } = channelMessageService;
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
+    const [localEditContent, setLocalEditContent] = useState("");
 
     // Edit state management
     const {
         editingMessageId,
+        editContent,
         editMode,
         isSaving,
         startEditing: startEdit,
         save,
         cancel,
-        switchToExpandedMode
+        switchToExpandedMode,
+        switchToInlineMode
     } = useEditStateStore();
 
     const isEditing = editingMessageId === message.id;
+    const isExpandedEditing = isEditing && editMode === 'expanded';
+
+    // Sync local content with store content
+    useEffect(() => {
+        if (editContent) {
+            setLocalEditContent(editContent);
+        }
+    }, [editContent]);
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
@@ -57,6 +69,12 @@ export const MobileThoughtRecord = ({
     const handleEdit = () => {
         startEdit(message.id, message.content);
         setPopoverOpen(false);
+    };
+
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newContent = e.target.value;
+        setLocalEditContent(newContent);
+        // Note: updateContent is handled by the inline editor
     };
 
     const handleDelete = async () => {
@@ -273,6 +291,65 @@ export const MobileThoughtRecord = ({
                         />
                     </div>
                 )}
+
+                {/* Expanded Editor Modal */}
+                <Dialog open={isExpandedEditing} onOpenChange={(open) => {
+                    if (!open) {
+                        switchToInlineMode();
+                    }
+                }}>
+                    <DialogContent 
+                        showCloseButton={false}
+                        className="h-[90vh] w-[95vw] max-w-none p-0 border-0 bg-background"
+                        onInteractOutside={(e) => {
+                            e.preventDefault();
+                        }}
+                    >
+                        <div className="h-full flex flex-col">
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => switchToInlineMode()}
+                                        className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                    <h3 className="font-semibold text-foreground">Edit Message</h3>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleCancel}
+                                        disabled={isSaving}
+                                        className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isSaving}
+                                        className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                    >
+                                        {isSaving ? "Saving..." : "Save"}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Editor */}
+                            <div className="flex-1 p-4">
+                                <textarea
+                                    value={localEditContent}
+                                    onChange={handleContentChange}
+                                    className="w-full h-full resize-none text-sm leading-relaxed border border-input rounded-lg p-3 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                                    placeholder="Edit your message..."
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );

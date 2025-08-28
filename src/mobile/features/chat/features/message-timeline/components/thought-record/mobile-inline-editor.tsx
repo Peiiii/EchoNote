@@ -83,6 +83,7 @@ export function MobileInlineEditor({
                     variant="outline"
                     size="sm"
                     onClick={onExpand}
+                    disabled={isSaving}
                     className="h-8 px-3 text-xs"
                 >
                     <Expand className="w-3 h-3 mr-1" />

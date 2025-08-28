@@ -43,9 +43,9 @@ export const MobileExpandedEditor = ({
     };
 
     return (
-        <div className="h-full flex flex-col bg-background">
+        <div className="w-full h-full flex flex-col bg-white dark:bg-slate-900">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                 <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
@@ -84,18 +84,18 @@ export const MobileExpandedEditor = ({
             </div>
 
             {/* Editor */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 min-h-0">
                 <Textarea
                     value={editContent}
                     onChange={handleContentChange}
                     placeholder="Edit your message..."
-                    className="h-full resize-none text-sm leading-relaxed"
+                    className="w-full h-full resize-none text-sm leading-relaxed border border-slate-200 dark:border-slate-700 rounded-lg p-3"
                     autoFocus
                 />
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-border bg-muted/50">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                 <div className="text-xs text-muted-foreground text-center">
                     {hasChanges ? "Unsaved changes" : "All changes saved"}
                 </div>
