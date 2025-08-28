@@ -34,7 +34,6 @@ export const MobileThoughtRecord = ({
     const { deleteMessage } = channelMessageService;
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [localEditContent, setLocalEditContent] = useState("");
 
     // Edit state management
     const {
@@ -51,9 +50,6 @@ export const MobileThoughtRecord = ({
     const isEditing = editingMessageId === message.id;
     const isExpandedEditing = isEditing && editMode === 'expanded';
 
-    // Sync local content with store content
-    // Note: This is now handled by the individual editor components
-
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
@@ -65,12 +61,6 @@ export const MobileThoughtRecord = ({
     const handleEdit = () => {
         startEdit(message.id, message.content);
         setPopoverOpen(false);
-    };
-
-    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newContent = e.target.value;
-        setLocalEditContent(newContent);
-        // Note: updateContent is handled by the inline editor
     };
 
     const handleDelete = async () => {
