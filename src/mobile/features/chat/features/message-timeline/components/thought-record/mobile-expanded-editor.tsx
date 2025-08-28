@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
 
 interface MobileExpandedEditorProps {
-    content: string;
     originalContent: string;
     onSave: () => void;
     onCancel: () => void;
@@ -13,23 +12,19 @@ interface MobileExpandedEditorProps {
 }
 
 export const MobileExpandedEditor = ({
-    content,
     originalContent,
     onSave,
     onCancel,
     onCollapse,
     isSaving
 }: MobileExpandedEditorProps) => {
-    const [editContent, setEditContent] = useState(content);
-    const [hasChanges, setHasChanges] = useState(false);
+    const { editContent, updateContent } = useEditStateStore();
+    const hasChanges = editContent !== originalContent;
 
-    useEffect(() => {
-        setEditContent(content);
-    }, [content]);
-
-    useEffect(() => {
-        setHasChanges(editContent !== originalContent);
-    }, [editContent, originalContent]);
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newContent = e.target.value;
+        updateContent(newContent);
+    };
 
     const handleSave = () => {
         if (hasChanges) {
@@ -69,15 +64,20 @@ export const MobileExpandedEditor = ({
                         onClick={handleCancel}
                         disabled={isSaving}
                     >
-                        <X className="w-4 h-4 mr-1" />
+                        <X className="h-4 w-4 mr-1" />
                         Cancel
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={!hasChanges || isSaving}
                         size="sm"
+                        className={`${
+                            hasChanges 
+                                ? 'bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200' 
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                        }`}
                     >
-                        <Save className="w-4 h-4 mr-1" />
+                        <Save className="h-4 w-4 mr-1" />
                         {isSaving ? "Saving..." : "Save"}
                     </Button>
                 </div>
@@ -87,7 +87,7 @@ export const MobileExpandedEditor = ({
             <div className="flex-1 p-4">
                 <Textarea
                     value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
+                    onChange={handleContentChange}
                     placeholder="Edit your message..."
                     className="h-full resize-none text-sm leading-relaxed"
                     autoFocus
@@ -97,7 +97,7 @@ export const MobileExpandedEditor = ({
             {/* Footer */}
             <div className="p-4 border-t border-border bg-muted/50">
                 <div className="text-xs text-muted-foreground text-center">
-                    {hasChanges ? "You have unsaved changes" : "No changes made"}
+                    {hasChanges ? "Unsaved changes" : "All changes saved"}
                 </div>
             </div>
         </div>

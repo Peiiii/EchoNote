@@ -12,7 +12,6 @@ interface MobileChatContentProps {
 export const MobileChatContent = ({ timeline, input, scrollButton, className = "" }: MobileChatContentProps) => {
     const { 
         editingMessageId, 
-        editContent, 
         originalContent, 
         editMode, 
         isSaving,
@@ -48,7 +47,6 @@ export const MobileChatContent = ({ timeline, input, scrollButton, className = "
             {isExpandedEditing && (
                 <div className="fixed inset-0 z-50 bg-background">
                     <MobileExpandedEditor
-                        content={editContent}
                         originalContent={originalContent}
                         onSave={handleSave}
                         onCancel={handleCancel}

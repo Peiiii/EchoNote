@@ -36,7 +36,6 @@ export const MobileThoughtRecord = ({
     // Edit state management
     const {
         editingMessageId,
-        editContent,
         editMode,
         isSaving,
         startEditing: startEdit,
@@ -244,7 +243,6 @@ export const MobileThoughtRecord = ({
                 {/* Content Area - Show inline editor or read-only content */}
                 {isEditing && editMode === 'inline' ? (
                     <MobileInlineEditor
-                        content={editContent}
                         onSave={handleSave}
                         onCancel={handleCancel}
                         onExpand={handleExpand}

@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/common/components/ui/button';
 import { Textarea } from '@/common/components/ui/textarea';
 import { Save, X, Expand } from 'lucide-react';
+import { useEditStateStore } from '@/core/stores/edit-state.store';
 
 interface MobileInlineEditorProps {
-    content: string;
     onSave: () => void;
     onCancel: () => void;
     onExpand: () => void;
@@ -12,22 +11,18 @@ interface MobileInlineEditorProps {
 }
 
 export function MobileInlineEditor({
-    content,
     onSave,
     onCancel,
     onExpand,
     isSaving
 }: MobileInlineEditorProps) {
-    const [editContent, setEditContent] = useState(content);
-    const [hasChanges, setHasChanges] = useState(false);
+    const { editContent, originalContent, updateContent } = useEditStateStore();
+    const hasChanges = editContent !== originalContent;
 
-    useEffect(() => {
-        setEditContent(content);
-    }, [content]);
-
-    useEffect(() => {
-        setHasChanges(editContent !== content);
-    }, [editContent, content]);
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newContent = e.target.value;
+        updateContent(newContent);
+    };
 
     const handleSave = () => {
         if (hasChanges) {
@@ -50,7 +45,7 @@ export function MobileInlineEditor({
             {/* Editor */}
             <Textarea
                 value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
+                onChange={handleContentChange}
                 placeholder="Edit your thought..."
                 className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
                 autoFocus
@@ -73,7 +68,11 @@ export function MobileInlineEditor({
                         onClick={handleSave}
                         disabled={!hasChanges || isSaving}
                         size="sm"
-                        className="h-8 px-3 text-xs"
+                        className={`h-8 px-3 text-xs ${
+                            hasChanges 
+                                ? 'bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200' 
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                        }`}
                     >
                         <Save className="w-3 h-3 mr-1" />
                         {isSaving ? "Saving..." : "Save"}
@@ -90,13 +89,6 @@ export function MobileInlineEditor({
                     Expand
                 </Button>
             </div>
-
-            {/* Status */}
-            {hasChanges && (
-                <div className="text-xs text-blue-600 dark:text-blue-400 text-center">
-                    You have unsaved changes
-                </div>
-            )}
         </div>
     );
 }
