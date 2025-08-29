@@ -1,3 +1,4 @@
+import { CodeBlock } from './code-block';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -12,28 +13,13 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                    // 自定义代码块样式
-                    code({ className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        const isInline = !className || !match;
-                        return !isInline ? (
-                            <pre className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 overflow-x-auto border border-slate-200/50 dark:border-slate-700/50">
-                                <code className={className} {...props}>
-                                    {children}
-                                </code>
-                            </pre>
-                        ) : (
-                            <code className="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-sm border border-slate-200/50 dark:border-slate-600/50" {...props}>
-                                {children}
-                            </code>
-                        );
-                    },
-                    // 自定义链接样式
+                    code: CodeBlock,
+
                     a({ children, href, ...props }) {
                         return (
                             <a
                                 href={href}
-                                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors duration-200"
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors duration-200 font-medium"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 {...props}
@@ -42,11 +28,11 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                             </a>
                         );
                     },
-                    // 自定义表格样式
+
                     table({ children, ...props }) {
                         return (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden" {...props}>
+                            <div className="my-6 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700" {...props}>
                                     {children}
                                 </table>
                             </div>
@@ -54,96 +40,121 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     th({ children, ...props }) {
                         return (
-                            <th className="border border-slate-300 dark:border-slate-600 px-4 py-2 bg-slate-100 dark:bg-slate-700 font-semibold" {...props}>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800" {...props}>
                                 {children}
                             </th>
                         );
                     },
                     td({ children, ...props }) {
                         return (
-                            <td className="border border-slate-300 dark:border-slate-600 px-4 py-2" {...props}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100 border-t border-slate-100 dark:border-slate-800" {...props}>
                                 {children}
                             </td>
                         );
                     },
-                    // 自定义引用样式
+
                     blockquote({ children, ...props }) {
                         return (
-                            <blockquote className="border-l-4 border-blue-400 dark:border-blue-500 pl-4 italic text-slate-600 dark:text-slate-400 bg-blue-50/30 dark:bg-blue-900/20 py-2 rounded-r-lg" {...props}>
+                            <blockquote className="relative my-6 pl-6 py-2 italic text-slate-700 dark:text-slate-300 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-lg" {...props}>
+                                <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-400 to-indigo-500 rounded-l-lg"></div>
                                 {children}
                             </blockquote>
                         );
                     },
-                    // 自定义列表样式
+
                     ul({ children, ...props }) {
                         return (
-                            <ul className="list-disc list-inside space-y-1 marker:text-blue-500 dark:marker:text-blue-400" {...props}>
+                            <ul className="my-4 space-y-2 list-none" {...props}>
                                 {children}
                             </ul>
                         );
                     },
+                    li({ children, ...props }) {
+                        return (
+                            <li className="flex items-start space-x-3" {...props}>
+                                <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-500 dark:bg-blue-400"></div>
+                                <span className="text-slate-700 dark:text-slate-300">{children}</span>
+                            </li>
+                        );
+                    },
                     ol({ children, ...props }) {
                         return (
-                            <ol className="list-decimal list-inside space-y-1 marker:text-blue-500 dark:marker:text-blue-400 marker:font-medium" {...props}>
+                            <ol className="my-4 space-y-2 list-decimal list-inside" {...props}>
                                 {children}
                             </ol>
                         );
                     },
-                    // 自定义标题样式
+
                     h1({ children, ...props }) {
                         return (
-                            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2" {...props}>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-6 pb-3 border-b-2 border-gradient-to-r from-blue-500 to-purple-500 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent" {...props}>
                                 {children}
                             </h1>
                         );
                     },
                     h2({ children, ...props }) {
                         return (
-                            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3 text-blue-600 dark:text-blue-400" {...props}>
+                            <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-4 mt-8 pb-2 border-b border-slate-200 dark:border-slate-700" {...props}>
                                 {children}
                             </h2>
                         );
                     },
                     h3({ children, ...props }) {
                         return (
-                            <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-2" {...props}>
+                            <h3 className="text-xl font-medium text-slate-800 dark:text-slate-200 mb-3 mt-6" {...props}>
                                 {children}
                             </h3>
                         );
                     },
                     h4({ children, ...props }) {
                         return (
-                            <h4 className="text-base font-medium text-slate-800 dark:text-slate-200 mb-2" {...props}>
+                            <h4 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-2 mt-5" {...props}>
                                 {children}
                             </h4>
                         );
                     },
                     h5({ children, ...props }) {
                         return (
-                            <h5 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1" {...props}>
+                            <h5 className="text-base font-medium text-slate-800 dark:text-slate-200 mb-2 mt-4" {...props}>
                                 {children}
                             </h5>
                         );
                     },
                     h6({ children, ...props }) {
                         return (
-                            <h6 className="text-xs font-medium text-slate-800 dark:text-slate-200 mb-1" {...props}>
+                            <h6 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1 mt-3" {...props}>
                                 {children}
                             </h6>
                         );
                     },
-                    // 自定义段落样式
+
                     p({ children, ...props }) {
                         return (
-                            <p className="text-base leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words font-normal mb-3" {...props}>
+                            <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words font-normal mb-4" {...props}>
                                 {children}
                             </p>
                         );
                     },
-                    // 自定义分割线样式
+
                     hr({ ...props }) {
                         return (
-                            <hr className="border-t border-slate-300 dark:border-slate-600 my-6" {...props} />
+                            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent" {...props} />
+                        );
+                    },
+
+                    strong({ children, ...props }) {
+                        return (
+                            <strong className="font-semibold text-slate-900 dark:text-slate-100" {...props}>
+                                {children}
+                            </strong>
+                        );
+                    },
+
+                    em({ children, ...props }) {
+                        return (
+                            <em className="italic text-slate-600 dark:text-slate-400" {...props}>
+                                {children}
+                            </em>
                         );
                     },
                 }}

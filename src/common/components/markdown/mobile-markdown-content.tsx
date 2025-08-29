@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { CodeBlock } from './code-block';
 
 interface MobileMarkdownContentProps {
     content: string;
@@ -13,21 +14,8 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                 remarkPlugins={[remarkGfm]}
                 components={{
                     // 移动端优化的代码块样式
-                    code({ className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        const isInline = !className || !match;
-                        return !isInline ? (
-                            <pre className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto border border-slate-200/50 dark:border-slate-700/50 text-sm">
-                                <code className={className} {...props}>
-                                    {children}
-                                </code>
-                            </pre>
-                        ) : (
-                            <code className="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-sm border border-slate-200/50 dark:border-slate-600/50" {...props}>
-                                {children}
-                            </code>
-                        );
-                    },
+                    code: CodeBlock,
+
                     // 移动端优化的链接样式
                     a({ children, href, ...props }) {
                         return (
@@ -42,6 +30,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             </a>
                         );
                     },
+
                     // 移动端优化的表格样式
                     table({ children, ...props }) {
                         return (
@@ -66,6 +55,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             </td>
                         );
                     },
+
                     // 移动端优化的引用样式
                     blockquote({ children, ...props }) {
                         return (
@@ -74,6 +64,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             </blockquote>
                         );
                     },
+
                     // 移动端优化的列表样式
                     ul({ children, ...props }) {
                         return (
@@ -89,6 +80,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             </ol>
                         );
                     },
+
                     // 移动端优化的标题样式
                     h1({ children, ...props }) {
                         return (
@@ -130,8 +122,9 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             <h6 className="text-xs font-medium text-slate-800 dark:text-slate-200 mb-1" {...props}>
                                 {children}
                             </h6>
-                        );
+                            );
                     },
+
                     // 移动端优化的段落样式
                     p({ children, ...props }) {
                         return (
@@ -140,6 +133,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                             </p>
                         );
                     },
+
                     // 移动端优化的分割线样式
                     hr({ ...props }) {
                         return (

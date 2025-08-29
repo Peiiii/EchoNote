@@ -12,7 +12,7 @@ import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { MobileInlineEditor } from "./mobile-inline-editor";
-import { MobileMarkdownContent } from "./mobile-markdown-content";
+import { MobileMarkdownContent } from "@/common/components/markdown";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";

@@ -8,7 +8,7 @@ import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { MoreActionsMenu } from "../more-actions-menu";
 import { InlineEditor } from "./inline-editor";
-import { MarkdownContent } from "./markdown-content";
+import { MarkdownContent } from "@/common/components/markdown";
 import { ReadMoreWrapper } from "./read-more-wrapper";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
 
@@ -259,7 +259,3 @@ export function ThoughtRecord({
         </div>
     );
 }
-
-export { MarkdownContent } from "./markdown-content";
-export { ReadMoreWrapper } from "./read-more-wrapper";
-

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { MarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
-import { Check, X, Loader2, Minimize2, Eye, EyeOff } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { MarkdownContent } from "./markdown-content";
+import { Check, Eye, EyeOff, Loader2, Minimize2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface ExpandedEditorProps {
   content: string;
@@ -13,13 +13,13 @@ interface ExpandedEditorProps {
   isSaving: boolean;
 }
 
-export function ExpandedEditor({ 
-  content, 
-  originalContent, 
-  onSave, 
-  onCancel, 
-  onCollapse, 
-  isSaving 
+export function ExpandedEditor({
+  content,
+  originalContent,
+  onSave,
+  onCancel,
+  onCollapse,
+  isSaving
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const [showOriginal, setShowOriginal] = useState(true);
@@ -80,7 +80,7 @@ export function ExpandedEditor({
             Editing Thought
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {/* Toggle original content view */}
           <Button
@@ -101,7 +101,7 @@ export function ExpandedEditor({
               </>
             )}
           </Button>
-          
+
           {/* Collapse to inline mode */}
           <Button
             variant="ghost"
@@ -147,7 +147,7 @@ export function ExpandedEditor({
                 {localContent.length} characters
               </div>
             </div>
-            
+
             {/* Editor textarea */}
             <div className="relative">
               <textarea
@@ -181,7 +181,7 @@ export function ExpandedEditor({
             </kbd>
             <span className="ml-2">to cancel</span>
           </div>
-          
+
           {/* Right side - Action buttons */}
           <div className="flex items-center gap-2">
             <Button
@@ -194,7 +194,7 @@ export function ExpandedEditor({
               <X className="w-3.5 h-3.5 mr-1.5" />
               Cancel
             </Button>
-            
+
             <Button
               size="sm"
               onClick={handleSave}
