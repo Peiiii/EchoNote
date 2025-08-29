@@ -164,6 +164,7 @@ export const firebaseChatService = {
       ...channelData,
       createdAt: serverTimestamp(),
       messageCount: 0,
+      isDeleted: false,
       lastMessageTime: serverTimestamp(), // Initialize last message time
     });
     return docRef.id;
