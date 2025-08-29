@@ -23,7 +23,7 @@ export class ChannelToolsManager {
     private createNoteTool(channelId: string): Tool {
         return {
             name: 'createNote',
-            description: 'Create a new note in the current channel',
+            description: 'Create a new note in the current channel. ONLY use this tool when the user explicitly requests to create a note or thought.',
             parameters: {
                 type: 'object',
                 properties: {
