@@ -18,18 +18,18 @@ export class ChannelToolsManager {
     }
 
     /**
-     * Create a new note
+     * Create a new note/thought
      */
     private createNoteTool(channelId: string): Tool {
         return {
             name: 'createNote',
-            description: 'Create a new note in the current channel. ONLY use this tool when the user explicitly requests to create a note or thought.',
+            description: 'Create a new note/thought in the current channel. ONLY use this tool when the user explicitly requests to create a note or thought.',
             parameters: {
                 type: 'object',
                 properties: {
                     content: {
                         type: 'string',
-                        description: 'Content of the note'
+                        description: 'Content of the note/thought'
                     }
                 },
                 required: ['content']
@@ -62,18 +62,18 @@ export class ChannelToolsManager {
     }
 
     /**
-     * Read a specific note by ID
+     * Read a specific note/thought by ID
      */
     private readNoteTool(channelId: string): Tool {
         return {
             name: 'readNote',
-            description: 'Read a specific note by its ID',
+            description: 'Read a specific note/thought by its ID',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: {
                         type: 'string',
-                        description: 'ID of the note to read'
+                        description: 'ID of the note/thought to read'
                     }
                 },
                 required: ['noteId']
@@ -111,22 +111,22 @@ export class ChannelToolsManager {
     }
 
     /**
-     * Update an existing note
+     * Update an existing note/thought
      */
     private updateNoteTool(channelId: string): Tool {
         return {
             name: 'updateNote',
-            description: 'Update an existing note by its ID',
+            description: 'Update an existing note/thought by its ID',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: {
                         type: 'string',
-                        description: 'ID of the note to update'
+                        description: 'ID of the note/thought to update'
                     },
                     content: {
                         type: 'string',
-                        description: 'New content for the note'
+                        description: 'New content for the note/thought'
                     }
                 },
                 required: ['noteId', 'content']
@@ -169,18 +169,18 @@ export class ChannelToolsManager {
     }
 
     /**
-     * Delete a note by ID
+     * Delete a note/thought by ID
      */
     private deleteNoteTool(channelId: string): Tool {
         return {
             name: 'deleteNote',
-            description: 'Delete a note by its ID',
+            description: 'Delete a note/thought by its ID',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: {
                         type: 'string',
-                        description: 'ID of the note to delete'
+                        description: 'ID of the note/thought to delete'
                     }
                 },
                 required: ['noteId']

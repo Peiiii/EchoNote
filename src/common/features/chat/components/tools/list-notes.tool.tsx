@@ -21,13 +21,13 @@ export function ListNotesToolRender({ limit, channelId }: ListNotesToolRenderPro
 export function createListNotesTool(channelId: string): Tool {
     return {
         name: 'listNotes',
-        description: 'List all notes in the current channel',
+        description: 'List all notes/thoughts in the current channel',
         parameters: {
             type: 'object',
             properties: {
                 limit: {
                     type: 'number',
-                    description: 'Maximum number of notes to return (default: 10)'
+                    description: 'Maximum number of notes/thoughts to return (default: 10)'
                 }
             },
             required: []
