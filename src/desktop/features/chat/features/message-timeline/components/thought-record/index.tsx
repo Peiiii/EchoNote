@@ -183,7 +183,7 @@ export function ThoughtRecord({
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full" data-component="thought-record">
             <div className="group relative w-full px-8 py-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all duration-300 ease-out hover:shadow-sm">
                 {/* Record Header */}
                 <div className="flex items-center justify-between mb-4">

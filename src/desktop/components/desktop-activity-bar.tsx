@@ -61,7 +61,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
           }
           title="EchoNote"
           showSearch={false}
-          className="bg-muted dark:bg-muted"
+          className="bg-muted dark:bg-card"
         />
 
         {/* Group List - 主要功能区域 */}
@@ -71,7 +71,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
               <ActivityBar.Item
                 key={item.id}
                 id={item.id}
-                className="activity-bar-item"
+                className="activity-bar-item dark:bg-accent"
                 collapsedLabel={item.collapsedLabel}
                 icon={
                   <div
@@ -93,7 +93,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
         </ActivityBar.GroupList>
 
         {/* Footer - 设置区域 */}
-        <ActivityBar.Footer className="bg-muted dark:bg-muted border-t border-border">
+        <ActivityBar.Footer className="bg-muted dark:bg-card border-t border-border">
           {/* Auth Status Section - 统一的认证状态显示 */}
           <div className="px-2 py-2 border-b border-border flex justify-center">
             <AuthStatus />

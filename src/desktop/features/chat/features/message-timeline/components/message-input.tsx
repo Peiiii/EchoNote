@@ -88,7 +88,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
     }, [message]);
 
     return (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-background">
             {/* Reply indicator */}
             {replyToMessage && (
                 <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">

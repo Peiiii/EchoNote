@@ -78,9 +78,9 @@
 }
 
 .dark {
-  --background: oklch(0.10 0 0);        /* 主内容区 - 最亮 */
+  --background: #191A1A;        /* 主内容区 - 最亮 */
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.15 0 0);              /* Channel List - 中等亮度 */
+  --card: #1F2121;              /* Channel List - 中等亮度 */
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
@@ -88,9 +88,9 @@
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.18 0 0);             /* AI 助手 - 中等亮度 */
+  --muted: #2D2F2F;             /* AI 助手 - 中等亮度 */
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.18 0 0);            /* 活动栏 - 最深色，更中性的深灰 */
+  --accent: #2D2F2F;            /* 活动栏 - 最深色，更中性的深灰 */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.25 0 0);            /* 主要边框 */
