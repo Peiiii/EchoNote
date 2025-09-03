@@ -188,7 +188,6 @@ export function ThoughtRecord({
                 {/* Record Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 shadow-sm"></div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
                             <Clock className="w-3 h-3" />
                             <span>{formatTimeForSocial(message.timestamp)}</span>
