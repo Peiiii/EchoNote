@@ -1,22 +1,22 @@
+import { MobileMarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
+import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger
 } from "@/common/components/ui/popover";
-import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { MobileExpandedEditor } from "./mobile-expanded-editor";
 import { MobileInlineEditor } from "./mobile-inline-editor";
-import { MobileMarkdownContent } from "@/common/components/markdown";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
-import { MobileExpandedEditor } from "./mobile-expanded-editor";
 
 interface MobileThoughtRecordProps {
     message: Message;
@@ -66,7 +66,7 @@ export const MobileThoughtRecord = ({
     const handleDelete = async () => {
         // Close popover immediately when delete button is clicked
         setPopoverOpen(false);
-        
+
         // Use setTimeout to ensure React has time to re-render before showing confirm
         setTimeout(async () => {
             const messagePreview = message.content.length > 100
@@ -134,9 +134,8 @@ export const MobileThoughtRecord = ({
                 {/* Record Header - Ultra Simplified */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50"></div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                            {formatTimeForSocial(message.timestamp)}
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            <span> {formatTimeForSocial(message.timestamp)}</span>
                         </div>
                     </div>
 
@@ -284,7 +283,7 @@ export const MobileThoughtRecord = ({
                         switchToInlineMode();
                     }
                 }}>
-                    <DialogContent 
+                    <DialogContent
                         showCloseButton={false}
                         className="h-[90vh] w-[95vw] max-w-none p-0 border-0 bg-background"
                         onInteractOutside={(e) => {
