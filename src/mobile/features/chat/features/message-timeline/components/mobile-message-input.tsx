@@ -51,10 +51,10 @@ export const MobileMessageInput = ({
     const isReplyMode = !!replyToMessageId;
 
     return (
-        <div className={cn("border-t border-border bg-background p-3 space-y-3", className)}>
+        <div className={cn("bg-background p-4 space-y-3", className)}>
             {/* Reply indicator */}
             {isReplyMode && (
-                <div className="flex items-center justify-between bg-muted rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between bg-muted/50 rounded-xl px-4 py-3 border border-border/50">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>Replying to message</span>
                     </div>
@@ -62,15 +62,15 @@ export const MobileMessageInput = ({
                         variant="ghost"
                         size="sm"
                         onClick={onCancelReply}
-                        className="h-6 px-2 text-xs"
+                        className="h-7 px-3 text-xs rounded-lg"
                     >
                         Cancel
                     </Button>
                 </div>
             )}
 
-            {/* Input area */}
-            <div className="flex items-end gap-2">
+            {/* Input area - Perplexity style */}
+            <div className="flex items-end gap-3">
                 {/* Message input */}
                 <div className="flex-1 relative">
                     <Textarea
@@ -78,18 +78,19 @@ export const MobileMessageInput = ({
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type your message..."
-                        className="min-h-[40px] max-h-[120px] resize-none"
+                        placeholder="What's on your mind?"
+                        className="min-h-[44px] max-h-[120px] resize-none rounded-2xl border-border/60 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md focus:border-transparent focus:outline-none transition-all duration-200 px-4 py-2 text-base"
                         rows={1}
                     />
                 </div>
 
-                {/* Send button */}
+                {/* Send button - Apple style */}
                 <Button
+                    variant="default"
                     onClick={handleSend}
                     disabled={!message.trim() || isSending}
                     size="icon"
-                    className="h-10 w-10 flex-shrink-0"
+                    className="h-11 w-11 flex-shrink-0 bg-primary rounded-2xl shadow-sm hover:shadow-md transition-all duration-200"
                 >
                     {isSending ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>

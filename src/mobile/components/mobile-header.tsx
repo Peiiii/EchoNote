@@ -22,7 +22,7 @@ export const MobileHeader = ({
                     variant="ghost"
                     size="icon"
                     onClick={onOpenChannelList}
-                    className="h-10 w-10 dark:text-primary/90"
+                    className="h-10 w-10 dark:text-primary"
                 >
                     <Menu className="h-5 w-5" />
                 </Button>
@@ -40,7 +40,7 @@ export const MobileHeader = ({
                         variant="ghost"
                         size="icon"
                         onClick={onOpenAIAssistant}
-                        className="h-10 w-10 dark:text-primary/90"
+                        className="h-10 w-10 dark:text-primary"
                     >
                         <Bot className="h-5 w-5" />
                     </Button>
@@ -48,7 +48,7 @@ export const MobileHeader = ({
                         variant="ghost"
                         size="icon"
                         onClick={onOpenSettings}
-                        className="h-10 w-10 dark:text-primary/90"
+                        className="h-10 w-10 dark:text-primary"
                     >
                         <Settings className="h-5 w-5" />
                     </Button>
