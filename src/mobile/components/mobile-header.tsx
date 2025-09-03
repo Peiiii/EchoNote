@@ -15,7 +15,7 @@ export const MobileHeader = ({
     currentChannelName 
 }: MobileHeaderProps) => {
     return (
-        <div className="flex-shrink-0 px-4 py-3 border-b border-border bg-background">
+        <div className="flex-shrink-0 px-4 py-3 bg-background">
             <div className="flex items-center justify-between">
                 {/* Left: Channel List Button */}
                 <Button
