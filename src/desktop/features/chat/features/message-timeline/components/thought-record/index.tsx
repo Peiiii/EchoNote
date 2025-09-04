@@ -226,6 +226,7 @@ export function ThoughtRecord({
                         message={message}
                         showAnalysis={showAnalysis}
                         className="px-8 mx-8"
+                        onClose={handleToggleAnalysis}
                     />
                 )}
 
