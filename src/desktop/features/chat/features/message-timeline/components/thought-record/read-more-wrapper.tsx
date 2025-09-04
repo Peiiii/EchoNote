@@ -69,7 +69,7 @@ export function ReadMoreWrapper({
                         <div
                             className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/70 via-white/40 to-transparent dark:from-transparent dark:via-transparent dark:to-transparent"
                         />
-                        <div className="absolute bottom-1 left-1/2 pointer-events-auto">
+                        <div className="absolute bottom-1 flex w-full items-center justify-center pointer-events-auto">
                             <ReadMoreButton
                                 onClick={toggleExpanded}
                                 icon={<ChevronDown className="w-3 h-3 text-slate-400/70 dark:text-slate-500/70 transition-transform duration-200" />}
