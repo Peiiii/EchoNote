@@ -39,6 +39,7 @@ export const chatExtension = defineExtension({
           label: "Chat",
           title: "Conversational Notes",
           group: ActivityBarGroup.MAIN,
+          collapsedLabel: "Chat",
           icon: "message-square",
           order: 1,
           iconColor: "text-blue-600 dark:text-blue-400",

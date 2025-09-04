@@ -45,6 +45,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
       )}
     >
       <ActivityBar.Root
+        toggleable={false}
         expanded={expanded}
         activeId={activeId}
         expandedWidth={240}
