@@ -6,7 +6,7 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { Hash, MessageSquare, Plus } from "lucide-react";
+import { Hash, MessageSquare, Plus,Notebook } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 import { Navigate } from "react-router-dom";
 
@@ -27,6 +27,7 @@ export const chatExtension = defineExtension({
           "message-square": MessageSquare,
           hash: Hash,
           plus: Plus,
+          notebook: Notebook,
         })
       )
     );
@@ -35,12 +36,12 @@ export const chatExtension = defineExtension({
     subscriptions.push(
       Disposable.from(
         useActivityBarStore.getState().addItem({
-          id: "chat",
-          label: "Chat",
+          id: "notes",
+          label: "Notes",
           title: "Conversational Notes",
           group: ActivityBarGroup.MAIN,
-          collapsedLabel: "Chat",
-          icon: "message-square",
+          collapsedLabel: "Notes",
+          icon: "notebook",
           order: 1,
         })
       )

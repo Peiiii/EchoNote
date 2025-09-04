@@ -65,9 +65,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                         <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
                             Thought Spaces
                         </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            Choose your thinking domain
-                        </p>
                     </div>
                     <CollapsibleSidebar.ToggleButton />
                 </div>
