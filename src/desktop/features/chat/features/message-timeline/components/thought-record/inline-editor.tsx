@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Check, X, Loader2, Maximize2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { cn } from "@/common/lib/utils";
 
 interface InlineEditorProps {
   content: string;
@@ -9,9 +10,10 @@ interface InlineEditorProps {
   onCancel: () => void;
   onExpand: () => void;
   isSaving: boolean;
+  className?: string;
 }
 
-export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving }: InlineEditorProps) {
+export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving, className }: InlineEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateContent } = useEditStateStore();
@@ -61,7 +63,7 @@ export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving }: 
   };
 
   return (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", className)}>
       {/* Editor Textarea - Borderless, like message input */}
       <div className="relative">
         <textarea

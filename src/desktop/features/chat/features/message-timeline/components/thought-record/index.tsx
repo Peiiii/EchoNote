@@ -184,9 +184,9 @@ export function ThoughtRecord({
 
     return (
         <div className="w-full" data-component="thought-record">
-            <div className="group relative w-full px-8 py-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all duration-300 ease-out hover:shadow-sm">
+            <div className="group relative w-full py-6 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all duration-300 ease-out hover:shadow-sm">
                 {/* Record Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 px-8">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
                             <Clock className="w-3 h-3" />
@@ -212,10 +212,11 @@ export function ThoughtRecord({
                         onCancel={handleCancel}
                         onExpand={handleExpand}
                         isSaving={isSaving}
+                        className="px-8"
                     />
                 ) : (
                     <ReadMoreWrapper maxHeight={300} >
-                        <MarkdownContent content={message.content} />
+                        <MarkdownContent content={message.content} className="px-8" />
                     </ReadMoreWrapper>
                 )}
 
@@ -224,12 +225,13 @@ export function ThoughtRecord({
                     <ThoughtRecordSparks
                         message={message}
                         showAnalysis={showAnalysis}
+                        className="px-8"
                     />
                 )}
 
                 {/* Footer - Hide when editing */}
                 {!isEditing && (
-                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 px-8">
                         <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                             <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
                                 {message.content.length} characters

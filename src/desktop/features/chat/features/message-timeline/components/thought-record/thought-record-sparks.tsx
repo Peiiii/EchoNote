@@ -3,15 +3,18 @@ import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
 import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useState } from "react";
+import { cn } from "@/common/lib/utils";
 
 interface ThoughtRecordSparksProps {
     message: Message;
     showAnalysis: boolean;
+    className?: string;
 }
 
 export function ThoughtRecordSparks({
     message,
     showAnalysis,
+    className,
 }: ThoughtRecordSparksProps) {
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -58,7 +61,7 @@ export function ThoughtRecordSparks({
     }
 
     return (
-        <div className="mb-4 p-4 bg-slate-50/60 dark:bg-slate-800/30 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+        <div className={cn("mb-4 p-4 bg-slate-50/60 dark:bg-slate-800/30 rounded-lg border border-slate-200/50 dark:border-slate-700/50", className)}>
             <div className="space-y-4">
                 {/* Conditional: empty vs populated */}
                 {!hasSparks ? (
