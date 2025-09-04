@@ -42,7 +42,6 @@ export const chatExtension = defineExtension({
           collapsedLabel: "Chat",
           icon: "message-square",
           order: 1,
-          iconColor: "text-blue-600 dark:text-blue-400",
         })
       )
     );

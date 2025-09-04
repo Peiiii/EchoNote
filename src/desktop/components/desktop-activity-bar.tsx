@@ -38,8 +38,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
       className={cn(
         "relative flex-shrink-0 h-full",
         // 使用基础背景色，让 active item 能够突出显示
-        "bg-card dark:bg-card",
-        "border-border",
+        "bg-sidebar dark:bg-card border-none",
         "shadow-sm",
         className
       )}
@@ -51,18 +50,18 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
         expandedWidth={240}
         onExpandedChange={handleExpandedChange}
         onActiveChange={handleActiveChange}
-        className="relative z-10 h-full bg-transparent"
+        className="relative z-10 h-full bg-transparent border-none"
       >
         {/* Header - 简洁的标题区域 */}
         <ActivityBar.Header
           icon={
             <div className="flex items-center justify-center w-6 h-6">
-              <LayoutDashboard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <LayoutDashboard className="w-5 h-5" />
             </div>
           }
           title="EchoNote"
           showSearch={false}
-          className="bg-muted dark:bg-card"
+          className="bg-sidebar dark:bg-card"
         />
 
         {/* Group List - 主要功能区域 */}
@@ -73,13 +72,13 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
                 key={item.id}
                 id={item.id}
                 className="activity-bar-item dark:bg-accent"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
                 collapsedLabel={item.collapsedLabel}
                 icon={
                   <div
                     data-testid={item.id}
                     className={cn(
                       "flex items-center justify-center",
-                      item.iconColor || "text-blue-600 dark:text-blue-400"
                     )}
                   >
                     <IconRegistry id={item.icon} />
@@ -94,7 +93,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
         </ActivityBar.GroupList>
 
         {/* Footer - 设置区域 */}
-        <ActivityBar.Footer className="bg-muted dark:bg-card border-t border-border">
+        <ActivityBar.Footer className="bg-sidebar dark:bg-card border-t border-border">
           {/* Auth Status Section - 统一的认证状态显示 */}
           <div className="px-2 py-2 border-b border-border flex justify-center">
             <AuthStatus />
