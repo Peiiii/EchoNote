@@ -225,7 +225,7 @@ export function ThoughtRecord({
                     <ThoughtRecordSparks
                         message={message}
                         showAnalysis={showAnalysis}
-                        className="px-8"
+                        className="px-8 mx-8"
                     />
                 )}
 
