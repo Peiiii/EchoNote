@@ -239,7 +239,10 @@ export function ThoughtRecord({
                             {hasSparks && (
                                 <>
                                     <span className="text-slate-300 dark:text-slate-600">•</span>
-                                    <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
+                                    <span 
+                                        className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                                        onClick={handleToggleAnalysis}
+                                    >
                                         {aiAnalysis!.insights.length} sparks
                                     </span>
                                 </>
