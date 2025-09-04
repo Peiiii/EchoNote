@@ -23,7 +23,7 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
         >
             <div className={`relative p-3 rounded-lg transition-all duration-200 ${isActive
                 ? 'bg-sidebar-accent dark:bg-sidebar-accent'
-                : 'bg-transparent hover:bg-sidebar-accent dark:hover:bg-slate-700 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
+                : 'bg-transparent hover:bg-sidebar-accent dark:hover:bg-sidebar-accent'
                 }`}>
 
                 <div className="flex items-start gap-3">
