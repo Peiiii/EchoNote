@@ -66,35 +66,43 @@ export function ThoughtRecordSparks({
     return (
         <div className={cn("mb-4 p-4 bg-slate-50/60 dark:bg-slate-800/30 rounded-lg border border-slate-200/50 dark:border-slate-700/50", className)}>
             <div className="space-y-4">
-                {/* Header with close button */}
-                <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
-                            title="Close analysis"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    )}
-                </div>
-
                 {/* Conditional: empty vs populated */}
                 {!hasSparks ? (
                     <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">No sparks yet</span>
-                        <Button variant="outline" onClick={handleGenerateSparks} disabled={isGenerating}>
-                            {isGenerating ? 'Generating...' : 'Generate Sparks'}
-                        </Button>
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" onClick={handleGenerateSparks} disabled={isGenerating}>
+                                {isGenerating ? 'Generating...' : 'Generate Sparks'}
+                            </Button>
+                            {onClose && (
+                                <button
+                                    onClick={onClose}
+                                    className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
+                                    title="Close analysis"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500 dark:text-slate-400">Generated insights</span>
-                            <Button onClick={handleGenerateSparks} variant="outline" disabled={isGenerating}>
-                                {isGenerating ? 'Generating...' : 'Regenerate'}
-                            </Button>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                            <div className="flex items-center gap-2">
+                                <Button onClick={handleGenerateSparks} variant="outline" disabled={isGenerating}>
+                                    {isGenerating ? 'Generating...' : 'Regenerate'}
+                                </Button>
+                                {onClose && (
+                                    <button
+                                        onClick={onClose}
+                                        className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
+                                        title="Close analysis"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         <div className="space-y-3">
                             {aiAnalysis?.insights?.map((spark, index) => (
