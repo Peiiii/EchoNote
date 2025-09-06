@@ -119,36 +119,39 @@
     @apply bg-background text-foreground;
   }
   
-  /* Hide scrollbars for channel list to prevent flashing */
+  /* Scrollbar styles */
   .channel-list-content::-webkit-scrollbar {
     display: none;
   }
 
-  /* Custom scrollbar styles for timeline - subtle and non-distracting */
-  .timeline-scroll::-webkit-scrollbar {
-    width: 6px;
+  .timeline-scroll {
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
   }
-
+  
+  .timeline-scroll::-webkit-scrollbar {
+    width: 3px;
+  }
+  
   .timeline-scroll::-webkit-scrollbar-track {
     background: transparent;
   }
-
+  
   .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 3px;
-    transition: background 0.2s ease;
+    background: rgba(148, 163, 184, 0.03);
+    border-radius: 2px;
+    transition: background 0.3s ease;
   }
-
+  
   .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.5);
+    background: rgba(148, 163, 184, 0.08);
   }
-
-  /* Dark mode scrollbar */
+  
   .dark .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.4);
+    background: rgba(71, 85, 105, 0.05);
   }
-
+  
   .dark .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 0.6);
+    background: rgba(71, 85, 105, 0.12);
   }
 }

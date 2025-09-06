@@ -64,7 +64,9 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
                 style={{
                     height: '100%',
                     minHeight: '100%',
-                    maxHeight: '100%'
+                    maxHeight: '100%',
+                    scrollbarWidth: 'thin',
+                    msOverflowStyle: 'auto'
                 }}
                 onScroll={handleScroll}
             >
