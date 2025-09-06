@@ -45,9 +45,12 @@ export function MobileCreateChannelPopover({ onAddChannel }: MobileCreateChannel
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-full" size="lg">
+                <Button 
+                    variant="outline" 
+                    className="w-full h-10 text-muted-foreground hover:text-foreground border-dashed"
+                >
                     <Plus className="w-4 h-4 mr-2" />
-                    Create New Space
+                    New Space
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">

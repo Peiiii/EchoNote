@@ -15,37 +15,39 @@ export function MobileChannelItem({ channel, isActive, onClick, onDelete }: Mobi
         <button
             onClick={onClick}
             className={cn(
-                "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors",
-                "hover:bg-slate-100 dark:hover:bg-slate-800",
-                isActive && "bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
+                "w-full flex items-center gap-3 px-3 py-3 text-left transition-all duration-200 group rounded-lg",
+                "hover:bg-muted/50",
+                isActive && "bg-muted/50"
             )}
         >
+            {/* Minimal icon */}
             <div className={cn(
-                "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
+                "flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors",
                 isActive 
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground group-hover:bg-muted/80"
             )}>
-                <Hash className="w-4 h-4" />
+                <Hash className="w-3.5 h-3.5" />
             </div>
             
+            {/* Content */}
             <div className="flex-1 min-w-0">
                 <div className={cn(
-                    "font-medium truncate",
+                    "font-medium truncate text-sm",
                     isActive 
-                        ? "text-blue-900 dark:text-blue-100"
-                        : "text-slate-900 dark:text-slate-100"
+                        ? "text-foreground"
+                        : "text-foreground/80"
                 )}>
                     {channel.name}
                 </div>
                 {channel.description && (
-                    <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                    <div className="text-xs text-muted-foreground truncate mt-0.5">
                         {channel.description}
                     </div>
                 )}
             </div>
 
-            {/* More Actions Button - Always visible on mobile */}
+            {/* More Actions - Always visible on mobile */}
             {onDelete && (
                 <div className="flex-shrink-0">
                     <MobileChannelMoreActionsMenu 

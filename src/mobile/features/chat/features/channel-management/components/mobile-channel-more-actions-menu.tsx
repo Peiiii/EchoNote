@@ -16,11 +16,11 @@ export function MobileChannelMoreActionsMenu({ channel, onDelete }: MobileChanne
                 <Button
                     size="sm"
                     variant="ghost"
-                    className="h-6 w-6 p-0 hover:bg-slate-200 dark:hover:bg-slate-600"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                     title="More actions"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <MoreVertical className="h-3 w-3" />
+                    <MoreVertical className="h-3.5 w-3.5" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
