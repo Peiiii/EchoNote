@@ -70,8 +70,8 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     li({ children, ...props }) {
                         return (
-                            <li className="relative text-slate-700 dark:text-slate-300 leading-relaxed flex items-center" {...props}>
-                                <span className="flex-shrink-0 w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-500 mr-3"></span>
+                            <li className="relative text-slate-700 dark:text-slate-300 leading-relaxed flex items-start" {...props}>
+                                <span className="flex-shrink-0 w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-500 mr-3 mt-2.5"></span>
                                 <span className="flex-1">{children}</span>
                             </li>
                         );
