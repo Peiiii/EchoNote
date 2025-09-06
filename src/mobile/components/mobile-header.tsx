@@ -30,7 +30,7 @@ export const MobileHeader = ({
                 {/* Center: Current Channel Name */}
                 <div className="flex-1 text-center min-w-0">
                     <h1 className="text-lg font-semibold text-foreground/90 truncate px-2 max-w-full">
-                        {currentChannelName || "EchoNote"}
+                        {currentChannelName || "Chat"}
                     </h1>
                 </div>
 
