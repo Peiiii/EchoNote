@@ -1,4 +1,4 @@
-import { MobileMarkdownContent } from "@/common/components/markdown";
+import { MarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import {
@@ -143,7 +143,7 @@ export const MobileThoughtRecord = ({
 
   return (
     <div className="w-full flex flex-col overflow-hidden group">
-      <div className="w-full h-px bg-slate-100 dark:bg-slate-800/50 mb-0"></div>
+      <div className="w-full h-px bg-slate-200/60 dark:bg-slate-700/80 mb-0"></div>
 
       <div className="relative w-full px-4 py-4 bg-transparent hover:bg-slate-50/30 dark:hover:bg-slate-800/20 transition-all duration-200 ease-out">
         <div className="flex items-center justify-between mb-4">
@@ -265,7 +265,7 @@ export const MobileThoughtRecord = ({
             />
           ) : (
             <MobileReadMoreWrapper maxHeight={200}>
-              <MobileMarkdownContent content={message.content} />
+              <MarkdownContent content={message.content} />
             </MobileReadMoreWrapper>
           )}
         </div>
