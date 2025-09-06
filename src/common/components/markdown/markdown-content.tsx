@@ -55,8 +55,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     blockquote({ children, ...props }) {
                         return (
-                            <blockquote className="relative my-6 pl-6 py-2 italic text-slate-700 dark:text-slate-300 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-r-lg" {...props}>
-                                <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-400 to-indigo-500 rounded-l-lg"></div>
+                            <blockquote className="my-6 pl-6 py-2 italic text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 border-l-4 border-slate-300 dark:border-slate-600 rounded-r-lg [&>p:last-child]:mb-0" {...props}>
                                 {children}
                             </blockquote>
                         );
@@ -64,22 +63,22 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     ul({ children, ...props }) {
                         return (
-                            <ul className="my-4 space-y-2 list-none" {...props}>
+                            <ul className="my-4 space-y-1.5 list-none pl-4" {...props}>
                                 {children}
                             </ul>
                         );
                     },
                     li({ children, ...props }) {
                         return (
-                            <li className="flex items-start space-x-3" {...props}>
-                                <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-500 dark:bg-blue-400"></div>
-                                <span className="text-slate-700 dark:text-slate-300">{children}</span>
+                            <li className="relative text-slate-700 dark:text-slate-300 leading-relaxed flex items-center" {...props}>
+                                <span className="flex-shrink-0 w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-500 mr-3"></span>
+                                <span className="flex-1">{children}</span>
                             </li>
                         );
                     },
                     ol({ children, ...props }) {
                         return (
-                            <ol className="my-4 space-y-2 list-decimal list-inside" {...props}>
+                            <ol className="my-4 space-y-1.5 list-decimal list-inside pl-4 text-slate-700 dark:text-slate-300" {...props}>
                                 {children}
                             </ol>
                         );

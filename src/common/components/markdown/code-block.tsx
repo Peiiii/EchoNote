@@ -65,7 +65,6 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
                 </code>
             </pre>
 
-            <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-l-lg"></div>
         </div>
     );
 }
