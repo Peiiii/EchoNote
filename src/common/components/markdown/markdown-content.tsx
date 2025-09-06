@@ -31,7 +31,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     table({ children, ...props }) {
                         return (
-                            <div className="my-6 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                            <div className="my-8 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
                                 <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700" {...props}>
                                     {children}
                                 </table>
@@ -40,14 +40,14 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     th({ children, ...props }) {
                         return (
-                            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800" {...props}>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-600" {...props}>
                                 {children}
                             </th>
                         );
                     },
                     td({ children, ...props }) {
                         return (
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100 border-t border-slate-100 dark:border-slate-800" {...props}>
+                            <td className="px-6 py-4 text-sm text-slate-900 dark:text-slate-100 border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-150" {...props}>
                                 {children}
                             </td>
                         );
