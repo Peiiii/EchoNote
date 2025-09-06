@@ -20,7 +20,7 @@ import {
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";
 import { MobileInlineEditor } from "./mobile-inline-editor";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
@@ -59,8 +59,6 @@ export const MobileThoughtRecord = ({
   const isEditing = editingMessageId === message.id;
   const isExpandedEditing = isEditing && editMode === "expanded";
 
-  const aiAnalysis = message.aiAnalysis;
-  const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
   // If message is deleted, don't show it
   if (message.isDeleted) {
@@ -111,6 +109,22 @@ export const MobileThoughtRecord = ({
   const handleToggleAnalysis = () => {
     setShowAnalysis(!showAnalysis);
     setPopoverOpen(false);
+  };
+
+  const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
+
+  // 重置自动生成标志
+  useEffect(() => {
+    if (shouldAutoGenerate) {
+      setShouldAutoGenerate(false);
+    }
+  }, [shouldAutoGenerate]);
+
+  const handleGenerateSparks = async () => {
+    setPopoverOpen(false);
+    // 设置自动生成标志并展开 sparks 区域
+    setShouldAutoGenerate(true);
+    setShowAnalysis(true);
   };
 
   const handleCopy = () => {
@@ -193,18 +207,16 @@ export const MobileThoughtRecord = ({
                 )}
 
                 {/* Secondary Actions */}
-                {hasSparks && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleToggleAnalysis}
-                    disabled={isEditing}
-                    className="w-full justify-start h-9 px-3 text-sm"
-                  >
-                    <Lightbulb className="w-4 h-4 mr-2" />
-                    {showAnalysis ? "Hide Sparks" : "Show Sparks"}
-                  </Button>
-                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateSparks}
+                  disabled={isEditing}
+                  className="w-full justify-start h-9 px-3 text-sm"
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Generate Sparks
+                </Button>
 
                 <Button
                   variant="ghost"
@@ -276,6 +288,7 @@ export const MobileThoughtRecord = ({
             message={message}
             showAnalysis={showAnalysis}
             onToggleAnalysis={handleToggleAnalysis}
+            autoGenerate={shouldAutoGenerate}
           />
         )}
 
