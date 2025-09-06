@@ -8,7 +8,7 @@ const SparksSchema = {
       type: 'array',
       items: { type: 'string' },
       minItems: 3,
-      maxItems: 3
+      maxItems: 5
     }
   },
   required: ['sparks']
@@ -20,31 +20,23 @@ interface SparksResult {
 }
 
 export async function generateSparksForText(content: string): Promise<string[]> {
-  const prompt = [
-    'You are a creative companion in EchoNote, a personal thought recording and reflection application.',
-    'Your role is to spark imagination and creative thinking based on the user\'s recorded thoughts.',
-    '',
-    'Based on the text below, generate exactly 3 creative sparks - let your imagination run wild!',
-    'Remember: this is a personal thought space where creativity and imagination thrive.',
-    '',
-    'These sparks can be anything that comes to mind:',
-    '- A story or narrative that this content inspires',
-    '- A piece of knowledge or historical connection',
-    '- A philosophical reflection or existential thought',
-    '- A creative piece like a poem, metaphor, or analogy',
-    '- A random but somehow connected idea',
-    '- Something abstract, surreal, or seemingly unrelated',
-    '- A personal insight or life lesson',
-    '- A creative challenge or thought experiment',
-    '',
-    'Be creative, unexpected, and don\'t worry about being "correct" or "useful".',
-    'The goal is to spark new thoughts and creative connections, not to provide conventional analysis.',
-    'Feel free to be whimsical, profound, or even a bit nonsensical!',
-    'Think like a creative friend who wants to expand your thinking horizons.',
-    '',
-    'User\'s recorded thought:',
-    content,
-  ].join('\n')
+  const prompt = `You are EchoNote's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
+
+Your role is to generate 3-5 thoughtful sparks based on the user's recorded thought below. These sparks should:
+
+1. **Expand thinking** - Provide knowledge, insights, or perspectives that deepen understanding
+2. **Show care** - Express warmth, understanding, and support like a thoughtful friend
+3. **Adapt intelligently** - Match the content type (analytical, emotional, creative, philosophical, etc.)
+4. **Promote growth** - Help users learn, reflect, and develop their thinking
+
+Generate sparks that are:
+- Highly relevant to the user's thought
+- Educational and thought-provoking
+- Warm and supportive in tone
+- Varied in approach and perspective
+
+User's recorded thought:
+${content}`
 
   console.log('Generating creative sparks with schema:', SparksSchema)
   
