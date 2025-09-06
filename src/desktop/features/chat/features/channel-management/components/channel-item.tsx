@@ -32,7 +32,11 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
                         ? 'bg-sidebar-accent dark:bg-sidebar-accent'
                         : 'bg-slate-100 dark:bg-slate-800'
                         }`}>
-                        {getChannelIcon(channel.id)}
+                        {channel.emoji ? (
+                            <span className="text-lg" title={`Emoji: ${channel.emoji}`}>{channel.emoji}</span>
+                        ) : (
+                            getChannelIcon(channel.id)
+                        )}
                     </div>
 
                     {/* Channel Info */}

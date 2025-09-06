@@ -92,6 +92,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      emoji-picker-react:
+        specifier: ^4.13.3
+        version: 4.13.3(react@19.1.1)
       firebase:
         specifier: ^12.1.0
         version: 12.1.0
@@ -139,7 +142,7 @@ importers:
         version: 11.1.0
       zenmark-editor:
         specifier: ^0.0.1
-        version: 0.0.1(115844607f577370640427900bfbe07f)
+        version: 0.0.1(qvfew3ylgpygzxnisp3bsqcs2i)
       zustand:
         specifier: ^5.0.7
         version: 5.0.7(@types/react@19.1.9)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1))
@@ -2580,6 +2583,12 @@ packages:
   electron-to-chromium@1.5.194:
     resolution: {integrity: sha512-SdnWJwSUot04UR51I2oPD8kuP2VI37/CADR1OHsFOUzZIvfWJBO6q11k5P/uKNyTT3cdOsnyjkrZ+DDShqYqJA==}
 
+  emoji-picker-react@4.13.3:
+    resolution: {integrity: sha512-aZaxCI72oUQfvZtYuQ9RaYLEwmH3GVgAr5SEeB97Y7gWL06zJ4VTuSl8rAMVY7GNmd0tf/EQ1W2SDuXTl0q9AA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
 
@@ -2834,6 +2843,9 @@ packages:
 
   firebase@12.1.0:
     resolution: {integrity: sha512-oZucxvfWKuAW4eHHRqGKzC43fLiPqPwHYBHPRNsnkgonqYaq0VurYgqgBosRlEulW+TWja/5Tpo2FpUU+QrfEQ==}
+
+  flairup@1.0.0:
+    resolution: {integrity: sha512-IKlE+pNvL2R+kVL1kEhUYqRxVqeFnjiIvHWDMLFXNaqyUdFXQM2wte44EfMYJNHkW16X991t2Zg8apKkhv7OBA==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -7379,6 +7391,11 @@ snapshots:
 
   electron-to-chromium@1.5.194: {}
 
+  emoji-picker-react@4.13.3(react@19.1.1):
+    dependencies:
+      flairup: 1.0.0
+      react: 19.1.1
+
   emoji-regex@8.0.0: {}
 
   enhanced-resolve@5.18.2:
@@ -7818,6 +7835,8 @@ snapshots:
       '@firebase/util': 1.13.0
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
+
+  flairup@1.0.0: {}
 
   flat-cache@4.0.1:
     dependencies:
@@ -10162,7 +10181,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zenmark-editor@0.0.1(115844607f577370640427900bfbe07f):
+  zenmark-editor@0.0.1(qvfew3ylgpygzxnisp3bsqcs2i):
     dependencies:
       '@benrbray/prosemirror-math': 0.2.2(katex@0.13.24)(prosemirror-commands@1.7.1)(prosemirror-gapcursor@1.3.2)(prosemirror-history@1.4.1)(prosemirror-inputrules@1.5.0)(prosemirror-keymap@1.2.3)(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.40.1)
       '@emotion/css': 11.13.5

@@ -15,7 +15,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasScroll, setHasScroll] = useState(false);
 
-    const handleAddChannel = (channel: { name: string; description: string }) => {
+    const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
         addChannel(channel);
     };
 

@@ -5,6 +5,7 @@ import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { RefinedPopover } from "@/common/components/refined-popover";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 
 
 interface EditChannelPopoverProps {
@@ -16,6 +17,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   const [isOpen, setIsOpen] = useState(false);
   const [editName, setEditName] = useState(channel.name);
   const [editDescription, setEditDescription] = useState(channel.description);
+  const [editEmoji, setEditEmoji] = useState(channel.emoji || "");
   const [isLoading, setIsLoading] = useState(false);
   const { updateChannel } = useChatDataStore();
 
@@ -26,7 +28,8 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
     try {
       await updateChannel(channel.id, {
         name: editName.trim(),
-        description: editDescription.trim()
+        description: editDescription.trim(),
+        emoji: editEmoji.trim() || undefined
       });
       setIsOpen(false);
     } catch (error) {
@@ -34,6 +37,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
       // Reset to original values on error
       setEditName(channel.name);
       setEditDescription(channel.description);
+      setEditEmoji(channel.emoji || "");
     } finally {
       setIsLoading(false);
     }
@@ -42,6 +46,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   const handleCancel = () => {
     setEditName(channel.name);
     setEditDescription(channel.description);
+    setEditEmoji(channel.emoji || "");
     setIsOpen(false);
   };
 
@@ -70,6 +75,37 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
         
         <RefinedPopover.Body>
           <div className="space-y-4">
+            {/* Emoji selection */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Emoji
+              </Label>
+              <div className="flex items-center gap-2">
+                <EmojiPickerComponent
+                  value={editEmoji}
+                  onSelect={setEditEmoji}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-10 w-16 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    {editEmoji || "😊"}
+                  </Button>
+                </EmojiPickerComponent>
+                {editEmoji && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditEmoji("")}
+                    className="h-10 px-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+
             {/* Name input */}
             <div className="space-y-2">
               <Label 

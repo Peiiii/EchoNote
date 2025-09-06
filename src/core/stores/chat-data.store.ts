@@ -35,6 +35,7 @@ export interface Channel {
   id: string;
   name: string;
   description: string;
+  emoji?: string;
   createdAt: Date;
   messageCount: number;
   lastMessageTime?: Date;

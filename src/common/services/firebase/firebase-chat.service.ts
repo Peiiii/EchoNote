@@ -49,6 +49,7 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     id: doc.id,
     name: data.name,
     description: data.description,
+    emoji: data.emoji,
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
     messageCount: data.messageCount || 0,
     lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),

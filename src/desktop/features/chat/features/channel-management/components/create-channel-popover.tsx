@@ -1,26 +1,30 @@
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { RefinedPopover } from "@/common/components/refined-popover";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
 interface CreateChannelPopoverProps {
-    onAddChannel: (channel: { name: string; description: string }) => void;
+    onAddChannel: (channel: { name: string; description: string; emoji?: string }) => void;
 }
 
 export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [newChannelName, setNewChannelName] = useState("");
     const [newChannelDescription, setNewChannelDescription] = useState("");
+    const [newChannelEmoji, setNewChannelEmoji] = useState("");
 
     const handleAddChannel = () => {
         if (newChannelName.trim()) {
             onAddChannel({
                 name: newChannelName.trim(),
                 description: newChannelDescription.trim(),
+                emoji: newChannelEmoji.trim() || undefined,
             });
             setNewChannelName("");
             setNewChannelDescription("");
+            setNewChannelEmoji("");
             setIsOpen(false);
         }
     };
@@ -28,6 +32,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const handleCancel = () => {
         setNewChannelName("");
         setNewChannelDescription("");
+        setNewChannelEmoji("");
         setIsOpen(false);
     };
 
@@ -64,6 +69,37 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                 
                 <RefinedPopover.Body>
                     <div className="space-y-4">
+                        {/* Emoji selection */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                Emoji
+                            </label>
+                            <div className="flex items-center gap-2">
+                                <EmojiPickerComponent
+                                    value={newChannelEmoji}
+                                    onSelect={setNewChannelEmoji}
+                                >
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-10 w-16 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                    >
+                                        {newChannelEmoji || "😊"}
+                                    </Button>
+                                </EmojiPickerComponent>
+                                {newChannelEmoji && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setNewChannelEmoji("")}
+                                        className="h-10 px-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                                    >
+                                        Clear
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Space Name input */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
