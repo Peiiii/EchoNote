@@ -37,7 +37,7 @@
     "app-toolkit": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "composite-kit": "^0.6.6",
+    "composite-kit": "^0.6.7",
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.13.3",
     "firebase": "^12.1.0",

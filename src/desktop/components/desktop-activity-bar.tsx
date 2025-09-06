@@ -61,11 +61,12 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
           }
           title="EchoNote"
           showSearch={false}
+          showSeparator={false}
           className="bg-sidebar dark:bg-card"
         />
 
         {/* Group List - 主要功能区域 */}
-        <ActivityBar.GroupList>
+        <ActivityBar.GroupList showSeparator={false}>
           <ActivityBar.Group title="main">
             {mainGroupItems.map((item: ActivityItem) => (
               <ActivityBar.Item
@@ -93,9 +94,9 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
         </ActivityBar.GroupList>
 
         {/* Footer - 设置区域 */}
-        <ActivityBar.Footer className="bg-sidebar dark:bg-card border-t border-border">
+        <ActivityBar.Footer className="bg-sidebar dark:bg-card">
           {/* Auth Status Section - 统一的认证状态显示 */}
-          <div className="px-2 py-2 border-b border-border flex justify-center">
+          <div className="px-2 py-2 flex justify-center">
             <AuthStatus />
           </div>
 
