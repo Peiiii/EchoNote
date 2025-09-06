@@ -24,43 +24,37 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
 
     if (isInline) {
         return (
-            <code className="inline-block bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-1.5 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700">
+            <code className="inline-block bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-300 dark:border-gray-600">
                 {children}
             </code>
         );
     }
 
     return (
-        <div className="group relative my-6">
-            <div className="flex items-center justify-between bg-slate-800 dark:bg-slate-900 border-b border-slate-700 dark:border-slate-600 rounded-t-lg px-4 py-2">
+        <div className="group relative my-4">
+            <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 border-b border-gray-600 dark:border-gray-600 rounded-t px-3 py-2">
                 <div className="flex items-center space-x-2">
                     {language && (
-                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                        <span className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                             {language}
                         </span>
                     )}
                 </div>
                 <button
                     onClick={copyToClipboard}
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-700 hover:bg-slate-600 rounded-md transition-all duration-200 opacity-0 group-hover:opacity-100"
-                    title="Copy code"
+                    className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-gray-700 hover:bg-gray-600 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+                    title={copied ? "Copied!" : "Copy code"}
                 >
                     {copied ? (
-                        <>
-                            <Check className="w-3 h-3" />
-                            <span>Copied!</span>
-                        </>
+                        <Check className="w-3 h-3" />
                     ) : (
-                        <>
-                            <Copy className="w-3 h-3" />
-                            <span>Copy</span>
-                        </>
+                        <Copy className="w-3 h-3" />
                     )}
                 </button>
             </div>
 
-            <pre className="bg-slate-900 dark:bg-slate-950 rounded-b-lg p-4 overflow-x-auto border border-slate-700 dark:border-slate-600">
-                <code className={`${className} text-sm leading-relaxed font-mono text-slate-100 dark:text-slate-200`}>
+            <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+                <code className={`${className} text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200`}>
                     {children}
                 </code>
             </pre>
