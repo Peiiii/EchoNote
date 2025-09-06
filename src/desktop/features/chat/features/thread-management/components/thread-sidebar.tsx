@@ -71,7 +71,7 @@ export const ThreadSidebar = ({
             </div>
 
             {/* 中间内容区域 - 可滚动，包含原始内容和讨论消息 */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto timeline-scroll">
                 {/* Parent Message - 展开状态直接平铺 */}
                 {parentMessage && (
                     <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">

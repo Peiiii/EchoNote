@@ -123,4 +123,32 @@
   .channel-list-content::-webkit-scrollbar {
     display: none;
   }
+
+  /* Custom scrollbar styles for timeline - subtle and non-distracting */
+  .timeline-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .timeline-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .timeline-scroll::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  .timeline-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+  }
+
+  /* Dark mode scrollbar */
+  .dark .timeline-scroll::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.4);
+  }
+
+  .dark .timeline-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.6);
+  }
 }

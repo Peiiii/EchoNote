@@ -60,7 +60,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
         <>
             <div data-component="message-timeline"
                 ref={containerRef}
-                className={`w-full bg-background flex-1 overflow-y-auto min-h-0 ${className}`}
+                className={`w-full bg-background flex-1 overflow-y-auto min-h-0 timeline-scroll ${className}`}
                 style={{
                     height: '100%',
                     minHeight: '100%',
