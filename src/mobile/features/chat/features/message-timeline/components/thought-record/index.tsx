@@ -1,28 +1,13 @@
 import { MarkdownContent } from "@/common/components/markdown";
-import { Button } from "@/common/components/ui/button";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/common/components/ui/popover";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import {
-  Bookmark,
-  Copy,
-  Edit2,
-  Eye,
-  Lightbulb,
-  MessageCircle,
-  MoreHorizontal,
-  Trash2,
-} from "lucide-react";
 import { useState, useEffect } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";
 import { MobileInlineEditor } from "./mobile-inline-editor";
+import { MobileMoreActionsMenu } from "./mobile-more-actions-menu";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
@@ -42,7 +27,7 @@ export const MobileThoughtRecord = ({
 }: MobileThoughtRecordProps) => {
   const { deleteMessage } = channelMessageService;
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
 
   // Edit state management
   const {
@@ -65,54 +50,6 @@ export const MobileThoughtRecord = ({
     return null;
   }
 
-  const handleEdit = () => {
-    startEdit(message.id, message.content);
-    setPopoverOpen(false);
-  };
-
-  const handleDelete = async () => {
-    // Close popover immediately when delete button is clicked
-    setPopoverOpen(false);
-
-    // Use setTimeout to ensure React has time to re-render before showing confirm
-    setTimeout(async () => {
-      const messagePreview =
-        message.content.length > 100
-          ? `${message.content.substring(0, 100)}...`
-          : message.content;
-
-      const confirmed = window.confirm(
-        `🗑️ Delete Thought\n\n` +
-          `"${messagePreview}"\n\n` +
-          `⚠️ This action cannot be undone.\n` +
-          `The thought will be moved to trash.\n\n` +
-          `Are you sure you want to continue?`
-      );
-
-      if (confirmed) {
-        try {
-          await deleteMessage({
-            messageId: message.id,
-            channelId: message.channelId,
-          });
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          alert(
-            `❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`
-          );
-        }
-      }
-    }, 0);
-  };
-
-  const handleToggleAnalysis = () => {
-    setShowAnalysis(!showAnalysis);
-    setPopoverOpen(false);
-  };
-
-  const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
-
   // 重置自动生成标志
   useEffect(() => {
     if (shouldAutoGenerate) {
@@ -120,26 +57,60 @@ export const MobileThoughtRecord = ({
     }
   }, [shouldAutoGenerate]);
 
-  const handleGenerateSparks = async () => {
-    setPopoverOpen(false);
-    // 设置自动生成标志并展开 sparks 区域
+  // Action handlers
+  const handleEdit = () => {
+    startEdit(message.id, message.content);
+  };
+
+  const handleDelete = async () => {
+    const messagePreview =
+      message.content.length > 100
+        ? `${message.content.substring(0, 100)}...`
+        : message.content;
+
+    const confirmed = window.confirm(
+      `🗑️ Delete Thought\n\n` +
+        `"${messagePreview}"\n\n` +
+        `⚠️ This action cannot be undone.\n` +
+        `The thought will be moved to trash.\n\n` +
+        `Are you sure you want to continue?`
+    );
+
+    if (confirmed) {
+      try {
+        await deleteMessage({
+          messageId: message.id,
+          channelId: message.channelId,
+        });
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        alert(
+          `❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`
+        );
+      }
+    }
+  };
+
+  const handleToggleAnalysis = () => {
+    setShowAnalysis(!showAnalysis);
+  };
+
+  const handleGenerateSparks = () => {
     setShouldAutoGenerate(true);
     setShowAnalysis(true);
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
-    setPopoverOpen(false);
   };
 
   const handleOpenThread = () => {
     onOpenThread(message.id);
-    setPopoverOpen(false);
   };
 
   const handleReply = () => {
     onReply?.();
-    setPopoverOpen(false);
   };
 
   // Edit handlers
@@ -168,102 +139,18 @@ export const MobileThoughtRecord = ({
             <div className="w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
           </div>
 
-          {/* More Actions Popover */}
-          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-all duration-200"
-              >
-                <MoreHorizontal className="w-3.5 h-3.5" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-2" align="end" side="bottom">
-              <div className="space-y-1">
-                {/* Primary Actions */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleEdit}
-                  disabled={isEditing}
-                  className="w-full justify-start h-9 px-3 text-sm"
-                >
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
-
-                {onReply && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleReply}
-                    disabled={isEditing}
-                    className="w-full justify-start h-9 px-3 text-sm"
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Reply
-                  </Button>
-                )}
-
-                {/* Secondary Actions */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleGenerateSparks}
-                  disabled={isEditing}
-                  className="w-full justify-start h-9 px-3 text-sm"
-                >
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Generate Sparks
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {}}
-                  disabled={isEditing}
-                  className="w-full justify-start h-9 px-3 text-sm"
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {}}
-                  disabled={isEditing}
-                  className="w-full justify-start h-9 px-3 text-sm"
-                >
-                  <Bookmark className="w-4 h-4 mr-2" />
-                  Bookmark
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="w-full justify-start h-9 px-3 text-sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy
-                </Button>
-
-                {/* Destructive Action */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={isEditing}
-                  className="w-full justify-start h-9 px-3 text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {/* More Actions Menu */}
+          <MobileMoreActionsMenu
+            message={message}
+            isEditing={isEditing}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onCopy={handleCopy}
+            onReply={onReply ? handleReply : undefined}
+            onGenerateSparks={handleGenerateSparks}
+            onViewDetails={() => {}}
+            onBookmark={() => {}}
+          />
         </div>
 
         {/* Content Area - Floor content area */}

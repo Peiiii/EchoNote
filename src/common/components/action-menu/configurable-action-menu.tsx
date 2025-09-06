@@ -28,6 +28,7 @@ export interface ConfigurableActionMenuProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   width?: "sm" | "md" | "lg" | "xl";
+  alwaysVisible?: boolean;
 }
 
 export function ConfigurableActionMenu({
@@ -36,8 +37,9 @@ export function ConfigurableActionMenu({
   triggerClassName,
   contentClassName,
   align = "end",
-  sideOffset = 8,
-  width = "lg"
+  sideOffset = 4,
+  width = "md",
+  alwaysVisible = false
 }: ConfigurableActionMenuProps) {
   const visibleGroups = groups
     .map(group => ({
@@ -54,13 +56,14 @@ export function ConfigurableActionMenu({
       align={align}
       sideOffset={sideOffset}
       width={width}
+      alwaysVisible={alwaysVisible}
     >
       {visibleGroups.map((group, groupIndex) => (
         <ActionMenuGroup
           key={group.id}
           title={group.title}
           variant={group.variant}
-          showSeparator={group.showSeparator !== false || groupIndex > 0}
+          showSeparator={group.showSeparator !== false && groupIndex > 0}
         >
           {group.items.map((item) => (
             <ActionMenuItem
@@ -70,7 +73,7 @@ export function ConfigurableActionMenu({
               description={item.description}
               onClick={item.onClick}
               variant={item.variant}
-              className={item.disabled ? "opacity-50 cursor-not-allowed" : ""}
+              disabled={item.disabled}
             />
           ))}
         </ActionMenuGroup>

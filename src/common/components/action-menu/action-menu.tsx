@@ -16,6 +16,7 @@ export interface ActionMenuProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   width?: "sm" | "md" | "lg" | "xl";
+  alwaysVisible?: boolean;
 }
 
 export function ActionMenu({
@@ -24,14 +25,15 @@ export function ActionMenu({
   triggerClassName,
   contentClassName,
   align = "end",
-  sideOffset = 8,
-  width = "lg"
+  sideOffset = 4,
+  width = "md",
+  alwaysVisible = false
 }: ActionMenuProps) {
   const widthClasses = {
-    sm: "w-40",
-    md: "w-48", 
-    lg: "w-56",
-    xl: "w-64"
+    sm: "w-44",
+    md: "w-52", 
+    lg: "w-60",
+    xl: "w-72"
   };
 
   const defaultTrigger = (
@@ -39,11 +41,15 @@ export function ActionMenu({
       variant="ghost"
       size="sm"
       className={cn(
-        "h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-700/60 hover:scale-105 hover:shadow-sm border border-transparent hover:border-slate-200/60 dark:hover:border-slate-600/40",
+        "h-8 w-8 p-0 transition-all duration-200 rounded-md",
+        "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
+        "hover:bg-slate-100 dark:hover:bg-slate-800",
+        "focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700",
+        alwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
         triggerClassName
       )}
     >
-      <MoreHorizontal className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+      <MoreHorizontal className="h-4 w-4" />
       <span className="sr-only">More actions</span>
     </Button>
   );
@@ -57,7 +63,8 @@ export function ActionMenu({
       <DropdownMenuContent
         align={align}
         className={cn(
-          "p-2 rounded-2xl border-0 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl",
+          "p-1 rounded-lg border shadow-lg bg-white dark:bg-slate-900",
+          "min-w-[200px] max-w-[280px]",
           widthClasses[width],
           contentClassName
         )}

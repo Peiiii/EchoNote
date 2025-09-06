@@ -26,13 +26,13 @@ export function ActionMenuGroup({
   return (
     <>
       {showSeparator && (
-        <DropdownMenuSeparator className="my-2 bg-slate-200/60 dark:bg-slate-700/40" />
+        <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-slate-700" />
       )}
       
-      <DropdownMenuGroup className={cn("space-y-1", className)}>
+      <DropdownMenuGroup className={cn("space-y-0.5", className)}>
         {title && (
           <DropdownMenuLabel className={cn(
-            "px-3 py-2 text-xs font-semibold uppercase tracking-wider",
+            "px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400",
             variantStyles[variant]
           )}>
             {title}
