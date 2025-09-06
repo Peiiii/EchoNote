@@ -85,7 +85,7 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
     }
 
     return (
-        <div className={`flex-1 min-h-0 relative overflow-hidden ${className}`}>
+        <div className={`flex-1 min-h-0 relative overflow-hidden bg-white dark:bg-slate-950 ${className}`}>
             <MessageTimeline
                 ref={messageTimelineRef}
                 className="h-full"

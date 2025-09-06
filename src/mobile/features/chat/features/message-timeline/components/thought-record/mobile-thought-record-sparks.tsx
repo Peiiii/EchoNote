@@ -4,6 +4,7 @@ import { Message } from '@/core/stores/chat-data.store';
 
 interface MobileThoughtRecordSparksProps {
     message: Message;
+    className?: string;
     showAnalysis: boolean;
     onToggleAnalysis: () => void;
 }
@@ -11,7 +12,8 @@ interface MobileThoughtRecordSparksProps {
 export function MobileThoughtRecordSparks({ 
     message, 
     showAnalysis, 
-    onToggleAnalysis 
+    onToggleAnalysis,
+    className
 }: MobileThoughtRecordSparksProps) {
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
@@ -21,7 +23,7 @@ export function MobileThoughtRecordSparks({
     }
 
     return (
-        <div className="mt-3">
+        <div className={className}>
             {/* Toggle Button - Simplified */}
             <Button
                 variant="ghost"
