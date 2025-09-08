@@ -13,7 +13,7 @@ function ReadMoreButton({ onClick, icon, className = "" }: ReadMoreButtonProps) 
     return (
         <button
             onClick={onClick}
-            className={`group flex items-center justify-center w-8 h-8 bg-white/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 rounded-full shadow-lg border border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 hover:shadow-xl transition-all duration-200 font-normal backdrop-blur-sm ${className}`}
+            className={`group flex items-center justify-center w-8 h-8 bg-white/80 dark:bg-gray-800/80 text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-slate-700 dark:hover:text-slate-200 rounded-full shadow-lg border border-gray-200/60 dark:border-gray-700/60 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-xl transition-all duration-200 font-normal backdrop-blur-sm ${className}`}
         >
             {icon}
         </button>
@@ -67,7 +67,7 @@ export function ReadMoreWrapper({
                 {!isExpanded && showReadMore && (
                     <div className="absolute inset-0 pointer-events-none">
                         <div
-                            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white/90 via-white/50 to-transparent dark:from-background/85 dark:via-background/40 dark:to-transparent group-hover:from-slate-100/90 group-hover:via-slate-100/50 dark:group-hover:from-slate-800/85 dark:group-hover:via-slate-800/40 transition-all duration-300"
+                            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-100/40 via-gray-100/20 to-transparent dark:from-gray-800/30 dark:via-gray-800/15 dark:to-transparent group-hover:from-gray-100/30 group-hover:via-gray-100/15 dark:group-hover:from-gray-800/20 dark:group-hover:via-gray-800/10 transition-all duration-300"
                         />
                         <div className="absolute bottom-2 flex w-full items-center justify-center pointer-events-auto">
                             <ReadMoreButton

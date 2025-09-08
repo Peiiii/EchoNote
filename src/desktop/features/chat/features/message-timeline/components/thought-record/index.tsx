@@ -186,8 +186,8 @@ export function ThoughtRecord({
         <div className="w-full" data-component="thought-record">
             <div className={`group relative w-full py-4 transition-all duration-300 ease-out ${
                 isEditing 
-                    ? 'bg-stone-100/60 dark:bg-stone-700/30' 
-                    : 'hover:bg-slate-100/90 dark:hover:bg-slate-800/40'
+                    ? 'bg-gray-100/60 dark:bg-gray-800/30' 
+                    : 'hover:bg-gray-100/80 dark:hover:bg-gray-800/20'
             }`}>
                 {/* Record Header */}
                 <div className="flex items-center justify-between mb-4 px-8">
