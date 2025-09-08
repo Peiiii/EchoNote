@@ -67,7 +67,7 @@ export function ReadMoreWrapper({
                 {!isExpanded && showReadMore && (
                     <div className="absolute inset-0 pointer-events-none">
                         <div
-                            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white/90 via-white/50 to-transparent dark:from-slate-900/90 dark:via-slate-900/50 dark:to-transparent group-hover:from-slate-100/90 group-hover:via-slate-100/50 dark:group-hover:from-slate-800/90 dark:group-hover:via-slate-800/50 transition-all duration-300"
+                            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white/90 via-white/50 to-transparent dark:from-background/85 dark:via-background/40 dark:to-transparent group-hover:from-slate-100/90 group-hover:via-slate-100/50 dark:group-hover:from-slate-800/85 dark:group-hover:via-slate-800/40 transition-all duration-300"
                         />
                         <div className="absolute bottom-2 flex w-full items-center justify-center pointer-events-auto">
                             <ReadMoreButton
