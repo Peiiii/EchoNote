@@ -18,11 +18,10 @@ export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving, cl
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateContent } = useEditStateStore();
 
-  // Auto-focus and select all text when editing starts
+  // Auto-focus when editing starts
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
-      textareaRef.current.select();
     }
   }, []);
 

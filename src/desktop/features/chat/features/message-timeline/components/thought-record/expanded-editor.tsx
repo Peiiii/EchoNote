@@ -30,7 +30,6 @@ export function ExpandedEditor({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
-      textareaRef.current.select();
     }
   }, []);
 
