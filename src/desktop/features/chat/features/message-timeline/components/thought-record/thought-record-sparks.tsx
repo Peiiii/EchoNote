@@ -1,6 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
-import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
+import { generateSparksForText, GenerateSparksOptions } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useState } from "react";
 import { cn } from "@/common/lib/utils";
@@ -11,6 +11,7 @@ interface ThoughtRecordSparksProps {
     showAnalysis: boolean;
     className?: string;
     onClose?: () => void;
+    enableContextEnhancement?: boolean;
 }
 
 export function ThoughtRecordSparks({
@@ -18,6 +19,7 @@ export function ThoughtRecordSparks({
     showAnalysis,
     className,
     onClose,
+    enableContextEnhancement = true,
 }: ThoughtRecordSparksProps) {
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -27,7 +29,22 @@ export function ThoughtRecordSparks({
     async function handleGenerateSparks() {
         try {
             setIsGenerating(true);
-            const sparks = await generateSparksForText(message.content);
+            
+            // Prepare options for context enhancement
+            const options: GenerateSparksOptions = {
+                includeChannelContext: enableContextEnhancement,
+                contextOptions: {
+                    maxMessages: 8,
+                    maxContentLength: 1500,
+                }
+            };
+            
+            const sparks = await generateSparksForText(
+                message.content,
+                message.channelId,
+                message.id,
+                options
+            );
             
             const { userId } = useChatDataStore.getState();
             if (!userId) {

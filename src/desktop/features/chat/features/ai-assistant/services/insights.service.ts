@@ -1,4 +1,5 @@
 import { generateObject } from '@/common/services/ai/generate-object'
+import { ChannelContextService } from './context.service'
 
 // Define the JSON Schema for creative sparks
 const SparksSchema = {
@@ -19,7 +20,35 @@ interface SparksResult {
   sparks: string[]
 }
 
-export async function generateSparksForText(content: string): Promise<string[]> {
+// Define options for sparks generation
+export interface GenerateSparksOptions {
+  includeChannelContext?: boolean;
+  contextOptions?: {
+    maxMessages?: number;
+    maxContentLength?: number;
+  };
+}
+
+export async function generateSparksForText(
+  content: string, 
+  channelId?: string, 
+  messageId?: string, 
+  options: GenerateSparksOptions = {}
+): Promise<string[]> {
+  // Build context-aware prompt
+  let contextInfo = '';
+  if (options.includeChannelContext && channelId) {
+    const context = ChannelContextService.getChannelContext(
+      channelId, 
+      messageId, 
+      options.contextOptions
+    );
+    
+    if (context) {
+      contextInfo = ChannelContextService.formatContextForPrompt(context);
+    }
+  }
+
   const prompt = `You are EchoNote's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
 
 Your role is to generate 3-5 thoughtful sparks based on the user's recorded thought below. These sparks should:
@@ -28,15 +57,17 @@ Your role is to generate 3-5 thoughtful sparks based on the user's recorded thou
 2. **Show care** - Express warmth, understanding, and support like a thoughtful friend
 3. **Adapt intelligently** - Match the content type (analytical, emotional, creative, philosophical, etc.)
 4. **Promote growth** - Help users learn, reflect, and develop their thinking
+${contextInfo ? '5. **Connect contextually** - Consider related thoughts from the same channel to provide more relevant and connected insights' : ''}
 
 Generate sparks that are:
 - Highly relevant to the user's thought
 - Educational and thought-provoking
 - Warm and supportive in tone
 - Varied in approach and perspective
+${contextInfo ? '- Connected to the broader context of their thinking journey' : ''}
 
 User's recorded thought:
-${content}`
+${content}${contextInfo}`
 
   console.log('Generating creative sparks with schema:', SparksSchema)
   
