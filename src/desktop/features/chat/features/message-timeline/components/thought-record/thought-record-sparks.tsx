@@ -39,12 +39,12 @@ export function ThoughtRecordSparks({
                 }
             };
             
-            const sparks = await generateSparksForText(
-                message.content,
-                message.channelId,
-                message.id,
+            const sparks = await generateSparksForText({
+                content: message.content,
+                channelId: message.channelId,
+                messageId: message.id,
                 options
-            );
+            });
             
             const { userId } = useChatDataStore.getState();
             if (!userId) {

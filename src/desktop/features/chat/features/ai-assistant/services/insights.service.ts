@@ -29,12 +29,18 @@ export interface GenerateSparksOptions {
   };
 }
 
-export async function generateSparksForText(
-  content: string, 
-  channelId?: string, 
-  messageId?: string, 
-  options: GenerateSparksOptions = {}
-): Promise<string[]> {
+// Define the main configuration for sparks generation
+export interface SparksGenerationConfig {
+  content: string;
+  channelId?: string;
+  messageId?: string;
+  options?: GenerateSparksOptions;
+}
+
+// Main function with clean configuration object
+export async function generateSparksForText(config: SparksGenerationConfig): Promise<string[]> {
+  const { content, channelId, messageId, options = {} } = config;
+  
   // Build context-aware prompt
   let contextInfo = '';
   if (options.includeChannelContext && channelId) {
@@ -85,4 +91,9 @@ ${content}${contextInfo}`
     console.error('Failed to generate creative sparks:', error)
     throw error
   }
+}
+
+// Backward compatibility function for simple usage
+export async function generateSparksForTextSimple(content: string): Promise<string[]> {
+  return generateSparksForText({ content });
 }

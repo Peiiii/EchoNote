@@ -1,7 +1,7 @@
 import { Lightbulb } from 'lucide-react';
 import { Button } from '@/common/components/ui/button';
 import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
-import { generateSparksForText } from '@/desktop/features/chat/features/ai-assistant/services/insights.service';
+import { generateSparksForTextSimple } from '@/desktop/features/chat/features/ai-assistant/services/insights.service';
 import { channelMessageService } from '@/core/services/channel-message.service';
 import { useState, useEffect } from 'react';
 
@@ -35,7 +35,7 @@ export function MobileThoughtRecordSparks({
     async function handleGenerateSparks() {
         try {
             setIsGenerating(true);
-            const sparks = await generateSparksForText(message.content);
+            const sparks = await generateSparksForTextSimple(message.content);
             
             const { userId } = useChatDataStore.getState();
             if (!userId) {
