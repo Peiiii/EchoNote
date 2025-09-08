@@ -49,7 +49,6 @@ export async function generateSparksForText(config: SparksGenerationConfig): Pro
       messageId, 
       options.contextOptions
     );
-    
     if (context) {
       contextInfo = ChannelContextService.formatContextForPrompt(context);
     }

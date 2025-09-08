@@ -1,6 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
-import { generateSparksForText, GenerateSparksOptions } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
+import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useState } from "react";
 import { cn } from "@/common/lib/utils";
@@ -29,23 +29,17 @@ export function ThoughtRecordSparks({
     async function handleGenerateSparks() {
         try {
             setIsGenerating(true);
-            
-            // Prepare options for context enhancement
-            const options: GenerateSparksOptions = {
-                includeChannelContext: enableContextEnhancement,
-                contextOptions: {
-                    maxMessages: 8,
-                    maxContentLength: 1500,
-                }
-            };
-            
+
+
             const sparks = await generateSparksForText({
                 content: message.content,
                 channelId: message.channelId,
                 messageId: message.id,
-                options
+                options: {
+                    includeChannelContext: enableContextEnhancement,
+                }
             });
-            
+
             const { userId } = useChatDataStore.getState();
             if (!userId) {
                 throw new Error('User not authenticated');
@@ -68,7 +62,7 @@ export function ThoughtRecordSparks({
                 },
                 userId
             });
-            
+
             // Remove this line to keep the panel open after generating sparks
             // onToggleAnalysis();
         } finally {

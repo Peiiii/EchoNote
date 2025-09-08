@@ -1,5 +1,6 @@
+import { channelMessageService } from '@/core/services/channel-message.service';
 import { Message } from '@/core/stores/chat-data.store';
-import { useChatDataStore } from '@/core/stores/chat-data.store';
+import { createSlice } from 'rx-nested-bean';
 
 export interface ChannelContext {
   recentMessages: Message[];
@@ -15,7 +16,7 @@ export interface ContextServiceOptions {
 
 export class ChannelContextService {
   private static readonly DEFAULT_OPTIONS: Required<ContextServiceOptions> = {
-    maxMessages: 10,
+    maxMessages: 20,
     maxContentLength: 2000,
     excludeCurrentMessage: true,
   };
@@ -33,16 +34,14 @@ export class ChannelContextService {
     options: ContextServiceOptions = {}
   ): ChannelContext | null {
     const opts = { ...this.DEFAULT_OPTIONS, ...options };
-    const state = useChatDataStore.getState();
-    
-    const channelState = state.messagesByChannel[channelId];
-    if (!channelState?.messages) {
+    const state = createSlice(channelMessageService.dataContainer, `messageByChannel.${channelId}`).get();
+    if (!state?.messages) {
       console.warn(`[ChannelContextService] No messages found for channel: ${channelId}`);
       return null;
     }
 
-    let messages = channelState.messages;
-    
+    let messages = state.messages;
+
     // Exclude current message if specified
     if (opts.excludeCurrentMessage && currentMessageId) {
       messages = messages.filter(msg => msg.id !== currentMessageId);
@@ -61,7 +60,7 @@ export class ChannelContextService {
 
     return {
       recentMessages: truncatedMessages,
-      totalMessageCount: channelState.messages.length,
+      totalMessageCount: state.messages.length,
       channelId,
     };
   }
@@ -79,7 +78,7 @@ export class ChannelContextService {
     const contextLines = [
       `\n--- Channel Context (${context.recentMessages.length} recent messages from ${context.totalMessageCount} total) ---`,
       'Recent thoughts in this channel:',
-      ...context.recentMessages.map((msg, index) => 
+      ...context.recentMessages.map((msg, index) =>
         `${index + 1}. ${msg.content}`
       ),
       '--- End Channel Context ---\n'
