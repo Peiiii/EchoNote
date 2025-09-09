@@ -1,16 +1,18 @@
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { Message } from "@/core/stores/chat-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { Bookmark, Clock, Edit2, Eye, Lightbulb, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { Bookmark, Clock, Edit2, Eye, Lightbulb, MessageCircle, Tag as TagIcon } from "lucide-react";
+import React, { useState } from "react";
 
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { MoreActionsMenu } from "../more-actions-menu";
 import { InlineEditor } from "./inline-editor";
-import { MarkdownContent } from "@/common/components/markdown";
 import { ReadMoreWrapper } from "./read-more-wrapper";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
+import { MarkdownContent } from "@/common/components/markdown";
+import { TagEditorPopover } from "@/common/features/chat/components/tag-editor-popover";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 
 interface ThoughtRecordProps {
@@ -27,14 +29,21 @@ interface ActionButtonProps {
     onClick?: () => void;
     title: string;
     disabled?: boolean;
+    active?: boolean;
 }
 
-function ActionButton({ icon: Icon, onClick, title, disabled }: ActionButtonProps) {
+function ActionButton({ icon: Icon, onClick, title, disabled, active }: ActionButtonProps) {
     return (
         <button
             onClick={onClick}
             disabled={disabled}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 hover:scale-105"
+            className={`p-2 transition-all duration-200 rounded-lg hover:scale-105 ${
+                active 
+                    ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400' 
+                    : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
+            } ${
+                disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
             title={title}
         >
             <Icon className="w-4 h-4" />
@@ -60,6 +69,136 @@ function ThreadIndicator({ threadCount, onOpenThread, messageId }: ThreadIndicat
             <MessageCircle className="w-3 h-3" />
             <span>{displayText}</span>
         </button>
+    );
+}
+
+// Footer item component for reusable footer elements
+interface FooterItemProps {
+    children: React.ReactNode;
+    onClick?: () => void;
+    className?: string;
+}
+
+function FooterItem({ children, onClick, className = "" }: FooterItemProps) {
+    const baseClasses = "hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200";
+    const clickableClasses = onClick ? "cursor-pointer" : "";
+    
+    if (onClick) {
+        return (
+            <button 
+                onClick={onClick}
+                className={`${baseClasses} ${clickableClasses} ${className}`}
+            >
+                {children}
+            </button>
+        );
+    }
+    
+    return (
+        <span className={`${baseClasses} ${className}`}>
+            {children}
+        </span>
+    );
+}
+
+// Tag section component
+interface TagSectionProps {
+    tags: string[];
+    onTagsChange: (tags: string[]) => void;
+    maxTags?: number;
+}
+
+function TagSection({ tags, onTagsChange, maxTags = 10 }: TagSectionProps) {
+    return (
+        <div className="flex items-center gap-2">
+            <TagEditorPopover
+                tags={tags}
+                onTagsChange={onTagsChange}
+                maxTags={maxTags}
+                trigger={
+                    <button className="flex items-center gap-1 px-2 py-1 rounded transition-all duration-200 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800">
+                        <TagIcon className="h-3 w-3" />
+                        {tags.length > 0 ? `${tags.length} tags` : 'Add tags'}
+                    </button>
+                }
+            />
+            
+            {/* Inline tag display - only show first few tags */}
+            {tags.length > 0 && (
+                <div className="flex items-center gap-1">
+                    {tags.slice(0, 2).map((tag) => (
+                        <span
+                            key={tag}
+                            className="inline-flex items-center px-1.5 py-0.5 text-xs bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 rounded"
+                        >
+                            #{tag}
+                        </span>
+                    ))}
+                    {tags.length > 2 && (
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                            +{tags.length - 2}
+                        </span>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// Main footer component
+interface MessageFooterProps {
+    message: Message;
+    editingTags: string[];
+    onTagsChange: (tags: string[]) => void;
+    hasSparks: boolean;
+    aiAnalysis: { insights: { length: number } } | null;
+    onToggleAnalysis: () => void;
+    threadCount: number;
+    onOpenThread?: (messageId: string) => void;
+}
+
+function MessageFooter({ 
+    message, 
+    editingTags, 
+    onTagsChange, 
+    hasSparks, 
+    aiAnalysis, 
+    onToggleAnalysis, 
+    threadCount, 
+    onOpenThread 
+}: MessageFooterProps) {
+    return (
+        <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 px-8">
+            <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                <FooterItem>
+                    {message.content.length} characters
+                </FooterItem>
+                
+                {hasSparks && (
+                    <>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <FooterItem onClick={onToggleAnalysis}>
+                            {aiAnalysis!.insights.length} sparks
+                        </FooterItem>
+                    </>
+                )}
+                
+                <TagSection 
+                    tags={editingTags}
+                    onTagsChange={onTagsChange}
+                    maxTags={10}
+                />
+            </div>
+
+            {/* Thread indicator */}
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                <ThreadIndicator
+                    threadCount={threadCount}
+                    onOpenThread={onOpenThread}
+                    messageId={message.id}
+                />
+            </div>
+        </div>
     );
 }
 
@@ -109,7 +248,14 @@ export function ThoughtRecord({
     threadCount = 0
 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
     const { currentChannelId } = useChatViewStore();
+    const { userId } = useChatDataStore();
     const [showAnalysis, setShowAnalysis] = useState(false);
+    const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
+    
+    // Update editingTags when message.tags changes
+    React.useEffect(() => {
+        setEditingTags(message.tags || []);
+    }, [message.tags]);
     const deleteMessage = channelMessageService.deleteMessage;
 
     // Edit state management
@@ -182,6 +328,26 @@ export function ThoughtRecord({
         switchToExpandedMode();
     };
 
+    // Tag editing handlers
+    const handleTagsChange = async (newTags: string[]) => {
+        setEditingTags(newTags);
+        
+        if (!userId || !currentChannelId) return;
+        
+        try {
+            await channelMessageService.updateMessage({
+                messageId: message.id,
+                channelId: currentChannelId,
+                updates: { tags: newTags },
+                userId
+            });
+        } catch (error) {
+            console.error('Failed to update tags:', error);
+            // Revert on error
+            setEditingTags(message.tags || []);
+        }
+    };
+
     return (
         <div className="w-full" data-component="thought-record">
             <div className={`group relative w-full py-4 transition-all duration-300 ease-out ${
@@ -219,9 +385,12 @@ export function ThoughtRecord({
                         className="px-8"
                     />
                 ) : (
-                    <ReadMoreWrapper maxHeight={300} >
-                        <MarkdownContent content={message.content} className="px-8" />
-                    </ReadMoreWrapper>
+                    <div className="px-8">
+                        <ReadMoreWrapper maxHeight={300}>
+                            <MarkdownContent content={message.content} />
+                        </ReadMoreWrapper>
+                        
+                    </div>
                 )}
 
                 {/* Sparks Section - Hide when editing */}
@@ -236,33 +405,16 @@ export function ThoughtRecord({
 
                 {/* Footer - Hide when editing */}
                 {!isEditing && (
-                    <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 px-8">
-                        <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                            <span className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer">
-                                {message.content.length} characters
-                            </span>
-                            {hasSparks && (
-                                <>
-                                    <span className="text-slate-300 dark:text-slate-600">•</span>
-                                    <span 
-                                        className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 cursor-pointer"
-                                        onClick={handleToggleAnalysis}
-                                    >
-                                        {aiAnalysis!.insights.length} sparks
-                                    </span>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Thread indicator */}
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                            <ThreadIndicator
-                                threadCount={threadCount}
-                                onOpenThread={onOpenThread}
-                                messageId={message.id}
-                            />
-                        </div>
-                    </div>
+                    <MessageFooter
+                        message={message}
+                        editingTags={editingTags}
+                        onTagsChange={handleTagsChange}
+                        hasSparks={hasSparks}
+                        aiAnalysis={aiAnalysis || null}
+                        onToggleAnalysis={handleToggleAnalysis}
+                        threadCount={threadCount}
+                        onOpenThread={onOpenThread}
+                    />
                 )}
             </div>
         </div>
