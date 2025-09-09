@@ -2,6 +2,7 @@ import { Button } from "@/common/components/ui/button";
 import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
 import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { buildTaggedPrompt } from "@/common/lib/tag-analysis.service";
 import { useState } from "react";
 import { cn } from "@/common/lib/utils";
 import { X } from "lucide-react";
@@ -25,18 +26,27 @@ export function ThoughtRecordSparks({
 
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
-
+    
+    // Check if tags provide context for analysis
+    const { hasTagContext } = buildTaggedPrompt(message.content, message.tags || []);
+console.log("tags", message.tags)
     async function handleGenerateSparks() {
         try {
             setIsGenerating(true);
 
+            // Build enhanced instructions based on tags
+            const { enhancedPrompt, hasTagContext } = buildTaggedPrompt(
+                message.content, 
+                message.tags || []
+            );
 
             const sparks = await generateSparksForText({
-                content: message.content,
+                content: message.content, // Use original content
                 channelId: message.channelId,
                 messageId: message.id,
                 options: {
                     includeChannelContext: enableContextEnhancement,
+                    additionalInstructions: hasTagContext ? enhancedPrompt : undefined,
                 }
             });
 
@@ -80,7 +90,14 @@ export function ThoughtRecordSparks({
                 {/* Conditional: empty vs populated */}
                 {!hasSparks ? (
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                            {hasTagContext && (
+                                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+                                    Tag-enhanced
+                                </span>
+                            )}
+                        </div>
                         <div className="flex items-center gap-2">
                             <Button variant="outline" onClick={handleGenerateSparks} disabled={isGenerating}>
                                 {isGenerating ? 'Generating...' : 'Generate Sparks'}
@@ -99,7 +116,14 @@ export function ThoughtRecordSparks({
                 ) : (
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Creative Sparks</span>
+                                {hasTagContext && (
+                                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+                                        Tag-enhanced
+                                    </span>
+                                )}
+                            </div>
                             <div className="flex items-center gap-2">
                                 <Button onClick={handleGenerateSparks} variant="outline" disabled={isGenerating}>
                                     {isGenerating ? 'Generating...' : 'Regenerate'}

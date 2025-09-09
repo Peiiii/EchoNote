@@ -27,6 +27,7 @@ export interface GenerateSparksOptions {
     maxMessages?: number;
     maxContentLength?: number;
   };
+  additionalInstructions?: string;
 }
 
 // Define the main configuration for sparks generation
@@ -54,25 +55,49 @@ export async function generateSparksForText(config: SparksGenerationConfig): Pro
     }
   }
 
-  const prompt = `You are EchoNote's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
+  const prompt = `<role>
+You are EchoNote's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
+</role>
 
-Your role is to generate 3-5 thoughtful sparks based on the user's recorded thought below. These sparks should:
+<task>
+Generate 3-5 thoughtful sparks based on the user's recorded thought below.
 
-1. **Expand thinking** - Provide knowledge, insights, or perspectives that deepen understanding
-2. **Show care** - Express warmth, understanding, and support like a thoughtful friend
-3. **Adapt intelligently** - Match the content type (analytical, emotional, creative, philosophical, etc.)
-4. **Promote growth** - Help users learn, reflect, and develop their thinking
-${contextInfo ? '5. **Connect contextually** - Consider related thoughts from the same channel to provide more relevant and connected insights' : ''}
+<strategy>
+Since you can generate multiple sparks (3-5), strategically utilize this space to fully address different objectives and requirements. Each spark can focus on a different aspect, approach, or perspective to provide comprehensive coverage of the user's needs.
 
-Generate sparks that are:
-- Highly relevant to the user's thought
-- Educational and thought-provoking
-- Warm and supportive in tone
-- Varied in approach and perspective
-${contextInfo ? '- Connected to the broader context of their thinking journey' : ''}
+<spark_distribution_guide>
+- Use 3 sparks minimum, 5 sparks maximum
+- Distribute sparks across different objectives to maximize value
+- Each spark should have a distinct focus and approach
+- Vary the tone and style across sparks (analytical, creative, supportive, etc.)
+- Ensure each spark provides unique value rather than repeating similar points
+- Pay special attention to additional instructions - they may contain specific generation requirements or preferences that should be prioritized
+- If additional instructions specify particular needs, adjust spark allocation and focus accordingly
+</spark_distribution_guide>
+</strategy>
+</task>
 
-User's recorded thought:
-${content}${contextInfo}`
+<objectives>
+<objective priority="high" spark_allocation="1-2">Expand thinking - Provide knowledge, insights, or perspectives that deepen understanding. Use 1-2 sparks to offer different angles of analysis or expertise.</objective>
+<objective priority="high" spark_allocation="1">Show care - Express warmth, understanding, and support like a thoughtful friend. Use 1 spark to provide emotional support and encouragement.</objective>
+<objective priority="high" spark_allocation="1-2">Adapt intelligently - Match the content type (analytical, emotional, creative, philosophical, etc.). Use 1-2 sparks to demonstrate different thinking styles or approaches.</objective>
+<objective priority="high" spark_allocation="1">Promote growth - Help users learn, reflect, and develop their thinking. Use 1 spark to suggest actionable next steps or reflection questions.</objective>
+${contextInfo ? '<objective priority="medium" spark_allocation="1">Connect contextually - Consider related thoughts from the same channel to provide more relevant and connected insights. Use 1 spark to draw connections with previous thoughts.</objective>' : ''}
+<objective priority="highest" spark_allocation="flexible">Additional Instructions - If additional instructions are provided, prioritize and incorporate them into spark generation. Adjust spark allocation and focus to meet specific user requirements mentioned in additional instructions.</objective>
+</objectives>
+
+<quality_requirements>
+<requirement>Highly relevant to the user's thought</requirement>
+<requirement>Educational and thought-provoking</requirement>
+<requirement>Warm and supportive in tone</requirement>
+<requirement>Varied in approach and perspective</requirement>
+${contextInfo ? '<requirement>Connected to the broader context of their thinking journey</requirement>' : ''}
+</quality_requirements>
+
+<user_content>
+${content}
+</user_content>
+${contextInfo ? `<context>${contextInfo}</context>` : ''}${options.additionalInstructions ? `\n\n<additional_instructions>${options.additionalInstructions}</additional_instructions>` : ''}`
 
   console.log('Generating creative sparks with schema:', SparksSchema)
   
