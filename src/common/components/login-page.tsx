@@ -1,7 +1,6 @@
 import { Button } from '@/common/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { useAuthStore } from '@/core/stores/auth.store';
-import { LogIn, MessageSquare } from 'lucide-react';
+import { MessageSquare, Sparkles } from 'lucide-react';
 
 export const LoginPage = () => {
   const { signInWithGoogle, isAuthenticating } = useAuthStore();
@@ -15,55 +14,107 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-            <MessageSquare className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              Welcome to EchoNote
-            </CardTitle>
-            <CardDescription className="text-slate-600 dark:text-slate-400 mt-2">
-              Your personal note-taking and chat companion
-            </CardDescription>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          <div className="text-center space-y-2">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Sign in to access your notes and continue your conversations
-            </p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+      <div className="w-full max-w-sm">
+        <header className="text-center mb-8">
+          <div className="relative inline-block mb-6">
+            <div className="w-16 h-16 rounded-xl bg-slate-900 dark:bg-white flex items-center justify-center shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+              <MessageSquare className="w-7 h-7 text-white dark:text-slate-900" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-slate-900">
+              <Sparkles className="w-2.5 h-2.5 text-white" />
+            </div>
           </div>
           
-          <Button
-            onClick={handleGoogleLogin}
-            disabled={isAuthenticating}
-            className="w-full h-12 text-base font-medium"
-            size="lg"
-          >
-            {isAuthenticating ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Signing in...</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <LogIn className="w-5 h-5" />
-                <span>Sign in with Google</span>
-              </div>
-            )}
-          </Button>
-          
-          <div className="text-center">
-            <p className="text-xs text-slate-500 dark:text-slate-500">
-              By signing in, you agree to our Terms of Service and Privacy Policy
-            </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+            EchoNote
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
+            Your intelligent note-taking companion
+          </p>
+        </header>
+
+        <main className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 mb-6">
+          <div className="space-y-5">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                Welcome back
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Sign in to continue your journey
+              </p>
+            </div>
+
+            <Button
+              onClick={handleGoogleLogin}
+              disabled={isAuthenticating}
+              className="w-full h-11 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors shadow-sm hover:shadow-md"
+              size="lg"
+            >
+              {isAuthenticating ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 dark:border-slate-600 dark:border-t-slate-300 rounded-full animate-spin" />
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </div>
+              )}
+            </Button>
+
+            <footer className="text-center pt-2">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                By continuing, you agree to our{' '}
+                <button className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors font-medium">
+                  Terms of Service
+                </button>{' '}
+                and{' '}
+                <button className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors font-medium">
+                  Privacy Policy
+                </button>
+              </p>
+            </footer>
           </div>
-        </CardContent>
-      </Card>
+        </main>
+
+        <aside className="text-center">
+          <div className="inline-flex items-center gap-4 text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+              <span className="text-xs font-medium">Smart Notes</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+              <span className="text-xs font-medium">AI Insights</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+              <span className="text-xs font-medium">Organized</span>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 };
