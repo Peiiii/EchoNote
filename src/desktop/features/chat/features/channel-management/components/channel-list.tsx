@@ -2,6 +2,7 @@ import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
+import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { useRef, useState, useEffect } from "react";
 
@@ -10,7 +11,7 @@ interface ChannelListProps {
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-    const { channels, addChannel, deleteChannel } = useChatDataStore();
+    const { channels, channelsLoading, addChannel, deleteChannel } = useChatDataStore();
     const { currentChannelId, setCurrentChannel } = useChatViewStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasScroll, setHasScroll] = useState(false);
@@ -55,6 +56,11 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
             setHasScroll(scrollHeight > clientHeight);
         }
     });
+
+    // Show skeleton while loading
+    if (channelsLoading) {
+        return <ChannelListSkeleton />;
+    }
 
     return (
         <div data-component="channel-list" className="flex flex-col h-full overflow-hidden">

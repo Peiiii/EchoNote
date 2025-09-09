@@ -51,6 +51,7 @@ export interface ChannelMessageState {
 
 export interface ChatDataState {
   channels: Channel[];
+  channelsLoading: boolean;
   userId: string | null;
   unsubscribeChannels: (() => void) | null;
   isListenerEnabled: boolean;
@@ -59,6 +60,7 @@ export interface ChatDataState {
   messagesByChannel: Record<string, ChannelMessageState>;
 
   // Actions
+  setChannelsLoading: (loading: boolean) => void;
   addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => Promise<void>;
   updateChannel: (channelId: string, updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>) => Promise<void>;
   deleteChannel: (channelId: string) => Promise<void>;
@@ -102,12 +104,17 @@ const withErrorHandling = async <T>(operation: () => Promise<T>, operationName: 
 
 export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   channels: [],
+  channelsLoading: false,
   userId: null,
   unsubscribeChannels: null,
   isListenerEnabled: true,
 
   // Channel级别的消息管理
   messagesByChannel: {},
+
+  setChannelsLoading: (loading: boolean) => {
+    set({ channelsLoading: loading });
+  },
 
   addChannel: withUserValidation(async (userId, channel) => {
     await withErrorHandling(
@@ -328,7 +335,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   initFirebaseListeners: async (userId: string) => {
     get().cleanupListeners();
-    set({ userId });
+    set({ userId, channelsLoading: true });
 
     await get().fetchInitialData(userId);
 
@@ -341,7 +348,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       (channels) => {
         const { isListenerEnabled } = get();
         if (!isListenerEnabled) return;
-        set({ channels });
+        set({ channels, channelsLoading: false });
       }
     );
 
@@ -356,15 +363,17 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
           set({
             unsubscribeChannels: null,
             channels: [],
+            channelsLoading: false,
             userId: null,
             messagesByChannel: {}, // Clear channel messages when cleaning up
           });
         },
 
   fetchInitialData: async (userId: string) => {
+    set({ channelsLoading: true });
     await withErrorHandling(async () => {
       const channels = await firebaseChatService.fetchChannels(userId);
-      set({ channels });
+      set({ channels, channelsLoading: false });
     }, 'fetchChannels');
   },
 }));
