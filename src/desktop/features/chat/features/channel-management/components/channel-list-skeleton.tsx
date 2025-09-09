@@ -1,9 +1,13 @@
 import { Skeleton } from '@/common/components/ui/skeleton';
 import { CollapsibleSidebar } from '@/common/components/collapsible-sidebar';
 
-export function ChannelListSkeleton() {
+interface ChannelListSkeletonProps {
+  count?: number;
+}
+
+export function ChannelListSkeleton({ count = 12 }: ChannelListSkeletonProps) {
   return (
-    <div data-component="channel-list" className="flex flex-col h-full overflow-hidden min-h-0">
+    <div data-component="channel-list" className="w-full h-full overflow-hidden flex flex-col">
       {/* Header */}
       <div data-component="channel-list-header" className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
@@ -25,25 +29,30 @@ export function ChannelListSkeleton() {
           msOverflowStyle: 'none'
         }}
       >
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: count }).map((_, index) => (
           <div
             key={index}
             className="w-full group transition-all duration-200 cursor-pointer"
           >
             <div className="relative p-3 rounded-lg transition-all duration-200 bg-transparent">
               <div className="flex items-start gap-3">
-                {/* Channel Icon Skeleton */}
+                {/* Channel Icon Skeleton - 匹配真实item的8x8尺寸 */}
                 <Skeleton className="w-8 h-8 rounded-lg flex-shrink-0" />
                 
-                {/* Channel Info Skeleton */}
+                {/* Channel Info Skeleton - 匹配真实item的布局和高度 */}
                 <div className="flex-1 text-left min-w-0">
+                  {/* 标题行 - 匹配font-medium的高度 */}
                   <div className="flex items-center gap-2 mb-1">
                     <Skeleton className="w-20 h-4" />
                   </div>
-                  <Skeleton className="w-24 h-3" />
+                  {/* 描述行 - 匹配text-xs line-clamp-2的高度，通常是2行 */}
+                  <div className="space-y-1">
+                    <Skeleton className="w-24 h-3" />
+                    <Skeleton className="w-16 h-3" />
+                  </div>
                 </div>
                 
-                {/* Action Buttons Skeleton */}
+                {/* Action Buttons Skeleton - 匹配真实按钮的6x6尺寸 */}
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                   <Skeleton className="w-6 h-6 rounded" />
                   <Skeleton className="w-6 h-6 rounded" />
