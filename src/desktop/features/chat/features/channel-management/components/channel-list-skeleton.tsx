@@ -1,18 +1,28 @@
 import { Skeleton } from '@/common/components/ui/skeleton';
+import { CollapsibleSidebar } from '@/common/components/collapsible-sidebar';
 
 export function ChannelListSkeleton() {
   return (
-    <div data-component="channel-list-skeleton" className="flex flex-col h-full overflow-hidden">
-      {/* Header Skeleton */}
-      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+    <div data-component="channel-list" className="flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div data-component="channel-list-header" className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
-          <Skeleton className="w-32 h-5" />
-          <Skeleton className="w-8 h-8 rounded" />
+          <div>
+            <Skeleton className="w-32 h-5" />
+          </div>
+          <CollapsibleSidebar.ToggleButton />
         </div>
       </div>
 
-      {/* Channel List Skeleton */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1 min-h-0">
+      {/* Channel List */}
+      <div
+        data-component="channel-list-content"
+        className="flex-1 overflow-y-auto p-3 space-y-1 min-h-0 channel-list-content"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
         {Array.from({ length: 5 }).map((_, index) => (
           <div
             key={index}

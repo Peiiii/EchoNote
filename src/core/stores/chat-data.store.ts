@@ -104,7 +104,7 @@ const withErrorHandling = async <T>(operation: () => Promise<T>, operationName: 
 
 export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   channels: [],
-  channelsLoading: false,
+  channelsLoading: true, // Start with loading state
   userId: null,
   unsubscribeChannels: null,
   isListenerEnabled: true,
@@ -363,7 +363,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
           set({
             unsubscribeChannels: null,
             channels: [],
-            channelsLoading: false,
+            channelsLoading: true, // Keep loading state when not authenticated
             userId: null,
             messagesByChannel: {}, // Clear channel messages when cleaning up
           });
