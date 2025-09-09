@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/common/lib/utils';
 
-// 可复用的按钮组件
 interface ReadMoreButtonProps {
     onClick: () => void;
     icon: React.ReactNode;
@@ -63,7 +62,6 @@ export function ReadMoreWrapper({
                     {children}
                 </div>
 
-                {/* 优雅的渐变遮罩 */}
                 {!isExpanded && showReadMore && (
                     <div className="absolute inset-0 pointer-events-none">
                         <div

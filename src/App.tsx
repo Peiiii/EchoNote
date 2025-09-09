@@ -1,4 +1,5 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
+import { LoginPage } from "@/common/components/login-page";
 import { AppSkeleton } from "@/common/components/ui/skeleton";
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
@@ -8,19 +9,21 @@ import { useEffect } from "react";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
-  const { user } = useFirebaseAuth();
+  const { user, isInitializing } = useFirebaseAuth();
   const setChatViewAuth = useChatViewStore((state) => state.setAuth);
 
-  // 同步认证状态到 chat-view store (保持向后兼容)
   useEffect(() => {
     setChatViewAuth(user);
   }, [user, setChatViewAuth]);
 
-  // 显示骨架屏或应用
-  if (!user) {
+  if (isInitializing) {
     return <AppSkeleton />;
   }
 
-  // 加载完成，显示应用
+  if (!user) {
+    return <LoginPage />;
+  }
+
   return currentBreakpoint === 'sm' ? <MobileApp /> : <DesktopApp />;
 };
+
