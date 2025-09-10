@@ -3,6 +3,7 @@ import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-mes
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { rxEventBusService } from "@/core/services/rx-event-bus.service";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -12,10 +13,9 @@ interface MessageInputProps {
     onSend: () => void;
     replyToMessageId?: string;
     onCancelReply: () => void;
-    onOpenAIAssistant: (channelId?: string) => void;
 }
 
-export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAIAssistant }: MessageInputProps) {
+export function MessageInput({ onSend, replyToMessageId, onCancelReply }: MessageInputProps) {
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendMessage } = channelMessageService
@@ -127,7 +127,11 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply, onOpenAI
                         <Mic className="w-4 h-4" />
                     </button>
                     <button
-                        onClick={() => onOpenAIAssistant?.(currentChannelId || undefined)}
+                        onClick={() => {
+                            if (currentChannelId) {
+                                rxEventBusService.requestOpenAIAssistant$.emit({ channelId: currentChannelId });
+                            }
+                        }}
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200"
                         title="Open AI Assistant"
                     >

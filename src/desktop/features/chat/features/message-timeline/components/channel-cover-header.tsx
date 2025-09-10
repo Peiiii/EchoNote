@@ -1,13 +1,13 @@
 import { Channel } from "@/core/stores/chat-data.store";
 import { Button } from "@/common/components/ui/button";
 import { Badge } from "@/common/components/ui/badge";
+import { rxEventBusService } from "@/core/services/rx-event-bus.service";
 import { MessageSquare, Users, Settings, Star, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { useState } from "react";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
-  onOpenAIAssistant?: () => void;
   onOpenSettings?: () => void;
   className?: string;
   defaultCollapsed?: boolean;
@@ -83,7 +83,6 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
 
 export const ChannelCoverHeader = ({
   channel,
-  onOpenAIAssistant,
   onOpenSettings,
   className = "",
   defaultCollapsed = false
@@ -101,15 +100,15 @@ export const ChannelCoverHeader = ({
           className
         )}
       >
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
           {channel.emoji && (
-            <div className="text-lg">{channel.emoji}</div>
+            <div className="text-lg flex-shrink-0">{channel.emoji}</div>
           )}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
             <h1 className="text-lg font-semibold text-foreground truncate">
               {channel.name}
             </h1>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs flex-shrink-0">
               {channel.messageCount}
             </Badge>
           </div>
@@ -120,7 +119,7 @@ export const ChannelCoverHeader = ({
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
-            onClick={onOpenAIAssistant}
+            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
           >
             <Star className="h-4 w-4" />
           </Button>
@@ -162,9 +161,9 @@ export const ChannelCoverHeader = ({
       }}
     >
       <div className="relative z-10 flex items-start justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 min-w-0 flex-1">
           {channel.emoji && (
-            <div className="text-4xl drop-shadow-lg">{channel.emoji}</div>
+            <div className="text-4xl drop-shadow-lg flex-shrink-0">{channel.emoji}</div>
           )}
           <div className="flex-1 min-w-0">
             <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate">
@@ -178,7 +177,7 @@ export const ChannelCoverHeader = ({
           </div>
         </div>
         
-        <div className="flex items-center space-x-1 ml-4">
+        <div className="flex items-center space-x-1 ml-4 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -228,7 +227,7 @@ export const ChannelCoverHeader = ({
             variant="secondary"
             size="sm"
             className="bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm transition-all duration-200 hover:scale-105"
-            onClick={onOpenAIAssistant}
+            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
           >
             <Star className="h-4 w-4 mr-2" />
             <span className="font-medium">AI Assistant</span>

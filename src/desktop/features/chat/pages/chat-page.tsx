@@ -6,6 +6,8 @@ import { ThreadSidebar } from "@/desktop/features/chat/features/thread-managemen
 import { MessageTimelineFeature } from "@/desktop/features/chat/features/message-timeline";
 import { useAIAssistant } from "@/desktop/features/chat/features/ai-assistant/hooks/use-ai-assistant";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
+import { rxEventBusService } from "@/core/services/rx-event-bus.service";
+import { useEffect } from "react";
 
 export function ChatPage() {
     // Use specialized hooks
@@ -15,6 +17,14 @@ export function ChatPage() {
     const handleOpenSettings = () => {
         console.log('Open channel settings');
     };
+
+    useEffect(() => {
+        const unlisten = rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
+            handleOpenAIAssistant(channelId);
+        });
+
+        return unlisten;
+    }, [handleOpenAIAssistant]);
     
     return (
         <ChatLayout
@@ -22,7 +32,6 @@ export function ChatPage() {
             content={
                 <MessageTimelineFeature
                     onOpenThread={handleOpenThread}
-                    onOpenAIAssistant={handleOpenAIAssistant}
                     onOpenSettings={handleOpenSettings}
                 />
             }

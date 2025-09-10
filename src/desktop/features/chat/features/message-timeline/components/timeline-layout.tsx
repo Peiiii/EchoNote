@@ -6,7 +6,6 @@ interface TimelineLayoutProps {
     content?: ReactNode;
     actions?: ReactNode;
     channel?: Channel;
-    onOpenAIAssistant?: () => void;
     onOpenSettings?: () => void;
     className?: string;
 }
@@ -15,7 +14,6 @@ export const TimelineLayout = ({
     content, 
     actions, 
     channel,
-    onOpenAIAssistant,
     onOpenSettings,
     className = "" 
 }: TimelineLayoutProps) => {
@@ -25,7 +23,6 @@ export const TimelineLayout = ({
             {channel && (
                 <ChannelCoverHeader
                     channel={channel}
-                    onOpenAIAssistant={onOpenAIAssistant}
                     onOpenSettings={onOpenSettings}
                 />
             )}

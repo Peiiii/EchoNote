@@ -4,7 +4,6 @@ interface TimelineActionsProps {
     onSend: () => void;
     replyToMessageId?: string;
     onCancelReply: () => void;
-    onOpenAIAssistant: (channelId?: string) => void;
     className?: string;
 }
 
@@ -12,7 +11,6 @@ export const TimelineActions = ({
     onSend,
     replyToMessageId,
     onCancelReply,
-    onOpenAIAssistant,
     className = ""
 }: TimelineActionsProps) => {
     return (
@@ -21,7 +19,6 @@ export const TimelineActions = ({
                 onSend={onSend}
                 replyToMessageId={replyToMessageId}
                 onCancelReply={onCancelReply}
-                onOpenAIAssistant={onOpenAIAssistant}
             />
         </div>
     );

@@ -11,14 +11,12 @@ import { useRef } from "react";
 
 interface MessageTimelineFeatureProps {
     onOpenThread: (messageId: string) => void;
-    onOpenAIAssistant: (channelId?: string) => void;
     onOpenSettings?: () => void;
     className?: string;
 }
 
 export const MessageTimelineFeature = ({
     onOpenThread,
-    onOpenAIAssistant,
     onOpenSettings,
     className = ""
 }: MessageTimelineFeatureProps) => {
@@ -55,7 +53,6 @@ export const MessageTimelineFeature = ({
             {/* Timeline layout with content and actions */}
             <TimelineLayout
                 channel={currentChannel || undefined}
-                onOpenAIAssistant={onOpenAIAssistant}
                 onOpenSettings={onOpenSettings}
                 content={
                     <TimelineContent
@@ -68,7 +65,6 @@ export const MessageTimelineFeature = ({
                         onSend={handleSendMessage}
                         replyToMessageId={chatActions.replyToMessageId ?? undefined}
                         onCancelReply={chatActions.handleCancelReply}
-                        onOpenAIAssistant={onOpenAIAssistant}
                     />
                 }
             />
