@@ -1,7 +1,10 @@
 export interface BackgroundSwitcherProps {
-  currentBackground?: string;
+  currentBackground?: {
+    type: 'color' | 'image';
+    value?: string;
+  };
   currentBackgroundType?: 'color' | 'image';
-  onBackgroundChange: (type: 'color' | 'image', value: string) => void;
+  onBackgroundChange: ({ type, value }: { type: 'color' | 'image'; value: string }) => void;
   onRemoveBackground: () => void;
   buttonClassName?: string;
 }

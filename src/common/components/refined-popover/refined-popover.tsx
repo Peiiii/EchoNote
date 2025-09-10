@@ -115,6 +115,7 @@ interface RefinedPopoverContentWrapperProps {
   align?: "start" | "center" | "end";
   side?: "top" | "right" | "bottom" | "left";
   sideOffset?: number;
+  onInteractOutside?: (e: Event) => void;
 }
 
 const RefinedPopoverContentWrapper = ({ 
@@ -123,7 +124,8 @@ const RefinedPopoverContentWrapper = ({
   className = "",
   align = "center",
   side = "bottom",
-  sideOffset = 8
+  sideOffset = 8,
+  onInteractOutside
 }: RefinedPopoverContentWrapperProps) => {
   return (
     <PopoverContent 
@@ -135,6 +137,7 @@ const RefinedPopoverContentWrapper = ({
       align={align}
       side={side}
       sideOffset={sideOffset}
+      onInteractOutside={onInteractOutside}
     >
       {children}
     </PopoverContent>

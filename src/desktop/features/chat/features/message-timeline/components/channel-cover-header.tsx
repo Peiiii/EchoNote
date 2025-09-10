@@ -1,12 +1,11 @@
-import { Channel } from "@/core/stores/chat-data.store";
-import { Button } from "@/common/components/ui/button";
 import { Badge } from "@/common/components/ui/badge";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
-import { MessageSquare, Users, Settings, Bot, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
-import { useState, useRef } from "react";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { Channel, useChatDataStore } from "@/core/stores/chat-data.store";
+import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, Settings, Users } from "lucide-react";
+import { useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -66,13 +65,13 @@ export const ChannelCoverHeader = ({
         backgroundRepeat: 'no-repeat'
       };
     }
-    
+
     if (isGradient) {
       return {
         background: backgroundStyle
       };
     }
-    
+
     return {
       backgroundColor: backgroundStyle
     };
@@ -89,7 +88,7 @@ export const ChannelCoverHeader = ({
     }, 300);
   };
 
-  const handleBackgroundChange = async (type: 'color' | 'image', value: string) => {
+  const handleBackgroundChange = async ({ type, value }: { type: 'color' | 'image'; value: string }) => {
     try {
       if (type === 'color') {
         await updateChannel(channel.id, { backgroundColor: value, backgroundImage: undefined });
@@ -158,7 +157,10 @@ export const ChannelCoverHeader = ({
             <Settings className="h-4 w-4" />
           </Button>
           <BackgroundSwitcher
-            currentBackground={channel.backgroundColor || channel.backgroundImage}
+            currentBackground={{
+              type: channel.backgroundColor ? 'color' : 'image',
+              value: channel.backgroundColor || channel.backgroundImage
+            }}
             onBackgroundChange={handleBackgroundChange}
             onRemoveBackground={handleRemoveBackground}
             buttonClassName="h-8 w-8 p-0 text-white hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
@@ -238,7 +240,10 @@ export const ChannelCoverHeader = ({
               <Bot className="h-4 w-4" />
             </Button>
             <BackgroundSwitcher
-              currentBackground={channel.backgroundColor || channel.backgroundImage}
+              currentBackground={{
+                type: channel.backgroundColor ? 'color' : 'image',
+                value: channel.backgroundColor || channel.backgroundImage
+              }}
               onBackgroundChange={handleBackgroundChange}
               onRemoveBackground={handleRemoveBackground}
             />

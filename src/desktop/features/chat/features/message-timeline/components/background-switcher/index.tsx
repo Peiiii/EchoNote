@@ -15,6 +15,7 @@ export function BackgroundSwitcher({
 }: BackgroundSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'colors' | 'images'>('colors');
+  const [originalBackground, setOriginalBackground] = useState<{ type: 'color' | 'image'; value?: string } | undefined>(currentBackground);
   const isOpenRef = useRef(false);
 
   useEffect(() => {
@@ -22,20 +23,27 @@ export function BackgroundSwitcher({
   }, [isOpen]);
 
   const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setOriginalBackground(currentBackground);
+    }
     setIsOpen(open);
   };
 
   const handleBackgroundSelect = (option: BackgroundOption) => {
     if (option.type === 'gradient' || option.type === 'color') {
-      onBackgroundChange('color', option.value);
+      onBackgroundChange({ type: 'color', value: option.value });
     } else if (option.type === 'image') {
-      onBackgroundChange('image', option.value);
+      onBackgroundChange({ type: 'image', value: option.value });
     }
   };
 
-  const handleRemoveBackground = () => {
-    onRemoveBackground();
-    setIsOpen(false);
+  const handleResetBackground = () => {
+    if (originalBackground) {
+      console.log('🎨 [BackgroundSwitcher] Resetting background to:', { originalBackground });
+      onBackgroundChange({ type: originalBackground.type, value: originalBackground.value || '' });
+    } else {
+      onRemoveBackground();
+    }
   };
 
   return (
@@ -55,6 +63,9 @@ export function BackgroundSwitcher({
       </RefinedPopover.Trigger>
       <RefinedPopover.Content
         width="w-80"
+        onInteractOutside={(e: Event) => {
+          e.preventDefault();
+        }}
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
@@ -63,8 +74,8 @@ export function BackgroundSwitcher({
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-              onClick={handleRemoveBackground}
-              title="Remove background"
+              onClick={() => setIsOpen(false)}
+              title="Close"
             >
               <X className="h-3 w-3" />
             </Button>
@@ -94,21 +105,34 @@ export function BackgroundSwitcher({
           <div className="max-h-64 overflow-y-auto">
             {activeTab === 'colors' ? (
               <ColorSelector
-                currentBackground={currentBackground}
+                currentBackground={currentBackground?.value}
                 onBackgroundSelect={handleBackgroundSelect}
               />
             ) : (
               <ImageSelector
-                currentBackground={currentBackground}
+                currentBackground={currentBackground?.value}
                 onBackgroundSelect={handleBackgroundSelect}
               />
             )}
           </div>
 
           <div className="mt-4 pt-3 border-t border-border">
-            <p className="text-xs text-muted-foreground text-center">
-              Choose a background to personalize your channel
-            </p>
+            <div className="flex flex-col space-y-2">
+              <p className="text-xs text-muted-foreground text-center">
+                Choose a background to personalize your channel
+              </p>
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-3 text-xs"
+                  onClick={handleResetBackground}
+                  title="Reset to original background"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </RefinedPopover.Content>
