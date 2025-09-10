@@ -22,27 +22,31 @@ import { db } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/chat-data.store";
 
 /**
- * Firebase Chat Service - Handle Firebase operations related to chat
+ * Firebase Notes Service - Handle Firebase operations related to user notes and thoughts
+ * 
+ * This service manages:
+ * - Thought Spaces (channels): User-created spaces for organizing thoughts
+ * - Thought Records (messages): Individual notes and thoughts within spaces
  * 
  * Important notes about the isDeleted field:
  * 
  * 1. Data model standardization:
- *    - All new messages will automatically include isDeleted: false
- *    - Use where("isDeleted", "==", false) to query non-deleted messages
+ *    - All new thought records will automatically include isDeleted: false
+ *    - Use where("isDeleted", "==", false) to query non-deleted thought records
  *    - This allows efficient use of Firestore indexes, optimal performance
  * 
  * 2. Data migration:
- *    - Use migrateMessagesForIsDeleted() to add isDeleted field to existing messages
+ *    - Use migrateMessagesForIsDeleted() to add isDeleted field to existing thought records
  *    - It is recommended to execute this once when the application starts
  * 
  * 3. Query optimization:
  *    - Avoid using where("isDeleted", "!=", true), because it will exclude documents without the field
- *    - Use where("isDeleted", "==", false) to ensure only non-deleted messages are returned
+ *    - Use where("isDeleted", "==", false) to ensure only non-deleted thought records are returned
  * 
  * 4. Soft delete process:
  *    - Call softDeleteMessage() to set isDeleted: true
- *    - Call restoreMessage() to restore messages
- *    - Call permanentDeleteMessage() to permanently delete messages
+ *    - Call restoreMessage() to restore thought records
+ *    - Call permanentDeleteMessage() to permanently delete thought records
  */
 // Type conversion helper functions
 const docToChannel = (doc: DocumentSnapshot): Channel => {
@@ -88,13 +92,13 @@ const getChannelsCollectionRef = (userId: string) =>
 const getMessagesCollectionRef = (userId: string) =>
   collection(db, `users/${userId}/messages`);
 
-export const firebaseChatService = {
+export const firebaseNotesService = {
   // Channel Services
   subscribeToChannels: (
     userId: string,
     onUpdate: (channels: Channel[]) => void
   ): (() => void) => {
-    console.log("🔔 [firebaseChatService][subscribeToChannels]:", { userId });
+    console.log("🔔 [firebaseNotesService][subscribeToChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
       where("isDeleted", "==", false), // Only get non-deleted channels
@@ -122,7 +126,7 @@ export const firebaseChatService = {
     messagesLimit: number,
     onUpdate: (messages: Message[], hasMore: boolean) => void
   ): (() => void) => {
-    console.log("🔔 [firebaseChatService][subscribeToChannelMessages]:", { userId, channelId, messagesLimit });
+    console.log("🔔 [firebaseNotesService][subscribeToChannelMessages]:", { userId, channelId, messagesLimit });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -150,7 +154,7 @@ export const firebaseChatService = {
   },
 
   fetchChannels: async (userId: string): Promise<Channel[]> => {
-    console.log("🔔 [firebaseChatService][fetchChannels]:", { userId });
+    console.log("🔔 [firebaseNotesService][fetchChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
       where("isDeleted", "==", false), // Only get non-deleted channels
@@ -206,7 +210,7 @@ export const firebaseChatService = {
     userId: string,
     channelId: string
   ): Promise<void> => {
-    console.log("🔔 [firebaseChatService][deleteChannel]:", { userId, channelId });
+    console.log("🔔 [firebaseNotesService][deleteChannel]:", { userId, channelId });
     
     // Soft delete the channel document
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
@@ -240,12 +244,12 @@ export const firebaseChatService = {
         await Promise.all(softDeletePromises);
       }
       
-      console.log("🔔 [firebaseChatService][deleteChannel]: Successfully soft deleted channel and messages", { 
+      console.log("🔔 [firebaseNotesService][deleteChannel]: Successfully soft deleted channel and messages", { 
         channelId, 
         messageCount: messagesSnapshot.docs.length 
       });
     } catch (error) {
-      console.error("🔔 [firebaseChatService][deleteChannel]: Error soft deleting messages:", error);
+      console.error("🔔 [firebaseNotesService][deleteChannel]: Error soft deleting messages:", error);
       // Even if message soft deletion fails, the channel is already soft deleted
       throw new Error(`Channel soft deleted but failed to soft delete associated messages: ${error}`);
     }
@@ -256,7 +260,7 @@ export const firebaseChatService = {
     userId: string,
     channelId: string
   ): Promise<void> => {
-    console.log("🔔 [firebaseChatService][restoreChannel]:", { userId, channelId });
+    console.log("🔔 [firebaseNotesService][restoreChannel]:", { userId, channelId });
     
     // Restore the channel document
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
@@ -291,12 +295,12 @@ export const firebaseChatService = {
         await Promise.all(restorePromises);
       }
       
-      console.log("🔔 [firebaseChatService][restoreChannel]: Successfully restored channel and messages", { 
+      console.log("🔔 [firebaseNotesService][restoreChannel]: Successfully restored channel and messages", { 
         channelId, 
         messageCount: messagesSnapshot.docs.length 
       });
     } catch (error) {
-      console.error("🔔 [firebaseChatService][restoreChannel]: Error restoring messages:", error);
+      console.error("🔔 [firebaseNotesService][restoreChannel]: Error restoring messages:", error);
       // Even if message restoration fails, the channel is already restored
       throw new Error(`Channel restored but failed to restore associated messages: ${error}`);
     }
@@ -307,7 +311,7 @@ export const firebaseChatService = {
     channelId: string,
     messagesLimit: number
   ) => {
-    console.log("🔔 [firebaseChatService][fetchInitialMessages]:", { userId, channelId, messagesLimit });
+    console.log("🔔 [firebaseNotesService][fetchInitialMessages]:", { userId, channelId, messagesLimit });
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
@@ -332,7 +336,7 @@ export const firebaseChatService = {
     messagesLimit: number,
     cursor: DocumentSnapshot
   ) => {
-    console.log("🔔 [firebaseChatService][fetchMoreMessages]:", { userId, channelId, messagesLimit, cursor });
+    console.log("🔔 [firebaseNotesService][fetchMoreMessages]:", { userId, channelId, messagesLimit, cursor });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -360,7 +364,7 @@ export const firebaseChatService = {
     afterTimestamp: Date,
     onUpdate: (newMessages: Message[]) => void
   ): (() => void) => {
-    console.log("🔔 [firebaseChatService][subscribeToNewMessages]:", { userId, channelId, afterTimestamp });
+    console.log("🔔 [firebaseNotesService][subscribeToNewMessages]:", { userId, channelId, afterTimestamp });
     const q = query(
       getMessagesCollectionRef(userId),
       where("isDeleted", "==", false),
@@ -448,7 +452,7 @@ export const firebaseChatService = {
 
   // Get deleted messages (for management interface)
   getDeletedMessages: async (userId: string, channelId?: string): Promise<Message[]> => {
-    console.log("🔔 [firebaseChatService][getDeletedMessages]:", { userId, channelId });
+    console.log("🔔 [firebaseNotesService][getDeletedMessages]:", { userId, channelId });
     try {
       let q = query(
         getMessagesCollectionRef(userId),

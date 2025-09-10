@@ -1,4 +1,4 @@
-import { firebaseChatService } from "@/common/services/firebase/firebase-chat.service";
+import { firebaseNotesService } from "@/common/services/firebase/firebase-notes.service";
 import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
 import { DocumentSnapshot } from "firebase/firestore";
@@ -120,7 +120,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   addChannel: withUserValidation(async (userId, channel) => {
     await withErrorHandling(
-      () => firebaseChatService.createChannel(userId, channel),
+      () => firebaseNotesService.createChannel(userId, channel),
       'createChannel'
     );
   }),
@@ -134,7 +134,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
     set({ channels: updatedChannels });
     
     await withErrorHandling(
-      () => firebaseChatService.updateChannel(userId, channelId, updates),
+      () => firebaseNotesService.updateChannel(userId, channelId, updates),
       'updateChannel'
     );
   }),
@@ -142,7 +142,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   deleteChannel: withUserValidation(async (userId, channelId) => {
     // 调用 Firebase 服务删除 channel
     await withErrorHandling(
-      () => firebaseChatService.deleteChannel(userId, channelId),
+      () => firebaseNotesService.deleteChannel(userId, channelId),
       'deleteChannel'
     );
     
@@ -166,15 +166,15 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   addMessage: withUserValidation(async (userId, message) => {
     await withErrorHandling(
-      () => firebaseChatService.createMessage(userId, message),
+      () => firebaseNotesService.createMessage(userId, message),
       'createMessage'
     );
   }),
 
   deleteMessage: withUserValidation(async (userId, messageId, hardDelete = false) => {
     const operation = hardDelete 
-      ? () => firebaseChatService.deleteMessage(userId, messageId)
-      : () => firebaseChatService.softDeleteMessage(userId, messageId);
+      ? () => firebaseNotesService.deleteMessage(userId, messageId)
+      : () => firebaseNotesService.softDeleteMessage(userId, messageId);
     
     await withErrorHandling(operation, hardDelete ? 'deleteMessage' : 'softDeleteMessage');
     
@@ -194,14 +194,14 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   updateMessage: withUserValidation(async (userId, messageId, updates) => {
     await withErrorHandling(
-      () => firebaseChatService.updateMessage(userId, messageId, updates),
+      () => firebaseNotesService.updateMessage(userId, messageId, updates),
       'updateMessage'
     );
   }),
 
   addThreadMessage: withUserValidation(async (userId, parentMessageId, message) => {
     await withErrorHandling(
-      () => firebaseChatService.createMessage(userId, {
+      () => firebaseNotesService.createMessage(userId, {
         ...message,
         parentId: parentMessageId,
         threadId: parentMessageId,
@@ -212,14 +212,14 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
 
   restoreMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
-      () => firebaseChatService.restoreMessage(userId, messageId),
+      () => firebaseNotesService.restoreMessage(userId, messageId),
       'restoreMessage'
     );
   }),
 
   permanentDeleteMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
-      () => firebaseChatService.deleteMessage(userId, messageId),
+      () => firebaseNotesService.deleteMessage(userId, messageId),
       'permanentDeleteMessage'
     );
   }),
@@ -345,7 +345,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
       await firebaseMigrateService.runAllMigrations(userId);
     }, 'runMigrations');
 
-    const unsubscribeChannels = firebaseChatService.subscribeToChannels(
+    const unsubscribeChannels = firebaseNotesService.subscribeToChannels(
       userId,
       (channels) => {
         const { isListenerEnabled } = get();
@@ -374,7 +374,7 @@ export const useChatDataStore = create<ChatDataState>()((set, get) => ({
   fetchInitialData: async (userId: string) => {
     set({ channelsLoading: true });
     await withErrorHandling(async () => {
-      const channels = await firebaseChatService.fetchChannels(userId);
+      const channels = await firebaseNotesService.fetchChannels(userId);
       set({ channels, channelsLoading: false });
     }, 'fetchChannels');
   },

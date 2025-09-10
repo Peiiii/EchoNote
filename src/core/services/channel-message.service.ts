@@ -1,5 +1,5 @@
 import { RxEvent } from '@/common/lib/rx-event';
-import { firebaseChatService } from '@/common/services/firebase';
+import { firebaseNotesService } from '@/common/services/firebase';
 import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
 import { useChatViewStore } from '@/core/stores/chat-view.store';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
@@ -131,7 +131,7 @@ export class ChannelMessageService {
         setLoading(true);
 
         try {
-            const result = await firebaseChatService.fetchInitialMessages(
+            const result = await firebaseNotesService.fetchInitialMessages(
                 userId,
                 channelId,
                 messagesLimit
@@ -166,7 +166,7 @@ export class ChannelMessageService {
         setLoadingMore(true);
 
         try {
-            const result = await firebaseChatService.fetchMoreMessages(
+            const result = await firebaseNotesService.fetchMoreMessages(
                 userId,
                 channelId,
                 messagesLimit,
@@ -204,7 +204,7 @@ export class ChannelMessageService {
 
         console.log('🔔 [subscribeToNewMessages] 开始订阅新消息', { channelId, afterTimestamp });
 
-        const unsubscribe = firebaseChatService.subscribeToNewMessages(
+        const unsubscribe = firebaseNotesService.subscribeToNewMessages(
             userId,
             channelId,
             afterTimestamp,
@@ -230,9 +230,9 @@ export class ChannelMessageService {
             () => removeMessage(messageId),
             async () => {
                 if (hardDelete) {
-                    await firebaseChatService.deleteMessage(userId, messageId);
+                    await firebaseNotesService.deleteMessage(userId, messageId);
                 } else {
-                    await firebaseChatService.softDeleteMessage(userId, messageId);
+                    await firebaseNotesService.softDeleteMessage(userId, messageId);
                 }
                 console.log('Message deleted successfully:', { messageId, channelId, hardDelete });
             },
@@ -249,7 +249,7 @@ export class ChannelMessageService {
         const { addMessage, fixFakeMessage } = this.getChannelStateControl(message.channelId);
         const tmpMessage: Message = { ...message, id: v4(), timestamp: new Date() }
         addMessage(tmpMessage);
-        const realMsgId = await firebaseChatService.createMessage(userId, message);
+        const realMsgId = await firebaseNotesService.createMessage(userId, message);
         fixFakeMessage(tmpMessage.id, realMsgId);
     }
 
@@ -276,7 +276,7 @@ export class ChannelMessageService {
         await withOptimisticUpdate(
             () => setMessages(messages.map(m => m.id === messageId ? updatedMessage : m)),
             async () => {
-                await firebaseChatService.updateMessage(userId, messageId, updates);
+                await firebaseNotesService.updateMessage(userId, messageId, updates);
                 console.log('Message updated successfully:', { messageId, channelId, updates });
             },
             () => {
