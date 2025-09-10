@@ -29,7 +29,6 @@ export function ThoughtRecordSparks({
     
     // Check if tags provide context for analysis
     const { hasTagContext } = buildTaggedPrompt(message.content, message.tags || []);
-console.log("tags", message.tags)
     async function handleGenerateSparks() {
         try {
             setIsGenerating(true);

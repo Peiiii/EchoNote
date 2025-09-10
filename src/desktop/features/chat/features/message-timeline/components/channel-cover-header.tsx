@@ -5,6 +5,8 @@ import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { MessageSquare, Users, Settings, Bot, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { useState, useRef } from "react";
+import { BackgroundSwitcher } from "./background-switcher";
+import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -23,9 +25,9 @@ const generateHash = (channelId: string): number => {
 
 const getPicsumBackground = (hash: number) => {
   const imageId = (hash % 100) + 1;
-  return { 
-    background: `url(https://picsum.photos/800/400?random=${imageId})`, 
-    isImage: true 
+  return {
+    background: `url(https://picsum.photos/800/400?random=${imageId})`,
+    isImage: true
   };
 };
 
@@ -33,11 +35,11 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
   if (channel.backgroundImage) {
     return { background: `url(${channel.backgroundImage})`, isImage: true };
   }
-  
+
   if (channel.backgroundColor) {
     return { background: channel.backgroundColor, isImage: false };
   }
-  
+
   const hash = generateHash(channel.id);
   return getPicsumBackground(hash);
 };
@@ -51,17 +53,60 @@ export const ChannelCoverHeader = ({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { updateChannel } = useChatDataStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
+  const isGradient = backgroundStyle.includes('gradient');
+
+  const getBackgroundStyle = (): React.CSSProperties => {
+    if (hasBackgroundImage) {
+      return {
+        backgroundImage: backgroundStyle,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      };
+    }
+    
+    if (isGradient) {
+      return {
+        background: backgroundStyle
+      };
+    }
+    
+    return {
+      backgroundColor: backgroundStyle
+    };
+  };
 
   const handleToggle = () => {
     if (isAnimating) return;
-    
+
     setIsAnimating(true);
     setIsCollapsed(!isCollapsed);
-    
+
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
+  };
+
+  const handleBackgroundChange = async (type: 'color' | 'image', value: string) => {
+    try {
+      if (type === 'color') {
+        await updateChannel(channel.id, { backgroundColor: value, backgroundImage: undefined });
+      } else if (type === 'image') {
+        await updateChannel(channel.id, { backgroundImage: value, backgroundColor: undefined });
+      }
+    } catch (error) {
+      console.error('Failed to update channel background:', error);
+    }
+  };
+
+  const handleRemoveBackground = async () => {
+    try {
+      await updateChannel(channel.id, { backgroundColor: undefined, backgroundImage: undefined });
+    } catch (error) {
+      console.error('Failed to remove channel background:', error);
+    }
   };
 
   const collapsedContent = (
@@ -102,7 +147,7 @@ export const ChannelCoverHeader = ({
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-1 ml-4 flex-shrink-0">
           <Button
             variant="ghost"
@@ -112,6 +157,12 @@ export const ChannelCoverHeader = ({
           >
             <Settings className="h-4 w-4" />
           </Button>
+          <BackgroundSwitcher
+            currentBackground={channel.backgroundColor || channel.backgroundImage}
+            onBackgroundChange={handleBackgroundChange}
+            onRemoveBackground={handleRemoveBackground}
+            buttonClassName="h-8 w-8 p-0 text-white hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+          />
           <Button
             variant="ghost"
             size="sm"
@@ -137,7 +188,7 @@ export const ChannelCoverHeader = ({
             <span className="font-medium">{channel.messageCount}</span>
             <span className="ml-1 text-xs opacity-90">messages</span>
           </Badge>
-          
+
           {channel.lastMessageTime && (
             <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out">
               <Users className="h-3 w-3 mr-1.5" />
@@ -164,7 +215,7 @@ export const ChannelCoverHeader = ({
   );
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
         "relative w-full overflow-hidden transition-all duration-300 ease-out",
@@ -172,12 +223,7 @@ export const ChannelCoverHeader = ({
         isCollapsed ? "flex items-center justify-between px-4 bg-muted/50 border-b border-border" : "",
         className
       )}
-      style={!isCollapsed ? {
-        backgroundImage: backgroundStyle,
-        backgroundSize: hasBackgroundImage ? 'cover' : 'auto',
-        backgroundPosition: hasBackgroundImage ? 'center' : 'top left',
-        backgroundRepeat: hasBackgroundImage ? 'no-repeat' : 'no-repeat'
-      } : {}}
+      style={!isCollapsed ? getBackgroundStyle() : {}}
     >
       {isCollapsed ? (
         <>
@@ -191,6 +237,11 @@ export const ChannelCoverHeader = ({
             >
               <Bot className="h-4 w-4" />
             </Button>
+            <BackgroundSwitcher
+              currentBackground={channel.backgroundColor || channel.backgroundImage}
+              onBackgroundChange={handleBackgroundChange}
+              onRemoveBackground={handleRemoveBackground}
+            />
             <Button
               variant="ghost"
               size="sm"

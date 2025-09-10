@@ -11,10 +11,12 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   serverTimestamp,
   Timestamp,
   DocumentSnapshot,
   increment,
+  FieldValue,
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/chat-data.store";
@@ -53,6 +55,8 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
     messageCount: data.messageCount || 0,
     lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),
+    backgroundImage: data.backgroundImage,
+    backgroundColor: data.backgroundColor,
   };
 };
 
@@ -177,7 +181,20 @@ export const firebaseChatService = {
     updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
   ): Promise<void> => {
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
-    await updateDoc(channelRef, updates);
+    
+    // Process updates to handle undefined values properly
+    const processedUpdates: Record<string, FieldValue | string | number | boolean | Date | null> = {};
+    
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === undefined) {
+        // Use deleteField() for undefined values to remove the field
+        processedUpdates[key] = deleteField();
+      } else {
+        processedUpdates[key] = value;
+      }
+    }
+    
+    await updateDoc(channelRef, processedUpdates);
   },
 
   deleteChannel: async (

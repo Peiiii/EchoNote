@@ -38,7 +38,6 @@ export const MessageTimeline = forwardRef<
     },
     ref
   ) => {
-    console.log("[MessageTimeline]", { groupedMessages, messages });
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
       [],
