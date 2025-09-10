@@ -115,7 +115,3 @@ export function BackgroundSwitcher({
     </RefinedPopover>
   );
 }
-
-export type { BackgroundSwitcherProps, BackgroundType } from './types';
-export { BackgroundOption } from './background-options';
-
