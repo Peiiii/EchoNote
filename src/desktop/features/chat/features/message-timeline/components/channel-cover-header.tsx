@@ -72,10 +72,10 @@ export const ChannelCoverHeader = ({
         </div>
       )}
       <div className="flex items-center space-x-2 min-w-0 flex-1">
-        <h1 className="text-lg font-semibold text-foreground truncate transition-all duration-300 ease-out">
+        <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out">
           {channel.name}
         </h1>
-        <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out">
+        <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
           {channel.messageCount}
         </Badge>
       </div>
@@ -186,7 +186,7 @@ export const ChannelCoverHeader = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
             >
               <Bot className="h-4 w-4" />
@@ -194,7 +194,7 @@ export const ChannelCoverHeader = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={onOpenSettings}
             >
               <Settings className="h-4 w-4" />
@@ -202,7 +202,7 @@ export const ChannelCoverHeader = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={handleToggle}
             >
               <ChevronDown className="h-4 w-4 transition-transform duration-200" />
