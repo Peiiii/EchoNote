@@ -31,8 +31,9 @@ export function Button() { ... }
 ### 3. **Directory** - Complex modules
 ```
 component-name/
-├── index.tsx          # Main component
+├── index.tsx          # Main component (entry point)
 ├── types.ts           # Types
+├── hooks/             # Custom hooks
 └── components/        # Sub-components
 ```
 
@@ -42,4 +43,14 @@ component-name/
 - Complex functionality
 - Need for testing structure
 
-## Rule: Use `index.tsx` as directory entry point
+## Directory Structure Rules:
+- **Main component**: Always use `index.tsx` as the entry point
+- **No duplicate files**: Never have both `component-name.tsx` and `component-name/index.tsx`
+- **Clean imports**: Import from directory path, not specific file
+- **Consistent naming**: Directory name should match the main component name
+
+## Migration Process:
+1. Create directory structure with `index.tsx`
+2. Move main component logic to `index.tsx`
+3. Delete the original `.tsx` file
+4. Update all imports to use directory path
