@@ -4,7 +4,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { MessageSquare, Users, Settings, Star, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -49,89 +49,54 @@ export const ChannelCoverHeader = ({
   defaultCollapsed = false
 }: ChannelCoverHeaderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
-  
-  if (isCollapsed) {
-    return (
-      <div 
-        className={cn(
-          "relative h-12 w-full",
-          "flex items-center justify-between px-4",
-          "bg-muted/50 border-b border-border",
-          className
-        )}
-      >
-        <div className="flex items-center space-x-3 min-w-0 flex-1">
-          {channel.emoji && (
-            <div className="text-lg flex-shrink-0">{channel.emoji}</div>
-          )}
-          <div className="flex items-center space-x-2 min-w-0 flex-1">
-            <h1 className="text-lg font-semibold text-foreground truncate">
-              {channel.name}
-            </h1>
-            <Badge variant="secondary" className="text-xs flex-shrink-0">
-              {channel.messageCount}
-            </Badge>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
-          >
-            <Star className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={onOpenSettings}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => setIsCollapsed(false)}
-          >
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
-  return (
-    <div 
-      className={cn(
-        "relative h-52 w-full overflow-hidden",
-        "flex flex-col justify-between p-6",
-        "before:absolute before:inset-0 before:bg-gradient-to-b before:from-black/10 before:via-black/20 before:to-black/30 before:z-0",
-        "after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-transparent after:to-black/10 after:z-0",
-        className
+  const handleToggle = () => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    setIsCollapsed(!isCollapsed);
+    
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 300);
+  };
+
+  const collapsedContent = (
+    <div className="flex items-center space-x-3 min-w-0 flex-1">
+      {channel.emoji && (
+        <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
+          {channel.emoji}
+        </div>
       )}
-      style={{
-        backgroundImage: backgroundStyle,
-        backgroundSize: hasBackgroundImage ? 'cover' : 'auto',
-        backgroundPosition: hasBackgroundImage ? 'center' : 'top left',
-        backgroundRepeat: hasBackgroundImage ? 'no-repeat' : 'no-repeat'
-      }}
-    >
+      <div className="flex items-center space-x-2 min-w-0 flex-1">
+        <h1 className="text-lg font-semibold text-foreground truncate transition-all duration-300 ease-out">
+          {channel.name}
+        </h1>
+        <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out">
+          {channel.messageCount}
+        </Badge>
+      </div>
+    </div>
+  );
+
+  const expandedContent = (
+    <>
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex items-center space-x-4 min-w-0 flex-1">
           {channel.emoji && (
-            <div className="text-4xl drop-shadow-lg flex-shrink-0">{channel.emoji}</div>
+            <div className="text-4xl drop-shadow-lg flex-shrink-0 transition-all duration-300 ease-out">
+              {channel.emoji}
+            </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate">
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out">
               {channel.name}
             </h1>
             {channel.description && (
-              <p className="text-white/90 text-sm mt-2 drop-shadow-md line-clamp-2">
+              <p className="text-white/90 text-sm mt-2 drop-shadow-md line-clamp-2 transition-all duration-300 ease-out">
                 {channel.description}
               </p>
             )}
@@ -142,7 +107,7 @@ export const ChannelCoverHeader = ({
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 transition-colors"
+            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
             onClick={onOpenSettings}
           >
             <Settings className="h-4 w-4" />
@@ -150,31 +115,31 @@ export const ChannelCoverHeader = ({
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 transition-colors"
+            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 transition-colors"
-            onClick={() => setIsCollapsed(true)}
+            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+            onClick={handleToggle}
           >
-            <ChevronUp className="h-4 w-4" />
+            <ChevronUp className="h-4 w-4 transition-transform duration-200" />
           </Button>
         </div>
       </div>
 
       <div className="relative z-10 flex items-center justify-between mt-4">
         <div className="flex items-center space-x-3">
-          <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm">
+          <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out">
             <MessageSquare className="h-3 w-3 mr-1.5" />
             <span className="font-medium">{channel.messageCount}</span>
             <span className="ml-1 text-xs opacity-90">messages</span>
           </Badge>
           
           {channel.lastMessageTime && (
-            <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm">
+            <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out">
               <Users className="h-3 w-3 mr-1.5" />
               <span className="text-xs">
                 {new Date(channel.lastMessageTime).toLocaleDateString()}
@@ -195,6 +160,62 @@ export const ChannelCoverHeader = ({
           </Button>
         </div>
       </div>
+    </>
+  );
+
+  return (
+    <div 
+      ref={containerRef}
+      className={cn(
+        "relative w-full overflow-hidden transition-all duration-300 ease-out",
+        isCollapsed ? "h-12" : "h-52",
+        isCollapsed ? "flex items-center justify-between px-4 bg-muted/50 border-b border-border" : "",
+        className
+      )}
+      style={!isCollapsed ? {
+        backgroundImage: backgroundStyle,
+        backgroundSize: hasBackgroundImage ? 'cover' : 'auto',
+        backgroundPosition: hasBackgroundImage ? 'center' : 'top left',
+        backgroundRepeat: hasBackgroundImage ? 'no-repeat' : 'no-repeat'
+      } : {}}
+    >
+      {isCollapsed ? (
+        <>
+          {collapsedContent}
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
+            >
+              <Star className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              onClick={onOpenSettings}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
+              onClick={handleToggle}
+            >
+              <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="relative w-full h-full flex flex-col justify-between p-6">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/30 z-0" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/10 z-0" />
+          {expandedContent}
+        </div>
+      )}
     </div>
   );
 };
