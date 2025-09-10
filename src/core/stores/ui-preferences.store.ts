@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface ViewState {
+export interface UIPreferencesState {
   // Sidebar states
   isLeftSidebarCollapsed: boolean;
   
@@ -26,7 +26,7 @@ export interface ViewState {
   setShowUserAvatars: (show: boolean) => void;
 }
 
-export const useViewStateStore = create<ViewState>()(
+export const useUIPreferencesStore = create<UIPreferencesState>()(
   persist(
     (set) => ({
       // Initial state
@@ -69,7 +69,7 @@ export const useViewStateStore = create<ViewState>()(
       },
     }),
     {
-      name: "echonote-view-state-storage",
+      name: "echonote-ui-preferences-storage",
       // Only persist UI preferences, not temporary states
       partialize: (state) => ({
         isLeftSidebarCollapsed: state.isLeftSidebarCollapsed,

@@ -1,5 +1,5 @@
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/common/components/ui/resizable";
-import { useViewStateStore } from "@/core/stores/view-state.store";
+import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 import { ReactNode } from "react";
 
 interface ContentAreaProps {
@@ -12,7 +12,7 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
     const { 
         rightSidebarSize, 
         setRightSidebarSize 
-    } = useViewStateStore();
+    } = useUIPreferencesStore();
 
     // Calculate content panel size based on right sidebar
     const contentPanelSize = rightSidebar ? (100 - rightSidebarSize) : 100;

@@ -1,5 +1,5 @@
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
-import { useViewStateStore } from "@/core/stores/view-state.store";
+import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 import { ReactNode } from "react";
 
 interface LeftSidebarProps {
@@ -15,7 +15,7 @@ export const LeftSidebar = ({
     collapsedWidth = "w-0",
     className = "" 
 }: LeftSidebarProps) => {
-    const { isLeftSidebarCollapsed, setLeftSidebarCollapsed } = useViewStateStore();
+    const { isLeftSidebarCollapsed, setLeftSidebarCollapsed } = useUIPreferencesStore();
 
     const handleCollapseChange = (collapsed: boolean) => {
         setLeftSidebarCollapsed(collapsed);
