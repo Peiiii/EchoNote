@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";

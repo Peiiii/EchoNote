@@ -2,7 +2,7 @@
 import { Button } from "@/common/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 interface MobileThreadSidebarProps {

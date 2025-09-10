@@ -5,7 +5,7 @@ A React Hook for maintaining scroll position during lazy loading or pagination s
 ## Usage
 
 ```typescript
-import { useLazyLoadingScrollControl } from '@/common/features/chat/hooks/use-lazy-loading-scroll-control';
+import { useLazyLoadingScrollControl } from '@/common/features/notes/hooks/use-lazy-loading-scroll-control';
 
 const MyComponent = () => {
   const containerRef = useRef<HTMLDivElement>(null);

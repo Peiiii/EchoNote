@@ -1,8 +1,8 @@
 import { X } from "lucide-react";
 import { useMemo } from "react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AIAssistantCore } from "@/common/features/chat/components/ai-assistant-core/ai-assistant-core";
-import { aiAgentFactory } from "@/common/features/chat/services/ai-agent-factory";
+import { AIAssistantCore } from "@/common/features/notes/components/ai-assistant-core/ai-assistant-core";
+import { aiAgentFactory } from "@/common/features/notes/services/ai-agent-factory";
 
 interface AIAssistantSidebarProps {
     isOpen: boolean;

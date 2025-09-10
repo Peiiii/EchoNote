@@ -1,9 +1,9 @@
-import { EmptyState } from "@/common/features/chat/components/message-timeline/empty-state";
-import { MessageTimelineSkeleton } from "@/common/features/chat/components/message-timeline/message-skeleton";
-import { MessageTimeline, MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
-import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
-import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
+import { EmptyState } from "@/common/features/notes/components/message-timeline/empty-state";
+import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
+import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
+import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
+import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";

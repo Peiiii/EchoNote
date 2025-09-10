@@ -1,4 +1,4 @@
-import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
+import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useMemo, useRef } from "react";
 

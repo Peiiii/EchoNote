@@ -1,7 +1,7 @@
 import { Tool } from "@agent-labs/agent-chat";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { createListNotesTool } from "@/common/features/chat/components/tools/list-notes.tool";
+import { createListNotesTool } from "@/common/features/notes/components/tools/list-notes.tool";
 
 export class ChannelToolsManager {
     /**

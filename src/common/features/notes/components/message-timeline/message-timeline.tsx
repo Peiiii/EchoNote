@@ -1,6 +1,6 @@
-import { ScrollToBottomButton } from "@/common/features/chat/components/scroll-to-bottom-button";
-import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
-import { useLazyLoadingScrollControl } from "@/common/features/chat/hooks/use-lazy-loading-scroll-control";
+import { ScrollToBottomButton } from "@/common/features/notes/components/scroll-to-bottom-button";
+import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
+import { useLazyLoadingScrollControl } from "@/common/features/notes/hooks/use-lazy-loading-scroll-control";
 import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";

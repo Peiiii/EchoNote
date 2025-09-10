@@ -1,4 +1,4 @@
-import { MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
+import { MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
 import { Message } from "@/core/stores/notes-data.store";
 import { ExpandedEditorOverlay } from "@/desktop/features/notes/features/message-timeline/components/expanded-editor-overlay";
 import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";

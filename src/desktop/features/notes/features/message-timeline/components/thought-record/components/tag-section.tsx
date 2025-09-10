@@ -1,6 +1,6 @@
 import { Tag as TagIcon } from "lucide-react";
-import { TagEditorPopover } from "@/common/features/chat/components/tag-editor-popover";
-import { TagList } from "@/common/features/chat/components/tag";
+import { TagEditorPopover } from "@/common/features/notes/components/tag-editor-popover";
+import { TagList } from "@/common/features/notes/components/tag";
 import { TagSectionProps } from "../types";
 
 export function TagSection({ tags, onTagsChange, maxTags = 10 }: TagSectionProps) {

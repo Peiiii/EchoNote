@@ -1,6 +1,6 @@
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
-import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
-import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
+import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
+import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
+import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useThreadSidebar } from "@/desktop/features/notes/features/thread-management/hooks/use-thread-sidebar";

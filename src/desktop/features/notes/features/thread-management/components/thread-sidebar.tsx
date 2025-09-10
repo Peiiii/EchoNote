@@ -1,4 +1,4 @@
-import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
+import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { Bot, ChevronDown, ChevronUp, MessageCircle, Send, User, X } from "lucide-react";
 import { useState } from "react";
 
