@@ -2,7 +2,7 @@ import { Channel } from "@/core/stores/chat-data.store";
 import { Button } from "@/common/components/ui/button";
 import { Badge } from "@/common/components/ui/badge";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
-import { MessageSquare, Users, Settings, Star, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { MessageSquare, Users, Settings, Bot, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { useState, useRef } from "react";
 
@@ -155,7 +155,7 @@ export const ChannelCoverHeader = ({
             className="bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm transition-all duration-200 hover:scale-105"
             onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
           >
-            <Star className="h-4 w-4 mr-2" />
+            <Bot className="h-4 w-4 mr-2" />
             <span className="font-medium">AI Assistant</span>
           </Button>
         </div>
@@ -189,7 +189,7 @@ export const ChannelCoverHeader = ({
               className="h-8 w-8 p-0 transition-all duration-200 hover:scale-105"
               onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
             >
-              <Star className="h-4 w-4" />
+              <Bot className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
