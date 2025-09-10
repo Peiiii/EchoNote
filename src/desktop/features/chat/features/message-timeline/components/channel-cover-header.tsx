@@ -53,41 +53,42 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
     return { background: channel.backgroundColor, isImage: false };
   }
   
-  // 使用channel ID生成一致的哈希值
-  const hash = channel.id.split('').reduce((a, b) => {
-    a = ((a << 5) - a) + b.charCodeAt(0);
-    return a & a;
-  }, 0);
+  // 使用简单但可靠的哈希算法
+  let hash = 0;
+  for (let i = 0; i < channel.id.length; i++) {
+    hash = hash * 31 + channel.id.charCodeAt(i);
+  }
   
+  // 确保为正数
   const absHash = Math.abs(hash);
   
-  // 四种方案按比例分配：40% CSS渐变，20% SVG图案，20% Picsum，20% Unsplash
-  const backgroundType = absHash % 10;
+  // 四种方案按比例分配：25% CSS渐变，25% SVG图案，25% Picsum，25% Unsplash
+  const backgroundType = absHash % 4;
   
-  if (backgroundType < 4) {
-    // CSS渐变
+  if (backgroundType === 0) {
+    // CSS渐变 (25%)
     const gradientIndex = absHash % CSS_GRADIENTS.length;
     return { 
       background: CSS_GRADIENTS[gradientIndex], 
       isImage: false 
     };
-  } else if (backgroundType < 6) {
-    // SVG图案 + 渐变组合
+  } else if (backgroundType === 1) {
+    // SVG图案 + 渐变组合 (25%)
     const gradientIndex = absHash % CSS_GRADIENTS.length;
     const svgIndex = absHash % SVG_PATTERNS.length;
     return { 
       background: `${CSS_GRADIENTS[gradientIndex]}, url(${SVG_PATTERNS[svgIndex]})`, 
       isImage: true 
     };
-  } else if (backgroundType < 8) {
-    // Picsum图片
+  } else if (backgroundType === 2) {
+    // Picsum图片 (25%)
     const imageId = (absHash % 1000) + 1;
     return { 
       background: `url(https://picsum.photos/800/400?random=${imageId})`, 
       isImage: true 
     };
   } else {
-    // Unsplash Source
+    // Unsplash Source (25%)
     const sourceIndex = absHash % UNSPLASH_SOURCES.length;
     return { 
       background: `url(${UNSPLASH_SOURCES[sourceIndex]})`, 
