@@ -66,9 +66,9 @@ export class ChannelContextService {
   }
 
   /**
-   * Format channel context for AI prompt
+   * Format channel context for AI prompt using XML structure
    * @param context - Channel context
-   * @returns Formatted context string
+   * @returns Formatted context string with XML tags
    */
   static formatContextForPrompt(context: ChannelContext): string {
     if (context.recentMessages.length === 0) {
@@ -76,15 +76,36 @@ export class ChannelContextService {
     }
 
     const contextLines = [
-      `\n--- Channel Context (${context.recentMessages.length} recent messages from ${context.totalMessageCount} total) ---`,
-      'Recent thoughts in this channel:',
-      ...context.recentMessages.map((msg, index) =>
-        `${index + 1}. ${msg.content}`
-      ),
-      '--- End Channel Context ---\n'
+      `\n<channel_context>`,
+      `  <metadata>`,
+      `    <recent_messages_count>${context.recentMessages.length}</recent_messages_count>`,
+      `    <total_messages_count>${context.totalMessageCount}</total_messages_count>`,
+      `    <channel_id>${context.channelId}</channel_id>`,
+      `  </metadata>`,
+      `  <recent_thoughts>`,
+      ...context.recentMessages.map((msg, index) => {
+        const readableTime = this.formatReadableTime(msg.timestamp);
+        return `    <thought index="${index + 1}" timestamp="${readableTime}">${msg.content}</thought>`;
+      }),
+      `  </recent_thoughts>`,
+      `</channel_context>\n`
     ];
 
     return contextLines.join('\n');
+  }
+
+  /**
+   * Format timestamp to readable time string
+   * @param timestamp - The timestamp to format
+   * @returns Readable time string
+   */
+  private static formatReadableTime(timestamp: Date): string {
+    return timestamp.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   /**

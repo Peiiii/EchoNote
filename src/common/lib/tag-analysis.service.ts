@@ -55,7 +55,7 @@ export class TagProcessor {
       };
     }
 
-    const enhancedPrompt = `${content}\n\nSpecial instructions:\n${tagPrompts.join('\n')}`;
+    const enhancedPrompt = `Special instructions:\n${tagPrompts.join('\n')}`;
     
     return {
       enhancedPrompt,

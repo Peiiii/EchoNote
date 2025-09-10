@@ -14,6 +14,11 @@ export interface AuthState {
   
   // 公共方法
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<{ user: User; verificationSent: boolean }>;
+  sendSignUpLink: (email: string, password: string, displayName?: string) => Promise<{ verificationSent: boolean }>;
+  sendPasswordReset: (email: string) => Promise<void>;
+  sendEmailVerification: () => Promise<void>;
   signOut: () => Promise<void>;
   
   // 内部状态管理
@@ -41,6 +46,58 @@ export const useAuthStore = create<AuthState>()(
         set({ isAuthenticating: true });
         try {
           await firebaseAuthService.signInWithGoogle();
+        } finally {
+          set({ isAuthenticating: false });
+        }
+      },
+
+      signInWithEmail: async (email: string, password: string) => {
+        set({ isAuthenticating: true });
+        try {
+          await firebaseAuthService.signInWithEmail(email, password);
+        } finally {
+          set({ isAuthenticating: false });
+        }
+      },
+
+      signUpWithEmail: async (email: string, password: string, displayName?: string) => {
+        set({ isAuthenticating: true });
+        try {
+          const result = await firebaseAuthService.signUpWithEmail(email, password, displayName);
+          return result;
+        } finally {
+          set({ isAuthenticating: false });
+        }
+      },
+
+      sendSignUpLink: async (email: string, password: string, displayName?: string) => {
+        set({ isAuthenticating: true });
+        try {
+          const result = await firebaseAuthService.sendSignUpLink(email, password, displayName);
+          return result;
+        } finally {
+          set({ isAuthenticating: false });
+        }
+      },
+
+
+      sendPasswordReset: async (email: string) => {
+        set({ isAuthenticating: true });
+        try {
+          await firebaseAuthService.sendPasswordReset(email);
+        } finally {
+          set({ isAuthenticating: false });
+        }
+      },
+
+      sendEmailVerification: async () => {
+        set({ isAuthenticating: true });
+        try {
+          const user = get().currentUser;
+          if (!user) {
+            throw new Error('No user logged in');
+          }
+          await firebaseAuthService.sendEmailVerification(user);
         } finally {
           set({ isAuthenticating: false });
         }
