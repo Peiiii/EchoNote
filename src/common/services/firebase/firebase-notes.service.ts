@@ -92,9 +92,10 @@ const getChannelsCollectionRef = (userId: string) =>
 const getMessagesCollectionRef = (userId: string) =>
   collection(db, `users/${userId}/messages`);
 
-export const firebaseNotesService = {
+
+export class FirebaseNotesService {
   // Channel Services
-  subscribeToChannels: (
+  subscribeToChannels = (
     userId: string,
     onUpdate: (channels: Channel[]) => void
   ): (() => void) => {
@@ -117,15 +118,15 @@ export const firebaseNotesService = {
     );
 
     return unsubscribe;
-  },
+  };
 
   // Message Services - Subscribe to messages for a specific channel only
-  subscribeToChannelMessages: (
+  subscribeToChannelMessages = (
     userId: string,
     channelId: string,
     messagesLimit: number,
     onUpdate: (messages: Message[], hasMore: boolean) => void
-  ): (() => void) => {
+    ): (() => void) => {
     console.log("🔔 [firebaseNotesService][subscribeToChannelMessages]:", { userId, channelId, messagesLimit });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
@@ -151,9 +152,9 @@ export const firebaseNotesService = {
     );
 
     return unsubscribe;
-  },
+  };
 
-  fetchChannels: async (userId: string): Promise<Channel[]> => {
+  fetchChannels = async (userId: string): Promise<Channel[]> => {
     console.log("🔔 [firebaseNotesService][fetchChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
@@ -163,9 +164,9 @@ export const firebaseNotesService = {
 
     const snapshot = await getDocs(q);
     return snapshot.docs.map(docToChannel);
-  },
+  };
 
-  createChannel: async (
+  createChannel = async (
     userId: string,
     channelData: Omit<Channel, "id" | "createdAt" | "messageCount">
   ): Promise<string> => {
@@ -182,9 +183,9 @@ export const firebaseNotesService = {
       lastMessageTime: serverTimestamp(), // Initialize last message time
     });
     return docRef.id;
-  },
+  };
 
-  updateChannel: async (
+  updateChannel = async (
     userId: string,
     channelId: string,
     updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
@@ -204,9 +205,9 @@ export const firebaseNotesService = {
     }
     
     await updateDoc(channelRef, processedUpdates);
-  },
+  };
 
-  deleteChannel: async (
+  deleteChannel = async (
     userId: string,
     channelId: string
   ): Promise<void> => {
@@ -253,10 +254,10 @@ export const firebaseNotesService = {
       // Even if message soft deletion fails, the channel is already soft deleted
       throw new Error(`Channel soft deleted but failed to soft delete associated messages: ${error}`);
     }
-  },
+  };
 
   // Restore soft deleted channel
-  restoreChannel: async (
+  restoreChannel = async (
     userId: string,
     channelId: string
   ): Promise<void> => {
@@ -304,9 +305,9 @@ export const firebaseNotesService = {
       // Even if message restoration fails, the channel is already restored
       throw new Error(`Channel restored but failed to restore associated messages: ${error}`);
     }
-  },
+    };
 
-  fetchInitialMessages: async (
+  fetchInitialMessages = async (
     userId: string,
     channelId: string,
     messagesLimit: number
@@ -328,9 +329,9 @@ export const firebaseNotesService = {
     const allLoaded = messages.length < messagesLimit;
 
     return { messages, lastVisible, allLoaded };
-  },
+  };
 
-  fetchMoreMessages: async (
+  fetchMoreMessages = async (
     userId: string,
     channelId: string,
     messagesLimit: number,
@@ -355,10 +356,10 @@ export const firebaseNotesService = {
     const allLoaded = messages.length < messagesLimit;
 
     return { messages, lastVisible, allLoaded };
-  },
+  };
 
   // Subscribe to new messages after a specific timestamp
-  subscribeToNewMessages: (
+  subscribeToNewMessages = (
     userId: string,
     channelId: string,
     afterTimestamp: Date,
@@ -386,9 +387,9 @@ export const firebaseNotesService = {
     );
 
     return unsubscribe;
-  },
+  };
 
-  createMessage: async (
+  createMessage = async (
     userId: string,
     messageData: Omit<Message, "id" | "timestamp">
   ): Promise<string> => {
@@ -411,47 +412,47 @@ export const firebaseNotesService = {
     });
 
     return docRef.id;
-  },
+  };
 
-  updateMessage: async (
+  updateMessage = async (
     userId: string,
     messageId: string,
     updates: Partial<Message>
   ): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, updates);
-  },
+  };
 
-  deleteMessage: async (
+  deleteMessage = async (
     userId: string,
     messageId: string
   ): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await deleteDoc(messageRef);
-  },
+    };
 
   // Soft delete message
-  softDeleteMessage: async (userId: string, messageId: string): Promise<void> => {
+  softDeleteMessage = async (userId: string, messageId: string): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: true,
       deletedAt: serverTimestamp(),
       deletedBy: userId,
     });
-  },
+  };
 
   // Restore message
-  restoreMessage: async (userId: string, messageId: string): Promise<void> => {
+  restoreMessage = async (userId: string, messageId: string): Promise<void> => {
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: false,
       deletedAt: null,
       deletedBy: null,
     });
-  },
+  };
 
   // Get deleted messages (for management interface)
-  getDeletedMessages: async (userId: string, channelId?: string): Promise<Message[]> => {
+  getDeletedMessages = async (userId: string, channelId?: string): Promise<Message[]> => {
     console.log("🔔 [firebaseNotesService][getDeletedMessages]:", { userId, channelId });
     try {
       let q = query(
@@ -476,5 +477,8 @@ export const firebaseNotesService = {
       console.error("🔔 [Firebase] [getDeletedMessages]: Error fetching deleted messages:", error);
       return [];
     }
-  },
+  };
+
 };
+
+export const firebaseNotesService = new FirebaseNotesService();

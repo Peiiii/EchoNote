@@ -1,4 +1,4 @@
-import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Smile, Video } from "lucide-react";
+import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Smile, Video, MessageSquare } from "lucide-react";
 import { ToolbarButton } from "./toolbar-button";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 
@@ -13,12 +13,19 @@ export function Toolbar({ currentChannelId }: ToolbarProps) {
         }
     };
 
+    const handleOpenAIConversation = () => {
+        if (currentChannelId) {
+            rxEventBusService.requestOpenAIConversation$.emit({ channelId: currentChannelId });
+        }
+    };
+
     const leftButtons = [
         { icon: Smile, title: "Emoji", onClick: undefined },
         { icon: Image, title: "Image", onClick: undefined },
         { icon: FileText, title: "File", onClick: undefined },
         { icon: Mic, title: "Voice", onClick: undefined },
         { icon: Bot, title: "AI Assistant", onClick: handleOpenAIAssistant },
+        { icon: MessageSquare, title: "AI Chat", onClick: handleOpenAIConversation },
         { icon: MoreHorizontal, title: "More", onClick: undefined },
     ];
 
