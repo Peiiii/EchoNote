@@ -1,0 +1,223 @@
+---
+alwaysApply: true
+description: Event Bus Pattern Documentation and Guidelines
+---
+
+# Event Bus Pattern Documentation
+
+## Overview
+
+The Event Bus pattern is used in this project to decouple components and reduce props drilling. It provides a centralized communication mechanism for cross-component interactions.
+
+## Core Service
+
+The event bus is implemented in [src/common/services/rx-event-bus.service.ts](mdc:src/common/services/rx-event-bus.service.ts) using RxJS-based events.
+
+## Current Events
+
+### AI Assistant Events
+- `requestOpenAIAssistant$` - Emits when AI assistant should be opened
+  - Type: `{ channelId: string }`
+  - Used by: Message input buttons, channel cover header
+
+### Thread Management Events
+- `requestOpenThread$` - Emits when a thread should be opened
+  - Type: `{ messageId: string }`
+  - Used by: Thought record components
+- `requestCloseThread$` - Emits when thread should be closed
+  - Type: `void`
+  - Used by: Thread sidebar close actions
+
+### Settings Events
+- `requestOpenSettings$` - Emits when settings should be opened
+  - Type: `{ channelId?: string }`
+  - Used by: Channel cover header, various UI components
+
+## Usage Patterns
+
+### Emitting Events
+```typescript
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+
+// Emit an event
+rxEventBusService.requestOpenAIAssistant$.emit({ channelId: "channel-123" });
+```
+
+### Listening to Events
+```typescript
+import { useEffect } from "react";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+
+// Simple listener pattern
+useEffect(() =>
+    rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
+        handleOpenAIAssistant(channelId);
+    }), [handleOpenAIAssistant]);
+```
+
+## Guidelines
+
+### When to Use Event Bus
+- **Cross-component communication** that would require deep props drilling
+- **Global actions** that multiple components need to trigger
+- **Decoupling** tightly coupled components
+- **State management** that doesn't fit well in stores
+
+### When NOT to Use Event Bus
+- **Local component state** - use useState or useReducer
+- **Parent-child communication** - use props and callbacks
+- **Data fetching** - use custom hooks or services
+- **Form state** - use form libraries or local state
+
+### Event Naming Convention
+- Use `request` prefix for action events: `requestOpenXxx$`
+- Use descriptive action names: `requestOpenAIAssistant$`
+- Use past tense for completion events: `requestOpenedAIAssistant$` (if needed)
+
+### Type Safety
+- Always define proper TypeScript types for event payloads
+- Use interfaces for complex payloads
+- Make optional properties explicit with `?`
+
+### Memory Management
+- Event listeners are automatically cleaned up by RxJS
+- No manual cleanup required in useEffect
+- The `listen()` method returns an unlisten function
+
+## Examples
+
+### Adding a New Event
+1. Define the event in [rx-event-bus.service.ts](mdc:src/common/services/rx-event-bus.service.ts):
+```typescript
+// Add to RxEventBusService class
+requestNewAction$ = new RxEvent<{ param1: string; param2?: number }>();
+```
+
+2. Emit the event from components:
+```typescript
+rxEventBusService.requestNewAction$.emit({ param1: "value", param2: 42 });
+```
+
+3. Listen to the event in page components:
+```typescript
+useEffect(() =>
+    rxEventBusService.requestNewAction$.listen(({ param1, param2 }) => {
+        handleNewAction(param1, param2);
+    }), [handleNewAction]);
+```
+
+### Replacing Props with Events
+**Before (Props Drilling):**
+```typescript
+<ComponentA onAction={handleAction} />
+  <ComponentB onAction={onAction} />
+    <ComponentC onAction={onAction} />
+```
+
+**After (Event Bus):**
+```typescript
+// ComponentC emits event
+rxEventBusService.requestAction$.emit({ data });
+
+// Page component listens
+useEffect(() =>
+    rxEventBusService.requestAction$.listen(({ data }) => {
+        handleAction(data);
+    }), [handleAction]);
+```
+
+## Best Practices
+
+### 1. Keep Events Focused
+- One event per action type
+- Avoid generic "doSomething" events
+- Use specific, descriptive names
+
+### 2. Minimize Event Payload
+- Only include necessary data
+- Use optional properties for optional data
+- Avoid passing entire objects when only IDs are needed
+
+### 3. Document Event Usage
+- Add comments explaining when events are used
+- Document expected payload structure
+- Keep examples up to date
+
+### 4. Progressive Development
+- Add events only when needed (YAGNI principle)
+- Remove unused events regularly
+- Refactor when patterns emerge
+
+### 5. Error Handling
+- Events should not throw errors
+- Handle errors in the listener, not the emitter
+- Use try-catch in event handlers when appropriate
+
+## Migration Guide
+
+### From Props to Events
+1. Identify props that are passed through multiple levels
+2. Create appropriate event in the service
+3. Replace prop passing with event emission
+4. Add event listener in the target component
+5. Remove unused props from intermediate components
+
+### Testing Events
+```typescript
+// Mock the event bus for testing
+jest.mock('@/common/services/rx-event-bus.service', () => ({
+    rxEventBusService: {
+        requestOpenAIAssistant$: {
+            emit: jest.fn(),
+            listen: jest.fn()
+        }
+    }
+}));
+```
+
+## Common Patterns
+
+### Page-Level Event Coordination
+Page components should listen to events and coordinate with hooks:
+```typescript
+export function ChatPage() {
+    const { handleOpenAIAssistant } = useAIAssistant();
+    
+    useEffect(() =>
+        rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
+            handleOpenAIAssistant(channelId);
+        }), [handleOpenAIAssistant]);
+}
+```
+
+### Component Event Emission
+Components emit events for actions they can't handle directly:
+```typescript
+<Button onClick={() => 
+    rxEventBusService.requestOpenSettings$.emit({ channelId: currentChannelId })
+}>
+    Open Settings
+</Button>
+```
+
+## Troubleshooting
+
+### Event Not Working
+1. Check if event is properly defined in the service
+2. Verify the event is being emitted with correct payload
+3. Ensure listener is set up in the correct component
+4. Check for typos in event names
+
+### Memory Leaks
+- RxJS automatically handles cleanup
+- No manual unsubscription needed
+- If issues persist, check for circular references
+
+### Type Errors
+- Ensure event payload types match exactly
+- Check for optional vs required properties
+- Verify import paths are correct
+
+---
+
+This pattern significantly reduces coupling and makes the codebase more maintainable. Use it judiciously and follow these guidelines for best results.
