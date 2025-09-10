@@ -8,6 +8,8 @@ interface EmailPasswordFormProps {
   confirmPassword: string;
   isSignUp: boolean;
   isAuthenticating: boolean;
+  error?: string;
+  statusMessage?: string;
   onEmailChange: (email: string) => void;
   onPasswordChange: (password: string) => void;
   onConfirmPasswordChange: (confirmPassword: string) => void;
@@ -22,6 +24,8 @@ export const EmailPasswordForm = ({
   confirmPassword,
   isSignUp,
   isAuthenticating,
+  error,
+  statusMessage,
   onEmailChange,
   onPasswordChange,
   onConfirmPasswordChange,
@@ -40,7 +44,7 @@ export const EmailPasswordForm = ({
         placeholder="Enter your email"
         value={email}
         onChange={(e) => onEmailChange(e.target.value)}
-        className="w-full h-12 text-sm rounded-xl border-slate-200 focus:border-slate-400 focus:ring-slate-400"
+        className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
         disabled={isAuthenticating}
         autoComplete="email"
       />
@@ -52,16 +56,16 @@ export const EmailPasswordForm = ({
           placeholder="Enter your password"
           value={password}
           onChange={(e) => onPasswordChange(e.target.value)}
-          className="w-full h-12 text-sm rounded-xl border-slate-200 focus:border-slate-400 focus:ring-slate-400 pr-10"
+          className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
           disabled={isAuthenticating}
           autoComplete={isSignUp ? "new-password" : "current-password"}
         />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-          disabled={isAuthenticating}
-        >
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+            disabled={isAuthenticating}
+          >
           {showPassword ? (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
@@ -83,14 +87,14 @@ export const EmailPasswordForm = ({
             placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
-            className="w-full h-12 text-sm rounded-xl border-slate-200 focus:border-slate-400 focus:ring-slate-400 pr-10"
+            className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
             disabled={isAuthenticating}
             autoComplete="new-password"
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
             disabled={isAuthenticating}
           >
             {showConfirmPassword ? (
@@ -107,6 +111,18 @@ export const EmailPasswordForm = ({
         </div>
       )}
 
+      {error && (
+        <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-lg p-3">
+          {error}
+        </div>
+      )}
+
+      {statusMessage && (
+        <div className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-lg p-3">
+          {statusMessage}
+        </div>
+      )}
+
       <Button
         onClick={onSubmit}
         disabled={
@@ -115,7 +131,7 @@ export const EmailPasswordForm = ({
           !password || 
           (isSignUp && (!confirmPassword || password !== confirmPassword || password.length < 6))
         }
-        className="w-full h-12 text-sm font-medium rounded-xl bg-slate-600 hover:bg-slate-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-12 text-sm font-medium rounded-xl bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         size="lg"
       >
         {isAuthenticating ? (
@@ -131,7 +147,7 @@ export const EmailPasswordForm = ({
       <div className="text-center">
         <button
           onClick={onToggleSignUp}
-          className="text-sm text-slate-600 hover:text-slate-800 transition-colors underline underline-offset-2"
+          className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors underline underline-offset-2"
           disabled={isAuthenticating}
         >
           {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
@@ -142,7 +158,7 @@ export const EmailPasswordForm = ({
         <div className="text-center">
           <button
             onClick={onPasswordReset}
-            className="text-sm text-slate-500 hover:text-slate-700 transition-colors underline underline-offset-2"
+            className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors underline underline-offset-2"
             disabled={isAuthenticating || !email}
           >
             Forgot your password?

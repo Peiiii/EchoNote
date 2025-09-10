@@ -11,12 +11,12 @@ export const SocialLogin = ({ onGoogleLogin, isAuthenticating }: SocialLoginProp
       <Button
         onClick={onGoogleLogin}
         disabled={isAuthenticating}
-        className="w-full h-12 text-sm font-medium rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-900 transition-colors shadow-sm hover:shadow-md"
+        className="w-full h-12 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-900 dark:text-white transition-colors shadow-sm hover:shadow-md"
         size="lg"
       >
         {isAuthenticating ? (
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-slate-300 dark:border-slate-500 border-t-slate-600 dark:border-t-slate-300 rounded-full animate-spin" />
             <span>Signing in...</span>
           </div>
         ) : (

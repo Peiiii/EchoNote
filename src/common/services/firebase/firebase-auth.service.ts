@@ -14,6 +14,7 @@ import {
 } from 'firebase/auth';
 
 let isRegistering = false;
+let isSigningIn = false;
 
 export const firebaseAuthService = {
 
@@ -126,17 +127,40 @@ export const firebaseAuthService = {
 
   signInWithEmail: async (email: string, password: string): Promise<User | null> => {
     try {
+      console.log("🔐 Starting email sign-in process...");
+      isSigningIn = true;
+      console.log("🔐 isSigningIn set to true");
+      
       const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log("✅ Firebase authentication successful");
+      console.log("📧 Email verified:", result.user.emailVerified);
       
       if (!result.user.emailVerified) {
+        console.log("📧 Email not verified, sending verification email...");
+        await sendEmailVerification(result.user);
+        console.log("📧 Verification email sent");
         await signOut(auth);
-        throw new Error('EMAIL_NOT_VERIFIED');
+        console.log("🚪 User signed out due to unverified email");
+        isSigningIn = false;
+        console.log("🔐 isSigningIn reset to false due to unverified email");
+        throw new Error('EMAIL_NOT_VERIFIED_RESENT');
       }
       
+      console.log("✅ Email is verified, proceeding with login");
+      console.log("🔗 Initializing Firebase listeners...");
       await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
+      console.log("✅ Firebase listeners initialized");
+      
+      // 在初始化监听器后再重置标志，确保 onAuthStateChanged 能正确处理
+      isSigningIn = false;
+      console.log("🔐 isSigningIn set to false after listeners initialized");
+      
+      console.log("🎉 Login process completed successfully");
       return result.user;
     } catch (error) {
-      console.error("Email Sign-In Error:", error);
+      console.error("❌ Email Sign-In Error:", error);
+      isSigningIn = false;
+      console.log("🔐 isSigningIn reset to false due to error");
       throw error;
     }
   },
@@ -157,19 +181,38 @@ export const firebaseAuthService = {
 
   onAuthStateChanged: (callback: (user: User | null) => void): (() => void) => {
     return onAuthStateChanged(auth, async (user) => {
+      console.log("🔄 Auth state changed:", user ? `User: ${user.email} (verified: ${user.emailVerified})` : "No user");
+      console.log("🔐 isRegistering:", isRegistering, "isSigningIn:", isSigningIn);
+      
+      // 如果是注册过程，跳过处理
       if (isRegistering) {
+        console.log("⏸️ Skipping auth state change due to ongoing registration");
+        return;
+      }
+      
+      // 如果是登录过程，但用户已通过邮箱验证，则处理这个状态变化
+      if (isSigningIn && user && user.emailVerified) {
+        console.log("✅ Processing login state change - user is verified");
+        // 不在这里初始化监听器，因为 signInWithEmail 已经处理了
+      } else if (isSigningIn) {
+        console.log("⏸️ Skipping auth state change due to ongoing sign-in (unverified user)");
         return;
       }
       
       if (user) {
         if (user.emailVerified) {
+          console.log("✅ User email verified, initializing listeners");
           await useChatDataStore.getState().initFirebaseListeners(user.uid);
         } else {
+          console.log("❌ User email not verified, cleaning up listeners");
           useChatDataStore.getState().cleanupListeners();
         }
       } else {
+        console.log("🚪 No user, cleaning up listeners");
         useChatDataStore.getState().cleanupListeners();
       }
+      
+      console.log("📞 Calling auth state callback");
       callback(user);
     });
   },

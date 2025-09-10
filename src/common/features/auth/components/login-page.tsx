@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/core/stores/auth.store';
+import { toast } from 'sonner';
 import { useState } from 'react';
 import { SocialLogin } from './social-login';
 import { EmailPasswordForm } from './email-password-form';
@@ -17,11 +18,13 @@ export const LoginPage = () => {
     isAuthenticating 
   } = useAuthStore();
   
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [isEmailVerificationSent, setIsEmailVerificationSent] = useState(false);
   const [pendingUser, setPendingUser] = useState<{ email: string } | null>(null);
@@ -79,63 +82,97 @@ export const LoginPage = () => {
 
     try {
       setError('');
+      setStatusMessage('');
+      
       if (isSignUp) {
+        toast.loading("Creating your account...", {
+          id: "creating-account",
+          duration: 1000
+        });
+        
         const result = await sendSignUpLink(email, password);
         if (result.verificationSent) {
           setPendingUser({ email });
           setIsEmailVerificationSent(true);
           setError('');
+          setStatusMessage('');
+          
+          toast.success("Account created! Please check your email to verify your account.", {
+            id: "creating-account",
+            duration: 3000
+          });
         }
       } else {
+        toast.loading("Signing you in...", {
+          id: "signing-in",
+          duration: 1000
+        });
+        
         await signInWithEmail(email, password);
+        
+        toast.success("Login successful! Welcome back!", {
+          id: "signing-in",
+          duration: 1500
+        });
       }
     } catch (error: unknown) {
       console.error('Email auth failed:', error);
+      setStatusMessage('');
       
       // 处理常见的Firebase错误，转换为用户友好的错误信息
       const firebaseError = error as { code?: string; message?: string };
+      let errorMessage = '';
+      
       switch (firebaseError.code) {
         case 'auth/user-not-found':
-          setError('No account found with this email address');
+          errorMessage = 'No account found with this email address';
           break;
         case 'auth/wrong-password':
-          setError('Incorrect password');
+          errorMessage = 'Incorrect password';
           break;
         case 'auth/invalid-credential':
-          setError('Invalid email or password. Please check your credentials and try again.');
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
           break;
         case 'auth/email-already-in-use':
-          setError('An account with this email already exists');
+          errorMessage = 'An account with this email already exists';
           break;
         case 'auth/weak-password':
-          setError('Password should be at least 6 characters');
+          errorMessage = 'Password should be at least 6 characters';
           break;
         case 'auth/invalid-email':
-          setError('Invalid email address');
+          errorMessage = 'Invalid email address';
           break;
         case 'auth/user-disabled':
-          setError('This account has been disabled. Please contact support.');
+          errorMessage = 'This account has been disabled. Please contact support.';
           break;
         case 'auth/too-many-requests':
-          setError('Too many failed attempts. Please try again later.');
+          errorMessage = 'Too many failed attempts. Please try again later.';
           break;
         case 'auth/network-request-failed':
-          setError('Network error. Please check your connection and try again.');
+          errorMessage = 'Network error. Please check your connection and try again.';
           break;
         case 'auth/operation-not-allowed':
-          setError('This sign-in method is not enabled. Please try a different method.');
+          errorMessage = 'This sign-in method is not enabled. Please try a different method.';
           break;
         default:
           if (firebaseError.message === 'EMAIL_NOT_VERIFIED') {
-            setError('Please verify your email address before signing in. Check your inbox for a verification link.');
+            errorMessage = 'Please verify your email address before signing in. Check your inbox for a verification link.';
+          } else if (firebaseError.message === 'EMAIL_NOT_VERIFIED_RESENT') {
+            errorMessage = 'Please verify your email address before signing in. We\'ve sent a new verification link to your inbox.';
           } else if (firebaseError.message === 'EMAIL_ALREADY_VERIFIED') {
-            setError('This email is already verified. Please sign in instead.');
+            errorMessage = 'This email is already verified. Please sign in instead.';
           } else if (firebaseError.message === 'ACCOUNT_EXISTS_WRONG_PASSWORD') {
-            setError('An account with this email already exists, but the password is incorrect. Please check your password or try signing in.');
+            errorMessage = 'An account with this email already exists, but the password is incorrect. Please check your password or try signing in.';
           } else {
-            setError('Authentication failed. Please check your credentials and try again.');
+            errorMessage = 'Authentication failed. Please check your credentials and try again.';
           }
       }
+      
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        id: isSignUp ? "creating-account" : "signing-in",
+        duration: 4000
+      });
     }
   };
 
@@ -219,20 +256,20 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 flex">
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <LoginHeader />
           
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
             <SocialLogin onGoogleLogin={handleGoogleLogin} isAuthenticating={isAuthenticating} />
 
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
+                <div className="w-full border-t border-slate-200 dark:border-slate-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500">or</span>
+                <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">or</span>
               </div>
             </div>
 
@@ -242,6 +279,8 @@ export const LoginPage = () => {
               confirmPassword={confirmPassword}
               isSignUp={isSignUp}
               isAuthenticating={isAuthenticating}
+              error={error}
+              statusMessage={statusMessage}
               onEmailChange={setEmail}
               onPasswordChange={setPassword}
               onConfirmPasswordChange={setConfirmPassword}
@@ -251,7 +290,7 @@ export const LoginPage = () => {
             />
 
             <AuthMessages
-              error={error}
+              error=""
               isPasswordReset={isPasswordReset}
               isEmailVerificationSent={isEmailVerificationSent}
               email={email}

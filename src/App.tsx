@@ -1,6 +1,7 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
 import { LoginPage } from "@/common/features/auth/components/login-page";
 import { AppSkeleton } from "@/common/components/ui/skeleton";
+import { Toaster } from "@/common/components/ui/sonner";
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
 import { DesktopApp } from "@/desktop/desktop-app";
@@ -17,13 +18,28 @@ export const App = () => {
   }, [user, setChatViewAuth]);
 
   if (isInitializing) {
-    return <AppSkeleton />;
+    return (
+      <>
+        <AppSkeleton />
+        <Toaster />
+      </>
+    );
   }
 
   if (!user) {
-    return <LoginPage />;
+    return (
+      <>
+        <LoginPage />
+        <Toaster />
+      </>
+    );
   }
 
-  return currentBreakpoint === 'sm' ? <MobileApp /> : <DesktopApp />;
+  return (
+    <>
+      {currentBreakpoint === 'sm' ? <MobileApp /> : <DesktopApp />}
+      <Toaster />
+    </>
+  );
 };
 
