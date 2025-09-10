@@ -96,53 +96,28 @@ export const colorOptions: BackgroundOption[] = [
   }
 ];
 
-export const imageOptions: BackgroundOption[] = [
-  {
-    id: 'image-1',
-    name: 'Abstract 1',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=1',
-    preview: 'https://picsum.photos/100/100?random=1'
-  },
-  {
-    id: 'image-2',
-    name: 'Abstract 2',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=2',
-    preview: 'https://picsum.photos/100/100?random=2'
-  },
-  {
-    id: 'image-3',
-    name: 'Abstract 3',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=3',
-    preview: 'https://picsum.photos/100/100?random=3'
-  },
-  {
-    id: 'image-4',
-    name: 'Abstract 4',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=4',
-    preview: 'https://picsum.photos/100/100?random=4'
-  },
-  {
-    id: 'image-5',
-    name: 'Abstract 5',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=5',
-    preview: 'https://picsum.photos/100/100?random=5'
-  },
-  {
-    id: 'image-6',
-    name: 'Abstract 6',
-    type: 'image',
-    value: 'https://picsum.photos/800/400?random=6',
-    preview: 'https://picsum.photos/100/100?random=6'
+export const generateRandomImages = (count: number = 6): BackgroundOption[] => {
+  const images: BackgroundOption[] = [];
+  const usedIds = new Set<number>();
+  
+  while (images.length < count) {
+    const randomId = Math.floor(Math.random() * 1000) + 1;
+    if (usedIds.has(randomId)) continue;
+    
+    usedIds.add(randomId);
+    images.push({
+      id: `random-${randomId}`,
+      name: `Image ${images.length + 1}`,
+      type: 'image',
+      value: `https://picsum.photos/id/${randomId}/800/400`,
+      preview: `https://picsum.photos/id/${randomId}/100/100`
+    });
   }
-];
+  
+  return images;
+};
 
 export const allBackgroundOptions = [
   ...gradientOptions,
-  ...colorOptions,
-  ...imageOptions
+  ...colorOptions
 ];
