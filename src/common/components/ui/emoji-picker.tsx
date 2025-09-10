@@ -39,7 +39,7 @@ export function EmojiPickerComponent({ onSelect, children }: EmojiPickerProps) {
     };
   }, []);
 
-  const handleEmojiClick = (emojiData: any) => {
+  const handleEmojiClick = (emojiData: { emoji: string }) => {
     onSelect(emojiData.emoji);
     setIsOpen(false);
   };
