@@ -11,6 +11,11 @@ export function ChatPage() {
     // Use specialized hooks
     const { isThreadOpen, currentThreadId, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
+    
+    const handleOpenSettings = () => {
+        console.log('Open channel settings');
+    };
+    
     return (
         <ChatLayout
             sidebar={<ChannelList />}
@@ -18,6 +23,7 @@ export function ChatPage() {
                 <MessageTimelineFeature
                     onOpenThread={handleOpenThread}
                     onOpenAIAssistant={handleOpenAIAssistant}
+                    onOpenSettings={handleOpenSettings}
                 />
             }
             rightSidebar={

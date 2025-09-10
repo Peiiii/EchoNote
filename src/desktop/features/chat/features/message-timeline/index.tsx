@@ -6,17 +6,20 @@ import { TimelineActions } from "@/desktop/features/chat/features/message-timeli
 import { TimelineContent } from "@/desktop/features/chat/features/message-timeline/components/timeline-content";
 import { TimelineLayout } from "@/desktop/features/chat/features/message-timeline/components/timeline-layout";
 import { useTimelineState } from "@/desktop/features/chat/features/message-timeline/hooks/use-timeline-state";
+import { useCurrentChannel } from "@/desktop/features/chat/hooks/use-current-channel";
 import { useRef } from "react";
 
 interface MessageTimelineFeatureProps {
     onOpenThread: (messageId: string) => void;
     onOpenAIAssistant: (channelId?: string) => void;
+    onOpenSettings?: () => void;
     className?: string;
 }
 
 export const MessageTimelineFeature = ({
     onOpenThread,
     onOpenAIAssistant,
+    onOpenSettings,
     className = ""
 }: MessageTimelineFeatureProps) => {
     // Use unified timeline state management
@@ -26,6 +29,9 @@ export const MessageTimelineFeature = ({
         editActions,
         isExpandedEditing
     } = useTimelineState();
+
+    // Get current channel for cover header
+    const currentChannel = useCurrentChannel();
 
     const timelineContentRef = useRef<MessageTimelineRef>(null);
 
@@ -48,6 +54,9 @@ export const MessageTimelineFeature = ({
         <div className={`relative w-full h-full ${className}`}>
             {/* Timeline layout with content and actions */}
             <TimelineLayout
+                channel={currentChannel || undefined}
+                onOpenAIAssistant={onOpenAIAssistant}
+                onOpenSettings={onOpenSettings}
                 content={
                     <TimelineContent
                         ref={timelineContentRef}

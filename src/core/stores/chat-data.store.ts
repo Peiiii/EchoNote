@@ -39,6 +39,8 @@ export interface Channel {
   createdAt: Date;
   messageCount: number;
   lastMessageTime?: Date;
+  backgroundImage?: string;
+  backgroundColor?: string;
 }
 
 // 新增：Channel级别的消息状态类型
