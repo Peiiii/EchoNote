@@ -65,7 +65,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     return (
         <div data-component="channel-list" className="flex flex-col h-full overflow-hidden">
             {/* Header */}
-            <div data-component="channel-list-header" className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+            <div data-component="channel-list-header" className="px-4 py-3 dark:border-slate-700">
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
@@ -95,8 +95,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                         onDelete={() => handleDeleteChannel(channel.id)}
                     />
                 ))}
-                {/* Fade effect overlay */}
-                {/* <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-slate-900 to-transparent pointer-events-none" /> */}
             </div>
 
             {/* Fade effect overlay container - positioned outside channel list */}
@@ -105,8 +103,9 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                     <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-100/90 dark:from-slate-800/90 to-transparent pointer-events-none" />
                 </div>
             )}
-            {/* Create Channel Button */}
-            <div data-component="channel-list-footer" className="p-3 border-t border-slate-200 dark:border-slate-700">
+
+            {/* Create Channel Button - Bottom Layout */}
+            <div data-component="channel-list-footer" className="p-3 border-t border-slate-200/30 dark:border-slate-700/30">
                 <CreateChannelPopover onAddChannel={handleAddChannel} />
             </div>
 

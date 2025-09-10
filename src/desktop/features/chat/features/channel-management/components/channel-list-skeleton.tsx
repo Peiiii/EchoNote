@@ -9,7 +9,7 @@ export function ChannelListSkeleton({ count = 12 }: ChannelListSkeletonProps) {
   return (
     <div data-component="channel-list" className="w-full h-full overflow-hidden flex flex-col">
       {/* Header */}
-      <div data-component="channel-list-header" className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+      <div data-component="channel-list-header" className="px-4 py-3 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">

@@ -51,10 +51,12 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
             <RefinedPopover.Trigger asChild>
                 <Button 
                     variant="ghost"
-                    className="w-full h-10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 border border-dashed border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500"
+                    className="group relative w-full h-11 text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all duration-200 border border-dashed border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 rounded-lg bg-transparent hover:bg-slate-50/40 dark:hover:bg-slate-800/20 hover:scale-[1.005] active:scale-[0.995]"
                 >
-                    <Plus className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">Create New Space</span>
+                    <div className="flex items-center justify-center gap-2.5">
+                        <Plus className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+                        <span className="text-sm font-medium">Create New Space</span>
+                    </div>
                 </Button>
             </RefinedPopover.Trigger>
             <RefinedPopover.Content align="center" side="top">
