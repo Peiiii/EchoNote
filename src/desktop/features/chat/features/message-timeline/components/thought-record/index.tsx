@@ -12,6 +12,7 @@ import { ReadMoreWrapper } from "./read-more-wrapper";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
 import { MarkdownContent } from "@/common/components/markdown";
 import { TagEditorPopover } from "@/common/features/chat/components/tag-editor-popover";
+import { TagList } from "@/common/features/chat/components/tag";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 
 
@@ -123,23 +124,16 @@ function TagSection({ tags, onTagsChange, maxTags = 10 }: TagSectionProps) {
                 }
             />
             
-            {/* Inline tag display - only show first few tags */}
+            {/* Inline tag display - only show first few tags with truncation */}
             {tags.length > 0 && (
-                <div className="flex items-center gap-1">
-                    {tags.slice(0, 2).map((tag) => (
-                        <span
-                            key={tag}
-                            className="inline-flex items-center px-1.5 py-0.5 text-xs bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 rounded"
-                        >
-                            #{tag}
-                        </span>
-                    ))}
-                    {tags.length > 2 && (
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                            +{tags.length - 2}
-                        </span>
-                    )}
-                </div>
+                <TagList
+                    tags={tags}
+                    variant="footer"
+                    size="sm"
+                    maxTags={2}
+                    truncate={true}
+                    maxWidth="80px"
+                />
             )}
         </div>
     );

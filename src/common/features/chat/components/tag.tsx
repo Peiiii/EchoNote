@@ -4,19 +4,22 @@ import { Button } from "@/common/components/ui/button";
 
 export interface TagProps {
   name: string;
-  variant?: "default" | "secondary" | "outline" | "destructive";
+  variant?: "default" | "secondary" | "outline" | "destructive" | "footer";
   size?: "sm" | "md" | "lg";
   removable?: boolean;
   onClick?: () => void;
   onRemove?: () => void;
   className?: string;
+  truncate?: boolean;
+  maxWidth?: string;
 }
 
 const tagVariants = {
   default: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   secondary: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
   outline: "border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300",
-  destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+  destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  footer: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
 };
 
 const tagSizes = {
@@ -32,7 +35,9 @@ export function Tag({
   removable = false,
   onClick,
   onRemove,
-  className
+  className,
+  truncate = false,
+  maxWidth = "80px"
 }: TagProps) {
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,11 +51,14 @@ export function Tag({
         tagVariants[variant],
         tagSizes[size],
         onClick && "cursor-pointer hover:opacity-80",
+        truncate && "max-w-[80px]",
         className
       )}
+      style={truncate ? { maxWidth } : undefined}
       onClick={onClick}
+      title={truncate ? name : undefined}
     >
-      <span>#{name}</span>
+      <span className={cn(truncate && "truncate")}>#{name}</span>
       {removable && (
         <Button
           variant="ghost"
@@ -74,6 +82,8 @@ export interface TagListProps {
   onTagRemove?: (tag: string) => void;
   className?: string;
   maxTags?: number;
+  truncate?: boolean;
+  maxWidth?: string;
 }
 
 export function TagList({
@@ -84,7 +94,9 @@ export function TagList({
   onTagClick,
   onTagRemove,
   className,
-  maxTags
+  maxTags,
+  truncate = false,
+  maxWidth = "80px"
 }: TagListProps) {
   const displayTags = maxTags ? tags.slice(0, maxTags) : tags;
   const remainingCount = maxTags && tags.length > maxTags ? tags.length - maxTags : 0;
@@ -104,6 +116,8 @@ export function TagList({
           removable={removable}
           onClick={() => onTagClick?.(tag)}
           onRemove={() => onTagRemove?.(tag)}
+          truncate={truncate}
+          maxWidth={maxWidth}
         />
       ))}
       {remainingCount > 0 && (
