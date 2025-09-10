@@ -1,7 +1,7 @@
-import { useMobileSidebars } from '@/mobile/features/chat/features/message-timeline';
-import { useMobileChatState } from '@/mobile/features/chat/hooks';
-import { MobileChatLayout } from '@/mobile/features/chat/components/mobile-chat-layout';
-import { MobileSidebarManager } from '@/mobile/features/chat/features/message-timeline';
+import { useMobileSidebars } from '@/mobile/features/notes/features/message-timeline';
+import { useMobileChatState } from '@/mobile/features/notes/hooks';
+import { MobileChatLayout } from '@/mobile/features/notes/components/mobile-chat-layout';
+import { MobileSidebarManager } from '@/mobile/features/notes/features/message-timeline';
 
 export function MobileChatPage() {
     // Use custom hooks for state management

@@ -1,8 +1,8 @@
-import { MobileAIAssistant } from "@/mobile/features/chat/features/ai-assistant";
-import { MobileChannelList } from "@/mobile/features/chat/features/channel-management";
-import { MobileSettingsSidebar } from "@/mobile/features/chat/components/mobile-settings-sidebar";
+import { MobileAIAssistant } from "@/mobile/features/notes/features/ai-assistant";
+import { MobileChannelList } from "@/mobile/features/notes/features/channel-management";
+import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
-import { MobileThreadSidebar } from "@/mobile/features/chat/features/thread-management";
+import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
 
 // Types
 interface MobileSidebarState {

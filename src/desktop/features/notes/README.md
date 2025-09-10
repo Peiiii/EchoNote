@@ -5,7 +5,7 @@ This directory contains the chat functionality components for the desktop applic
 ## 📁 Directory Structure
 
 ```
-src/desktop/features/chat/
+src/desktop/features/notes/
 ├── components/                    # Chat UI components
 │   ├── index.ts                  # Unified exports
 │   ├── chat-layout.tsx           # Main layout component

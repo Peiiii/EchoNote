@@ -1,6 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
-import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
+import { generateSparksForText } from "@/desktop/features/notes/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { buildTaggedPrompt } from "@/common/lib/tag-analysis.service";
 import { useState } from "react";

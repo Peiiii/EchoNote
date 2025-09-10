@@ -1,12 +1,12 @@
 import { MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
 import { Message } from "@/core/stores/notes-data.store";
-import { ExpandedEditorOverlay } from "@/desktop/features/chat/features/message-timeline/components/expanded-editor-overlay";
-import { ThoughtRecord } from "@/desktop/features/chat/features/message-timeline/components/thought-record";
-import { TimelineActions } from "@/desktop/features/chat/features/message-timeline/components/timeline-actions";
-import { TimelineContent } from "@/desktop/features/chat/features/message-timeline/components/timeline-content";
-import { TimelineLayout } from "@/desktop/features/chat/features/message-timeline/components/timeline-layout";
-import { useTimelineState } from "@/desktop/features/chat/features/message-timeline/hooks/use-timeline-state";
-import { useCurrentChannel } from "@/desktop/features/chat/hooks/use-current-channel";
+import { ExpandedEditorOverlay } from "@/desktop/features/notes/features/message-timeline/components/expanded-editor-overlay";
+import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
+import { TimelineActions } from "@/desktop/features/notes/features/message-timeline/components/timeline-actions";
+import { TimelineContent } from "@/desktop/features/notes/features/message-timeline/components/timeline-content";
+import { TimelineLayout } from "@/desktop/features/notes/features/message-timeline/components/timeline-layout";
+import { useTimelineState } from "@/desktop/features/notes/features/message-timeline/hooks/use-timeline-state";
+import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useRef } from "react";
 

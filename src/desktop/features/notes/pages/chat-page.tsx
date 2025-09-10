@@ -1,11 +1,11 @@
 
-import { ChannelList } from "@/desktop/features/chat/features/channel-management/components/channel-list";
-import { ChatLayout } from "@/desktop/features/chat/components/chat-layout";
-import { AIAssistantSidebar } from "@/desktop/features/chat/features/ai-assistant/components/ai-assistant-sidebar";
-import { ThreadSidebar } from "@/desktop/features/chat/features/thread-management/components/thread-sidebar";
-import { MessageTimelineFeature } from "@/desktop/features/chat/features/message-timeline";
-import { useAIAssistant } from "@/desktop/features/chat/features/ai-assistant/hooks/use-ai-assistant";
-import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
+import { ChannelList } from "@/desktop/features/notes/features/channel-management/components/channel-list";
+import { ChatLayout } from "@/desktop/features/notes/components/chat-layout";
+import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assistant/components/ai-assistant-sidebar";
+import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
+import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
+import { useAIAssistant } from "@/desktop/features/notes/features/ai-assistant/hooks/use-ai-assistant";
+import { useThreadSidebar } from "@/desktop/features/notes/features/thread-management/hooks/use-thread-sidebar";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useEffect } from "react";
 

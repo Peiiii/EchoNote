@@ -12,7 +12,7 @@ This document tracks the progress of migrating mobile chat from the old flat str
 ## Current Status: ✅ MIGRATION COMPLETED + PAGES REFACTORING COMPLETED + HOOKS REFACTORING COMPLETED + PAGES DIRECTORY SIMPLIFICATION COMPLETED
 
 ### ✅ Completed
-- [x] Created `src/mobile/features/chat/features/message-timeline/` directory structure
+- [x] Created `src/mobile/features/notes/features/message-timeline/` directory structure
 - [x] Migrated `MobileTimelineContent` component to new location
 - [x] Migrated `thought-record` components to new location
 - [x] Migrated `MobileMessageInput` component to message-timeline feature
@@ -20,20 +20,20 @@ This document tracks the progress of migrating mobile chat from the old flat str
 - [x] Created subfeature index.tsx with proper exports
 - [x] Updated `MobileChatLayout` to use new import paths
 - [x] Verified build success
-- [x] Created `src/mobile/features/chat/features/ai-assistant/` directory structure
+- [x] Created `src/mobile/features/notes/features/ai-assistant/` directory structure
 - [x] Migrated `MobileAIAssistant` component to new location
 - [x] Migrated `MobileAIAssistantSidebar` component to new location
 - [x] Created ai-assistant subfeature index.tsx with proper exports
 - [x] Updated `mobile-sidebar-manager.tsx` to use new import paths
 - [x] Verified build success
-- [x] Created `src/mobile/features/chat/features/channel-management/` directory structure
+- [x] Created `src/mobile/features/notes/features/channel-management/` directory structure
 - [x] Migrated `MobileChannelList` component to new location
 - [x] Migrated `MobileChannelItem` component to new location
 - [x] Migrated `MobileCreateChannelPopover` component to new location
 - [x] Created channel-management subfeature index.tsx with proper exports
 - [x] Updated `mobile-sidebar-manager.tsx` to use new import paths
 - [x] Verified build success
-- [x] Created `src/mobile/features/chat/features/thread-management/` directory structure
+- [x] Created `src/mobile/features/notes/features/thread-management/` directory structure
 - [x] Migrated `MobileThreadSidebar` component to new location
 - [x] Created thread-management subfeature index.tsx with proper exports
 - [x] Updated `mobile-sidebar-manager.tsx` to use new import paths
@@ -71,7 +71,7 @@ All subfeatures have been successfully migrated to the new architecture structur
 
 ### ✅ Achieved Structure
 ```
-src/mobile/features/chat/
+src/mobile/features/notes/
 ├── features/                     # 业务功能
 │   ├── message-timeline/        # 时间线功能（包含输入、内容、显示、侧边栏管理）
 │   │   ├── components/          # Timeline components

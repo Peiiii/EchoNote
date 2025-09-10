@@ -1,7 +1,7 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
-import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
+import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline";
 import { useRef } from "react";
 
 interface MobileChatLayoutProps {

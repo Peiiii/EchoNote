@@ -7,7 +7,7 @@ import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { MobileThoughtRecord } from "@/mobile/features/chat/features/message-timeline";
+import { MobileThoughtRecord } from "@/mobile/features/notes/features/message-timeline";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
 export interface MobileTimelineContentRef {

@@ -1,5 +1,5 @@
 import { MobileSetupApp } from "./mobile-setup-app";
-import { mobileChatExtension } from "./features/chat";
+import { mobileChatExtension } from "./features/notes";
 
 export const MobileApp = () => {
   return (

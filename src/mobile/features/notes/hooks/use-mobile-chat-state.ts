@@ -3,8 +3,8 @@ import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
-import { useMessageSender } from "@/mobile/features/chat/hooks/use-message-sender";
+import { useThreadSidebar } from "@/desktop/features/notes/features/thread-management/hooks/use-thread-sidebar";
+import { useMessageSender } from "@/mobile/features/notes/hooks/use-message-sender";
 import { useEffect } from 'react';
 
 export const useMobileChatState = () => {

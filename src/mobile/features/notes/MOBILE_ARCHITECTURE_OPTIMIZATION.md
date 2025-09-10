@@ -80,7 +80,7 @@ MobileChatLayout (Clean Layout Coordinator)
 ## File Structure
 
 ```
-src/mobile/features/chat/pages/mobile-chat-page/
+src/mobile/features/notes/pages/mobile-chat-page/
 ├── components/
 │   ├── mobile-chat-layout.tsx          # Layout coordinator
 │   ├── mobile-timeline-content.tsx     # Timeline content logic

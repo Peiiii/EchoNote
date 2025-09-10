@@ -1,5 +1,5 @@
 import { DesktopSetupApp } from "./desktop-setup-app";
-import { chatExtension } from "./features/chat/extensions";
+import { chatExtension } from "./features/notes/extensions";
 
 export const DesktopApp = () => {
   return (
