@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/common/components/ui/
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
 import { LogOut } from 'lucide-react';
 import { firebaseAuthService } from '@/common/services/firebase';
-import { LoginButton } from './login-button';
+import { LoginButton } from '@/common/features/auth/components/login-button';
 
 interface UserProfileProps {
   user: User | null; // Firebase User

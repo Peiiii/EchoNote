@@ -1,5 +1,5 @@
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
-import { LoginButton } from "./login-button";
+import { LoginButton } from "@/common/features/auth/components/login-button";
 import { UserProfile } from "./user-profile";
 
 export const AuthStatus = () => {

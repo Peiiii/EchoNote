@@ -1,5 +1,5 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
-import { LoginPage } from "@/common/components/login-page";
+import { LoginPage } from "@/common/features/auth/components/login-page";
 import { AppSkeleton } from "@/common/components/ui/skeleton";
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
