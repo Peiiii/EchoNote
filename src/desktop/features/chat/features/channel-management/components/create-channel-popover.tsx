@@ -84,9 +84,9 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="h-10 w-16 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                        className="h-10 w-16 text-sm border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
                                     >
-                                        {newChannelEmoji || "😊"}
+                                        {newChannelEmoji || "Select"}
                                     </Button>
                                 </EmojiPickerComponent>
                                 {newChannelEmoji && (

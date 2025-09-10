@@ -165,8 +165,13 @@ export const firebaseChatService = {
     userId: string,
     channelData: Omit<Channel, "id" | "createdAt" | "messageCount">
   ): Promise<string> => {
+    // Filter out undefined values to prevent Firebase errors
+    const filteredChannelData = Object.fromEntries(
+      Object.entries(channelData).filter(([, value]) => value !== undefined)
+    );
+    
     const docRef = await addDoc(getChannelsCollectionRef(userId), {
-      ...channelData,
+      ...filteredChannelData,
       createdAt: serverTimestamp(),
       messageCount: 0,
       isDeleted: false,
@@ -383,8 +388,13 @@ export const firebaseChatService = {
     userId: string,
     messageData: Omit<Message, "id" | "timestamp">
   ): Promise<string> => {
+    // Filter out undefined values to prevent Firebase errors
+    const filteredMessageData = Object.fromEntries(
+      Object.entries(messageData).filter(([, value]) => value !== undefined)
+    );
+    
     const docRef = await addDoc(getMessagesCollectionRef(userId), {
-      ...messageData,
+      ...filteredMessageData,
       timestamp: serverTimestamp(),
       isDeleted: false, // Ensure new messages have isDeleted field
     });
