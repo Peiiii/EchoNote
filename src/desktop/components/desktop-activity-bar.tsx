@@ -37,7 +37,6 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
     <div
       className={cn(
         "relative flex-shrink-0 h-full",
-        // 使用基础背景色，让 active item 能够突出显示
         "bg-sidebar dark:bg-card border-none",
         "shadow-sm",
         className

@@ -7,7 +7,7 @@ export const ChatLayout = ({ sidebar, content, rightSidebar, className = "" }: C
         <div className={`flex-1 flex flex-col bg-background ${className} overflow-hidden`}>
             <div className="flex-1 flex min-h-0 relative">
                 {/* Left sidebar */}
-                <LeftSidebar>
+                <LeftSidebar className="bg-card dark:bg-sidebar">
                     {sidebar}
                 </LeftSidebar>
 

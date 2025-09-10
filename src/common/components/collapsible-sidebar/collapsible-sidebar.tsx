@@ -74,7 +74,7 @@ const CollapsibleSidebarRoot = ({
             <div
                 data-component="collapsible-sidebar"
                 className={cn(
-                    "flex-shrink-0 bg-sidebar transition-all duration-300 ease-in-out overflow-hidden",
+                    "flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden",
                     isCollapsed ? collapsedWidth : width,
                     className
                 )}
