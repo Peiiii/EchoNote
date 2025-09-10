@@ -13,8 +13,8 @@ interface ChannelCoverHeaderProps {
   defaultCollapsed?: boolean;
 }
 
-const DEFAULT_BACKGROUNDS = [
-  // 渐变背景
+
+const CSS_GRADIENTS = [
   "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
   "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
@@ -23,33 +23,25 @@ const DEFAULT_BACKGROUNDS = [
   "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
   "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
   "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-  "linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)",
-  "linear-gradient(135deg, #48cae4 0%, #023e8a 100%)",
-  "linear-gradient(135deg, #f72585 0%, #b5179e 100%)",
-  "linear-gradient(135deg, #06ffa5 0%, #3a86ff 100%)",
-  "linear-gradient(135deg, #ffbe0b 0%, #fb5607 100%)",
-  "linear-gradient(135deg, #8338ec 0%, #3a86ff 100%)",
-  "linear-gradient(135deg, #06ffa5 0%, #8338ec 100%)",
-  "linear-gradient(135deg, #ff006e 0%, #8338ec 100%)",
 ];
 
-const DEFAULT_BACKGROUND_IMAGES = [
-  "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=400&fit=crop&q=80",
+const SVG_PATTERNS = [
+  "data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E",
+  "data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20v20h20z'/%3E%3C/g%3E%3C/svg%3E",
+  "data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E",
+  "data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpolygon points='50 0 100 50 50 100 0 50'/%3E%3C/g%3E%3C/svg%3E",
+];
+
+
+const UNSPLASH_SOURCES = [
+  "https://source.unsplash.com/800x400/?abstract,geometric",
+  "https://source.unsplash.com/800x400/?nature,landscape", 
+  "https://source.unsplash.com/800x400/?minimal,texture",
+  "https://source.unsplash.com/800x400/?tech,digital",
+  "https://source.unsplash.com/800x400/?pattern,design",
+  "https://source.unsplash.com/800x400/?colorful,gradient",
+  "https://source.unsplash.com/800x400/?modern,clean",
+  "https://source.unsplash.com/800x400/?art,creative",
 ];
 
 const getChannelBackground = (channel: Channel): { background: string; isImage: boolean } => {
@@ -69,15 +61,38 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
   
   const absHash = Math.abs(hash);
   
-  // 70% 概率使用背景图，30% 概率使用渐变
-  const useImage = (absHash % 10) < 7;
+  // 四种方案按比例分配：40% CSS渐变，20% SVG图案，20% Picsum，20% Unsplash
+  const backgroundType = absHash % 10;
   
-  if (useImage) {
-    const imageIndex = absHash % DEFAULT_BACKGROUND_IMAGES.length;
-    return { background: `url(${DEFAULT_BACKGROUND_IMAGES[imageIndex]})`, isImage: true };
+  if (backgroundType < 4) {
+    // CSS渐变
+    const gradientIndex = absHash % CSS_GRADIENTS.length;
+    return { 
+      background: CSS_GRADIENTS[gradientIndex], 
+      isImage: false 
+    };
+  } else if (backgroundType < 6) {
+    // SVG图案 + 渐变组合
+    const gradientIndex = absHash % CSS_GRADIENTS.length;
+    const svgIndex = absHash % SVG_PATTERNS.length;
+    return { 
+      background: `${CSS_GRADIENTS[gradientIndex]}, url(${SVG_PATTERNS[svgIndex]})`, 
+      isImage: true 
+    };
+  } else if (backgroundType < 8) {
+    // Picsum图片
+    const imageId = (absHash % 1000) + 1;
+    return { 
+      background: `url(https://picsum.photos/800/400?random=${imageId})`, 
+      isImage: true 
+    };
   } else {
-    const gradientIndex = absHash % DEFAULT_BACKGROUNDS.length;
-    return { background: DEFAULT_BACKGROUNDS[gradientIndex], isImage: false };
+    // Unsplash Source
+    const sourceIndex = absHash % UNSPLASH_SOURCES.length;
+    return { 
+      background: `url(${UNSPLASH_SOURCES[sourceIndex]})`, 
+      isImage: true 
+    };
   }
 };
 
