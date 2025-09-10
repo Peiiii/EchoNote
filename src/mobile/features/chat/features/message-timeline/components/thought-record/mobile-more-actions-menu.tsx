@@ -1,4 +1,4 @@
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 import { 
   Bookmark, 
   Copy, 

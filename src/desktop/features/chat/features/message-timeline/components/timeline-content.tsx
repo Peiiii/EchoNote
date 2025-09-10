@@ -4,8 +4,8 @@ import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-mes
 import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
-import { Message } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { Message } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { forwardRef } from "react";
 
 interface TimelineContentProps {
@@ -18,7 +18,7 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     className = ""
 }, ref) => {
 
-    const { currentChannelId } = useChatViewStore();
+    const { currentChannelId } = useNotesViewStore();
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 

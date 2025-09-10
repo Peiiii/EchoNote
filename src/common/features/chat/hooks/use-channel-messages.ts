@@ -1,6 +1,6 @@
 import { channelMessageService } from '@/core/services/channel-message.service';
-import { Message } from '@/core/stores/chat-data.store';
-import { useChatViewStore } from '@/core/stores/chat-view.store';
+import { Message } from '@/core/stores/notes-data.store';
+import { useNotesViewStore } from '@/core/stores/notes-view.store';
 import { useMemoizedFn } from 'ahooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createSlice, useDataContainerState } from 'rx-nested-bean';
@@ -26,7 +26,7 @@ export interface UseChannelMessagesOptions {
 export const useChannelMessages = ({
     onHistoryMessagesChange,
 }: UseChannelMessagesOptions) => {
-    const { currentChannelId } = useChatViewStore();
+    const { currentChannelId } = useNotesViewStore();
     const slice = useMemo(() => createSlice(channelMessageService.dataContainer, `messageByChannel.${currentChannelId}`), [currentChannelId]);
 
     const { value: {

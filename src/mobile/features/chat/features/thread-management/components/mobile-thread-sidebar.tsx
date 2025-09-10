@@ -3,7 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 interface MobileThreadSidebarProps {
     onSendMessage: (message: string) => void;
@@ -12,7 +12,7 @@ interface MobileThreadSidebarProps {
 export const MobileThreadSidebar = ({
     onSendMessage
 }: MobileThreadSidebarProps) => {
-    const { currentChannelId } = useChatViewStore();
+    const { currentChannelId } = useNotesViewStore();
     const { messages } = useChannelMessages({});
     const parentMessage = currentChannelId ? messages.find(m => m.id === currentChannelId) : null;
     const threadMessages = currentChannelId ? messages.filter(m => m.threadId === currentChannelId) || [] : [];

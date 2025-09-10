@@ -1,5 +1,5 @@
-import { Channel } from "@/core/stores/chat-data.store";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
@@ -19,7 +19,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   const [editDescription, setEditDescription] = useState(channel.description);
   const [editEmoji, setEditEmoji] = useState(channel.emoji || "");
   const [isLoading, setIsLoading] = useState(false);
-  const { updateChannel } = useChatDataStore();
+  const { updateChannel } = useNotesDataStore();
 
   const handleSave = async () => {
     if (!editName.trim()) return;

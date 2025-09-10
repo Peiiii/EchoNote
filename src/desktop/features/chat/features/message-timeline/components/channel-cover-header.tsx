@@ -2,7 +2,7 @@ import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
-import { Channel, useChatDataStore } from "@/core/stores/chat-data.store";
+import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, Settings, Users } from "lucide-react";
 import { useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
@@ -52,7 +52,7 @@ export const ChannelCoverHeader = ({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { updateChannel } = useChatDataStore();
+  const { updateChannel } = useNotesDataStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
   const isGradient = backgroundStyle.includes('gradient');
 

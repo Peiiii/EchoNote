@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { useChatDataStore } from "./chat-data.store";
-import { useChatViewStore } from "./chat-view.store";
+import { useNotesDataStore } from "./notes-data.store";
+import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "../services/channel-message.service";
 
 export interface EditState {
@@ -72,12 +72,12 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
     set({ isSaving: true });
 
     try {
-      const { userId } = useChatDataStore.getState();
+      const { userId } = useNotesDataStore.getState();
       if (!userId) {
         throw new Error('User not authenticated');
       }
 
-      const { currentChannelId } = useChatViewStore.getState();
+      const { currentChannelId } = useNotesViewStore.getState();
       if (!currentChannelId) {
         throw new Error('No current channel selected');
       }

@@ -1,5 +1,5 @@
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileChannelItem } from "./mobile-channel-item";
 import { MobileCreateChannelPopover } from "./mobile-create-channel-popover";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
@@ -11,8 +11,8 @@ interface MobileChannelListProps {
 }
 
 export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileChannelListProps) {
-    const { channels, addChannel, deleteChannel } = useChatDataStore();
-    const { currentChannelId, setCurrentChannel } = useChatViewStore();
+    const { channels, addChannel, deleteChannel } = useNotesDataStore();
+    const { currentChannelId, setCurrentChannel } = useNotesViewStore();
 
     const handleAddChannel = (channel: { name: string; description: string }) => {
         addChannel(channel);

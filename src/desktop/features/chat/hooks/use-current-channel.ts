@@ -1,9 +1,9 @@
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 export function useCurrentChannel() {
-    const { channels } = useChatDataStore();
-    const { currentChannelId } = useChatViewStore();
+    const { channels } = useNotesDataStore();
+    const { currentChannelId } = useNotesViewStore();
     
     return channels.find((channel) => channel.id === currentChannelId) || null;
 }

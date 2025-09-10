@@ -1,4 +1,4 @@
-import { Channel } from "@/core/stores/chat-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
 import { MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/common/components/ui/dropdown-menu";

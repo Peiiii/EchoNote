@@ -1,5 +1,5 @@
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
@@ -11,8 +11,8 @@ interface ChannelListProps {
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-    const { channels, channelsLoading, addChannel, deleteChannel } = useChatDataStore();
-    const { currentChannelId, setCurrentChannel } = useChatViewStore();
+    const { channels, channelsLoading, addChannel, deleteChannel } = useNotesDataStore();
+    const { currentChannelId, setCurrentChannel } = useNotesViewStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasScroll, setHasScroll] = useState(false);
 

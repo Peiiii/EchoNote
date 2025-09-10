@@ -1,15 +1,15 @@
 import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { useChatActions } from "@/common/features/chat/hooks/use-chat-actions";
 import { useChatScroll } from "@/common/features/chat/hooks/use-chat-scroll";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
 import { useMessageSender } from "@/mobile/features/chat/hooks/use-message-sender";
 import { useEffect } from 'react';
 
 export const useMobileChatState = () => {
-    const { currentChannelId } = useChatViewStore();
-    const { channels } = useChatDataStore();
+    const { currentChannelId } = useNotesViewStore();
+    const { channels } = useNotesDataStore();
     const { messages, hasMore, loadMore } = useChannelMessages({});
 
     // Use specialized hooks

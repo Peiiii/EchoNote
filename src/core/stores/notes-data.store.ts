@@ -51,7 +51,7 @@ export interface ChannelMessageState {
   lastVisible: DocumentSnapshot | null;
 }
 
-export interface ChatDataState {
+export interface NotesDataState {
   channels: Channel[];
   channelsLoading: boolean;
   userId: string | null;
@@ -91,7 +91,7 @@ export interface ChatDataState {
 // Utility functions to reduce code duplication
 const withUserValidation = <T extends unknown[]>(fn: (userId: string, ...args: T) => Promise<void>) => 
   async (...args: T): Promise<void> => {
-    const { userId } = useChatDataStore.getState();
+    const { userId } = useNotesDataStore.getState();
     if (!userId) return;
     await fn(userId, ...args);
   };
@@ -104,7 +104,7 @@ const withErrorHandling = async <T>(operation: () => Promise<T>, operationName: 
   }
 };
 
-export const useChatDataStore = create<ChatDataState>()((set, get) => ({
+export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   channels: [],
   channelsLoading: true, // Start with loading state
   userId: null,

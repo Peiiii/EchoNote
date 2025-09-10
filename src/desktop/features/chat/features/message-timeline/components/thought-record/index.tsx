@@ -1,11 +1,11 @@
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Bookmark, Clock, Edit2, Eye, Lightbulb, MessageCircle, Tag as TagIcon } from "lucide-react";
 import React, { useState } from "react";
 
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MoreActionsMenu } from "../more-actions-menu";
 import { InlineEditor } from "./inline-editor";
 import { ReadMoreWrapper } from "./read-more-wrapper";
@@ -13,7 +13,7 @@ import { ThoughtRecordSparks } from "./thought-record-sparks";
 import { MarkdownContent } from "@/common/components/markdown";
 import { TagEditorPopover } from "@/common/features/chat/components/tag-editor-popover";
 import { TagList } from "@/common/features/chat/components/tag";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 
 interface ThoughtRecordProps {
@@ -241,8 +241,8 @@ export function ThoughtRecord({
     onOpenThread,
     threadCount = 0
 }: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
-    const { currentChannelId } = useChatViewStore();
-    const { userId } = useChatDataStore();
+    const { currentChannelId } = useNotesViewStore();
+    const { userId } = useNotesDataStore();
     const [showAnalysis, setShowAnalysis] = useState(false);
     const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
     

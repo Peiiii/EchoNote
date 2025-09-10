@@ -1,5 +1,5 @@
 import { MessageTimelineRef } from "@/common/features/chat/components/message-timeline/message-timeline";
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 import { ExpandedEditorOverlay } from "@/desktop/features/chat/features/message-timeline/components/expanded-editor-overlay";
 import { ThoughtRecord } from "@/desktop/features/chat/features/message-timeline/components/thought-record";
 import { TimelineActions } from "@/desktop/features/chat/features/message-timeline/components/timeline-actions";

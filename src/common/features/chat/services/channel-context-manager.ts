@@ -1,5 +1,5 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 /**
  * Generate system instructions for AI Assistant
@@ -64,7 +64,7 @@ export class ChannelContextManager {
     // Get channel and message data
     const state = channelMessageService.dataContainer.get();
     const channelState = state.messageByChannel[channelId];
-    const channel = useChatDataStore.getState().channels.find(ch => ch.id === channelId);
+    const channel = useNotesDataStore.getState().channels.find(ch => ch.id === channelId);
     const messages = channelState.messages || [];
 
     if (!channelState || !channel) {

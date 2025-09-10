@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Channel } from "@/core/stores/chat-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
 import { ChannelCoverHeader } from "./channel-cover-header";
 
 interface TimelineLayoutProps {

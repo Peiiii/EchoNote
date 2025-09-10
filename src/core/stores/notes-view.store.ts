@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Message } from "./chat-data.store";
-import { useChatDataStore } from "./chat-data.store";
+import { Message } from "./notes-data.store";
+import { useNotesDataStore } from "./notes-data.store";
 import { User } from "firebase/auth";
 
-export interface ChatViewState {
+export interface NotesViewState {
   // View state
   currentChannelId: string | null;
 
@@ -34,7 +34,7 @@ export interface ChatViewState {
   ) => Promise<void>;
 }
 
-export const useChatViewStore = create<ChatViewState>()(
+export const useNotesViewStore = create<NotesViewState>()(
   persist(
     (set, get) => ({
       // Initial view state
@@ -68,7 +68,7 @@ export const useChatViewStore = create<ChatViewState>()(
         // 设置加载状态
         get().setIsAddingMessage(true);
         try {
-          await useChatDataStore.getState().addMessage(message);
+          await useNotesDataStore.getState().addMessage(message);
         } finally {
           // 重置加载状态
           get().setIsAddingMessage(false);
@@ -78,7 +78,7 @@ export const useChatViewStore = create<ChatViewState>()(
         // 设置加载状态
         get().setIsDeletingMessage(true);
         try {
-          await useChatDataStore.getState().deleteMessage(messageId);
+          await useNotesDataStore.getState().deleteMessage(messageId);
         } finally {
           // 重置加载状态
           get().setIsDeletingMessage(false);
@@ -88,7 +88,7 @@ export const useChatViewStore = create<ChatViewState>()(
         // 设置加载状态
         get().setIsUpdatingMessage(true);
         try {
-          await useChatDataStore.getState().updateMessage(messageId, updates);
+          await useNotesDataStore.getState().updateMessage(messageId, updates);
         } finally {
           // 重置加载状态
           get().setIsUpdatingMessage(false);
@@ -96,7 +96,7 @@ export const useChatViewStore = create<ChatViewState>()(
       },
     }),
     {
-      name: "echonote-chat-view-storage",
+      name: "echonote-notes-view-storage",
     }
   )
 );

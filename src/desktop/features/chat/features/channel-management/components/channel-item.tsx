@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { Channel } from "@/core/stores/chat-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
 import { Edit2 } from "lucide-react";
 import { getChannelIcon } from "./channel-icons";
 import { EditChannelPopover } from "./edit-channel-popover";

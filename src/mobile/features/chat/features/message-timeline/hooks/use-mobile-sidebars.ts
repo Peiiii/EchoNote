@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 // Types
 interface MobileSidebarState {
@@ -23,7 +23,7 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     
-    const { setCurrentChannel } = useChatViewStore();
+    const { setCurrentChannel } = useNotesViewStore();
 
     // 移动端特有的处理：切换频道并关闭频道列表
     const handleChannelSelect = (channelId: string) => {

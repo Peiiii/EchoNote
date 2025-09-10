@@ -3,7 +3,7 @@ import { LoginPage } from "@/common/features/auth/components/login-page";
 import { AppSkeleton } from "@/common/components/ui/skeleton";
 import { Toaster } from "@/common/components/ui/sonner";
 import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
 import { useEffect } from "react";
@@ -11,11 +11,11 @@ import { useEffect } from "react";
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user, isInitializing } = useFirebaseAuth();
-  const setChatViewAuth = useChatViewStore((state) => state.setAuth);
+  const setNotesViewAuth = useNotesViewStore((state) => state.setAuth);
 
   useEffect(() => {
-    setChatViewAuth(user);
-  }, [user, setChatViewAuth]);
+    setNotesViewAuth(user);
+  }, [user, setNotesViewAuth]);
 
   if (isInitializing) {
     return (

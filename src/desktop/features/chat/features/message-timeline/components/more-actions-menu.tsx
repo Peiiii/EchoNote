@@ -1,4 +1,4 @@
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 import { Copy, Edit, Flag, Share2, Trash2 } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 

@@ -1,5 +1,5 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/chat/features/message-timeline";
 import { useRef } from "react";
@@ -44,7 +44,7 @@ export const MobileChatLayout = ({
     const handleSendMessage = (content: string) => {
         // timelineState.handleSendMessage(content);
         channelMessageService.sendMessage({
-            channelId: useChatViewStore.getState().currentChannelId!,
+            channelId: useNotesViewStore.getState().currentChannelId!,
             content: content,
             sender: "user",
         });

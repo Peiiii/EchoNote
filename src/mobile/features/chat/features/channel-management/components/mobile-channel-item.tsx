@@ -1,4 +1,4 @@
-import { Channel } from "@/core/stores/chat-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
 import { Hash } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { MobileChannelMoreActionsMenu } from "./mobile-channel-more-actions-menu";

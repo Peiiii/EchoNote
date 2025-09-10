@@ -5,8 +5,8 @@ import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-mes
 import { useGroupedMessages } from "@/common/features/chat/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/chat/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
-import { Message } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { Message } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileThoughtRecord } from "@/mobile/features/chat/features/message-timeline";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
@@ -25,7 +25,7 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
     onReply,
     className = ""
 }, ref) => {
-    const { currentChannelId } = useChatViewStore();
+    const { currentChannelId } = useNotesViewStore();
     const messageTimelineRef = useRef<MessageTimelineRef>(null);
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();

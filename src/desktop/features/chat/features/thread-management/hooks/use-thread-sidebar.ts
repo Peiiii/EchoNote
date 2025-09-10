@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 export function useThreadSidebar() {
-    const { currentChannelId } = useChatViewStore();
-    const addThreadMessage = useChatDataStore(state => state.addThreadMessage);
+    const { currentChannelId } = useNotesViewStore();
+    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
 
     // // 直接从store获取当前channel的消息，避免重复订阅
-    // const { messages } = useChatDataStore(state =>
+    // const { messages } = useNotesDataStore(state =>
     //     currentChannelId ? state.messagesByChannel[currentChannelId] || {
     //         messages: [],
     //         loading: false,

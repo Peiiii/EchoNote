@@ -1,7 +1,7 @@
 import { RxEvent } from '@/common/lib/rx-event';
 import { firebaseNotesService } from '@/common/services/firebase';
-import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
-import { useChatViewStore } from '@/core/stores/chat-view.store';
+import { Message, useNotesDataStore } from '@/core/stores/notes-data.store';
+import { useNotesViewStore } from '@/core/stores/notes-view.store';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { createDataContainer, createSlice } from 'rx-nested-bean';
 import { distinctUntilChanged, filter, ReplaySubject, switchMap } from 'rxjs';
@@ -122,7 +122,7 @@ export class ChannelMessageService {
     }
 
     loadInitialMessages = async ({ channelId, messagesLimit }: { channelId: string, messagesLimit: number }) => {
-        const { currentUser } = useChatViewStore.getState();
+        const { currentUser } = useNotesViewStore.getState();
         const userId = currentUser?.uid;
         console.log("[ChannelMessageService] loadInitialMessages", { channelId, messagesLimit, userId });
         if (!userId || !channelId) return;
@@ -155,7 +155,7 @@ export class ChannelMessageService {
     };
 
     loadMoreHistory = async ({ channelId, messagesLimit }: { channelId: string, messagesLimit: number }) => {
-        const { userId } = useChatDataStore.getState();
+        const { userId } = useNotesDataStore.getState();
         if (!userId || !channelId) return;
 
         const { getChannelState, setLoadingMore, setLastVisible, setHasMore, setMessages } = this.getChannelStateControl(channelId);
@@ -189,7 +189,7 @@ export class ChannelMessageService {
     }
 
     subscribeToNewMessages = ({ channelId, afterTimestamp }: { channelId: string, afterTimestamp: Date }): () => void => {
-        const { userId } = useChatDataStore.getState();
+        const { userId } = useNotesDataStore.getState();
         if (!userId || !channelId) return () => { };
         const {
             addMessage,
@@ -220,7 +220,7 @@ export class ChannelMessageService {
     };
 
     deleteMessage = async ({ messageId, hardDelete, channelId }: { messageId: string, hardDelete?: boolean, channelId: string }) => {
-        const { userId } = useChatDataStore.getState();
+        const { userId } = useNotesDataStore.getState();
         if (!userId) return;
 
         const { removeMessage, getChannelState, setMessages } = this.getChannelStateControl(channelId);
@@ -244,7 +244,7 @@ export class ChannelMessageService {
     }
 
     sendMessage = async (message: Omit<Message, 'id' | 'timestamp'>) => {
-        const { userId } = useChatDataStore.getState();
+        const { userId } = useNotesDataStore.getState();
         if (!userId) return;
         const { addMessage, fixFakeMessage } = this.getChannelStateControl(message.channelId);
         const tmpMessage: Message = { ...message, id: v4(), timestamp: new Date() }

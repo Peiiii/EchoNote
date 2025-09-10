@@ -1,8 +1,8 @@
 
 import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-messages";
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -19,11 +19,11 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
     const [message, setMessage] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendMessage } = channelMessageService
-    const addThreadMessage = useChatDataStore(state => state.addThreadMessage);
-    const { currentChannelId, isAddingMessage } = useChatViewStore();
+    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
+    const { currentChannelId, isAddingMessage } = useNotesViewStore();
 
     // 遵循Zustand最佳实践：分别订阅不同的状态
-    // const {messages: channelMessages} = useChatDataStore(state => 
+    // const {messages: channelMessages} = useNotesDataStore(state => 
     //     currentChannelId ? state.messagesByChannel[currentChannelId] || {
     //         messages: [],
     //         loading: false,

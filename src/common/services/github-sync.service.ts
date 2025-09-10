@@ -1,5 +1,5 @@
-import { Channel, Message } from '@/core/stores/chat-data.store';
-import { useChatDataStore } from '@/core/stores/chat-data.store';
+import { Channel, Message } from '@/core/stores/notes-data.store';
+import { useNotesDataStore } from '@/core/stores/notes-data.store';
 import { useGitHubSyncStore } from '@/core/stores/github-sync.store';
 import { githubChatStorageService } from './github-chat-storage.service';
 
@@ -10,7 +10,7 @@ export class GitHubSyncService {
     async syncToGitHub(): Promise<void> {
         console.log('[GitHubSyncService] syncToGitHub');
         
-        const dataStore = useChatDataStore.getState();
+        const dataStore = useNotesDataStore.getState();
         const syncStore = useGitHubSyncStore.getState();
         
         if (!syncStore.isGitHubEnabled) {
@@ -91,7 +91,7 @@ export class GitHubSyncService {
         if (!metadata) return;
 
         // 检查频道是否已存在
-        const dataStore = useChatDataStore.getState();
+        const dataStore = useNotesDataStore.getState();
         const existingChannel = dataStore.channels.find(ch => ch.id === channelSlug);
 
         if (!existingChannel) {
@@ -110,7 +110,7 @@ export class GitHubSyncService {
     // 从 GitHub 加载频道消息
     private async loadChannelMessagesFromGitHub(channelSlug: string): Promise<void> {
         const messages = await this.chatStorageService.getChannelMessages(channelSlug);
-        const dataStore = useChatDataStore.getState();
+        const dataStore = useNotesDataStore.getState();
 
         for (const chatMessage of messages) {
             // 检查消息是否已存在 - 在所有channel中查找

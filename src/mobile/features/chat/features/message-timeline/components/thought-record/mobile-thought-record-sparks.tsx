@@ -1,6 +1,6 @@
 import { Lightbulb } from 'lucide-react';
 import { Button } from '@/common/components/ui/button';
-import { Message, useChatDataStore } from '@/core/stores/chat-data.store';
+import { Message, useNotesDataStore } from '@/core/stores/notes-data.store';
 import { generateSparksForTextSimple } from '@/desktop/features/chat/features/ai-assistant/services/insights.service';
 import { channelMessageService } from '@/core/services/channel-message.service';
 import { useState, useEffect } from 'react';
@@ -37,7 +37,7 @@ export function MobileThoughtRecordSparks({
             setIsGenerating(true);
             const sparks = await generateSparksForTextSimple(message.content);
             
-            const { userId } = useChatDataStore.getState();
+            const { userId } = useNotesDataStore.getState();
             if (!userId) {
                 throw new Error('User not authenticated');
             }

@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { Message, useChatDataStore } from "@/core/stores/chat-data.store";
+import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { generateSparksForText } from "@/desktop/features/chat/features/ai-assistant/services/insights.service";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { buildTaggedPrompt } from "@/common/lib/tag-analysis.service";
@@ -49,7 +49,7 @@ export function ThoughtRecordSparks({
                 }
             });
 
-            const { userId } = useChatDataStore.getState();
+            const { userId } = useNotesDataStore.getState();
             if (!userId) {
                 throw new Error('User not authenticated');
             }

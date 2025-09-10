@@ -1,5 +1,5 @@
 import { channelMessageService } from '@/core/services/channel-message.service';
-import { Message } from '@/core/stores/chat-data.store';
+import { Message } from '@/core/stores/notes-data.store';
 import { createSlice } from 'rx-nested-bean';
 
 export interface ChannelContext {

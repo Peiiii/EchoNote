@@ -19,7 +19,7 @@ import {
   FieldValue,
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
-import { Message, Channel } from "@/core/stores/chat-data.store";
+import { Message, Channel } from "@/core/stores/notes-data.store";
 
 /**
  * Firebase Notes Service - Handle Firebase operations related to user notes and thoughts

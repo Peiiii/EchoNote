@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 
 export const useGroupedMessages = (messages?: Message[]) => {
     return useMemo(() => {

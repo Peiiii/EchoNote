@@ -1,5 +1,5 @@
 import { auth } from '@/common/config/firebase.config';
-import { useChatDataStore } from '@/core/stores/chat-data.store';
+import { useNotesDataStore } from '@/core/stores/notes-data.store';
 import {
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -22,7 +22,7 @@ export const firebaseAuthService = {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
+      await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       return result.user; 
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -148,7 +148,7 @@ export const firebaseAuthService = {
       
       console.log("✅ Email is verified, proceeding with login");
       console.log("🔗 Initializing Firebase listeners...");
-      await useChatDataStore.getState().initFirebaseListeners(result.user.uid);
+      await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       console.log("✅ Firebase listeners initialized");
       
       // 在初始化监听器后再重置标志，确保 onAuthStateChanged 能正确处理
@@ -176,7 +176,7 @@ export const firebaseAuthService = {
 
   signOut: async (): Promise<void> => {
     await signOut(auth);
-    useChatDataStore.getState().cleanupListeners();
+    useNotesDataStore.getState().cleanupListeners();
   },
 
   onAuthStateChanged: (callback: (user: User | null) => void): (() => void) => {
@@ -202,14 +202,14 @@ export const firebaseAuthService = {
       if (user) {
         if (user.emailVerified) {
           console.log("✅ User email verified, initializing listeners");
-          await useChatDataStore.getState().initFirebaseListeners(user.uid);
+          await useNotesDataStore.getState().initFirebaseListeners(user.uid);
         } else {
           console.log("❌ User email not verified, cleaning up listeners");
-          useChatDataStore.getState().cleanupListeners();
+          useNotesDataStore.getState().cleanupListeners();
         }
       } else {
         console.log("🚪 No user, cleaning up listeners");
-        useChatDataStore.getState().cleanupListeners();
+        useNotesDataStore.getState().cleanupListeners();
       }
       
       console.log("📞 Calling auth state callback");

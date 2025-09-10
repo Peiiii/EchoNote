@@ -1,6 +1,6 @@
 import { Tool } from "@agent-labs/agent-chat";
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useChatDataStore } from "@/core/stores/chat-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { createListNotesTool } from "@/common/features/chat/components/tools/list-notes.tool";
 
 export class ChannelToolsManager {
@@ -136,7 +136,7 @@ export class ChannelToolsManager {
                 const { noteId, content } = args;
 
                 try {
-                    const { userId } = useChatDataStore.getState();
+                    const { userId } = useNotesDataStore.getState();
                     if (!userId) {
                         return {
                             toolCallId: toolCall.id,

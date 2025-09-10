@@ -2,7 +2,7 @@ import { MarkdownContent } from "@/common/components/markdown";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { Message } from "@/core/stores/chat-data.store";
+import { Message } from "@/core/stores/notes-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useState, useEffect } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";

@@ -1,9 +1,9 @@
-import { useChatDataStore } from "@/core/stores/chat-data.store";
-import { useChatViewStore } from "@/core/stores/chat-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 export const useMessageSender = () => {
-    const { addMessage, addThreadMessage } = useChatDataStore();
-    const { currentChannelId, isAddingMessage, setIsAddingMessage } = useChatViewStore();
+    const { addMessage, addThreadMessage } = useNotesDataStore();
+    const { currentChannelId, isAddingMessage, setIsAddingMessage } = useNotesViewStore();
 
 
 
