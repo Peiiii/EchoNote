@@ -45,17 +45,19 @@ export const MobileThoughtRecord = ({
   const isExpandedEditing = isEditing && editMode === "expanded";
 
 
-  // If message is deleted, don't show it
-  if (message.isDeleted) {
-    return null;
-  }
-
   // 重置自动生成标志
   useEffect(() => {
     if (shouldAutoGenerate) {
       setShouldAutoGenerate(false);
     }
   }, [shouldAutoGenerate]);
+
+
+  // If message is deleted, don't show it
+  if (message.isDeleted) {
+    return null;
+  }
+
 
   // Action handlers
   const handleEdit = () => {
