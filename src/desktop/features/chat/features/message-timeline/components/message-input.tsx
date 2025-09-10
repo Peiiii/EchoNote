@@ -3,7 +3,7 @@ import { useChannelMessages } from "@/common/features/chat/hooks/use-channel-mes
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useChatDataStore } from "@/core/stores/chat-data.store";
 import { useChatViewStore } from "@/core/stores/chat-view.store";
-import { rxEventBusService } from "@/core/services/rx-event-bus.service";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Reply, Send, Smile, Video } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 

@@ -1,7 +1,7 @@
 import { Channel } from "@/core/stores/chat-data.store";
 import { Button } from "@/common/components/ui/button";
 import { Badge } from "@/common/components/ui/badge";
-import { rxEventBusService } from "@/core/services/rx-event-bus.service";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { MessageSquare, Users, Settings, Star, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { useState } from "react";

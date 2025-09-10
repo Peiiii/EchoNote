@@ -7,17 +7,14 @@ import { TimelineContent } from "@/desktop/features/chat/features/message-timeli
 import { TimelineLayout } from "@/desktop/features/chat/features/message-timeline/components/timeline-layout";
 import { useTimelineState } from "@/desktop/features/chat/features/message-timeline/hooks/use-timeline-state";
 import { useCurrentChannel } from "@/desktop/features/chat/hooks/use-current-channel";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useRef } from "react";
 
 interface MessageTimelineFeatureProps {
-    onOpenThread: (messageId: string) => void;
-    onOpenSettings?: () => void;
     className?: string;
 }
 
 export const MessageTimelineFeature = ({
-    onOpenThread,
-    onOpenSettings,
     className = ""
 }: MessageTimelineFeatureProps) => {
     // Use unified timeline state management
@@ -37,7 +34,7 @@ export const MessageTimelineFeature = ({
     const renderThoughtRecord = (message: Message, threadCount: number) => (
         <ThoughtRecord
             message={message}
-            onOpenThread={onOpenThread}
+            onOpenThread={(messageId) => rxEventBusService.requestOpenThread$.emit({ messageId })}
             threadCount={threadCount}
         />
     );
@@ -53,7 +50,7 @@ export const MessageTimelineFeature = ({
             {/* Timeline layout with content and actions */}
             <TimelineLayout
                 channel={currentChannel || undefined}
-                onOpenSettings={onOpenSettings}
+                onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
                 content={
                     <TimelineContent
                         ref={timelineContentRef}

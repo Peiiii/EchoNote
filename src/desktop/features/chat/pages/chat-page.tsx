@@ -6,34 +6,43 @@ import { ThreadSidebar } from "@/desktop/features/chat/features/thread-managemen
 import { MessageTimelineFeature } from "@/desktop/features/chat/features/message-timeline";
 import { useAIAssistant } from "@/desktop/features/chat/features/ai-assistant/hooks/use-ai-assistant";
 import { useThreadSidebar } from "@/desktop/features/chat/features/thread-management/hooks/use-thread-sidebar";
-import { rxEventBusService } from "@/core/services/rx-event-bus.service";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useEffect } from "react";
 
 export function ChatPage() {
     // Use specialized hooks
     const { isThreadOpen, currentThreadId, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
-    
+
     const handleOpenSettings = () => {
         console.log('Open channel settings');
     };
 
-    useEffect(() => {
-        const unlisten = rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
+    useEffect(() =>
+        rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
             handleOpenAIAssistant(channelId);
-        });
+        }), [handleOpenAIAssistant]);
 
-        return unlisten;
-    }, [handleOpenAIAssistant]);
-    
+    useEffect(() =>
+        rxEventBusService.requestOpenThread$.listen(({ messageId }) => {
+            handleOpenThread(messageId);
+        }), [handleOpenThread]);
+
+    useEffect(() =>
+        rxEventBusService.requestCloseThread$.listen(() => {
+            handleCloseThread();
+        }), [handleCloseThread]);
+
+    useEffect(() =>
+        rxEventBusService.requestOpenSettings$.listen(() => {
+            handleOpenSettings();
+        }), []);
+
     return (
         <ChatLayout
             sidebar={<ChannelList />}
             content={
-                <MessageTimelineFeature
-                    onOpenThread={handleOpenThread}
-                    onOpenSettings={handleOpenSettings}
-                />
+                <MessageTimelineFeature />
             }
             rightSidebar={
                 (isThreadOpen || isAIAssistantOpen) && (
