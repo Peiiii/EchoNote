@@ -1,38 +1,38 @@
 import { useMobileSidebars } from '@/mobile/features/notes/features/message-timeline';
-import { useMobileChatState } from '@/mobile/features/notes/hooks';
+import { useMobileNotesState } from '@/mobile/features/notes/hooks';
 import { MobileNotesLayout } from '@/mobile/features/notes/components/mobile-notes-layout';
 import { MobileSidebarManager } from '@/mobile/features/notes/features/message-timeline';
 
-export function MobileChatPage() {
+export function MobileNotesPage() {
     // Use custom hooks for state management
     const sidebarState = useMobileSidebars();
-    const chatState = useMobileChatState();
+    const notesState = useMobileNotesState();
     
     // Get current channel name for header
-    const currentChannel = chatState.channels.find(channel => channel.id === chatState.currentChannelId);
+    const currentChannel = notesState.channels.find(channel => channel.id === notesState.currentChannelId);
     return (
         <div className="h-full flex flex-col">
             {/* Main Chat Layout */}
             <MobileNotesLayout
                 currentChannelName={currentChannel?.name}
-                replyToMessageId={chatState.replyToMessageId}
-                isAddingMessage={chatState.isAddingMessage}
+                replyToMessageId={notesState.replyToMessageId}
+                isAddingMessage={notesState.isAddingMessage}
                 onOpenChannelList={sidebarState.openChannelList}
                 onOpenAIAssistant={sidebarState.openAIAssistant}
                 onOpenSettings={sidebarState.openSettings}
-                onOpenThread={chatState.handleOpenThread}
-                onSendMessage={chatState.handleSendMessage}
-                onCancelReply={chatState.handleCancelReply}
-                setReplyToMessageId={chatState.setReplyToMessageId}
+                onOpenThread={notesState.handleOpenThread}
+                onSendMessage={notesState.handleSendMessage}
+                onCancelReply={notesState.handleCancelReply}
+                setReplyToMessageId={notesState.setReplyToMessageId}
             />
             
             {/* Sidebar Manager */}
             <MobileSidebarManager
                 {...sidebarState}
-                isThreadOpen={chatState.isThreadOpen}
-                onSendThreadMessage={chatState.handleSendThreadMessage}
-                onCloseThread={chatState.handleCloseThread}
-                currentChannelId={chatState.currentChannelId}
+                isThreadOpen={notesState.isThreadOpen}
+                onSendThreadMessage={notesState.handleSendThreadMessage}
+                onCloseThread={notesState.handleCloseThread}
+                currentChannelId={notesState.currentChannelId}
             />
         </div>
     );

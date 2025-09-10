@@ -1,5 +1,5 @@
 import { MobileSetupApp } from "./mobile-setup-app";
-import { mobileChatExtension } from "./features/notes";
+import { mobileNotesExtension } from "./features/notes";
 
 export const MobileApp = () => {
   return (
@@ -9,7 +9,7 @@ export const MobileApp = () => {
         height: '100%'
       }}
     >
-      <MobileSetupApp extensions={[mobileChatExtension]} />
+      <MobileSetupApp extensions={[mobileNotesExtension]} />
     </div>
   );
 };

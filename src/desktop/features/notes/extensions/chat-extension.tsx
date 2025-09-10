@@ -10,14 +10,14 @@ import { Hash, MessageSquare, Plus,Notebook } from "lucide-react";
 import { ChatPage } from "../pages/chat-page";
 import { Navigate } from "react-router-dom";
 
-export const chatExtension = defineExtension({
+export const notesExtension = defineExtension({
   manifest: {
-    id: "chat",
-    name: "Chat Extension",
+    id: "notes",
+    name: "Notes Extension",
     description: "Conversational AI note-taking feature",
     version: "1.0.0",
     author: "EchoNote Team",
-    icon: "message-square",
+    icon: "notebook",
   },
   activate: ({ subscriptions }) => {
     // Register icons
@@ -47,21 +47,21 @@ export const chatExtension = defineExtension({
       )
     );
 
-    // Register routes - main chat page
+    // Register routes - main notes page
     subscriptions.push(
       Disposable.from(
         useRouteTreeStore.getState().addRoutes([
           {
-            id: "chat-main",
-            path: "/chat",
+            id: "notes-main",
+            path: "/notes",
             element: <ChatPage />,
             order: 1,
           },
-          // default route to chat
+          // default route to notes
           {
-            id: "chat-default",
+            id: "notes-default",
             path: "*",
-            element: <Navigate to="/chat" />,
+            element: <Navigate to="/notes" />,
             order: 9999,
           },
         ])
@@ -73,8 +73,8 @@ export const chatExtension = defineExtension({
       Disposable.from(
         connectRouterWithActivityBar([
           {
-            activityKey: "chat",
-            routerPath: "/chat",
+            activityKey: "notes",
+            routerPath: "/notes",
           },
         ])
       )

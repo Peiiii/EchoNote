@@ -6,15 +6,15 @@ import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
-import { Notebook, Hash, Plus, Menu } from "lucide-react";
-import { MobileNotesPage } from "../pages/mobile-notes-page";
+import { Hash, MessageSquare, Plus,Notebook } from "lucide-react";
+import { NotesPage } from "../pages/notes-page";
 import { Navigate } from "react-router-dom";
 
-export const mobileNotesExtension = defineExtension({
+export const notesExtension = defineExtension({
   manifest: {
-    id: "mobile-notes",
-    name: "Mobile Notes Extension",
-    description: "Mobile-optimized conversational AI note-taking feature",
+    id: "notes",
+    name: "Notes Extension",
+    description: "Conversational AI note-taking feature",
     version: "1.0.0",
     author: "EchoNote Team",
     icon: "notebook",
@@ -24,42 +24,42 @@ export const mobileNotesExtension = defineExtension({
     subscriptions.push(
       Disposable.from(
         useIconStore.getState().addIcons({
-          "notebook": Notebook,
+          "message-square": MessageSquare,
           hash: Hash,
           plus: Plus,
-          menu: Menu,
+          notebook: Notebook,
         })
       )
     );
 
-    // Register activity bar items - mobile optimized
+    // Register activity bar items - main group
     subscriptions.push(
       Disposable.from(
         useActivityBarStore.getState().addItem({
-          id: "mobile-notes",
+          id: "notes",
           label: "Notes",
-          title: "Mobile Notes",
+          title: "Conversational Notes",
           group: ActivityBarGroup.MAIN,
+          collapsedLabel: "Notes",
           icon: "notebook",
           order: 1,
-          iconColor: "text-blue-600 dark:text-blue-400",
         })
       )
     );
 
-    // Register routes - mobile notes page
+    // Register routes - main notes page
     subscriptions.push(
       Disposable.from(
         useRouteTreeStore.getState().addRoutes([
           {
-            id: "mobile-notes-main",
+            id: "notes-main",
             path: "/notes",
-            element: <MobileNotesPage />,
+            element: <NotesPage />,
             order: 1,
           },
           // default route to notes
           {
-            id: "mobile-notes-default",
+            id: "notes-default",
             path: "*",
             element: <Navigate to="/notes" />,
             order: 9999,
@@ -73,7 +73,7 @@ export const mobileNotesExtension = defineExtension({
       Disposable.from(
         connectRouterWithActivityBar([
           {
-            activityKey: "mobile-notes",
+            activityKey: "notes",
             routerPath: "/notes",
           },
         ])

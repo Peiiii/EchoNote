@@ -1,1 +1,1 @@
-export { chatExtension } from './chat-extension'; 
+export { notesExtension } from './notes-extension'; 

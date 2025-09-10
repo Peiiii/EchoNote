@@ -1,6 +1,6 @@
 
 import { ChannelList } from "@/desktop/features/notes/features/channel-management/components/channel-list";
-import { ChatLayout } from "@/desktop/features/notes/components/chat-layout";
+import { NotesLayout } from "@/desktop/features/notes/components/notes-layout";
 import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assistant/components/ai-assistant-sidebar";
 import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
 import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
@@ -39,7 +39,7 @@ export function NotesPage() {
         }), []);
 
     return (
-        <ChatLayout
+        <NotesLayout
             sidebar={<ChannelList />}
             content={
                 <MessageTimelineFeature />

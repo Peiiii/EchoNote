@@ -1,5 +1,5 @@
 import { DesktopSetupApp } from "./desktop-setup-app";
-import { chatExtension } from "./features/notes/extensions";
+import { notesExtension } from "./features/notes/extensions";
 
 export const DesktopApp = () => {
   return (
@@ -7,7 +7,7 @@ export const DesktopApp = () => {
       <DesktopSetupApp
         extensions={[
           // demoExtension,
-          chatExtension,
+          notesExtension,
           // githubExtension,
         ]}
       />

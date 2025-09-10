@@ -1,2 +1,2 @@
-export { mobileChatExtension } from "./extensions";
-export { MobileChatPage } from "./pages/mobile-chat-page";
+export { mobileNotesExtension } from "./extensions";
+export { MobileNotesPage } from "./pages/mobile-notes-page";
