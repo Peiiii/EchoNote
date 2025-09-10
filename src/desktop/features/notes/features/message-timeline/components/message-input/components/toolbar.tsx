@@ -1,4 +1,4 @@
-import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Video } from "lucide-react";
+import { Bot, FileText, Image, Mic, MoreHorizontal, Phone, Smile, Video } from "lucide-react";
 import { ToolbarButton } from "./toolbar-button";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 
@@ -14,7 +14,7 @@ export function Toolbar({ currentChannelId }: ToolbarProps) {
     };
 
     const leftButtons = [
-        { icon: () => <span>😊</span>, title: "Emoji", onClick: undefined },
+        { icon: Smile, title: "Emoji", onClick: undefined },
         { icon: Image, title: "Image", onClick: undefined },
         { icon: FileText, title: "File", onClick: undefined },
         { icon: Mic, title: "Voice", onClick: undefined },
