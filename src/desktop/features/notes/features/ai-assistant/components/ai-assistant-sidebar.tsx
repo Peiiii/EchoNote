@@ -32,16 +32,12 @@ export function AIAssistantSidebar({
     const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
 
     // Listen for AI conversation requests
-    useEffect(() => {
-        const unsubscribe = rxEventBusService.requestOpenAIConversation$.listen(({ channelId: requestedChannelId }) => {
-            if (requestedChannelId === channelId) {
-                setActiveMode("conversations");
-            }
-        });
+    useEffect(() => rxEventBusService.requestOpenAIConversation$.listen(({ channelId: requestedChannelId }) => {
+        if (requestedChannelId === channelId) {
+            setActiveMode("conversations");
+        }
+    }), [channelId]);
 
-        return unsubscribe;
-    }, [channelId]);
-    
     if (!isOpen) return null;
 
     console.log("[AIAssistantSidebar] contexts", { contexts, tools, agent });
@@ -73,7 +69,7 @@ export function AIAssistantSidebar({
                         <X className="w-5 h-5" />
                     </button>
                 </div>
-                
+
                 <div className="flex gap-2">
                     <Button
                         variant={activeMode === "assistant" ? "default" : "outline"}
@@ -113,6 +109,7 @@ export function AIAssistantSidebar({
                     <AIConversationInterface
                         channelId={channelId}
                         onClose={onClose}
+                        useModernChat={true}
                     />
                 )}
             </div>

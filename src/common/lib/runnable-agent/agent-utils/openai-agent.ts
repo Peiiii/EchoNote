@@ -138,7 +138,7 @@ export class OpenAIAgent {
         model: this.config.model,
         messages,
         stream: true,
-        tools,
+        tools: tools.length > 0 ? tools : undefined,
       });
 
       // 处理流

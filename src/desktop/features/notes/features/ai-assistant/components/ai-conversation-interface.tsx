@@ -5,16 +5,19 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { MessageSquare, Plus, Settings, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ConversationChat } from "./conversation-chat/conversation-chat";
+import { ModernChatContainer } from "./modern-chat";
 import { CompactConversationManager } from "./conversation-manager/compact-conversation-manager";
 
 interface AIConversationInterfaceProps {
   channelId?: string;
   onClose?: () => void;
+  useModernChat?: boolean;
 }
 
 export function AIConversationInterface({
   channelId,
-  onClose
+  onClose,
+  useModernChat = true
 }: AIConversationInterfaceProps) {
   const { 
     currentConversationId, 
@@ -125,10 +128,19 @@ export function AIConversationInterface({
 
         <div className="flex-1 flex flex-col">
           {currentConversationId ? (
-            <ConversationChat
-              conversationId={currentConversationId}
-              onMessageSent={handleMessageSent}
-            />
+            useModernChat ? (
+              <ModernChatContainer
+                conversationId={currentConversationId}
+                channelId={channelId}
+                onMessageSent={handleMessageSent}
+                className="h-full"
+              />
+            ) : (
+              <ConversationChat
+                conversationId={currentConversationId}
+                onMessageSent={handleMessageSent}
+              />
+            )
           ) : showWelcome ? (
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center max-w-xs">
