@@ -31,7 +31,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     table({ children, ...props }) {
                         return (
-                            <div className="my-6 overflow-x-auto">
+                            <div className="my-4 overflow-x-auto">
                                 <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600" {...props}>
                                     {children}
                                 </table>
@@ -40,14 +40,14 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     th({ children, ...props }) {
                         return (
-                            <th className="px-3 py-2 text-left text-sm font-medium text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600" {...props}>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600" {...props}>
                                 {children}
                             </th>
                         );
                     },
                     td({ children, ...props }) {
                         return (
-                            <td className="px-3 py-2 text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" {...props}>
+                            <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" {...props}>
                                 {children}
                             </td>
                         );
@@ -63,7 +63,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     ul({ children, ...props }) {
                         return (
-                            <ul className="my-4 space-y-1 list-disc pl-6" {...props}>
+                            <ul className="my-2 space-y-2 list-disc pl-6" {...props}>
                                 {children}
                             </ul>
                         );
@@ -77,7 +77,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     ol({ children, ...props }) {
                         return (
-                            <ol className="my-4 space-y-1 list-decimal pl-6 text-gray-800 dark:text-gray-200" {...props}>
+                            <ol className="my-2 space-y-2 list-decimal pl-6 text-gray-800 dark:text-gray-200" {...props}>
                                 {children}
                             </ol>
                         );
@@ -85,42 +85,42 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     h1({ children, ...props }) {
                         return (
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6 pb-2 border-b border-gray-300 dark:border-gray-600" {...props}>
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-8" {...props}>
                                 {children}
                             </h1>
                         );
                     },
                     h2({ children, ...props }) {
                         return (
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-5 pb-1 border-b border-gray-200 dark:border-gray-700" {...props}>
+                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-7" {...props}>
                                 {children}
                             </h2>
                         );
                     },
                     h3({ children, ...props }) {
                         return (
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 mt-4" {...props}>
+                            <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
                                 {children}
                             </h3>
                         );
                     },
                     h4({ children, ...props }) {
                         return (
-                            <h4 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 mt-3" {...props}>
+                            <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
                                 {children}
                             </h4>
                         );
                     },
                     h5({ children, ...props }) {
                         return (
-                            <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1 mt-3" {...props}>
+                            <h5 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
                                 {children}
                             </h5>
                         );
                     },
                     h6({ children, ...props }) {
                         return (
-                            <h6 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1 mt-2" {...props}>
+                            <h6 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
                                 {children}
                             </h6>
                         );
@@ -128,7 +128,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     p({ children, ...props }) {
                         return (
-                            <p className="text-base leading-relaxed text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words font-normal mb-4" {...props}>
+                            <p className="text-base leading-6 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words font-normal mb-2" {...props}>
                                 {children}
                             </p>
                         );
