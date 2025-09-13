@@ -47,7 +47,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                     },
                     td({ children, ...props }) {
                         return (
-                            <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" {...props}>
+                            <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600" {...props}>
                                 {children}
                             </td>
                         );
