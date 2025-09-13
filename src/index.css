@@ -119,6 +119,11 @@
     @apply bg-background text-foreground;
   }
   
+  /* 启用字体合成以支持中文斜体 */
+  em, i, .italic {
+    font-synthesis: style;
+  }
+  
   /* Scrollbar styles */
   .channel-list-content::-webkit-scrollbar {
     display: none;

@@ -87,8 +87,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       composite-kit:
-        specifier: ^0.6.7
-        version: 0.6.7(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.8.1))
+        specifier: ^0.7.0
+        version: 0.7.0(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.8.1))
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -145,7 +145,7 @@ importers:
         version: 11.1.0
       zenmark-editor:
         specifier: ^0.0.1
-        version: 0.0.1(775d610735e1eb6d5662c0edbc32c4ca)
+        version: 0.0.1(2ehzvkqm7hdzdlxuofgq3dpnsy)
       zustand:
         specifier: ^5.0.7
         version: 5.0.8(@types/react@19.1.12)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1))
@@ -2250,8 +2250,8 @@ packages:
   composite-kit@0.5.8:
     resolution: {integrity: sha512-Ga0xRClVPgsELR4HpoalNBz/qWaQT8GNj5Jio7Q1IDGd3/PdLWVayewOYK4UIEorQmspO2AABq283/o0t36ppg==}
 
-  composite-kit@0.6.7:
-    resolution: {integrity: sha512-Dtf7Oa0es0ZeempLyPRk3RlsYZON3RBDqoDId9SdUOBZx+eXVFrHG/zoglDvKKKVAj44AtaHavl1umrT7AATGw==}
+  composite-kit@0.7.0:
+    resolution: {integrity: sha512-Lo4UmkWHwd0fOmjMPcK4CP5ePm5C8TTvlnnOO0vsPaoWWNs3rgtU8PWq5HXva6I1nWmF9ql7bj5ZO1cIyUZjeQ==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -6875,7 +6875,7 @@ snapshots:
       - '@types/react-dom'
       - vite
 
-  composite-kit@0.6.7(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.8.1)):
+  composite-kit@0.7.0(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.8.1)):
     dependencies:
       '@hookform/resolvers': 5.2.1(react-hook-form@7.62.0(react@19.1.1))
       '@radix-ui/react-avatar': 1.1.10(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -9762,7 +9762,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zenmark-editor@0.0.1(775d610735e1eb6d5662c0edbc32c4ca):
+  zenmark-editor@0.0.1(2ehzvkqm7hdzdlxuofgq3dpnsy):
     dependencies:
       '@benrbray/prosemirror-math': 0.2.2(katex@0.13.24)(prosemirror-commands@1.7.1)(prosemirror-gapcursor@1.3.2)(prosemirror-history@1.4.1)(prosemirror-inputrules@1.5.0)(prosemirror-keymap@1.2.3)(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.41.0)
       '@emotion/css': 11.13.5

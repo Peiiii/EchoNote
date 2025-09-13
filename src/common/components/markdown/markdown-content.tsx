@@ -150,7 +150,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     em({ children, ...props }) {
                         return (
-                            <em className="italic text-gray-700 dark:text-gray-300" {...props}>
+                            <em className="italic text-gray-700 dark:text-gray-300"  {...props}>
                                 {children}
                             </em>
                         );
