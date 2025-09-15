@@ -1,11 +1,11 @@
-import { X, MessageSquare, Bot as BotIcon } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { Button } from "@/common/components/ui/button";
 import { AIAssistantCore } from "@/common/features/notes/components/ai-assistant-core/ai-assistant-core";
 import { aiAgentFactory } from "@/common/features/notes/services/ai-agent-factory";
-import { AIConversationInterface } from "./ai-conversation-interface";
-import { Button } from "@/common/components/ui/button";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { Bot as BotIcon, MessageSquare, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AIConversationInterface } from "./ai-conversation-interface";
 
 interface AIAssistantSidebarProps {
     isOpen: boolean;
@@ -29,7 +29,16 @@ export function AIAssistantSidebar({
     const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
 
     // Get channel context
-    const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
+    const contexts = useMemo(() => [...aiAgentFactory.getChannelContext(channelId),
+    {
+        description: "current time",
+        value: JSON.stringify({
+            isoTime: new Date().toISOString(),
+            timestamp: new Date().getTime(),
+            localTime: new Date().toLocaleString(),
+        }),
+    }
+    ], [channelId]);
 
     // Listen for AI conversation requests
     useEffect(() => {
@@ -41,7 +50,7 @@ export function AIAssistantSidebar({
 
         return unsubscribe;
     }, [channelId]);
-    
+
     if (!isOpen) return null;
 
     console.log("[AIAssistantSidebar] contexts", { contexts, tools, agent });
@@ -73,7 +82,7 @@ export function AIAssistantSidebar({
                         <X className="w-5 h-5" />
                     </button>
                 </div>
-                
+
                 <div className="flex gap-2">
                     <Button
                         variant={activeMode === "assistant" ? "default" : "outline"}
