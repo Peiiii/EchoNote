@@ -1,6 +1,6 @@
+import { channelMessageService } from '@/core/services/channel-message.service';
 import { Tool, ToolCall, ToolResult } from '@agent-labs/agent-chat';
 import { List } from 'lucide-react';
-import { channelMessageService } from '@/core/services/channel-message.service';
 
 // Render component - 极简设计，大道至简
 interface ListNotesToolRenderProps {
@@ -43,14 +43,17 @@ export function createListNotesTool(channelId: string): Tool {
                 
                 console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, channelState });
                 
-                // 简洁的结果格式
-                const resultText = `Found ${notes.length} notes in channel ${channelId}:\n${notes.map((note) =>
-                    `• ${note.content.substring(0, 60)}${note.content.length > 60 ? '...' : ''}`
-                ).join('\n')}`;
+                const notesForDisplay = notes.map((note) => ({
+                    content: note.content.substring(0, 60) + (note.content.length > 60 ? '...' : ''),
+                    contentLength: note.content.length,
+                    timestamp: note.timestamp,
+                    timestampReadable: note.timestamp.toLocaleString(),
+                    noteId: note.id,
+                }));
 
                 return {
                     toolCallId: toolCall.id,
-                    result: resultText,
+                    result: JSON.stringify(notesForDisplay),
                     state: 'result' as const
                 };
 
