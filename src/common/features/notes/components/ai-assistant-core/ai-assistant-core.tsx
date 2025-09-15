@@ -77,6 +77,9 @@ export function AIAssistantCore({
                         tools={tools}
                         contexts={contexts}
                         className="h-full w-full max-w-full"
+                        messageItemProps={{
+                            showAvatar: false,
+                        }}
                     />
                 </div>
             </div>

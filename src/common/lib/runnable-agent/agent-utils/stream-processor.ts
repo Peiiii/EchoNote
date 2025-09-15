@@ -1,10 +1,9 @@
-import { EventType } from "@ag-ui/core";
-import { EventEncoder } from "@ag-ui/encoder";
+import { EventType, RunErrorEvent } from "@agent-labs/agent-chat";
 import OpenAI from "openai";
 import { v4 as uuidv4 } from "uuid";
+import { EventEncoder } from "./encoder";
 import { TextMessageHandler } from "./handlers/text-message.handler";
 import {
-  EventData,
   StreamProcessor as IStreamProcessor,
   StreamContext,
   StreamHandler,
@@ -27,9 +26,9 @@ export class StreamProcessor implements IStreamProcessor {
         last_response: this.context.fullResponse,
         last_tool_call: this.context.isToolCallStarted
           ? {
-              name: this.context.toolCallName,
-              arguments: this.context.toolCallArgs,
-            }
+            name: this.context.toolCallName,
+            arguments: this.context.toolCallArgs,
+          }
           : null,
         usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
       }),
@@ -56,45 +55,6 @@ export class StreamProcessor implements IStreamProcessor {
       for (const handler of this.handlers.values()) {
         yield* handler.finalize(this.context);
       }
-
-      // 发送状态快照
-      const event: EventData = {
-        type: EventType.STATE_SNAPSHOT,
-        snapshot: this.context.getSnapshot(),
-        content: this.context.fullResponse,
-        toolCalls: this.context.isToolCallStarted
-          ? [
-              {
-                id: this.context.toolCallId,
-                type: "function",
-                function: {
-                  name: this.context.toolCallName,
-                  arguments: this.context.toolCallArgs,
-                },
-              },
-            ]
-          : undefined,
-        messages: [
-          {
-            id: this.context.messageId,
-            role: "assistant",
-            content: this.context.fullResponse,
-            toolCalls: this.context.isToolCallStarted
-              ? [
-                  {
-                    id: this.context.toolCallId,
-                    type: "function",
-                    function: {
-                      name: this.context.toolCallName,
-                      arguments: this.context.toolCallArgs,
-                    },
-                  },
-                ]
-              : undefined,
-          },
-        ],
-      };
-      yield this.encoder.encode(event);
     } catch (error) {
       yield* this.handleError(error as Error);
     }
@@ -133,11 +93,9 @@ export class StreamProcessor implements IStreamProcessor {
     yield* errorHandler.finalize(this.context);
 
     // 发送错误事件
-    const event: EventData = {
+    const event: RunErrorEvent = {
       type: EventType.RUN_ERROR,
-      error: {
-        message: error.message,
-      },
+      error: error.message,
     };
     yield this.encoder.encode(event);
   }

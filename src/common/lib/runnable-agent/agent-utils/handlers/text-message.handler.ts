@@ -1,23 +1,16 @@
-import { EventEncoder } from '@ag-ui/encoder';
-import { EventType } from '@ag-ui/core';
-import { StreamHandler, StreamContext, EventData } from '../types';
+import { EventType, TextDeltaEvent, TextEndEvent, TextStartEvent } from '@agent-labs/agent-chat';
 import OpenAI from 'openai';
+import { EventEncoder } from '../encoder';
+import { StreamContext, StreamHandler } from '../types';
 
 export class TextMessageHandler implements StreamHandler {
   constructor(private encoder: EventEncoder) {}
 
   async *handle(chunk: OpenAI.Chat.Completions.ChatCompletionChunk, context: StreamContext): AsyncGenerator<string, void, unknown> {
     if (!context.isMessageStarted) {
-      const event: EventData = {
-        type: EventType.TEXT_MESSAGE_START,
+      const event: TextStartEvent = {
+        type: EventType.TEXT_START,
         messageId: context.messageId,
-        role: 'assistant',
-        content: '',
-        messages: [{
-          id: context.messageId,
-          role: 'assistant',
-          content: ''
-        }]
       };
       yield this.encoder.encode(event);
       context.isMessageStarted = true;
@@ -26,17 +19,10 @@ export class TextMessageHandler implements StreamHandler {
     const content = chunk.choices[0].delta.content;
     if (content) {
       context.fullResponse += content;
-      const event: EventData = {
-        type: EventType.TEXT_MESSAGE_CONTENT,
+      const event: TextDeltaEvent = {
+        type: EventType.TEXT_DELTA,
         messageId: context.messageId,
-        role: 'assistant',
         delta: content,
-        content: context.fullResponse,
-        messages: [{
-          id: context.messageId,
-          role: 'assistant',
-          content: context.fullResponse
-        }]
       };
       yield this.encoder.encode(event);
     }
@@ -44,16 +30,9 @@ export class TextMessageHandler implements StreamHandler {
 
   async *finalize(context: StreamContext): AsyncGenerator<string, void, unknown> {
     if (context.isMessageStarted) {
-      const event: EventData = {
-        type: EventType.TEXT_MESSAGE_END,
+      const event: TextEndEvent = {
+        type: EventType.TEXT_END,
         messageId: context.messageId,
-        role: 'assistant',
-        content: context.fullResponse,
-        messages: [{
-          id: context.messageId,
-          role: 'assistant',
-          content: context.fullResponse
-        }]
       };
       yield this.encoder.encode(event);
     }

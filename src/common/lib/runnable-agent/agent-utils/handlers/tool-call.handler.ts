@@ -1,10 +1,10 @@
-import { EventType } from '@ag-ui/core';
-import { EventEncoder } from '@ag-ui/encoder';
+import { EventType, ToolCallArgsDeltaEvent, ToolCallEndEvent, ToolCallStartEvent } from '@agent-labs/agent-chat';
 import OpenAI from 'openai';
-import { EventData, StreamContext, StreamHandler } from '../types';
+import { EventEncoder } from '../encoder';
+import { StreamContext, StreamHandler } from '../types';
 
 export class ToolCallHandler implements StreamHandler {
-  constructor(private encoder: EventEncoder) {}
+  constructor(private encoder: EventEncoder) { }
 
   async *handle(
     chunk: OpenAI.Chat.Completions.ChatCompletionChunk,
@@ -20,115 +20,33 @@ export class ToolCallHandler implements StreamHandler {
       context.toolCallName = toolCall.function?.name ?? '';
       context.isToolCallStarted = true;
 
-      const event: EventData = {
+      const event: ToolCallStartEvent = {
         type: EventType.TOOL_CALL_START,
         toolCallId: context.toolCallId,
-        toolCallName: context.toolCallName,
-        toolCallArgs: '',
-        toolCalls: [
-          {
-            id: context.toolCallId,
-            type: 'function',
-            function: {
-              name: context.toolCallName,
-              arguments: '',
-            },
-          },
-        ],
-        messages: [
-          {
-            id: context.messageId,
-            role: 'assistant',
-            toolCalls: [
-              {
-                id: context.toolCallId,
-                type: 'function',
-                function: {
-                  name: context.toolCallName,
-                  arguments: '',
-                },
-              },
-            ],
-          },
-        ],
+        toolName: context.toolCallName,
       };
       yield this.encoder.encode(event);
     }
 
     if (toolCall.function?.arguments) {
       context.toolCallArgs += toolCall.function.arguments;
-      const event: EventData = {
-        type: EventType.TOOL_CALL_ARGS,
+      const event: ToolCallArgsDeltaEvent = {
+        type: EventType.TOOL_CALL_ARGS_DELTA,
         toolCallId: context.toolCallId,
-        toolCallName: context.toolCallName,
-        toolCallArgs: context.toolCallArgs,
-        delta: toolCall.function?.arguments,
-        toolCalls: [
-          {
-            id: context.toolCallId,
-            type: 'function',
-            function: {
-              name: context.toolCallName,
-              arguments: context.toolCallArgs,
-            },
-          },
-        ],
-        messages: [
-          {
-            id: context.messageId,
-            role: 'assistant',
-            toolCalls: [
-              {
-                id: context.toolCallId,
-                type: 'function',
-                function: {
-                  name: context.toolCallName,
-                  arguments: context.toolCallArgs,
-                },
-              },
-            ],
-          },
-        ],
+        argsDelta: toolCall.function.arguments,
       };
       yield this.encoder.encode(event);
     }
   }
 
-  async *finalize(
+
+  async * finalize(
     context: StreamContext,
   ): AsyncGenerator<string, void, unknown> {
     if (context.isToolCallStarted) {
-      const event: EventData = {
+      const event: ToolCallEndEvent = {
         type: EventType.TOOL_CALL_END,
         toolCallId: context.toolCallId,
-        toolCallName: context.toolCallName,
-        toolCallArgs: context.toolCallArgs,
-        toolCalls: [
-          {
-            id: context.toolCallId,
-            type: 'function',
-            function: {
-              name: context.toolCallName,
-              arguments: context.toolCallArgs,
-            },
-          },
-        ],
-        messages: [
-          {
-            id: context.messageId,
-            role: 'assistant',
-            toolCalls: [
-              {
-                id: context.toolCallId,
-                type: 'function',
-                function: {
-                  name: context.toolCallName,
-                  arguments: context.toolCallArgs,
-                },
-              },
-            ],
-          },
-        ],
       };
       yield this.encoder.encode(event);
     }

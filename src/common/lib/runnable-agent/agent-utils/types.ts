@@ -1,4 +1,4 @@
-import { EventType } from '@ag-ui/core';
+import { EventType } from '@agent-labs/agent-chat';
 
 export interface StreamContext {
   messageId: string;

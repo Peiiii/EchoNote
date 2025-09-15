@@ -1,17 +1,20 @@
 import {
+  convertUIMessagesToMessages,
   EventType,
-  Message,
+  RunErrorEvent,
+  RunFinishedEvent,
+  RunStartedEvent,
   Tool,
+  UIMessage,
   type Context,
   type RunAgentInput,
-  type ToolCall,
-} from "@ag-ui/core";
-import { EventEncoder } from "@ag-ui/encoder";
+  type ToolCall
+} from "@agent-labs/agent-chat";
 import OpenAI from "openai";
+import { EventEncoder } from "./encoder";
 import { TextMessageHandler } from "./handlers/text-message.handler";
 import { ToolCallHandler } from "./handlers/tool-call.handler";
 import { StreamProcessor } from "./stream-processor";
-import { EventData } from "./types";
 
 export interface AgentConfig {
   apiKey: string;
@@ -50,8 +53,9 @@ export class OpenAIAgent {
   }
 
   private convertMessagesToOpenAIFormat(
-    messages: Message[]
+    uiMessages: UIMessage[]
   ): OpenAI.Chat.ChatCompletionMessageParam[] {
+    const messages = convertUIMessagesToMessages(uiMessages);
     return messages.map((message) => {
       if (message.role === "tool" && "toolCallId" in message) {
         return {
@@ -78,13 +82,13 @@ export class OpenAIAgent {
         tool_calls:
           "toolCalls" in message
             ? message.toolCalls?.map((toolCall: ToolCall) => ({
-                id: toolCall.id,
-                type: "function" as const,
-                function: {
-                  name: toolCall.function.name,
-                  arguments: toolCall.function.arguments,
-                },
-              }))
+              id: toolCall.id,
+              type: "function" as const,
+              function: {
+                name: toolCall.function.name,
+                arguments: toolCall.function.arguments,
+              },
+            }))
             : undefined,
       };
     });
@@ -105,19 +109,14 @@ export class OpenAIAgent {
 
   async *run(
     inputData: RunAgentInput,
-    acceptHeader: string
+    _acceptHeader: string
   ): AsyncGenerator<string, void, unknown> {
-    const encoder = new EventEncoder({ accept: acceptHeader });
+    const encoder = new EventEncoder();
 
     // 发送开始事件
-    const startEvent: EventData = {
+    const startEvent: RunStartedEvent = {
       type: EventType.RUN_STARTED,
       threadId: inputData.threadId,
-      runId: inputData.runId,
-      toolCalls: [],
-      messages: [],
-      toolCallArgs: "",
-      content: "",
     };
     yield encoder.encode(startEvent);
 
@@ -138,7 +137,7 @@ export class OpenAIAgent {
         model: this.config.model,
         messages,
         stream: true,
-        tools,
+        tools: tools.length > 0 ? (tools as OpenAI.Chat.ChatCompletionFunctionTool[]) : undefined,
       });
 
       // 处理流
@@ -151,14 +150,9 @@ export class OpenAIAgent {
     }
 
     // 发送结束事件
-    const endEvent: EventData = {
+    const endEvent: RunFinishedEvent = {
       type: EventType.RUN_FINISHED,
       threadId: inputData.threadId,
-      runId: inputData.runId,
-      toolCalls: [],
-      messages: [],
-      toolCallArgs: "",
-      content: "",
     };
     yield encoder.encode(endEvent);
   }
@@ -167,11 +161,9 @@ export class OpenAIAgent {
     error: Error,
     encoder: EventEncoder
   ): AsyncGenerator<string, void, unknown> {
-    const event: EventData = {
+    const event: RunErrorEvent = {
       type: EventType.RUN_ERROR,
-      error: {
-        message: error.message,
-      },
+      error: error.message,
     };
     console.error("[OpenAIAgent][handleError]:", error);
     yield encoder.encode(event);
