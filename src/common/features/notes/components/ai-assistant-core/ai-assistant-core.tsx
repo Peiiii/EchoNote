@@ -1,4 +1,4 @@
-import { AgentChatCore, IAgent, Tool, useAgentSessionManager, useParseTools } from "@agent-labs/agent-chat";
+import { AgentChatCore, IAgent, Tool, useAgentSessionManager, useAgentSessionManagerState, useParseTools } from "@agent-labs/agent-chat";
 import { Bot } from "lucide-react";
 import { v4 } from "uuid";
 
@@ -28,7 +28,7 @@ export function AIAssistantCore({
     extra
 }: AIAssistantCoreProps) {
 
-    const {toolDefs,toolExecutors,toolRenderers} = useParseTools(tools);
+    const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
     const agentSessionManager = useAgentSessionManager({
         agent,
         getToolDefs: () => toolDefs,
@@ -36,7 +36,8 @@ export function AIAssistantCore({
         initialMessages: [],
         getToolExecutor: (name: string) => toolExecutors[name],
     });
-
+    const { messages, isAgentResponding, threadId } = useAgentSessionManagerState(agentSessionManager);
+    console.log("[AIAssistantCore] messages", { messages, isAgentResponding, threadId });
     if (!isOpen) return null;
 
     const containerClasses = variant === 'sidebar'
