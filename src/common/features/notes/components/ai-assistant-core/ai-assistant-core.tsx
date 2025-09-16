@@ -1,7 +1,6 @@
+import { AgentChatCore, IAgent, Tool, useAgentSessionManager, useParseTools } from "@agent-labs/agent-chat";
 import { Bot } from "lucide-react";
-import { AgentChatCore } from "@agent-labs/agent-chat";
-import { IAgent } from "@agent-labs/agent-chat";
-import { Tool } from "@agent-labs/agent-chat";
+import { v4 } from "uuid";
 
 interface AIAssistantCoreProps {
     isOpen: boolean;
@@ -28,6 +27,16 @@ export function AIAssistantCore({
     variant = 'sidebar',
     extra
 }: AIAssistantCoreProps) {
+
+    const {toolDefs,toolExecutors,toolRenderers} = useParseTools(tools);
+    const agentSessionManager = useAgentSessionManager({
+        agent,
+        getToolDefs: () => toolDefs,
+        getContexts: () => contexts,
+        initialMessages: [],
+        getToolExecutor: (name: string) => toolExecutors[name],
+    });
+
     if (!isOpen) return null;
 
     const containerClasses = variant === 'sidebar'
@@ -73,12 +82,50 @@ export function AIAssistantCore({
                     }}
                 >
                     <AgentChatCore
-                        agent={agent}
-                        tools={tools}
-                        contexts={contexts}
+                        agentSessionManager={agentSessionManager}
+                        toolRenderers={toolRenderers}
                         className="h-full w-full max-w-full"
                         messageItemProps={{
                             showAvatar: false,
+                        }}
+                        promptsProps={{
+                            items: [
+                                {
+                                    id: "prompt-1",
+                                    prompt: "聊聊吧",
+                                },
+                                {
+                                    id: "prompt-2",
+                                    prompt: "帮我总结一下",
+                                },
+                                {
+                                    id: "prompt-3",
+                                    prompt: "你有啥建议吗",
+                                },
+                                {
+                                    id: "prompt-4",
+                                    prompt: "我接下来该做什么呢？",
+                                },
+                                {
+                                    id: "prompt-5",
+                                    prompt: "有什么很重要但是被我忽略的东西？",
+                                },
+                                {
+                                    id: "prompt-6",
+                                    prompt: "接下来一周的建议",
+                                }
+
+                            ],
+                            onItemClick: ({ prompt }) => {
+                                agentSessionManager.handleAddMessages([{
+                                    id: v4(),
+                                    role: "user",
+                                    parts: [{
+                                        type: "text",
+                                        text: prompt,
+                                    }],
+                                }])
+                            }
                         }}
                     />
                 </div>
