@@ -20,7 +20,7 @@ export function AIAssistantSidebar({
 }: AIAssistantSidebarProps) {
     const { channels } = useNotesDataStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
-    const [activeMode, setActiveMode] = useState<"assistant" | "conversations">("assistant");
+    const [activeMode, setActiveMode] = useState<"assistant" | "conversations">("conversations");
 
     // Create HttpAgent instance
     const agent = useMemo(() => aiAgentFactory.createAgent(), []);

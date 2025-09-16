@@ -24,6 +24,11 @@ export function NotesPage() {
         }), [handleOpenAIAssistant]);
 
     useEffect(() =>
+        rxEventBusService.requestOpenAIConversation$.listen(({ channelId }) => {
+            handleOpenAIAssistant(channelId);
+        }), [handleOpenAIAssistant]);
+
+    useEffect(() =>
         rxEventBusService.requestOpenThread$.listen(({ messageId }) => {
             handleOpenThread(messageId);
         }), [handleOpenThread]);
