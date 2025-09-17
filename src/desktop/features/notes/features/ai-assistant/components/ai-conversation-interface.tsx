@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useAIConversation } from "@/common/hooks/use-ai-conversation";
@@ -31,14 +31,13 @@ export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AI
   } = useAIConversation();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const mode = useContainerMode(containerRef, { sidebar: 320, chatMin: 520 });
+  const { mode, ready } = useContainerMode(containerRef, { sidebar: 320, chatMin: 520 });
   const isSinglePane = mode === "single-pane";
   const [showList, setShowList] = useState(false);
+  const hasConversations = conversations.length > 0;
   useEffect(() => {
-    if (isSinglePane) {
-      setShowList(!currentConversationId);
-    }
-  }, [isSinglePane, currentConversationId]);
+    setShowList(isSinglePane ? !hasConversations : false);
+  }, [isSinglePane, hasConversations]);
   useImperativeHandle(ref, () => ({
     showList: () => setShowList(true),
     showChat: () => setShowList(false),
@@ -63,8 +62,18 @@ export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AI
     if (isSinglePane) setShowList(false);
   };
   
+  if (loading) {
+    return (
+      <div ref={containerRef} className={"h-full flex " + (ready ? "" : "invisible") }>
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div ref={containerRef} className="h-full flex">
+    <div ref={containerRef} className={"h-full flex " + (ready ? "" : "invisible") }>
       {mode === "two-pane" && (
         <div className="w-80 flex flex-col">
           <AIConversationList
@@ -97,16 +106,20 @@ export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AI
                   onClose={onClose}
                 />
               ) : (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
-                    <p className="text-muted-foreground mb-4">Create a new conversation to start chatting</p>
-                    <Button onClick={handleCreateConversation}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Conversation
-                    </Button>
+                hasConversations ? (
+                  <div className="flex-1" />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
+                      <p className="text-muted-foreground mb-4">Create a new conversation to start chatting</p>
+                      <Button onClick={handleCreateConversation}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Conversation
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )
               )}
             </div>
           </div>
@@ -118,16 +131,20 @@ export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AI
               onClose={onClose}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
-                <p className="text-muted-foreground mb-4">Create a new conversation to start chatting</p>
-                <Button onClick={handleCreateConversation}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Conversation
-                </Button>
+            hasConversations ? (
+              <div className="flex-1" />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
+                  <p className="text-muted-foreground mb-4">Create a new conversation to start chatting</p>
+                  <Button onClick={handleCreateConversation}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Conversation
+                  </Button>
+                </div>
               </div>
-            </div>
+            )
           )
         )}
       </div>

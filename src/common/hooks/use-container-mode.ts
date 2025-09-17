@@ -1,34 +1,35 @@
 import { useLayoutEffect, useState } from 'react';
 
-// Observe a container element and return layout mode based on its width.
-// Useful for master-detail that must react to resizable parents instead of window breakpoints.
 export type ContainerMode = 'two-pane' | 'single-pane';
 
 export interface ContainerModeOptions {
-  sidebar?: number; // expected sidebar width in px
-  chatMin?: number; // minimum content width in px
-  gutter?: number;  // extra spacing in px
+  sidebar?: number;
+  chatMin?: number;
+  gutter?: number;
 }
 
 export function useContainerMode(
   ref: React.RefObject<HTMLElement | null>,
   opts?: ContainerModeOptions
-): ContainerMode {
+): { mode: ContainerMode; ready: boolean } {
   const { sidebar = 320, chatMin = 520, gutter = 0 } = opts || {};
   const [mode, setMode] = useState<ContainerMode>('two-pane');
+  const [ready, setReady] = useState(false);
 
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     const required = sidebar + chatMin + gutter;
-    const ro = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
+    const measure = () => {
+      const width = el.clientWidth || el.getBoundingClientRect().width;
       setMode(width >= required ? 'two-pane' : 'single-pane');
-    });
+      setReady(true);
+    };
+    measure();
+    const ro = new ResizeObserver(() => measure());
     ro.observe(el);
     return () => ro.disconnect();
   }, [ref, sidebar, chatMin, gutter]);
 
-  return mode;
+  return { mode, ready };
 }
-

@@ -8,7 +8,6 @@ interface ConversationListProps {
   withHeader?: boolean;
 }
 
-// Reusable conversation list for both two-pane sidebar and single-pane list view.
 export function AIConversationList({
   conversations,
   currentConversationId,
