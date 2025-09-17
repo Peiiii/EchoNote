@@ -5,7 +5,7 @@ import { firebaseAIConversationService } from '@/common/services/firebase/fireba
 export function useAIConversation() {
   const [conversations, setConversations] = useState<AIConversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   
@@ -26,6 +26,9 @@ export function useAIConversation() {
     try {
       const conversations = await firebaseAIConversationService.getConversations(userId, channelId);
       setConversations(conversations);
+      if (conversations.length > 0) {
+        setCurrentConversationId(conversations[0].id);
+      }
     } finally {
       setLoading(false);
     }

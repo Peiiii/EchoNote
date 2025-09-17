@@ -7,7 +7,7 @@ import { useNotesDataStore } from '@/core/stores/notes-data.store';
 export function useAgentChatSync(conversationId: string, _channelId: string) {
   const { userId } = useNotesDataStore();
   const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   
   // 加载初始消息
   useEffect(() => {
