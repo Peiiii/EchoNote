@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useAIConversation } from "@/common/hooks/use-ai-conversation";
+import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
 import { useContainerMode } from "@/common/hooks/use-container-mode";
 import { AIConversationTwoPane } from "./ai-conversation-two-pane";
 import { AIConversationSinglePane, SinglePaneRef } from "./ai-conversation-single-pane";

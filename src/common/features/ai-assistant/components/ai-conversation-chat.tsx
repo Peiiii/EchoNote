@@ -1,10 +1,10 @@
-import { aiAgentFactory } from "@/common/features/notes/services/ai-agent-factory";
+import { aiAgentFactory } from "../services/ai-agent-factory";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { AgentChatCore, useAgentSessionManager, useParseTools, UIMessage } from "@agent-labs/agent-chat";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { debounceTime } from "rxjs";
-import { useAgentChatSync } from "../hooks/use-agent-chat-sync";
+import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 interface AIConversationChatProps {
   conversationId: string;

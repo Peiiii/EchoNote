@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AIAssistantCore } from "@/common/features/notes/components/ai-assistant-core/ai-assistant-core";
-import { aiAgentFactory } from "@/common/features/notes/services/ai-agent-factory";
+import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
+import { AIConversationMobile, MobileConversationRef } from "./ai-conversation-mobile";
 
 interface MobileAIAssistantProps {
     channelId: string;
@@ -12,31 +12,39 @@ export const MobileAIAssistant = ({
     channelId, 
     isOpen, 
 }: MobileAIAssistantProps) => {
-    const { channels } = useNotesDataStore();
-    const currentChannel = channels.find(ch => ch.id === channelId);
+    const { userId } = useNotesDataStore();
+    const {
+        conversations,
+        currentConversationId,
+        loading,
+        createConversation,
+        loadConversations,
+        selectConversation
+    } = useAIConversation();
+    const conversationRef = useRef<MobileConversationRef>(null);
 
-    // Create HttpAgent instance
-    const agent = useMemo(() => aiAgentFactory.createAgent(), []);
+    useEffect(() => {
+        if (userId && isOpen) {
+            loadConversations(userId, channelId);
+        }
+    }, [userId, channelId, isOpen, loadConversations]);
 
-    // Get channel-related tools
-    const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
+    const handleCreateConversation = async () => {
+        if (!userId) return;
+        await createConversation(userId, channelId, "New Conversation");
+    };
 
-    // Get channel context
-    const contexts = useMemo(() => {
-        const context = aiAgentFactory.getChannelContext(channelId);
-        return context;
-    }, [channelId]);
+    if (!isOpen) return null;
 
     return (
-        <AIAssistantCore
-            isOpen={isOpen}
-            channelName={currentChannel?.name}
-            agent={agent}
-            tools={tools}
-            contexts={contexts}
-            variant="fullscreen"
-            showHeader={true}
-            showFooter={true}
+        <AIConversationMobile
+            ref={conversationRef}
+            conversations={conversations}
+            currentConversationId={currentConversationId}
+            loading={loading}
+            onSelect={(id) => selectConversation(id)}
+            onCreate={handleCreateConversation}
+            channelId={channelId}
         />
     );
 };

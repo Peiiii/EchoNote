@@ -1,5 +1,5 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useAIConversation } from "@/common/hooks/use-ai-conversation";
+import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
 import { Plus, MessageSquare, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";

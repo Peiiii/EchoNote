@@ -1,5 +1,6 @@
-import { AIConversationList } from "./ai-conversation-list";
-import { AIConversationChat } from "./ai-conversation-chat";
+import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
+import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
+import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
 import { AIConversation } from "@/common/types/ai-conversation";
 
 interface Props {
@@ -31,24 +32,11 @@ export function AIConversationTwoPane({ conversations, currentConversationId, lo
         ) : hasConversations ? (
           <div className="flex-1" />
         ) : (
-          <EmptyPane onCreate={onCreate} />
+          <AIConversationEmptyPane onCreate={onCreate} />
         )}
       </div>
     </>
   );
 }
 
-function EmptyPane({ onCreate }: { onCreate: () => void }) {
-  return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
-        <p className="text-muted-foreground mb-4">Create a new conversation to start chatting</p>
-        <button onClick={onCreate} className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md px-3 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90">
-          Create Conversation
-        </button>
-      </div>
-    </div>
-  );
-}
 
