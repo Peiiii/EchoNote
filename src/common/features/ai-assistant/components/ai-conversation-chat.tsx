@@ -6,13 +6,9 @@ import { useEffect, useMemo } from "react";
 import { debounceTime } from "rxjs";
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
-interface AIConversationChatProps {
-  conversationId: string;
-  channelId: string;
-  onClose?: () => void;
-}
+import { ConversationChatProps } from "../types/conversation.types";
 
-export function AIConversationChat({ conversationId, channelId }: AIConversationChatProps) {
+export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
   const { messages, addMessage, loading } = useAgentChatSync(conversationId, channelId);
   return (

@@ -49,15 +49,7 @@ export class FirebaseAIConversationService {
   }
   
   async getConversations(userId: string, channelId?: string): Promise<AIConversation[]> {
-    let q = query(
-      collection(this.db, `users/${userId}/aiConversations`),
-      orderBy('lastMessageAt', 'desc')
-    );
-    
-    if (channelId) {
-      q = query(q, where('channelId', '==', channelId));
-    }
-    
+    const q = this.buildConversationsQuery(userId, channelId);
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToAIConversation(doc));
   }
@@ -222,6 +214,16 @@ export class FirebaseAIConversationService {
     callback: (conversations: AIConversation[]) => void,
     channelId?: string
   ): () => void {
+    const q = this.buildConversationsQuery(userId, channelId);
+    
+    return onSnapshot(q, (snapshot) => {
+      const conversations = snapshot.docs.map(doc => this.docToAIConversation(doc));
+      callback(conversations);
+    });
+  }
+  
+  // 辅助方法
+  private buildConversationsQuery(userId: string, channelId?: string) {
     let q = query(
       collection(this.db, `users/${userId}/aiConversations`),
       orderBy('lastMessageAt', 'desc')
@@ -231,13 +233,9 @@ export class FirebaseAIConversationService {
       q = query(q, where('channelId', '==', channelId));
     }
     
-    return onSnapshot(q, (snapshot) => {
-      const conversations = snapshot.docs.map(doc => this.docToAIConversation(doc));
-      callback(conversations);
-    });
+    return q;
   }
-  
-  // 辅助方法
+
   private docToAIConversation(doc: DocumentSnapshot): AIConversation {
     const data = doc.data()!;
     return {

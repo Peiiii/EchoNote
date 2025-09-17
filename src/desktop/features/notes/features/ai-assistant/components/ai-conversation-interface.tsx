@@ -1,24 +1,15 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
 import { useContainerMode } from "@/common/hooks/use-container-mode";
 import { AIConversationTwoPane } from "./ai-conversation-two-pane";
 import { AIConversationSinglePane, SinglePaneRef } from "./ai-conversation-single-pane";
+import { ConversationInterfaceProps, ConversationInterfaceRef } from "@/common/features/ai-assistant/types/conversation.types";
 
-interface AIConversationInterfaceProps {
-  channelId: string;
-  onClose?: () => void;
-}
+export type AIConversationInterfaceRef = ConversationInterfaceRef;
 
-export type AIConversationInterfaceRef = {
-  showList: () => void;
-  showChat: () => void;
-  createNew: () => void;
-  isSinglePane: () => boolean;
-};
-
-export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AIConversationInterfaceProps>(function AIConversationInterface({ channelId, onClose }, ref) {
+export const AIConversationInterface = forwardRef<ConversationInterfaceRef, ConversationInterfaceProps>(function AIConversationInterface({ channelId, onClose }, ref) {
   const { userId } = useNotesDataStore();
   const {
     conversations,
@@ -34,25 +25,24 @@ export const AIConversationInterface = forwardRef<AIConversationInterfaceRef, AI
   const isSinglePane = mode === "single-pane";
   
   const singleRef = useRef<SinglePaneRef>(null);
+
+  const handleCreateConversation = useCallback(async () => {
+    if (!userId) return;
+    await createConversation(userId, channelId, "New Conversation");
+  }, [userId, channelId, createConversation]);
+
   useImperativeHandle(ref, () => ({
     showList: () => singleRef.current?.showList(),
     showChat: () => singleRef.current?.showChat(),
     createNew: () => handleCreateConversation(),
     isSinglePane: () => isSinglePane,
-  }), [isSinglePane]);
+  }), [isSinglePane, handleCreateConversation]);
 
   useEffect(() => {
     if (userId) {
       loadConversations(userId, channelId);
     }
   }, [userId, channelId, loadConversations]);
-
-
-  const handleCreateConversation = async () => {
-    if (!userId) return;
-    await createConversation(userId, channelId, "New Conversation");
-    
-  };
 
 
   if (loading||!ready) {

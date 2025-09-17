@@ -1,25 +1,19 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
-import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
-import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
-import { AIConversation } from "@/common/types/ai-conversation";
+import { ConversationContent } from "@/common/features/ai-assistant/components/conversation-content";
+import { ConversationPaneProps, SinglePaneRef } from "@/common/features/ai-assistant/types/conversation.types";
 
-export type SinglePaneRef = {
-  showList: () => void;
-  showChat: () => void;
-};
+export type { SinglePaneRef };
 
-interface Props {
-  conversations: AIConversation[];
-  currentConversationId: string | null;
-  loading: boolean;
-  onSelect: (id: string) => void;
-  onCreate: () => void;
-  channelId: string;
-  onClose?: () => void;
-}
-
-export const AIConversationSinglePane = forwardRef<SinglePaneRef, Props>(function AIConversationSinglePane({ conversations, currentConversationId, loading, onSelect, onCreate, channelId, onClose }, ref) {
+export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPaneProps>(function AIConversationSinglePane({ 
+  conversations, 
+  currentConversationId, 
+  loading, 
+  onSelect, 
+  onCreate, 
+  channelId, 
+  onClose 
+}, ref) {
   const [view, setView] = useState<"list" | "chat">("chat");
   const hasConversations = conversations.length > 0;
 
@@ -28,31 +22,31 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, Props>(functio
     showChat: () => setView("chat"),
   }), []);
 
-  const renderListView = () => (
-    <AIConversationList
-      conversations={conversations}
-      currentConversationId={currentConversationId}
-      loading={loading}
-      onSelect={(id) => { onSelect(id); setView("chat"); }}
-      withHeader={false}
-    />
-  );
-
-  const renderChatView = () => {
-    if (currentConversationId) {
-      return <AIConversationChat conversationId={currentConversationId} channelId={channelId} onClose={onClose} />;
-    } else if (hasConversations) {
-      return <div className="flex-1" />;
-    } else {
-      return <AIConversationEmptyPane onCreate={onCreate} />;
-    }
-
+  const handleSelect = (id: string) => {
+    onSelect(id);
+    setView("chat");
   };
 
   return (
     <div className="relative flex-1">
-      <div className={"absolute inset-0 flex flex-col " + (view === "list" ? "" : "hidden")}>{renderListView()}</div>
-      <div className={"absolute inset-0 flex flex-col " + (view === "chat" ? "" : "hidden")}>{renderChatView()}</div>
+      <div className={"absolute inset-0 flex flex-col " + (view === "list" ? "" : "hidden")}>
+        <AIConversationList
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          loading={loading}
+          onSelect={handleSelect}
+          withHeader={false}
+        />
+      </div>
+      <div className={"absolute inset-0 flex flex-col " + (view === "chat" ? "" : "hidden")}>
+        <ConversationContent
+          currentConversationId={currentConversationId}
+          channelId={channelId}
+          hasConversations={hasConversations}
+          onCreate={onCreate}
+          onClose={onClose}
+        />
+      </div>
     </div>
   );
 });

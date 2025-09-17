@@ -1,12 +1,4 @@
-import { AIConversation } from "@/common/types/ai-conversation";
-
-interface ConversationListProps {
-  conversations: AIConversation[];
-  currentConversationId: string | null;
-  loading: boolean;
-  onSelect: (id: string) => void;
-  withHeader?: boolean;
-}
+import { ConversationListProps } from "../types/conversation.types";
 
 export function AIConversationList({
   conversations,

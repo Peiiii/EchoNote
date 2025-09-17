@@ -58,20 +58,18 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
   const renderChatView = () => {
     if (currentConversationId) {
       return <AIConversationChat conversationId={currentConversationId} channelId={channelId} onClose={onClose} />;
+    } else if(loading) {
+      return <div className="relative flex-1 flex flex-col">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
     } else if (hasConversations) {
       return <div className="flex-1" />;
     } else {
       return <AIConversationEmptyPane onCreate={onCreate} />;
     }
   };
-
-  if(loading) {
-    return <div className="relative flex-1 flex flex-col">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Loader2 className="w-4 h-4 animate-spin" />
-      </div>
-    </div>
-  }
 
   return (
     <div className="relative flex-1 flex flex-col">
