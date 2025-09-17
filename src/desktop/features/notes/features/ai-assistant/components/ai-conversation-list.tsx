@@ -1,12 +1,9 @@
-import { Plus, MessageSquare } from "lucide-react";
-import { Button } from "@/common/components/ui/button";
 import { AIConversation } from "@/common/types/ai-conversation";
 
 interface ConversationListProps {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
-  onCreate: () => void;
   onSelect: (id: string) => void;
   withHeader?: boolean;
 }
@@ -16,24 +13,12 @@ export function AIConversationList({
   conversations,
   currentConversationId,
   loading,
-  onCreate,
   onSelect,
   withHeader = true,
 }: ConversationListProps) {
   return (
     <div className="flex flex-col h-full">
-      {withHeader && (
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5" />
-            <h2 className="text-lg font-semibold">AI Conversations</h2>
-          </div>
-          <Button onClick={onCreate} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            New Conversation
-          </Button>
-        </div>
-      )}
+      {withHeader && <div className="p-4" />}
 
       <div className="flex-1 overflow-y-auto">
         {loading ? (
@@ -44,7 +29,7 @@ export function AIConversationList({
           conversations.map((conversation) => (
             <div
               key={conversation.id}
-              className={`p-3 cursor-pointer hover:bg-accent border-b border-border ${
+              className={`p-3 cursor-pointer hover:bg-accent ${
                 currentConversationId === conversation.id ? "bg-accent" : ""
               }`}
               onClick={() => onSelect(conversation.id)}
@@ -63,4 +48,3 @@ export function AIConversationList({
     </div>
   );
 }
-
