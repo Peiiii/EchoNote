@@ -63,6 +63,7 @@ export const MobileSidebarManager = ({
                     <SheetContent
                         side="bottom"
                         className="h-[80vh] p-0 border-t border-border"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
                     >
                         <MobileAIAssistant
                             channelId={currentChannelId}
