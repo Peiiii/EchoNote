@@ -1,5 +1,6 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { Plus, MessageSquare, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
@@ -16,15 +17,23 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
     const currentChannel = channels.find(ch => ch.id === channelId);
     const convRef = useRef<AIConversationInterfaceRef>(null);
     const { currentConversation } = useConversationState();
+    const uiView = useConversationStore(s => s.uiView);
+    const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
 
     if (!isOpen) return null;
+
+    const getTitle = () => {
+        if (uiView === 'list') return 'Conversations';
+        if (currentConversation) return titleGeneratingMap[currentConversation.id] ? "Generating Title..." : currentConversation.title || 'AI Conversations';
+        return 'AI Conversations';
+    };
 
     return (
         <div className="h-full flex flex-col">
             <div className="px-3 py-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="font-semibold text-foreground truncate">{currentConversation?.title || "AI Conversations"}</h3>
+                        <h3 className="font-semibold text-foreground truncate">{getTitle()}</h3>
                         {currentChannel && (
                             <span className="text-sm text-muted-foreground truncate">- {currentChannel.name}</span>
                         )}

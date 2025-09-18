@@ -1,6 +1,35 @@
 import { create } from "zustand";
 import { AIConversation } from "@/common/types/ai-conversation";
 import { firebaseAIConversationService } from "@/common/services/firebase/firebase-ai-conversation.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import type { UIMessage } from "@agent-labs/agent-chat";
+import { handleAutoTitleSnapshot } from "@/common/features/ai-assistant/services/title-generator.service";
+
+function shouldGenerateTitleForConversation(conversation: AIConversation, state: State, messages: UIMessage[]): boolean {
+  if(conversation.id.startsWith("temp-")) {
+    return false;
+  }
+
+  if (state.autoTitleDone[conversation.id]) {
+    return false;
+  }
+
+  if (state.titleGeneratingMap[conversation.id]) {
+    return false;
+  }
+
+  const hasUserMessage = messages.some(m => m.role === 'user');
+  if (!hasUserMessage) {
+    return false;
+  }
+
+  const isDefaultTitle = !conversation.title ||
+    /^New Conversation/i.test(conversation.title) ||
+    conversation.title.startsWith('temp-') ||
+    conversation.title === 'Generating title...';
+
+  return isDefaultTitle;
+}
 
 type State = {
   conversations: AIConversation[];
@@ -10,6 +39,12 @@ type State = {
   selectionTick: number;
   uiView: 'list' | 'chat';
   deletingIds: string[];
+  showArchived: boolean;
+  query: string;
+  titleGeneratingMap: Record<string, boolean>;
+  autoTitleEnabled: boolean;
+  autoTitleDone: Record<string, boolean>;
+  autoTitleMode: 'deterministic' | 'ai' | 'auto';
 };
 
 type Actions = {
@@ -22,6 +57,16 @@ type Actions = {
   showList: () => void;
   showChat: () => void;
   setView: (v: 'list' | 'chat') => void;
+  setShowArchived: (v: boolean) => void;
+  setQuery: (q: string) => void;
+  archiveConversation: (userId: string, conversationId: string) => Promise<void>;
+  unarchiveConversation: (userId: string, conversationId: string) => Promise<void>;
+  setTitleGenerating: (id: string) => void;
+  completeTitleGenerating: (id: string) => void;
+  clearTitleGenerating: (id: string) => void;
+  setAutoTitleDone: (id: string) => void;
+  setAutoTitleMode: (m: 'deterministic' | 'ai' | 'auto') => void;
+  onMessagesSnapshot: (conversationId: string, messages: UIMessage[]) => void;
 };
 
 export const useConversationStore = create<State & Actions>((set, get) => ({
@@ -32,6 +77,13 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   selectionTick: 0,
   uiView: 'chat',
   deletingIds: [],
+  showArchived: false,
+  query: '',
+  titleGeneratingMap: {},
+  autoTitleEnabled: true,
+  autoTitleDone: {},
+  autoTitleMode: 'deterministic',
+  // autoTitleMode: 'ai',
 
   async createConversation(userId, channelId, title) {
     set({ error: null });
@@ -130,5 +182,64 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
   setView(v) {
     set({ uiView: v });
+  },
+
+  setShowArchived(v) {
+    set({ showArchived: v });
+  },
+  setQuery(q) {
+    set({ query: q });
+  },
+
+  async archiveConversation(userId, conversationId) {
+    await firebaseAIConversationService.updateConversation(userId, conversationId, { isArchived: true, updatedAt: new Date() });
+    set(s => ({ conversations: s.conversations.map(c => c.id === conversationId ? { ...c, isArchived: true } : c) }));
+  },
+  async unarchiveConversation(userId, conversationId) {
+    await firebaseAIConversationService.updateConversation(userId, conversationId, { isArchived: false, updatedAt: new Date() });
+    set(s => ({ conversations: s.conversations.map(c => c.id === conversationId ? { ...c, isArchived: false } : c) }));
+  },
+
+  setTitleGenerating(id: string) {
+    set(s => ({ titleGeneratingMap: { ...s.titleGeneratingMap, [id]: true } }));
+  },
+  completeTitleGenerating(id: string) {
+    set(s => { const t = { ...s.titleGeneratingMap }; delete t[id]; return { titleGeneratingMap: t }; });
+  },
+  clearTitleGenerating(id: string) {
+    set(s => { const t = { ...s.titleGeneratingMap }; delete t[id]; return { titleGeneratingMap: t }; });
+  },
+  setAutoTitleDone(id: string) {
+    set(s => ({ autoTitleDone: { ...s.autoTitleDone, [id]: true } }));
+  },
+  setAutoTitleMode(m: 'deterministic' | 'ai' | 'auto') {
+    set({ autoTitleMode: m });
+  },
+
+  onMessagesSnapshot(conversationId, messages) {
+    const state = get();
+    const conv = state.conversations.find(c => c.id === conversationId);
+    if (!conv) return;
+
+    if (!shouldGenerateTitleForConversation(conv, state, messages)) {
+      return;
+    }
+
+    void handleAutoTitleSnapshot({
+      conversationId,
+      conversation: conv,
+      messages,
+      autoTitleEnabled: state.autoTitleEnabled,
+      autoTitleMode: state.autoTitleMode,
+      autoTitleDone: state.autoTitleDone,
+      getUserId: () => useNotesDataStore.getState().userId,
+      update: async (userId, id, title) => {
+        await firebaseAIConversationService.updateConversation(userId, id, { title });
+      },
+      applyLocal: (id, title) => set(s => ({ conversations: s.conversations.map(c => (c.id === id ? { ...c, title } : c)) })),
+      markDone: (id) => set(s => ({ autoTitleDone: { ...s.autoTitleDone, [id]: true } })),
+      setTitleGenerating: (id) => get().setTitleGenerating(id),
+      completeTitleGenerating: (id) => get().completeTitleGenerating(id),
+    });
   },
 }));

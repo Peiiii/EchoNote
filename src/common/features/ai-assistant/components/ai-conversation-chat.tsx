@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 import { ConversationChatProps } from "../types/conversation.types";
@@ -62,6 +63,8 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   useEffect(() => {
     const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
       setSessionMessages(arr);
+      // Feed messages to store for auto-title evaluation (no AI call here; store handles policy)
+      useConversationStore.getState().onMessagesSnapshot(conversationId, arr);
     });
     return () => sub.unsubscribe();
   }, [agentSessionManager]);
@@ -81,19 +84,15 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     debounceMs: 1000,
   });
 
-  const { conversations, updateConversation } = useConversationState();
+  const { conversations } = useConversationState();
+  const autoTitleDoneMap = useConversationStore(s => s.autoTitleDone);
   useEffect(() => {
+    if (autoTitleDoneMap && autoTitleDoneMap[conversationId]) return;
     const conv = conversations.find(c => c.id === conversationId);
     if (!conv) return;
-    const defaultTitle = !conv.title || /^New Conversation/i.test(conv.title) || conv.title.startsWith('temp-');
-    if (!defaultTitle) return;
-    const firstUserText = sessionMessages.find(m => m.role === 'user')?.parts.find(p => p.type === 'text');
-    const text = firstUserText?.text?.trim?.();
-    if (!text) return;
-    const title = text.replace(/\s+/g, ' ').slice(0, 36);
-    if (title.length === 0) return;
-    updateConversation?.(conv.userId, conversationId, { title });
-  }, [conversations, sessionMessages, conversationId, updateConversation]);
+    // Ensure store sees initial static messages too
+    useConversationStore.getState().onMessagesSnapshot(conversationId, sessionMessages);
+  }, [conversations, sessionMessages, conversationId, autoTitleDoneMap]);
 
   return (
     <AgentChatCore
