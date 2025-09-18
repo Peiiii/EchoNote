@@ -2,15 +2,16 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { AgentChatCore, useAgentSessionManager, useParseTools, UIMessage } from "@agent-labs/agent-chat";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
+import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 import { ConversationChatProps } from "../types/conversation.types";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
-  const { messages, addMessage, loading } = useAgentChatSync(conversationId, channelId);
+  const { messages, createMessage, updateMessage, loading } = useAgentChatSync(conversationId, channelId);
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
@@ -26,7 +27,8 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
-            addMessage={addMessage}
+            createMessage={createMessage}
+            updateMessage={updateMessage}
           />
         )}
       </div>
@@ -38,10 +40,11 @@ interface AgentChatCoreWrapperProps {
   conversationId: string;
   channelId: string;
   messages: UIMessage[];
-  addMessage: (message: UIMessage) => Promise<void>;
+  createMessage: (message: UIMessage) => Promise<void>;
+  updateMessage: (message: UIMessage) => Promise<void>;
 }
 
-function AgentChatCoreWrapper({ conversationId: _conversationId, channelId, messages, addMessage }: AgentChatCoreWrapperProps) {
+function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
   const agent = useMemo(() => aiAgentFactory.createAgent(), []);
   const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
   const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
@@ -53,19 +56,28 @@ function AgentChatCoreWrapper({ conversationId: _conversationId, channelId, mess
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
+  const [sessionMessages, setSessionMessages] = useState<UIMessage[]>(messages);
   useEffect(() => {
-    const subscription = agentSessionManager.messages$.pipe(
-      debounceTime(1000)
-    ).subscribe(async (newMessages) => {
-      for (const message of newMessages) {
-        if (!message.id.startsWith('temp-')) {
-          await addMessage(message);
-        }
-      }
+    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
+      setSessionMessages(arr);
     });
+    return () => sub.unsubscribe();
+  }, [agentSessionManager]);
 
-    return () => subscription.unsubscribe();
-  }, [agentSessionManager, addMessage]);
+  const hash = (m: UIMessage) => JSON.stringify({ role: m.role, parts: m.parts });
+  useCollectionDiff<UIMessage>({
+    items: sessionMessages,
+    getId: (m) => (m.id ? m.id : null),
+    hash,
+    onAdd: async (m) => { 
+      console.log("[AgentChatCoreWrapper] onAdd", m);
+      await createMessage(m); },
+    onUpdate: async (m) => { 
+      console.log("[AgentChatCoreWrapper] onUpdate", m);
+      await updateMessage(m); },
+    resetKey: conversationId,
+    debounceMs: 1000,
+  });
 
   return (
     <AgentChatCore

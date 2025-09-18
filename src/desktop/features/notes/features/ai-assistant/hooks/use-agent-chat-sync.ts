@@ -32,9 +32,14 @@ export function useAgentChatSync(conversationId: string, _channelId: string) {
     return unsubscribe;
   }, [userId, conversationId]);
   
-  const addMessage = useCallback(async (message: UIMessage) => {
+  const createMessage = useCallback(async (message: UIMessage) => {
     if (!userId) return;
-    await firebaseAIConversationService.addMessage(userId, conversationId, message);
+    await firebaseAIConversationService.createMessage(userId, conversationId, message);
+  }, [userId, conversationId]);
+
+  const updateMessage = useCallback(async (message: UIMessage) => {
+    if (!userId) return;
+    await firebaseAIConversationService.updateMessage(userId, conversationId, message.id, message);
   }, [userId, conversationId]);
   
   const loadMoreMessages = useCallback(async (options?: MessageListOptions) => {
@@ -51,7 +56,8 @@ export function useAgentChatSync(conversationId: string, _channelId: string) {
   return { 
     messages, 
     loading, 
-    addMessage, 
+    createMessage, 
+    updateMessage,
     loadMoreMessages 
   };
 }

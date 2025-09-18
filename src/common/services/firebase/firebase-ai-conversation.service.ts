@@ -83,14 +83,13 @@ export class FirebaseAIConversationService {
     );
   }
   
-  // 消息管理
   async addMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
     const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
     const messageDoc = await getDoc(messageRef);
     const isNewMessage = !messageDoc.exists();
     
     if (isNewMessage) {
-      // 新消息：使用 setDoc 创建
+      console.log("[FirebaseAIConversationService] addMessage new message", message);
       await setDoc(
         messageRef,
         {
@@ -100,7 +99,7 @@ export class FirebaseAIConversationService {
         }
       );
     } else {
-      // 更新消息：使用 updateDoc 更新
+      console.log("[FirebaseAIConversationService] addMessage existing message", message);
       await updateDoc(
         messageRef,
         {
@@ -125,10 +124,25 @@ export class FirebaseAIConversationService {
       updateData.messageCount = increment(1);
     }
     
-    await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}`),
-      updateData
-    );
+    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), updateData);
+  }
+
+  async createMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
+    const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
+    const messageDoc = await getDoc(messageRef);
+    if (messageDoc.exists()) {
+      return;
+    }
+    await setDoc(messageRef, {
+      ...message,
+      conversationId,
+      timestamp: serverTimestamp(),
+    });
+    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
+      lastMessageAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      messageCount: increment(1),
+    });
   }
   
   async getMessages(userId: string, conversationId: string): Promise<UIMessage[]> {
@@ -171,14 +185,13 @@ export class FirebaseAIConversationService {
     return snapshot.docs.map(doc => this.docToUIMessage(doc));
   }
   
-  async updateMessage(userId: string, conversationId: string, messageId: string, updates: Partial<UIMessage>): Promise<void> {
-    await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
-      {
-        ...updates,
-        updatedAt: serverTimestamp(),
-      }
-    );
+  async updateMessage(userId: string, conversationId: string, messageId: string, updates: Partial<UIMessage> | UIMessage): Promise<void> {
+    const updateData = {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    };
+    
+    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`), updateData);
   }
   
   async deleteMessage(userId: string, conversationId: string, messageId: string): Promise<void> {
