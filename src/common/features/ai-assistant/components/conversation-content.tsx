@@ -1,22 +1,18 @@
 import { AIConversationChat } from "./ai-conversation-chat";
 import { AIConversationEmptyPane } from "./ai-conversation-empty-pane";
+import { useConversationState } from "../hooks/use-conversation-state";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 interface ConversationContentProps {
   currentConversationId: string | null;
   channelId: string;
   hasConversations: boolean;
-  onCreate: () => void;
   onClose?: () => void;
 }
 
-export function ConversationContent({
-  currentConversationId,
-  channelId,
-  hasConversations,
-  onCreate,
-  onClose
-}: ConversationContentProps) {
-  console.log("[ConversationContent]", { currentConversationId, hasConversations });
+export function ConversationContent({ currentConversationId, channelId, hasConversations, onClose }: ConversationContentProps) {
+  const { createConversation } = useConversationState();
+  const { userId } = useNotesDataStore();
   if (currentConversationId) {
     return (
       <AIConversationChat
@@ -31,5 +27,5 @@ export function ConversationContent({
     return <div className="flex-1" />;
   }
 
-  return <AIConversationEmptyPane onCreate={onCreate} />;
+  return <AIConversationEmptyPane onCreate={() => { if (userId) void createConversation(userId, channelId, "New Conversation"); }} />;
 }

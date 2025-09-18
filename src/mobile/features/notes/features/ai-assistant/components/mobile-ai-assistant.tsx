@@ -18,8 +18,7 @@ export const MobileAIAssistant = ({
         currentConversationId,
         loading,
         createConversation,
-        loadConversations,
-        selectConversation
+        loadConversations
     } = useConversationState();
     const conversationRef = useRef<MobileConversationRef>(null);
 
@@ -42,7 +41,6 @@ export const MobileAIAssistant = ({
             conversations={conversations}
             currentConversationId={currentConversationId}
             loading={loading}
-            onSelect={(id) => selectConversation(id)}
             onCreate={handleCreateConversation}
             channelId={channelId}
         />

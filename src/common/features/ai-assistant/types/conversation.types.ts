@@ -4,8 +4,6 @@ export interface ConversationListProps {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
-  onSelect: (id: string) => void;
-  onDelete?: (id: string) => void;
   withHeader?: boolean;
 }
 
@@ -13,9 +11,6 @@ export interface ConversationPaneProps {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
-  onSelect: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onCreate: () => void;
   channelId: string;
   onClose?: () => void;
 }

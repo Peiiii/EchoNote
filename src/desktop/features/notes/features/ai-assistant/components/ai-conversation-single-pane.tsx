@@ -1,7 +1,8 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
 import { ConversationContent } from "@/common/features/ai-assistant/components/conversation-content";
 import { ConversationPaneProps, SinglePaneRef } from "@/common/features/ai-assistant/types/conversation.types";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 
 export type { SinglePaneRef };
 
@@ -9,24 +10,20 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
   conversations, 
   currentConversationId, 
   loading, 
-  onSelect, 
-  onDelete,
-  onCreate, 
   channelId, 
   onClose 
 }, ref) {
-  const [view, setView] = useState<"list" | "chat">("chat");
+  const view = useConversationStore(s => s.uiView);
+  const showList = useConversationStore(s => s.showList);
+  const showChat = useConversationStore(s => s.showChat);
   const hasConversations = conversations.length > 0;
 
   useImperativeHandle(ref, () => ({
-    showList: () => setView("list"),
-    showChat: () => setView("chat"),
-  }), []);
+    showList: () => showList(),
+    showChat: () => showChat(),
+  }), [showList, showChat]);
 
-  const handleSelect = (id: string) => {
-    onSelect(id);
-    setView("chat");
-  };
+  
 
   return (
     <div className="relative flex-1">
@@ -35,8 +32,7 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
           conversations={conversations}
           currentConversationId={currentConversationId}
           loading={loading}
-          onSelect={handleSelect}
-          onDelete={onDelete}
+          
           withHeader={false}
         />
       </div>
@@ -45,7 +41,6 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
           currentConversationId={currentConversationId}
           channelId={channelId}
           hasConversations={hasConversations}
-          onCreate={onCreate}
           onClose={onClose}
         />
       </div>

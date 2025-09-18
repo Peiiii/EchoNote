@@ -6,9 +6,6 @@ export function AIConversationTwoPane({
   conversations, 
   currentConversationId, 
   loading, 
-  onSelect, 
-  onDelete,
-  onCreate, 
   channelId, 
   onClose 
 }: ConversationPaneProps) {
@@ -21,8 +18,6 @@ export function AIConversationTwoPane({
           conversations={conversations}
           currentConversationId={currentConversationId}
           loading={loading}
-          onSelect={onSelect}
-          onDelete={onDelete}
           withHeader={false}
         />
       </div>
@@ -31,11 +26,9 @@ export function AIConversationTwoPane({
           currentConversationId={currentConversationId}
           channelId={channelId}
           hasConversations={hasConversations}
-          onCreate={onCreate}
           onClose={onClose}
         />
       </div>
     </>
   );
 }
-

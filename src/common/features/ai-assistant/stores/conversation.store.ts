@@ -7,6 +7,9 @@ type State = {
   currentConversationId: string | null;
   loading: boolean;
   error: string | null;
+  selectionTick: number;
+  uiView: 'list' | 'chat';
+  deletingIds: string[];
 };
 
 type Actions = {
@@ -16,6 +19,9 @@ type Actions = {
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (userId: string, conversationId: string, updates: Partial<AIConversation>) => Promise<void>;
   clearError: () => void;
+  showList: () => void;
+  showChat: () => void;
+  setView: (v: 'list' | 'chat') => void;
 };
 
 export const useConversationStore = create<State & Actions>((set, get) => ({
@@ -23,6 +29,9 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   currentConversationId: null,
   loading: true,
   error: null,
+  selectionTick: 0,
+  uiView: 'chat',
+  deletingIds: [],
 
   async createConversation(userId, channelId, title) {
     set({ error: null });
@@ -38,12 +47,13 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       messageCount: 0,
       isArchived: false,
     };
-    set(s => ({ conversations: [optimistic, ...s.conversations], currentConversationId: tempId }));
+    set(s => ({ conversations: [optimistic, ...s.conversations], currentConversationId: tempId, uiView: 'chat' }));
     try {
       const created = await firebaseAIConversationService.createConversation(userId, channelId, title);
       set(s => ({
         conversations: s.conversations.map(c => (c.id === tempId ? created : c)),
         currentConversationId: created.id,
+        uiView: 'chat',
       }));
       return created;
     } catch (err) {
@@ -71,21 +81,30 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   selectConversation(conversationId) {
-    set({ currentConversationId: conversationId });
+    set(s => ({ currentConversationId: conversationId, selectionTick: s.selectionTick + 1, uiView: 'chat' }));
   },
 
   async deleteConversation(userId, conversationId) {
-    set({ loading: true, error: null });
+    set(s => ({ error: null, deletingIds: [...s.deletingIds, conversationId] }));
+    const prev = get().conversations;
+    const wasCurrent = get().currentConversationId === conversationId;
+    // optimistic remove
+    set(s => ({
+      conversations: s.conversations.filter(c => c.id !== conversationId),
+      currentConversationId: wasCurrent ? null : s.currentConversationId,
+    }));
     try {
       await firebaseAIConversationService.deleteConversation(userId, conversationId);
-      set(s => ({
-        conversations: s.conversations.filter(c => c.id !== conversationId),
-        currentConversationId: s.currentConversationId === conversationId ? null : s.currentConversationId,
-        loading: false,
-      }));
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : "Failed to delete conversation" });
+      // revert on failure
+      set({
+        conversations: prev,
+        currentConversationId: wasCurrent ? conversationId : get().currentConversationId,
+        error: err instanceof Error ? err.message : "Failed to delete conversation",
+      });
       throw err as Error;
+    } finally {
+      set(s => ({ deletingIds: s.deletingIds.filter(id => id !== conversationId) }));
     }
   },
 
@@ -102,5 +121,14 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   clearError() {
     set({ error: null });
   },
-}));
 
+  showList() {
+    set({ uiView: 'list' });
+  },
+  showChat() {
+    set({ uiView: 'chat' });
+  },
+  setView(v) {
+    set({ uiView: v });
+  },
+}));

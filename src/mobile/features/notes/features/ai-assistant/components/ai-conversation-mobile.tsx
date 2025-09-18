@@ -1,10 +1,11 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useEffect } from "react";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
 import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
 import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
 import { AIConversation } from "@/common/types/ai-conversation";
 import { Button } from "@/common/components/ui/button";
 import { Plus, MessageSquare, ArrowLeft, Loader2 } from "lucide-react";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 
 export type MobileConversationRef = {
   showList: () => void;
@@ -17,7 +18,6 @@ interface Props {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
-  onSelect: (id: string) => void;
   onCreate: () => void;
   channelId: string;
   onClose?: () => void;
@@ -27,33 +27,39 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
   conversations, 
   currentConversationId, 
   loading, 
-  onSelect, 
   onCreate, 
   channelId, 
   onClose 
 }, ref) {
-  const [view, setView] = useState<"list" | "chat">("chat");
+  const view = useConversationStore(s => s.uiView);
+  const showList = useConversationStore(s => s.showList);
+  const showChat = useConversationStore(s => s.showChat);
   const hasConversations = conversations.length > 0;
+  const selectionTick = useConversationStore(s => s.selectionTick);
 
   useImperativeHandle(ref, () => ({
-    showList: () => setView("list"),
-    showChat: () => setView("chat"),
-    createNew: () => {
-      onCreate();
-      setView("chat");
-    },
+    showList: () => showList(),
+    showChat: () => showChat(),
+    createNew: () => { onCreate(); showChat(); },
     isListView: () => view === "list",
-  }), [onCreate, view]);
+  }), [onCreate, showList, showChat, view]);
 
   const renderListView = () => (
     <AIConversationList
       conversations={conversations}
       currentConversationId={currentConversationId}
       loading={loading}
-      onSelect={(id) => { onSelect(id); setView("chat"); }}
       withHeader={false}
     />
   );
+
+  useEffect(() => {
+    if (view === 'list' && currentConversationId) showChat();
+  }, [view, currentConversationId, showChat]);
+
+  useEffect(() => {
+    if (view === 'list' && selectionTick > 0) showChat();
+  }, [view, selectionTick, showChat]);
 
   const renderChatView = () => {
     if (currentConversationId) {
@@ -80,7 +86,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setView("list")}
+              onClick={() => showList()}
               aria-label="Show conversations"
               className="h-8 w-8 flex-shrink-0"
             >
@@ -91,7 +97,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setView("chat")}
+              onClick={() => showChat()}
               aria-label="Back to chat"
               className="h-8 w-8 flex-shrink-0"
             >
@@ -106,10 +112,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              onCreate();
-              setView("chat");
-            }}
+            onClick={() => { onCreate(); showChat(); }}
             aria-label="New conversation"
             className="h-8 w-8"
           >
