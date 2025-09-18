@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
-import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
+import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 import { ConversationChatProps } from "../types/conversation.types";
@@ -13,6 +13,7 @@ import { ConversationChatProps } from "../types/conversation.types";
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
   const { messages, createMessage, updateMessage, loading } = useAgentChatSync(conversationId, channelId);
+  console.log("[AIConversationChat] loading", loading);
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
@@ -80,7 +81,7 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     debounceMs: 1000,
   });
 
-  const { conversations, updateConversation } = useAIConversation();
+  const { conversations, updateConversation } = useConversationState();
   useEffect(() => {
     const conv = conversations.find(c => c.id === conversationId);
     if (!conv) return;

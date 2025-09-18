@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
+import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useContainerMode } from "@/common/hooks/use-container-mode";
 import { AIConversationTwoPane } from "./ai-conversation-two-pane";
 import { AIConversationSinglePane, SinglePaneRef } from "./ai-conversation-single-pane";
@@ -19,7 +19,7 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
     loadConversations,
     selectConversation,
     deleteConversation
-  } = useAIConversation();
+  } = useConversationState();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { mode, ready } = useContainerMode(containerRef, { sidebar: 320, chatMin: 520, hysteresis: 12, debounceMs: 80 });

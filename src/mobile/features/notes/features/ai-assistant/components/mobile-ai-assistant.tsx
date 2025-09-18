@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
+import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { AIConversationMobile, MobileConversationRef } from "./ai-conversation-mobile";
 
 interface MobileAIAssistantProps {
@@ -20,7 +20,7 @@ export const MobileAIAssistant = ({
         createConversation,
         loadConversations,
         selectConversation
-    } = useAIConversation();
+    } = useConversationState();
     const conversationRef = useRef<MobileConversationRef>(null);
 
     useEffect(() => {

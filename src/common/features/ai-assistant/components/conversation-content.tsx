@@ -9,26 +9,27 @@ interface ConversationContentProps {
   onClose?: () => void;
 }
 
-export function ConversationContent({ 
-  currentConversationId, 
-  channelId, 
-  hasConversations, 
-  onCreate, 
-  onClose 
+export function ConversationContent({
+  currentConversationId,
+  channelId,
+  hasConversations,
+  onCreate,
+  onClose
 }: ConversationContentProps) {
+  console.log("[ConversationContent]", { currentConversationId, hasConversations });
   if (currentConversationId) {
     return (
-      <AIConversationChat 
-        conversationId={currentConversationId} 
-        channelId={channelId} 
-        onClose={onClose} 
+      <AIConversationChat
+        conversationId={currentConversationId}
+        channelId={channelId}
+        onClose={onClose}
       />
     );
   }
-  
+
   if (hasConversations) {
     return <div className="flex-1" />;
   }
-  
+
   return <AIConversationEmptyPane onCreate={onCreate} />;
 }

@@ -52,7 +52,7 @@ users/{userId}/aiConversations/{conversationId}
 
 - **AIConversationInterface**: Conversation list + chat UI
 - **AIConversationChat**: AgentChatCore wrapper with loading states
-- **useAIConversation**: Conversation CRUD operations
+- **useConversationState**: Conversation CRUD operations
 - **useAgentChatSync**: Message sync with Firebase
 
 ## Key Features
@@ -66,7 +66,7 @@ users/{userId}/aiConversations/{conversationId}
 ## Usage
 
 ```typescript
-const { conversations, createConversation, selectConversation } = useAIConversation();
+const { conversations, createConversation, selectConversation } = useConversationState();
 const { messages, addMessage, loading } = useAgentChatSync(conversationId, channelId);
 ```
 

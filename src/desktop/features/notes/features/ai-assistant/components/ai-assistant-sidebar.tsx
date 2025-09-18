@@ -1,5 +1,5 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
+import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { Plus, MessageSquare, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
@@ -15,7 +15,7 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
     const { channels } = useNotesDataStore();
     const currentChannel = channels.find(ch => ch.id === channelId);
     const convRef = useRef<AIConversationInterfaceRef>(null);
-    const { currentConversation } = useAIConversation();
+    const { currentConversation } = useConversationState();
 
     if (!isOpen) return null;
 
