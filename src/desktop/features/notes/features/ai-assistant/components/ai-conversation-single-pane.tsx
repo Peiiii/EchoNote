@@ -10,6 +10,7 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
   currentConversationId, 
   loading, 
   onSelect, 
+  onDelete,
   onCreate, 
   channelId, 
   onClose 
@@ -35,6 +36,7 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
           currentConversationId={currentConversationId}
           loading={loading}
           onSelect={handleSelect}
+          onDelete={onDelete}
           withHeader={false}
         />
       </div>
@@ -50,4 +52,3 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
     </div>
   );
 });
-

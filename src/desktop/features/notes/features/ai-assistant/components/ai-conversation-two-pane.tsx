@@ -7,6 +7,7 @@ export function AIConversationTwoPane({
   currentConversationId, 
   loading, 
   onSelect, 
+  onDelete,
   onCreate, 
   channelId, 
   onClose 
@@ -21,6 +22,7 @@ export function AIConversationTwoPane({
           currentConversationId={currentConversationId}
           loading={loading}
           onSelect={onSelect}
+          onDelete={onDelete}
           withHeader={false}
         />
       </div>
@@ -36,5 +38,4 @@ export function AIConversationTwoPane({
     </>
   );
 }
-
 

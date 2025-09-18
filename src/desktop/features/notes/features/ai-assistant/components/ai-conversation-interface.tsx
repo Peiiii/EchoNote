@@ -17,7 +17,8 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
     loading,
     createConversation,
     loadConversations,
-    selectConversation
+    selectConversation,
+    deleteConversation
   } = useAIConversation();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,6 +61,7 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
           currentConversationId={currentConversationId}
           loading={loading}
           onSelect={(id) => selectConversation(id)}
+          onDelete={(id) => { if (!userId) return; void deleteConversation(userId, id); }}
           onCreate={handleCreateConversation}
           channelId={channelId}
           onClose={onClose}
@@ -71,6 +73,7 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
           currentConversationId={currentConversationId}
           loading={loading}
           onSelect={(id) => selectConversation(id)}
+          onDelete={(id) => { if (!userId) return; void deleteConversation(userId, id); }}
           onCreate={handleCreateConversation}
           channelId={channelId}
           onClose={onClose}

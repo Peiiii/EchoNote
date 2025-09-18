@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
+import { useAIConversation } from "@/common/features/ai-assistant/hooks/use-ai-conversation";
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 import { ConversationChatProps } from "../types/conversation.types";
@@ -78,6 +79,20 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     resetKey: conversationId,
     debounceMs: 1000,
   });
+
+  const { conversations, updateConversation } = useAIConversation();
+  useEffect(() => {
+    const conv = conversations.find(c => c.id === conversationId);
+    if (!conv) return;
+    const defaultTitle = !conv.title || /^New Conversation/i.test(conv.title) || conv.title.startsWith('temp-');
+    if (!defaultTitle) return;
+    const firstUserText = sessionMessages.find(m => m.role === 'user')?.parts.find(p => p.type === 'text') as any;
+    const text = firstUserText?.text?.trim?.();
+    if (!text) return;
+    const title = text.replace(/\s+/g, ' ').slice(0, 36);
+    if (title.length === 0) return;
+    updateConversation && updateConversation(conv.userId, conversationId, { title });
+  }, [conversations, sessionMessages, conversationId, updateConversation]);
 
   return (
     <AgentChatCore
