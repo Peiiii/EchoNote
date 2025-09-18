@@ -86,12 +86,12 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     if (!conv) return;
     const defaultTitle = !conv.title || /^New Conversation/i.test(conv.title) || conv.title.startsWith('temp-');
     if (!defaultTitle) return;
-    const firstUserText = sessionMessages.find(m => m.role === 'user')?.parts.find(p => p.type === 'text') as any;
+    const firstUserText = sessionMessages.find(m => m.role === 'user')?.parts.find(p => p.type === 'text');
     const text = firstUserText?.text?.trim?.();
     if (!text) return;
     const title = text.replace(/\s+/g, ' ').slice(0, 36);
     if (title.length === 0) return;
-    updateConversation && updateConversation(conv.userId, conversationId, { title });
+    updateConversation?.(conv.userId, conversationId, { title });
   }, [conversations, sessionMessages, conversationId, updateConversation]);
 
   return (
