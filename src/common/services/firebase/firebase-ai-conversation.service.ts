@@ -112,7 +112,11 @@ export class FirebaseAIConversationService {
     }
     
     // 更新对话的 lastMessageAt 和 messageCount（只有新消息才增加计数）
-    const updateData: any = {
+    const updateData: {
+      lastMessageAt: ReturnType<typeof serverTimestamp>;
+      updatedAt: ReturnType<typeof serverTimestamp>;
+      messageCount?: ReturnType<typeof increment>;
+    } = {
       lastMessageAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
