@@ -91,7 +91,7 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                       />
                     ) : (
                       <span onDoubleClick={(e) => { e.stopPropagation(); setEditingId(c.id); setDraftTitle(c.title || ''); }}>
-                        {titleGeneratingMap[c.id] || c.title || "New Conversation"}
+                        {titleGeneratingMap[c.id] ? "Generating title..." : (c.title || "New Conversation")}
                       </span>
                     )}
                     {c.isArchived && <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground">Archived</span>}
