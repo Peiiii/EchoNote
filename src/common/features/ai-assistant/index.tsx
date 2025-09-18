@@ -13,4 +13,4 @@ export { channelContextManager } from './services/channel-context-manager';
 export { channelToolsManager } from './services/channel-tools-manager';
 
 // Hooks
-export { useConversationState } from './hooks/use-ai-conversation';
+export { useConversationState } from './hooks/use-conversation-state';
