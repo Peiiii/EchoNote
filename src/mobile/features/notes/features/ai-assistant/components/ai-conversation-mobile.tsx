@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useEffect } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
 import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
 import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
@@ -35,7 +35,6 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
   const showList = useConversationStore(s => s.showList);
   const showChat = useConversationStore(s => s.showChat);
   const hasConversations = conversations.length > 0;
-  const selectionTick = useConversationStore(s => s.selectionTick);
 
   useImperativeHandle(ref, () => ({
     showList: () => showList(),
@@ -53,13 +52,6 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(fun
     />
   );
 
-  useEffect(() => {
-    if (view === 'list' && currentConversationId) showChat();
-  }, [view, currentConversationId, showChat]);
-
-  useEffect(() => {
-    if (view === 'list' && selectionTick > 0) showChat();
-  }, [view, selectionTick, showChat]);
 
   const renderChatView = () => {
     if (currentConversationId) {
