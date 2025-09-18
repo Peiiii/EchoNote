@@ -82,8 +82,8 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   titleGeneratingMap: {},
   autoTitleEnabled: true,
   autoTitleDone: {},
-  autoTitleMode: 'deterministic',
-  // autoTitleMode: 'ai',
+  // autoTitleMode: 'deterministic',
+  autoTitleMode: 'ai',
 
   async createConversation(userId, channelId, title) {
     set({ error: null });
