@@ -29,9 +29,9 @@ export const MobileAIAssistant = ({
         }
     }, [userId, channelId, isOpen, loadConversations]);
 
-    const handleCreateConversation = async () => {
+    const handleCreateConversation = () => {
         if (!userId) return;
-        await createConversation(userId, channelId, "New Conversation");
+        void createConversation(userId, channelId, "New Conversation");
     };
 
     if (!isOpen) return null;

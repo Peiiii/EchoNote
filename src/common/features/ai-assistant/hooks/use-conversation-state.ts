@@ -31,21 +31,34 @@ export function useConversationState(): ConversationState & ConversationActions 
   );
 
   const createConversation = useCallback(async (userId: string, channelId: string, title: string) => {
-    setLoading(true);
     setError(null);
+    const tempId = `temp-${crypto.randomUUID()}`;
+    const optimistic: AIConversation = {
+      id: tempId,
+      title,
+      channelId,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastMessageAt: new Date(),
+      messageCount: 0,
+      isArchived: false,
+    };
+    setConversations(prev => [optimistic, ...prev]);
+    setCurrentConversationId(tempId);
     try {
-      const conversation = await firebaseAIConversationService.createConversation(userId, channelId, title);
-      setConversations(prev => [conversation, ...prev]);
-      setCurrentConversationId(conversation.id);
-      return conversation;
+      const created = await firebaseAIConversationService.createConversation(userId, channelId, title);
+      setConversations(prev => prev.map(c => c.id === tempId ? created : c));
+      setCurrentConversationId(created.id);
+      return created;
     } catch (err) {
+      setConversations(prev => prev.filter(c => c.id !== tempId));
+      if (currentConversationId === tempId) setCurrentConversationId(null);
       const errorMessage = err instanceof Error ? err.message : 'Failed to create conversation';
       setError(errorMessage);
       throw err;
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  }, [currentConversationId]);
 
   const loadConversations = useCallback(async (userId: string, channelId?: string) => {
     setLoading(true);

@@ -26,9 +26,9 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
   
   const singleRef = useRef<SinglePaneRef>(null);
 
-  const handleCreateConversation = useCallback(async () => {
+  const handleCreateConversation = useCallback(() => {
     if (!userId) return;
-    await createConversation(userId, channelId, "New Conversation");
+    void createConversation(userId, channelId, "New Conversation");
   }, [userId, channelId, createConversation]);
 
   useImperativeHandle(ref, () => ({
