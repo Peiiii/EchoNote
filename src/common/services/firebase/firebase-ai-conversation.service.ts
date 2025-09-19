@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
 import { AIConversation, UIMessage, MessageListOptions } from "@/common/types/ai-conversation";
+import { sanitizeUIMessageForPersistence } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export class FirebaseAIConversationService {
   private db = db;
@@ -90,20 +91,22 @@ export class FirebaseAIConversationService {
     
     if (isNewMessage) {
       console.log("[FirebaseAIConversationService] addMessage new message", message);
+      const toSave = sanitizeUIMessageForPersistence(message);
       await setDoc(
         messageRef,
         {
-          ...message,
+          ...toSave,
           conversationId,
           timestamp: serverTimestamp(),
         }
       );
     } else {
       console.log("[FirebaseAIConversationService] addMessage existing message", message);
+      const toSave = sanitizeUIMessageForPersistence(message);
       await updateDoc(
         messageRef,
         {
-          ...message,
+          ...toSave,
           conversationId,
           timestamp: serverTimestamp(),
         }
@@ -133,8 +136,9 @@ export class FirebaseAIConversationService {
     if (messageDoc.exists()) {
       return;
     }
+    const toSave = sanitizeUIMessageForPersistence(message);
     await setDoc(messageRef, {
-      ...message,
+      ...toSave,
       conversationId,
       timestamp: serverTimestamp(),
     });
@@ -186,12 +190,26 @@ export class FirebaseAIConversationService {
   }
   
   async updateMessage(userId: string, conversationId: string, messageId: string, updates: Partial<UIMessage> | UIMessage): Promise<void> {
-    const updateData = {
-      ...updates,
-      updatedAt: serverTimestamp(),
-    };
-    
-    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`), updateData);
+    const updateData: Record<string, unknown> = { updatedAt: serverTimestamp() };
+    // Only persist fields we care about and sanitize nested parts
+    const maybe = updates as Partial<UIMessage>;
+    if (Object.prototype.hasOwnProperty.call(maybe, 'role')) {
+      updateData.role = maybe.role;
+    }
+    if (Object.prototype.hasOwnProperty.call(maybe, 'parts')) {
+      // reuse sanitizer internals via public API
+      const sanitized = sanitizeUIMessageForPersistence({
+        id: messageId,
+        role: (maybe.role ?? 'assistant') as UIMessage['role'],
+        parts: maybe.parts as unknown,
+      } as UIMessage);
+      updateData.parts = sanitized.parts;
+    }
+
+    await updateDoc(
+      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
+      updateData as any
+    );
   }
   
   async deleteMessage(userId: string, conversationId: string, messageId: string): Promise<void> {

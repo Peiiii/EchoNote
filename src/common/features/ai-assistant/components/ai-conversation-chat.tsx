@@ -10,6 +10,7 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
 
 import { ConversationChatProps } from "../types/conversation.types";
+import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
@@ -69,7 +70,8 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     return () => sub.unsubscribe();
   }, [agentSessionManager]);
 
-  const hash = (m: UIMessage) => JSON.stringify({ role: m.role, parts: m.parts });
+  // Use a safe hash that ignores functions/cycles inside tool parts
+  const hash = (m: UIMessage) => safeHashMessage(m);
   useCollectionDiff<UIMessage>({
     items: sessionMessages,
     getId: (m) => (m.id ? m.id : null),
