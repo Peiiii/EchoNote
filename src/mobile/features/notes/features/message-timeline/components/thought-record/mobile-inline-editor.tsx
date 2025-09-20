@@ -1,5 +1,5 @@
-import { Button } from '@/common/components/ui/button';
 import { Textarea } from '@/common/components/ui/textarea';
+import { EditorToolbar } from '@/common/components/ui/editor-toolbar';
 import { Save, X, Expand } from 'lucide-react';
 import { useEditStateStore } from '@/core/stores/edit-state.store';
 
@@ -52,44 +52,34 @@ export function MobileInlineEditor({
             />
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleCancel}
-                        disabled={isSaving}
-                        className="h-8 px-3 text-xs"
-                    >
-                        <X className="w-3 h-3 mr-1" />
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={!hasChanges || isSaving}
-                        size="sm"
-                        className={`h-8 px-3 text-xs ${
-                            hasChanges 
-                                ? 'bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200' 
-                                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
-                        }`}
-                    >
-                        <Save className="w-3 h-3 mr-1" />
-                        {isSaving ? "Saving..." : "Save"}
-                    </Button>
-                </div>
-                
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onExpand}
-                    disabled={isSaving}
-                    className="h-8 px-3 text-xs"
-                >
-                    <Expand className="w-3 h-3 mr-1" />
-                    Expand
-                </Button>
-            </div>
+            <EditorToolbar
+                leftActions={[
+                    {
+                        label: "Cancel",
+                        onClick: handleCancel,
+                        disabled: isSaving,
+                        icon: <X className="w-3 h-3 mr-1" />
+                    },
+                    {
+                        label: isSaving ? "Saving..." : "Save",
+                        onClick: handleSave,
+                        disabled: !hasChanges || isSaving,
+                        icon: <Save className="w-3 h-3 mr-1" />,
+                        className: hasChanges 
+                            ? 'bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200' 
+                            : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                    }
+                ]}
+                rightActions={[
+                    {
+                        label: "Expand",
+                        onClick: onExpand,
+                        disabled: isSaving,
+                        icon: <Expand className="w-3 h-3 mr-1" />,
+                        variant: "outline"
+                    }
+                ]}
+            />
         </div>
     );
 }
