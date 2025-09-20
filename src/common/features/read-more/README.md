@@ -12,16 +12,16 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
 - `common/features/read-more/core/read-more.bus.ts`
   - `statusChanged$`: `{ messageId, long, expanded, collapseInlineVisible? }`
   - `requestCollapse$`: `{ messageId }`
-- `common/features/read-more/controllers/global-collapse.controller.ts`
-  - Encapsulates focused‑message detection + bottom‑overlap geometry.
-  - `showCollapse`: boolean; `collapseCurrent()`: collapse active message with scroll rules.
-  - Internals: rAF debouncing; uses `computeFocusedId` + geometry for inline/floating switch.
 - `common/features/read-more/core/collapse-utils.ts`
   - `computeFocusedId(container)`: picks the note closest to the vertical center.
   - `collapseWithScrollTop({ container, element, topVisibleBefore, onCollapse })`:
     - If top visible → just collapse; else collapse and align the top to container’s top.
+- `common/features/read-more/store/read-more.store.ts`
+  - Zustand store for shared status, focus info, collapse requests.
+- `common/features/read-more/components/read-more-wrapper.tsx`
+  - `ReadMoreBaseWrapper` – shared pill UI & state for both mobile/desktop wrappers.
 - `common/features/read-more/hooks/use-global-collapse.ts`
-  - Ultra‑thin hook that wires controller to React, returns `{ showCollapse, handleScroll, collapseCurrent }`.
+  - Ultra‑thin hook: computes focus/overlap with rAF, provides `{ showCollapse, handleScroll, collapseCurrent }`.
 - `message-timeline.tsx`
   - Integrates the hook; renders floating Collapse pill at the bottom center; ensures pointer‑events are correct.
 - Mobile
