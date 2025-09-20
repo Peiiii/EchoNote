@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/common/lib/utils';
-import { readMoreBus } from '@/common/features/notes/components/message-timeline/read-more.bus';
+import { readMoreBus } from '@/common/features/read-more/core/read-more.bus';
 
 interface ReadMoreWrapperProps {
     children: React.ReactNode;

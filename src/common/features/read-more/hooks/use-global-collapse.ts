@@ -10,20 +10,11 @@ export function useGlobalCollapse(containerRef: React.RefObject<HTMLDivElement |
     controllerRef.current = ctl
     const unsub = ctl.changed$.listen(() => setShow(ctl.showCollapse))
     setShow(ctl.showCollapse)
-    return () => {
-      unsub()
-      ctl.dispose()
-      controllerRef.current = null
-    }
+    return () => { unsub(); ctl.dispose(); controllerRef.current = null }
   }, [containerRef])
 
-  const handleScroll = useCallback(() => {
-    controllerRef.current?.handleScroll()
-  }, [])
-
-  const collapseCurrent = useCallback(() => {
-    controllerRef.current?.collapseCurrent()
-  }, [])
+  const handleScroll = useCallback(() => { controllerRef.current?.handleScroll() }, [])
+  const collapseCurrent = useCallback(() => { controllerRef.current?.collapseCurrent() }, [])
 
   return { showCollapse, handleScroll, collapseCurrent } as const
 }

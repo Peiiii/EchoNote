@@ -9,7 +9,7 @@ import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { Bot, ChevronUp } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { Button } from "@/common/components/ui/button";
-import { useGlobalCollapse } from "./hooks/use-global-collapse";
+import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
