@@ -13,11 +13,10 @@ interface TimelineContentProps {
     className?: string;
 }
 
-export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(({
+export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(({ 
     renderThoughtRecord,
     className = ""
 }, ref) => {
-
     const { currentChannelId } = useNotesViewStore();
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();

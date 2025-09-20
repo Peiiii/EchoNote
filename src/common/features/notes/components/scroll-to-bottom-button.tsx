@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/common/components/ui/button";
+import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
 
 interface ScrollToBottomButtonProps {
     onClick: () => void;
@@ -7,16 +7,13 @@ interface ScrollToBottomButtonProps {
 }
 
 export const ScrollToBottomButton = ({ onClick, isVisible }: ScrollToBottomButtonProps) => {
-    if (!isVisible) return null;
-
     return (
-        <Button
+        <FloatingActionButton
             onClick={onClick}
-            size="sm"
-            variant="secondary"
-            className="absolute bottom-4 right-4 z-50 h-8 w-8 rounded-full p-0 shadow-lg"
+            isVisible={isVisible}
+            ariaLabel="Scroll to bottom"
         >
             <ChevronDown className="h-4 w-4" />
-        </Button>
+        </FloatingActionButton>
     );
 };

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 
 // Types
 interface MobileSidebarState {
@@ -30,6 +31,8 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
         setCurrentChannel(channelId);
         setIsChannelListOpen(false);
     };
+
+    useEffect(() => rxEventBusService.requestOpenAIAssistant$.listen(() => setIsAIAssistantOpen(true)), []);
 
     return {
         // State

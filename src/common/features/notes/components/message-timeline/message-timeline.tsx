@@ -5,6 +5,10 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { DateDivider } from "./date-divider";
+import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
+import { Bot } from "lucide-react";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 interface MessageTimelineProps {
   renderThoughtRecord?: (
@@ -38,6 +42,7 @@ export const MessageTimeline = forwardRef<
     },
     ref
   ) => {
+    const { currentChannelId } = useNotesViewStore();
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
       [],
@@ -134,11 +139,24 @@ export const MessageTimeline = forwardRef<
             );
           })}
         </div>
-        <div className="absolute bottom-2 right-2 z-20">
-          <ScrollToBottomButton
-            onClick={() => scrollToBottom({ behavior: "smooth" })}
-            isVisible={canScrollToBottom}
-          />
+        <div className="absolute bottom-4 right-4 z-20">
+          <div className="flex flex-col items-end gap-2">
+            <FloatingActionButton
+              onClick={() => {
+                if (currentChannelId)
+                  rxEventBusService.requestOpenAIAssistant$.emit({
+                    channelId: currentChannelId,
+                  });
+              }}
+              ariaLabel="Open AI Assistant"
+            >
+              <Bot className="h-4 w-4" />
+            </FloatingActionButton>
+            <ScrollToBottomButton
+              onClick={() => scrollToBottom({ behavior: "smooth" })}
+              isVisible={canScrollToBottom}
+            />
+          </div>
         </div>
       </>
     );
