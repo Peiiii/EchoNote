@@ -1,40 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/common/lib/utils';
-
-interface ReadMoreButtonProps {
-    onClick: () => void;
-    icon: React.ReactNode;
-    className?: string;
-}
-
-function ReadMoreButton({ onClick, icon, className = "" }: ReadMoreButtonProps) {
-    return (
-        <button
-            onClick={onClick}
-            className={`group flex items-center justify-center w-8 h-8 bg-white/80 dark:bg-gray-800/80 text-slate-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-slate-700 dark:hover:text-slate-200 rounded-full shadow-lg border border-gray-200/60 dark:border-gray-700/60 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-xl transition-all duration-200 font-normal backdrop-blur-sm ${className}`}
-        >
-            {icon}
-        </button>
-    );
-}
+import { readMoreBus } from '@/common/features/notes/components/message-timeline/read-more.bus';
 
 interface ReadMoreWrapperProps {
     children: React.ReactNode;
     maxHeight?: number;
     className?: string;
+    messageId: string;
 }
 
 export function ReadMoreWrapper({
     children,
     maxHeight = 300,
     className = "",
+    messageId,
 }: ReadMoreWrapperProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showReadMore, setShowReadMore] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
-    // 检查内容是否需要readmore按钮
     useEffect(() => {
         if (contentRef.current) {
             const contentHeight = contentRef.current.scrollHeight;
@@ -43,48 +28,86 @@ export function ReadMoreWrapper({
         }
     }, [children, maxHeight, isExpanded]);
 
+    useEffect(() => {
+        readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: false });
+    }, [messageId, showReadMore, isExpanded]);
+
+    useEffect(() => {
+        return readMoreBus.requestCollapse$.listen(({ messageId: target }) => {
+            if (target === messageId && isExpanded) setIsExpanded(false);
+        });
+    }, [messageId, isExpanded]);
+
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
 
+    const collapseBtnRef = useRef<HTMLButtonElement | null>(null);
+    useEffect(() => {
+        const root = contentRef.current?.closest('[data-component="message-timeline"]') as HTMLElement | null;
+        const node = collapseBtnRef.current;
+        if (!root || !node || !isExpanded || !showReadMore) {
+            readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: false });
+            return;
+        }
+        const io = new IntersectionObserver((entries) => {
+            const vis = entries[0]?.isIntersecting ?? false;
+            readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: vis });
+        }, { root, threshold: 0.01 });
+        io.observe(node);
+        return () => io.disconnect();
+    }, [messageId, isExpanded, showReadMore]);
+
     return (
-        <div data-testid="read-more-wrapper" className={cn(className, "flex flex-col overflow-hidden pb-3")}>
-            <div className="relative">
-                <div
-                    ref={contentRef}
-                    className={`transition-all duration-500 ease-out ${!isExpanded && showReadMore ? 'overflow-hidden' : ''
-                        }`}
-                    style={{
-                        maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : 'none',
-                        height: !isExpanded && showReadMore ? `${maxHeight}px` : 'auto'
-                    }}
-                >
-                    {children}
-                </div>
-
-                {!isExpanded && showReadMore && (
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div
-                            className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-100/40 via-gray-100/20 to-transparent dark:from-gray-800/30 dark:via-gray-800/15 dark:to-transparent group-hover:from-gray-100/30 group-hover:via-gray-100/15 dark:group-hover:from-gray-800/20 dark:group-hover:via-gray-800/10 transition-all duration-300"
-                        />
-                        <div className="absolute bottom-2 flex w-full items-center justify-center pointer-events-auto">
-                            <ReadMoreButton
-                                onClick={toggleExpanded}
-                                icon={<ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:scale-110" />}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {isExpanded && showReadMore && (
-                    <div className="flex justify-center pt-2">
-                        <ReadMoreButton
-                            onClick={toggleExpanded}
-                            icon={<ChevronUp className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110" />}
-                        />
-                    </div>
-                )}
+        <div data-testid="read-more-wrapper" className={cn(className, "relative overflow-hidden pb-3")}>        
+            <div
+                ref={contentRef}
+                className={cn('transition-all duration-300 ease-in-out', !isExpanded && showReadMore ? 'overflow-hidden' : '')}
+                style={{
+                    maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : 'none',
+                    height: !isExpanded && showReadMore ? `${maxHeight}px` : 'auto'
+                }}
+            >
+                {children}
             </div>
+            {!isExpanded && showReadMore && (
+                <>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background via-background/60 to-transparent z-0" />
+                    <button
+                        type="button"
+                        onClick={toggleExpanded}
+                        className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+                    >
+                        <span>Read more</span>
+                        <ChevronDown className="w-3 h-3" />
+                    </button>
+                </>
+            )}
+
+            {isExpanded && showReadMore && (
+                <button
+                    type="button"
+                    ref={collapseBtnRef}
+                    data-collapse-inline-for={messageId}
+                    onClick={toggleExpanded}
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+                >
+                    <ChevronUp className="w-3 h-3" />
+                    <span>Collapse</span>
+                </button>
+            )}
+
+            {isExpanded && showReadMore && (
+                <button
+                    type="button"
+                    ref={collapseBtnRef}
+                    onClick={toggleExpanded}
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+                >
+                    <ChevronUp className="w-3 h-3" />
+                    <span>Collapse</span>
+                </button>
+            )}
         </div>
     );
 }

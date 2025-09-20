@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/common/lib/utils';
 import { readMoreBus } from '@/common/features/notes/components/message-timeline/read-more.bus';
 
@@ -28,7 +28,7 @@ export function MobileReadMoreWrapper({
     }, [children, maxHeight]);
 
     useEffect(() => {
-        readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded });
+        readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: false });
     }, [messageId, showReadMore, isExpanded]);
 
     useEffect(() => {
@@ -40,6 +40,22 @@ export function MobileReadMoreWrapper({
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
+
+    const collapseBtnRef = useRef<HTMLButtonElement | null>(null);
+    useEffect(() => {
+        const root = contentRef.current?.closest('[data-component="message-timeline"]') as HTMLElement | null;
+        const node = collapseBtnRef.current;
+        if (!root || !node || !isExpanded || !showReadMore) {
+            readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: false });
+            return;
+        }
+        const io = new IntersectionObserver((entries) => {
+            const vis = entries[0]?.isIntersecting ?? false;
+            readMoreBus.statusChanged$.emit({ messageId, long: showReadMore, expanded: isExpanded, collapseInlineVisible: vis });
+        }, { root, threshold: 0.01 });
+        io.observe(node);
+        return () => io.disconnect();
+    }, [messageId, isExpanded, showReadMore]);
 
     return (
         <div className={cn('relative group', className)}>
@@ -58,19 +74,26 @@ export function MobileReadMoreWrapper({
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background via-background/60 to-transparent z-0" />
                     <button
                         type="button"
-                        onClick={()=>{
-                            console.log('read more button clicked');
-                            toggleExpanded();
-                        }}
-                        className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm text-blue-600 dark:text-blue-400 shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+                        onClick={toggleExpanded}
+                        className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
                     >
                         <span>Read more</span>
                         <ChevronDown className="w-3 h-3" />
                     </button>
                 </>
             )}
-
-            {/* collapse button moved to global overlay in timeline */}
+            {isExpanded && showReadMore && (
+                <button
+                    type="button"
+                    data-collapse-inline-for={messageId}
+                    ref={collapseBtnRef}
+                    onClick={toggleExpanded}
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+                >
+                    <ChevronUp className="w-3 h-3" />
+                    <span>Collapse</span>
+                </button>
+            )}
         </div>
     );
 }

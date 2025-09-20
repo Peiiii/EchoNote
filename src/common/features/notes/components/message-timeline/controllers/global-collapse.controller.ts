@@ -4,15 +4,16 @@ import { computeFocusedId, collapseWithScrollTop } from '../utils/collapse-utils
 
 export class GlobalCollapseController {
   private focusedId: string | null = null;
-  private statusMap: Record<string, { long: boolean; expanded: boolean }> = {};
+  private statusMap: Record<string, { long: boolean; expanded: boolean; collapseInlineVisible?: boolean }> = {};
   private rafId: number | null = null;
   private unlisten: (() => void) | null = null;
+  private inlineOverlap = false;
 
   changed$ = new RxEvent<void>();
 
   constructor(private containerRef: React.RefObject<HTMLDivElement | null>) {
     this.unlisten = readMoreBus.statusChanged$.listen((s: ReadMoreStatus) => {
-      this.statusMap[s.messageId] = { long: s.long, expanded: s.expanded };
+      this.statusMap[s.messageId] = { long: s.long, expanded: s.expanded, collapseInlineVisible: s.collapseInlineVisible };
       this.changed$.emit();
     });
   }
@@ -29,10 +30,29 @@ export class GlobalCollapseController {
     if (this.rafId) cancelAnimationFrame(this.rafId);
     this.rafId = requestAnimationFrame(() => {
       const nextId = computeFocusedId(el);
+      let changed = false;
       if (nextId !== this.focusedId) {
         this.focusedId = nextId;
-        this.changed$.emit();
+        changed = true;
       }
+      if (nextId) {
+        const inlineBtn = el.querySelector(`[data-collapse-inline-for="${nextId}"]`) as HTMLElement | null;
+        if (inlineBtn) {
+          const cRect = el.getBoundingClientRect();
+          const bRect = inlineBtn.getBoundingClientRect();
+          const dist = cRect.bottom - bRect.bottom;
+          const offset = this.getFloatOffset();
+          const overlapNow = dist <= offset + 0.5;
+          if (overlapNow !== this.inlineOverlap) {
+            this.inlineOverlap = overlapNow;
+            changed = true;
+          }
+        } else if (this.inlineOverlap !== true) {
+          this.inlineOverlap = true;
+          changed = true;
+        }
+      }
+      if (changed) this.changed$.emit();
     });
   }
 
@@ -40,7 +60,16 @@ export class GlobalCollapseController {
     const id = this.focusedId;
     if (!id) return false;
     const s = this.statusMap[id];
-    return !!(s && s.long && s.expanded);
+    return !!(s && s.long && s.expanded && this.inlineOverlap);
+  }
+
+  private getFloatOffset(): number {
+    const el = this.containerRef.current;
+    if (!el) return 8;
+    const cs = getComputedStyle(el);
+    const v = cs.getPropertyValue('--collapse-float-offset');
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : 8;
   }
 
   collapseCurrent() {
@@ -60,4 +89,3 @@ export class GlobalCollapseController {
     });
   }
 }
-

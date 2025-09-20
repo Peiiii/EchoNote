@@ -76,7 +76,7 @@ export function ThoughtRecord({
                     />
                 ) : (
                     <div className="px-8">
-                        <ReadMoreWrapper maxHeight={300}>
+                        <ReadMoreWrapper maxHeight={300} messageId={message.id}>
                             <MarkdownContent content={message.content} />
                         </ReadMoreWrapper>
                         

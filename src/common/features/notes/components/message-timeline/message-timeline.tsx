@@ -8,6 +8,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { Bot, ChevronUp } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
+import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "./hooks/use-global-collapse";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
@@ -169,17 +170,23 @@ export const MessageTimeline = forwardRef<
             </div>
           </div>
         </div>
-        <div className={`pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showCollapse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+        <div
+          className={`pointer-events-none absolute left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showCollapse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + var(--collapse-float-offset, 8px))' }}
+        >
           {showCollapse && (
-            <button
-              type="button"
-              onClick={collapseCurrent}
-              className="pointer-events-auto text-xs px-2.5 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm text-blue-600 dark:text-blue-400 shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
-              aria-label="Collapse current"
-            >
-              <ChevronUp className="w-3 h-3" />
-              <span>Collapse</span>
-            </button>
+            <div className="pointer-events-auto">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1"
+                onClick={collapseCurrent}
+                aria-label="Collapse current"
+              >
+                <ChevronUp className="h-4 w-4" />
+                <span className="text-xs leading-none">Collapse</span>
+              </Button>
+            </div>
           )}
         </div>
       </>
