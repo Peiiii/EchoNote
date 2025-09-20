@@ -14,8 +14,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
         handleSend,
         handleKeyPress,
         handleMessageChange,
-        placeholder,
-        currentChannelId
+        placeholder
     } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
 
     return (
@@ -27,7 +26,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
                 />
             )}
 
-            <Toolbar currentChannelId={currentChannelId} />
+            <Toolbar />
 
             <div className="relative">
                 <InputArea
