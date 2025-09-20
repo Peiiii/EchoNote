@@ -69,7 +69,6 @@ export const MessageTimelineFeature = ({
             <ExpandedEditorOverlay
                 isVisible={isExpandedEditing}
                 editContent={editState.editContent}
-                originalContent={editState.originalContent}
                 isSaving={editState.isSaving}
                 onSave={editActions.handleSave}
                 onCancel={editActions.handleCancel}

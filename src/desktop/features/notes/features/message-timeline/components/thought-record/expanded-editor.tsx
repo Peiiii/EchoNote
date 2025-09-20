@@ -1,12 +1,11 @@
 import { MarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { Check, Eye, EyeOff, Loader2, Minimize2, X } from "lucide-react";
+import { Check, Loader2, Minimize2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface ExpandedEditorProps {
   content: string;
-  originalContent: string;
   onSave: () => void;
   onCancel: () => void;
   onCollapse: () => void;
@@ -15,14 +14,12 @@ interface ExpandedEditorProps {
 
 export function ExpandedEditor({
   content,
-  originalContent,
   onSave,
   onCancel,
   onCollapse,
   isSaving
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
-  const [showOriginal, setShowOriginal] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateContent } = useEditStateStore();
 
@@ -81,26 +78,6 @@ export function ExpandedEditor({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Toggle original content view */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowOriginal(!showOriginal)}
-            className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            {showOriginal ? (
-              <>
-                <EyeOff className="w-3.5 h-3.5 mr-1.5" />
-                Hide Original
-              </>
-            ) : (
-              <>
-                <Eye className="w-3.5 h-3.5 mr-1.5" />
-                Show Original
-              </>
-            )}
-          </Button>
-
           {/* Collapse to inline mode */}
           <Button
             variant="ghost"
@@ -114,53 +91,60 @@ export function ExpandedEditor({
         </div>
       </div>
 
-      {/* Main editing area */}
+      {/* Main editing area - Left Editor + Right Preview */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Original content panel (left) */}
-        {showOriginal && (
-          <div className="w-1/2 border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
-            <div className="p-6">
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                  Original Content
-                </h3>
-                <div className="text-xs text-slate-500 dark:text-slate-500">
-                  {originalContent.length} characters
-                </div>
-              </div>
-              <div className="prose prose-slate dark:prose-invert max-w-none">
-                <MarkdownContent content={originalContent} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Editor panel (right) */}
-        <div className={`${showOriginal ? 'w-1/2' : 'w-full'} flex flex-col overflow-hidden`}>
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="mb-4">
-              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                Edit Content
+        {/* Editor panel (left) */}
+        <div className="w-1/2 border-r border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                Editor
               </h3>
               <div className="text-xs text-slate-500 dark:text-slate-500">
                 {localContent.length} characters
               </div>
             </div>
+          </div>
+          
+          <div className="flex-1 p-6 overflow-y-auto">
+            <textarea
+              ref={textareaRef}
+              value={localContent}
+              onChange={(e) => handleContentChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Write your thought in Markdown..."
+              className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
+              disabled={isSaving}
+              style={{
+                caretColor: '#3b82f6',
+                minHeight: 'calc(100vh - 200px)'
+              }}
+            />
+          </div>
+        </div>
 
-            {/* Editor textarea */}
-            <div className="relative">
-              <textarea
-                ref={textareaRef}
-                value={localContent}
-                onChange={(e) => handleContentChange(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Edit your thought..."
-                className="w-full min-h-[400px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
-                disabled={isSaving}
-                style={{
-                  caretColor: '#3b82f6',
-                }}
-              />
+        {/* Preview panel (right) */}
+        <div className="w-1/2 flex flex-col overflow-hidden">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                Preview
+              </h3>
+              <div className="text-xs text-slate-500 dark:text-slate-500">
+                Live Preview
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+              {localContent.trim() ? (
+                <MarkdownContent content={localContent} />
+              ) : (
+                <div className="text-slate-400 dark:text-slate-500 italic text-center py-8">
+                  Start typing to see preview...
+                </div>
+              )}
             </div>
           </div>
         </div>
