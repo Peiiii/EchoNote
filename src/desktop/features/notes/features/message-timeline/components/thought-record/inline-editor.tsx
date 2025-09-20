@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Button } from "@/common/components/ui/button";
+import { EditorToolbar } from "@/common/components/editor-toolbar";
 import { Check, X, Loader2, Maximize2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { cn } from "@/common/lib/utils";
@@ -94,49 +94,35 @@ export function InlineEditor({ content, onSave, onCancel, onExpand, isSaving, cl
         </div>
         
         {/* Right side - Action buttons */}
-        <div className="flex items-center gap-2">
-          {/* Expand to full-screen editing */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onExpand}
-            disabled={isSaving}
-            className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <Maximize2 className="w-3.5 h-3.5 mr-1.5" />
-            Expand
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCancel}
-            disabled={isSaving}
-            className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <X className="w-3.5 h-3.5 mr-1.5" />
-            Cancel
-          </Button>
-          
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={isSaving || !localContent.trim()}
-            className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-          >
-            {isSaving ? (
-              <>
+        <EditorToolbar
+          rightActions={[
+            {
+              label: "Expand",
+              onClick: onExpand,
+              disabled: isSaving,
+              icon: <Maximize2 className="w-3.5 h-3.5 mr-1.5" />,
+              className: "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            },
+            {
+              label: "Cancel",
+              onClick: handleCancel,
+              disabled: isSaving,
+              icon: <X className="w-3.5 h-3.5 mr-1.5" />,
+              className: "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            },
+            {
+              label: isSaving ? "Saving..." : "Save",
+              onClick: handleSave,
+              disabled: isSaving || !localContent.trim(),
+              icon: isSaving ? (
                 <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
+              ) : (
                 <Check className="w-3.5 h-3.5 mr-1.5" />
-                Save
-              </>
-            )}
-          </Button>
-        </div>
+              ),
+              className: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            }
+          ]}
+        />
       </div>
     </div>
   );

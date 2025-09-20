@@ -1,5 +1,5 @@
 import { Textarea } from '@/common/components/ui/textarea';
-import { EditorToolbar } from '@/common/components/ui/editor-toolbar';
+import { EditorToolbar } from '@/common/components/editor-toolbar';
 import { Save, X, Expand } from 'lucide-react';
 import { useEditStateStore } from '@/core/stores/edit-state.store';
 
