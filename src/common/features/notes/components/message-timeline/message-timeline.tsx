@@ -1,14 +1,16 @@
+import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
 import { ScrollToBottomButton } from "@/common/features/notes/components/scroll-to-bottom-button";
 import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useLazyLoadingScrollControl } from "@/common/features/notes/hooks/use-lazy-loading-scroll-control";
 import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
-import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
-import { DateDivider } from "./date-divider";
-import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
-import { Bot } from "lucide-react";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { Bot, ChevronUp } from "lucide-react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
+import { useGlobalCollapse } from "./hooks/use-global-collapse";
+import { DateDivider } from "./date-divider";
+// removed global collapse bus usage
 
 interface MessageTimelineProps {
   renderThoughtRecord?: (
@@ -52,12 +54,15 @@ export const MessageTimeline = forwardRef<
     const { recordScrollPosition, restoreScrollPosition } =
       useLazyLoadingScrollControl({ containerRef });
 
+    const { showCollapse, handleScroll: handleCollapseScroll, collapseCurrent } = useGlobalCollapse(containerRef);
+
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
         onScroll?.(e);
         recordScrollPosition();
+        handleCollapseScroll();
       },
-      [onScroll, recordScrollPosition]
+      [onScroll, recordScrollPosition, handleCollapseScroll]
     );
 
     useEffect(() => {
@@ -78,7 +83,7 @@ export const MessageTimeline = forwardRef<
       scrollToBottom({ behavior: "instant" });
     }, [scrollToBottom]);
 
-    return (
+  return (
       <>
         <div
           data-component="message-timeline"
@@ -118,6 +123,7 @@ export const MessageTimeline = forwardRef<
                   return (
                     <div
                       key={message.id}
+                      data-message-id={message.id}
                       className="w-full"
                       style={{ height: "auto", minHeight: "auto" }}
                     >
@@ -140,24 +146,41 @@ export const MessageTimeline = forwardRef<
             );
           })}
         </div>
-        <div className="absolute bottom-4 right-4 z-20">
+        <div className="absolute bottom-4 right-4 z-20 pointer-events-none">
           <div className="flex flex-col items-end gap-2">
-            <FloatingActionButton
-              onClick={() => {
-                if (currentChannelId) {
-                  openAIAssistant(currentChannelId);
-                }
-              }}
-              isVisible={!isAIAssistantOpen}
-              ariaLabel="Open AI Assistant"
-            >
-              <Bot className="h-4 w-4" />
-            </FloatingActionButton>
-            <ScrollToBottomButton
-              onClick={() => scrollToBottom({ behavior: "smooth" })}
-              isVisible={canScrollToBottom}
-            />
+            <div className="pointer-events-auto">
+              <FloatingActionButton
+                onClick={() => {
+                  if (currentChannelId) {
+                    openAIAssistant(currentChannelId);
+                  }
+                }}
+                isVisible={!isAIAssistantOpen}
+                ariaLabel="Open AI Assistant"
+              >
+                <Bot className="h-4 w-4" />
+              </FloatingActionButton>
+            </div>
+            <div className="pointer-events-auto">
+              <ScrollToBottomButton
+                onClick={() => scrollToBottom({ behavior: "smooth" })}
+                isVisible={canScrollToBottom}
+              />
+            </div>
           </div>
+        </div>
+        <div className={`pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showCollapse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+          {showCollapse && (
+            <button
+              type="button"
+              onClick={collapseCurrent}
+              className="pointer-events-auto text-xs px-2.5 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/50 backdrop-blur-sm text-blue-600 dark:text-blue-400 shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+              aria-label="Collapse current"
+            >
+              <ChevronUp className="w-3 h-3" />
+              <span>Collapse</span>
+            </button>
+          )}
         </div>
       </>
     );

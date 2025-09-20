@@ -160,7 +160,7 @@ export const MobileThoughtRecord = ({
               isSaving={isSaving}
             />
           ) : (
-            <MobileReadMoreWrapper maxHeight={200}>
+            <MobileReadMoreWrapper maxHeight={400} messageId={message.id}>
               <MarkdownContent content={message.content} />
             </MobileReadMoreWrapper>
           )}
