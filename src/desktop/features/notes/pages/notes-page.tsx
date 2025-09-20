@@ -4,39 +4,52 @@ import { NotesLayout } from "@/desktop/features/notes/components/notes-layout";
 import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assistant/components/ai-assistant-sidebar";
 import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
 import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
-import { useAIAssistant } from "@/desktop/features/notes/features/ai-assistant/hooks/use-ai-assistant";
-import { useThreadSidebar } from "@/desktop/features/notes/features/thread-management/hooks/use-thread-sidebar";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useEffect } from "react";
 
 export function NotesPage() {
-    // Use specialized hooks
-    const { isThreadOpen, currentThreadId, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
-    const { isAIAssistantOpen, currentAIAssistantChannel, handleOpenAIAssistant, handleCloseAIAssistant } = useAIAssistant();
+    // Use UI state store
+    const { 
+        isAIAssistantOpen, 
+        aiAssistantChannelId, 
+        isThreadOpen, 
+        currentThreadId,
+        openAIAssistant, 
+        closeAIAssistant,
+        openThread,
+        closeThread,
+        openSettings
+    } = useUIStateStore();
 
     const handleOpenSettings = () => {
         console.log('Open channel settings');
+        openSettings();
+    };
+
+    const handleSendThreadMessage = (message: string) => {
+        console.log('Send thread message:', message);
     };
 
     useEffect(() =>
         rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
-            handleOpenAIAssistant(channelId);
-        }), [handleOpenAIAssistant]);
+            openAIAssistant(channelId);
+        }), [openAIAssistant]);
 
     useEffect(() =>
         rxEventBusService.requestOpenAIConversation$.listen(({ channelId }) => {
-            handleOpenAIAssistant(channelId);
-        }), [handleOpenAIAssistant]);
+            openAIAssistant(channelId);
+        }), [openAIAssistant]);
 
     useEffect(() =>
         rxEventBusService.requestOpenThread$.listen(({ messageId }) => {
-            handleOpenThread(messageId);
-        }), [handleOpenThread]);
+            openThread(messageId);
+        }), [openThread]);
 
     useEffect(() =>
         rxEventBusService.requestCloseThread$.listen(() => {
-            handleCloseThread();
-        }), [handleCloseThread]);
+            closeThread();
+        }), [closeThread]);
 
     useEffect(() =>
         rxEventBusService.requestOpenSettings$.listen(() => {
@@ -54,15 +67,15 @@ export function NotesPage() {
                     isThreadOpen ? (
                         <ThreadSidebar
                             isOpen={isThreadOpen}
-                            onClose={handleCloseThread}
+                            onClose={closeThread}
                             onSendMessage={handleSendThreadMessage}
-                            currentThreadId={currentThreadId}
+                            currentThreadId={currentThreadId || undefined}
                         />
                     ) : (
                         <AIAssistantSidebar
                             isOpen={isAIAssistantOpen}
-                            onClose={handleCloseAIAssistant}
-                            channelId={currentAIAssistantChannel || ''}
+                            onClose={closeAIAssistant}
+                            channelId={aiAssistantChannelId || ''}
                         />
                     )
                 )

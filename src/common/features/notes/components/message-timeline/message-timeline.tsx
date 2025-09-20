@@ -7,8 +7,8 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { DateDivider } from "./date-divider";
 import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
 import { Bot } from "lucide-react";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 
 interface MessageTimelineProps {
   renderThoughtRecord?: (
@@ -43,6 +43,7 @@ export const MessageTimeline = forwardRef<
     ref
   ) => {
     const { currentChannelId } = useNotesViewStore();
+    const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
       [],
@@ -143,11 +144,11 @@ export const MessageTimeline = forwardRef<
           <div className="flex flex-col items-end gap-2">
             <FloatingActionButton
               onClick={() => {
-                if (currentChannelId)
-                  rxEventBusService.requestOpenAIAssistant$.emit({
-                    channelId: currentChannelId,
-                  });
+                if (currentChannelId) {
+                  openAIAssistant(currentChannelId);
+                }
               }}
+              isVisible={!isAIAssistantOpen}
               ariaLabel="Open AI Assistant"
             >
               <Bot className="h-4 w-4" />

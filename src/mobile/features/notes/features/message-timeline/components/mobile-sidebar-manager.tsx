@@ -3,26 +3,23 @@ import { MobileChannelList } from "@/mobile/features/notes/features/channel-mana
 import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 
 // Types
-interface MobileSidebarState {
+interface MobileSidebarManagerProps {
+    // Sidebar states
     isChannelListOpen: boolean;
     isAIAssistantOpen: boolean;
     isSettingsOpen: boolean;
-}
-
-interface MobileSidebarActions {
-    openChannelList: () => void;
-    closeChannelList: () => void;
-    openAIAssistant: () => void;
-    closeAIAssistant: () => void;
-    openSettings: () => void;
-    closeSettings: () => void;
-    handleChannelSelect: (channelId: string) => void;
-}
-
-interface MobileSidebarManagerProps extends MobileSidebarState, MobileSidebarActions {
     isThreadOpen: boolean;
+    
+    // Sidebar actions
+    closeChannelList: () => void;
+    closeAIAssistant: () => void;
+    closeSettings: () => void;
+    
+    // Thread data
     onSendThreadMessage: (content: string) => void;
     onCloseThread: () => void;
     currentChannelId: string | null;
@@ -43,11 +40,16 @@ export const MobileSidebarManager = ({
     // Thread data
     onSendThreadMessage,
     onCloseThread,
-
-    // Channel selection
-    handleChannelSelect,
     currentChannelId,
 }: MobileSidebarManagerProps) => {
+    const { setCurrentChannel } = useNotesViewStore();
+    const { closeChannelList: closeChannelListFromStore } = useUIStateStore();
+
+    // Handle channel selection: switch channel and close channel list
+    const handleChannelSelect = (channelId: string) => {
+        setCurrentChannel(channelId);
+        closeChannelListFromStore();
+    };
     return (
         <>
             {/* Channel List Sidebar */}
