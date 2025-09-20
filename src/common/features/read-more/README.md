@@ -9,25 +9,25 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
 - Floating and inline pills share the same low‑key design and do not distract from content.
 
 ## Files & Responsibilities
-- `read-more.bus.ts`
+- `common/features/read-more/core/read-more.bus.ts`
   - `statusChanged$`: `{ messageId, long, expanded, collapseInlineVisible? }`
   - `requestCollapse$`: `{ messageId }`
-- `controllers/global-collapse.controller.ts`
+- `common/features/read-more/controllers/global-collapse.controller.ts`
   - Encapsulates focused‑message detection + bottom‑overlap geometry.
   - `showCollapse`: boolean; `collapseCurrent()`: collapse active message with scroll rules.
   - Internals: rAF debouncing; uses `computeFocusedId` + geometry for inline/floating switch.
-- `utils/collapse-utils.ts`
+- `common/features/read-more/core/collapse-utils.ts`
   - `computeFocusedId(container)`: picks the note closest to the vertical center.
   - `collapseWithScrollTop({ container, element, topVisibleBefore, onCollapse })`:
     - If top visible → just collapse; else collapse and align the top to container’s top.
-- `hooks/use-global-collapse.ts`
+- `common/features/read-more/hooks/use-global-collapse.ts`
   - Ultra‑thin hook that wires controller to React, returns `{ showCollapse, handleScroll, collapseCurrent }`.
 - `message-timeline.tsx`
   - Integrates the hook; renders floating Collapse pill at the bottom center; ensures pointer‑events are correct.
 - Mobile
-  - `mobile-thought-record/mobile-read-more-wrapper.tsx`: renders Read more + inline Collapse pills; reports status via bus; adds geometry handle (`data-collapse-inline-for="<id>"`).
+  - `mobile-thought-record/mobile-read-more-wrapper.tsx`: thin wrapper around `ReadMoreBaseWrapper`; sets defaults (maxHeight 600, clampMargin 24).
 - Desktop
-  - `desktop/thought-record/read-more-wrapper.tsx`: same as mobile but for desktop note layout.
+  - `desktop/thought-record/read-more-wrapper.tsx`: thin wrapper around `ReadMoreBaseWrapper`; defaults maxHeight 300.
 
 ## Visual Design
 - Inline pills (Read more / Collapse)
