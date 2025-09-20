@@ -14,6 +14,14 @@ export class GlobalCollapseController {
   constructor(private containerRef: React.RefObject<HTMLDivElement | null>) {
     this.unlisten = readMoreBus.statusChanged$.listen((s: ReadMoreStatus) => {
       this.statusMap[s.messageId] = { long: s.long, expanded: s.expanded, collapseInlineVisible: s.collapseInlineVisible }
+      if (this.focusedId === s.messageId && typeof s.collapseInlineVisible === 'boolean') {
+        const overlap = !s.collapseInlineVisible
+        if (overlap !== this.inlineOverlap) {
+          this.inlineOverlap = overlap
+          this.changed$.emit()
+          return
+        }
+      }
       this.changed$.emit()
     })
   }
@@ -47,8 +55,8 @@ export class GlobalCollapseController {
             this.inlineOverlap = overlapNow
             changed = true
           }
-        } else if (this.inlineOverlap !== true) {
-          this.inlineOverlap = true
+        } else if (this.inlineOverlap !== false) {
+          this.inlineOverlap = false
           changed = true
         }
       }
@@ -89,4 +97,3 @@ export class GlobalCollapseController {
     })
   }
 }
-

@@ -26,7 +26,7 @@ export function ReadMoreBaseWrapper({
 }: ReadMoreBaseWrapperProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showReadMore, setShowReadMore] = useState(false)
-  const [collapseInlineVisible, setCollapseInlineVisible] = useState(false)
+  const [collapseInlineVisible, setCollapseInlineVisible] = useState<boolean | undefined>(undefined)
   const contentRef = useRef<HTMLDivElement>(null)
   const collapseBtnRef = useRef<HTMLButtonElement | null>(null)
 
@@ -41,13 +41,14 @@ export function ReadMoreBaseWrapper({
       messageId,
       long: showReadMore,
       expanded: isExpanded,
-      collapseInlineVisible: collapseInlineVisible && isExpanded && showReadMore,
+      collapseInlineVisible:
+        collapseInlineVisible === undefined ? undefined : collapseInlineVisible && isExpanded && showReadMore,
     })
   }, [messageId, showReadMore, isExpanded, collapseInlineVisible])
 
   useEffect(() => {
     if (!isExpanded || !showReadMore) {
-      setCollapseInlineVisible(false)
+      setCollapseInlineVisible(undefined)
     }
   }, [isExpanded, showReadMore])
 
@@ -121,4 +122,3 @@ export function ReadMoreBaseWrapper({
     </div>
   )
 }
-
