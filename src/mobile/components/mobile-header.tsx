@@ -1,19 +1,23 @@
 import { Button } from "@/common/components/ui/button";
 import { Menu, Bot, Settings } from "lucide-react";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 interface MobileHeaderProps {
-    onOpenChannelList: () => void;
-    onOpenAIAssistant: () => void;
-    onOpenSettings: () => void;
     currentChannelName?: string;
 }
 
 export const MobileHeader = ({ 
-    onOpenChannelList, 
-    onOpenAIAssistant, 
-    onOpenSettings,
     currentChannelName 
 }: MobileHeaderProps) => {
+    const { openChannelList, openAIAssistant, openSettings } = useUIStateStore();
+    const { currentChannelId } = useNotesViewStore();
+    
+    const handleOpenAIAssistant = () => {
+        if (currentChannelId) {
+            openAIAssistant(currentChannelId);
+        }
+    };
     return (
         <div className="flex-shrink-0 px-4 py-3 bg-background">
             <div className="flex items-center justify-between">
@@ -21,7 +25,7 @@ export const MobileHeader = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={onOpenChannelList}
+                    onClick={openChannelList}
                     className="h-10 w-10 dark:text-primary"
                 >
                     <Menu className="h-5 w-5" />
@@ -39,7 +43,7 @@ export const MobileHeader = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onOpenAIAssistant}
+                        onClick={handleOpenAIAssistant}
                         className="h-10 w-10 dark:text-primary"
                     >
                         <Bot className="h-5 w-5" />
@@ -47,7 +51,7 @@ export const MobileHeader = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onOpenSettings}
+                        onClick={openSettings}
                         className="h-10 w-10 dark:text-primary"
                     >
                         <Settings className="h-5 w-5" />

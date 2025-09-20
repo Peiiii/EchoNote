@@ -14,14 +14,12 @@ import { MobileThreadIndicator } from "./mobile-thread-indicator";
 
 interface MobileThoughtRecordProps {
   message: Message;
-  onOpenThread: (messageId: string) => void;
   onReply?: () => void;
   threadCount?: number;
 }
 
 export const MobileThoughtRecord = ({
   message,
-  onOpenThread,
   onReply,
   threadCount = 0,
 }: MobileThoughtRecordProps) => {
@@ -107,9 +105,6 @@ export const MobileThoughtRecord = ({
     navigator.clipboard.writeText(message.content);
   };
 
-  const handleOpenThread = () => {
-    onOpenThread(message.id);
-  };
 
   const handleReply = () => {
     onReply?.();
@@ -186,7 +181,6 @@ export const MobileThoughtRecord = ({
           <div className="flex justify-end mt-4 pt-2">
             <MobileThreadIndicator
               threadCount={threadCount}
-              onOpenThread={handleOpenThread}
               messageId={message.id}
             />
           </div>

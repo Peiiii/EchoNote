@@ -8,10 +8,6 @@ interface MobileNotesLayoutProps {
     currentChannelName?: string;
     replyToMessageId?: string | null;
     isAddingMessage: boolean;
-    onOpenChannelList: () => void;
-    onOpenAIAssistant: () => void;
-    onOpenSettings: () => void;
-    onOpenThread: (messageId: string) => void;
     onSendMessage: (content: string) => void;
     onCancelReply: () => void;
     setReplyToMessageId: (messageId: string | null) => void;
@@ -21,10 +17,6 @@ export const MobileNotesLayout = ({
     currentChannelName,
     replyToMessageId,
     isAddingMessage,
-    onOpenChannelList,
-    onOpenAIAssistant,
-    onOpenSettings,
-    onOpenThread,
     onSendMessage,
     onCancelReply,
     setReplyToMessageId,
@@ -65,9 +57,6 @@ export const MobileNotesLayout = ({
         >
             {/* Header */}
             <MobileHeader
-                onOpenChannelList={onOpenChannelList}
-                onOpenAIAssistant={onOpenAIAssistant}
-                onOpenSettings={onOpenSettings}
                 currentChannelName={currentChannelName}
             />
 
@@ -76,7 +65,6 @@ export const MobileNotesLayout = ({
                 {/* Timeline content */}
                 <MobileTimelineContent
                     ref={timelineContentRef}
-                    onOpenThread={onOpenThread}
                     onReply={timelineState.handleReply}
                 />
 

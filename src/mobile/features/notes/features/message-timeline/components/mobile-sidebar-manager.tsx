@@ -5,50 +5,37 @@ import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
-// Types
-interface MobileSidebarManagerProps {
-    // Sidebar states
-    isChannelListOpen: boolean;
-    isAIAssistantOpen: boolean;
-    isSettingsOpen: boolean;
-    isThreadOpen: boolean;
-    
-    // Sidebar actions
-    closeChannelList: () => void;
-    closeAIAssistant: () => void;
-    closeSettings: () => void;
-    
-    // Thread data
-    onSendThreadMessage: (content: string) => void;
-    onCloseThread: () => void;
-    currentChannelId: string | null;
-}
-
-export const MobileSidebarManager = ({
-    // Sidebar states
-    isChannelListOpen,
-    isAIAssistantOpen,
-    isSettingsOpen,
-    isThreadOpen,
-
-    // Sidebar actions
-    closeChannelList,
-    closeAIAssistant,
-    closeSettings,
-
-    // Thread data
-    onSendThreadMessage,
-    onCloseThread,
-    currentChannelId,
-}: MobileSidebarManagerProps) => {
-    const { setCurrentChannel } = useNotesViewStore();
-    const { closeChannelList: closeChannelListFromStore } = useUIStateStore();
+export const MobileSidebarManager = () => {
+    const { setCurrentChannel, currentChannelId } = useNotesViewStore();
+    const { 
+        isChannelListOpen,
+        isAIAssistantOpen,
+        isSettingsOpen,
+        isThreadOpen,
+        closeChannelList,
+        closeAIAssistant,
+        closeSettings,
+        closeThread
+    } = useUIStateStore();
+    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
 
     // Handle channel selection: switch channel and close channel list
     const handleChannelSelect = (channelId: string) => {
         setCurrentChannel(channelId);
-        closeChannelListFromStore();
+        closeChannelList();
+    };
+
+    // Handle thread message sending
+    const handleSendThreadMessage = (content: string) => {
+        if (currentChannelId) {
+            addThreadMessage(currentChannelId, {
+                content,
+                sender: "user" as const,
+                channelId: currentChannelId,
+            });
+        }
     };
     return (
         <>
@@ -77,13 +64,13 @@ export const MobileSidebarManager = ({
 
             {/* Thread Sidebar */}
             {isThreadOpen && (
-                <Sheet open={isThreadOpen} onOpenChange={onCloseThread}>
+                <Sheet open={isThreadOpen} onOpenChange={closeThread}>
                     <SheetContent
                         side="right"
                         className="w-full max-w-md p-0 border-l border-border"
                     >
                         <MobileThreadSidebar
-                            onSendMessage={onSendThreadMessage}
+                            onSendMessage={handleSendThreadMessage}
                         />
                     </SheetContent>
                 </Sheet>

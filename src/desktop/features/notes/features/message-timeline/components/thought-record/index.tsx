@@ -14,9 +14,8 @@ import { ThoughtRecordProps } from "./types";
 export function ThoughtRecord({
     message,
     onReply,
-    onOpenThread,
     threadCount = 0
-}: Omit<ThoughtRecordProps, 'isFirstInGroup'>) {
+}: Omit<ThoughtRecordProps, 'isFirstInGroup' | 'onOpenThread'>) {
     const {
         showAnalysis,
         editingTags,
@@ -104,7 +103,6 @@ export function ThoughtRecord({
                         aiAnalysis={aiAnalysis || null}
                         onToggleAnalysis={handleToggleAnalysis}
                         threadCount={threadCount}
-                        onOpenThread={onOpenThread}
                     />
                 )}
             </div>

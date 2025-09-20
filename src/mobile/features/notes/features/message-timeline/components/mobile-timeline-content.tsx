@@ -15,13 +15,11 @@ export interface MobileTimelineContentRef {
 }
 
 interface MobileTimelineContentProps {
-    onOpenThread: (messageId: string) => void;
     onReply: (messageId: string) => void;
     className?: string;
 }
 
 export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, MobileTimelineContentProps>(({
-    onOpenThread,
     onReply,
     className = ""
 }, ref) => {
@@ -63,7 +61,6 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
     const renderThoughtRecord = (message: Message, threadCount: number) => (
         <MobileThoughtRecord
             message={message}
-            onOpenThread={onOpenThread}
             onReply={() => onReply(message.id)}
             threadCount={threadCount}
         />
