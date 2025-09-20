@@ -9,6 +9,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
@@ -238,67 +239,14 @@ const useNodeData = (
   path?: string
 ) => {
   const { $ } = getControlNode(dataTree, controlTree, path);
-
-  // const subscribe = useCallback(
-  //   (next: any) => {
-  //     const sub = $.subscribe(next);
-  //     return () => {
-  //       sub.unsubscribe();
-  //     };
-  //   },
-  //   [$]
-  // );
-  // // useSyncExternalStore not supported by react 16
-  //   const state = useSyncExternalStore(subscribe, $.getValue.bind($));
-  const [state, setState] = useState(() => $.getValue());
+  const [, setState] = useState(() => $.getValue());
   useEffect(() => {
     const sub = $.subscribe((value) => {
       setState(value);
     });
     return () => sub.unsubscribe();
   }, [$]);
-
-  // useEffect(() => {
-  //   console.log("$ changed");
-  // }, [$]);
-
-  // useEffect(() => {
-  //   console.log("dataTree changed:", dataTree);
-  // }, [dataTree]);
-
-  // useEffect(() => {
-  //   console.log("controlTree changed:", controlTree);
-  // }, [controlTree]);
-
-  // useEffect(() => {
-  //   console.log("path changed:", path);
-  // }, [path]);
-
-  // useEffect(() => {
-  //   // skip 会有问题，如果useEffect之前，$在其它地方被修改了，那么那次修改就会被skip掉
-  //   // 但是如果不skip我记得是有问题的？至少有一个问题是会导致二次运行，某些情况下可能引发无线循环？
-  //   // 假设path是一个顶层的路径，而顶层的状态每次获取都是不一样的，这样setState会触发render
-  //   // const sub = $.pipe(skip(1)).subscribe((value) => {
-  //   //   setState(value);
-  //   // });
-  //   const sub = $.pipe(skip(1)).subscribe((value) => {
-  //     setState(value);
-  //   });
-
-  //   if (path?.includes("currentFilePath")) {
-  //     console.log("use:", path);
-
-  //     $.subscribe((value) => {
-  //       console.log(`no skip: ${path}`, value);
-  //     });
-  //     $.pipe(skip(1)).subscribe((value) => {
-  //       console.log(`skip: ${path}`, value);
-  //     });
-  //   }
-
-  //   return () => sub.unsubscribe();
-  // }, [$]);
-  return state;
+  return $.getValue();
 };
 
 export type IBeanOpName = "get" | "set" | "use" | "$";

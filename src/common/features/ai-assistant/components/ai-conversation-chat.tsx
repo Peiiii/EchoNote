@@ -7,19 +7,21 @@ import { debounceTime } from "rxjs";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useAgentChatSync } from "@/desktop/features/notes/features/ai-assistant/hooks/use-agent-chat-sync";
+import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
 
 import { ConversationChatProps } from "../types/conversation.types";
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
-  const { messages, createMessage, updateMessage, loading } = useAgentChatSync(conversationId, channelId);
-  console.log("[AIConversationChat] loading", loading);
+  const { messages, createMessage, updateMessage, loading } = useConversationMessages(conversationId);
+  const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
+  const isBrandNewConversation = !!conv && (conv.messageCount === 0);
+  const showLoading = loading && !isBrandNewConversation;
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
-        {loading ? (
+        {showLoading ? (
           <div className="h-full flex items-center justify-center">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -28,6 +30,7 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
           </div>
         ) : (
           <AgentChatCoreWrapper
+            key={conversationId}
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
