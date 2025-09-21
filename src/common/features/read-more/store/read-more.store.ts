@@ -26,6 +26,8 @@ interface ReadMoreStore {
   activeVisibleHeight: number | null
   /** ID of the message that has a pending collapse request */
   pendingCollapseId: string | null
+  /** Latest layout sync callback registered by collapse hook */
+  layoutSync: (() => void) | null
   /** Updates the status information for a specific message */
   setStatus: (id: string, status: StatusEntry) => void
   /** Updates which message is controlling the floating collapse button */
@@ -38,18 +40,23 @@ interface ReadMoreStore {
   requestCollapse: (id: string) => void
   /** Acknowledges that a collapse request has been processed */
   acknowledgeCollapse: () => void
+  /** Registers latest layout sync callback */
+  registerLayoutSync: (cb: (() => void) | null) => void
+  /** Notifies that read-more layout may have changed */
+  notifyLayoutChange: () => void
 }
 
 /**
  * Zustand store instance for read-more/collapse state management
  * Provides centralized state management for all read-more components
  */
-export const useReadMoreStore = create<ReadMoreStore>((set) => ({
+export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
   statusMap: {},
   activeMessageId: null,
   inlineOverlap: false,
   activeVisibleHeight: null,
   pendingCollapseId: null,
+  layoutSync: null,
   setStatus: (id, status) => set((state) => ({
     statusMap: { ...state.statusMap, [id]: status },
   })),
@@ -61,6 +68,11 @@ export const useReadMoreStore = create<ReadMoreStore>((set) => ({
     }),
   requestCollapse: (id) => set({ pendingCollapseId: id }),
   acknowledgeCollapse: () => set({ pendingCollapseId: null }),
+  registerLayoutSync: (cb) => set({ layoutSync: cb }),
+  notifyLayoutChange: () => {
+    const cb = get().layoutSync
+    cb?.()
+  },
 }))
 
 /**

@@ -10,6 +10,7 @@ import { Bot, ChevronUp } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
+import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
@@ -56,6 +57,8 @@ export const MessageTimeline = forwardRef<
       useLazyLoadingScrollControl({ containerRef });
 
     const { showFloatingCollapse, handleScroll: handleCollapseScroll, collapseCurrent } = useGlobalCollapse(containerRef);
+
+    const messageDataAttr = READ_MORE_DATA_ATTRS.messageId;
 
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
@@ -124,7 +127,7 @@ export const MessageTimeline = forwardRef<
                   return (
                     <div
                       key={message.id}
-                      data-message-id={message.id}
+                      {...{ [messageDataAttr]: message.id }}
                       className="w-full"
                       style={{ height: "auto", minHeight: "auto" }}
                     >

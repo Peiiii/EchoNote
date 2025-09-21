@@ -4,8 +4,9 @@ import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, Settings, Users } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
+import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -52,6 +53,9 @@ export const ChannelCoverHeader = ({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const notifyLayoutChange = useReadMoreStore(
+    useCallback((state) => state.notifyLayoutChange, [])
+  );
   const { updateChannel } = useNotesDataStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
   const isGradient = backgroundStyle.includes('gradient');
@@ -82,9 +86,11 @@ export const ChannelCoverHeader = ({
 
     setIsAnimating(true);
     setIsCollapsed(!isCollapsed);
+    notifyLayoutChange();
 
     setTimeout(() => {
       setIsAnimating(false);
+      notifyLayoutChange();
     }, 300);
   };
 

@@ -1,3 +1,5 @@
+import { READ_MORE_SELECTORS, getMessageIdFromElement } from './dom-constants'
+
 /**
  * Computes the ID of the message that is currently focused (closest to container center)
  * Uses geometric distance calculation to find the most centered visible message
@@ -8,11 +10,11 @@ export function computeFocusedId(container: HTMLElement): string | null {
   const rect = container.getBoundingClientRect()
   const centerY = rect.top + rect.height / 2
   let best: { id: string; dist: number } | null = null
-  const nodes = container.querySelectorAll('[data-message-id]')
+  const nodes = container.querySelectorAll(READ_MORE_SELECTORS.message)
   nodes.forEach((node) => {
     const r = (node as HTMLElement).getBoundingClientRect()
     if (r.bottom < rect.top || r.top > rect.bottom) return
-    const id = (node as HTMLElement).getAttribute('data-message-id')
+    const id = getMessageIdFromElement(node)
     if (!id) return
     const d = Math.abs((r.top + r.height / 2) - centerY)
     if (!best || d < best.dist) best = { id, dist: d }

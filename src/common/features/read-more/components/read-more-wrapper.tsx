@@ -5,6 +5,7 @@ import {
   selectShowFloatingCollapse,
   useReadMoreStore,
 } from "../store/read-more.store";
+import { READ_MORE_DATA_ATTRS } from "../core/dom-constants";
 
 interface ReadMoreBaseWrapperProps {
   children: React.ReactNode;
@@ -44,6 +45,9 @@ export function ReadMoreBaseWrapper({
   const activeMessageId = useReadMoreStore(
     useCallback((state) => state.activeMessageId, [])
   );
+  const notifyLayoutChange = useReadMoreStore(
+    useCallback((state) => state.notifyLayoutChange, [])
+  );
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -66,9 +70,16 @@ export function ReadMoreBaseWrapper({
     }
   }, [pendingCollapseId, messageId, isExpanded, acknowledgeCollapse]);
 
+  useEffect(() => {
+    notifyLayoutChange();
+  }, [notifyLayoutChange, isExpanded, showReadMore]);
+
   const handleToggle = () => setIsExpanded((prev) => !prev);
   const inlineHidden =
     showFloatingCollapse && activeMessageId === messageId && isExpanded;
+  const collapseInlineData = {
+    [READ_MORE_DATA_ATTRS.collapseInlineFor]: messageId,
+  } as const;
 
   return (
     <div className={cn("relative group overflow-hidden", className)}>
@@ -107,7 +118,7 @@ export function ReadMoreBaseWrapper({
       {isExpanded && showReadMore && (
         <button
           type="button"
-          data-collapse-inline-for={messageId}
+          {...collapseInlineData}
           onClick={handleToggle}
           className={cn(
             "absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98] transition-opacity duration-150",
