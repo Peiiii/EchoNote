@@ -1,85 +1,96 @@
-import { Textarea } from '@/common/components/ui/textarea';
-import { EditorToolbar } from '@/common/components/editor-toolbar';
-import { Save, X, Expand } from 'lucide-react';
-import { useEditStateStore } from '@/core/stores/edit-state.store';
+import { useRef } from "react";
+import { Textarea } from "@/common/components/ui/textarea";
+import { EditorToolbar } from "@/common/components/editor-toolbar";
+import { Save, X, Expand } from "lucide-react";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { useEditor } from "@/common/hooks/use-editor";
 
 interface MobileInlineEditorProps {
-    onSave: () => void;
-    onCancel: () => void;
-    onExpand: () => void;
-    isSaving: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  onExpand: () => void;
+  isSaving: boolean;
 }
 
 export function MobileInlineEditor({
-    onSave,
-    onCancel,
-    onExpand,
-    isSaving
+  onSave,
+  onCancel,
+  onExpand,
+  isSaving,
 }: MobileInlineEditorProps) {
-    const { editContent, originalContent, updateContent } = useEditStateStore();
-    const hasChanges = editContent !== originalContent;
+  const { editContent, originalContent, updateContent } = useEditStateStore();
+  const hasChanges = editContent !== originalContent;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newContent = e.target.value;
-        updateContent(newContent);
-    };
+  useEditor({ textareaRef, updateContent, content: editContent });
 
-    const handleSave = () => {
-        if (hasChanges) {
-            onSave();
-        }
-    };
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    updateContent(newContent);
+  };
 
-    const handleCancel = () => {
-        if (hasChanges) {
-            if (confirm("You have unsaved changes. Are you sure you want to cancel?")) {
-                onCancel();
-            }
-        } else {
-            onCancel();
-        }
-    };
+  const handleSave = () => {
+    if (hasChanges) {
+      onSave();
+    }
+  };
 
-    return (
-        <div className="space-y-3">
-            {/* Editor */}
-            <Textarea
-                value={editContent}
-                onChange={handleContentChange}
-                placeholder="Edit your thought..."
-                className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
-                autoFocus
-            />
+  const handleCancel = () => {
+    if (hasChanges) {
+      if (
+        confirm("You have unsaved changes. Are you sure you want to cancel?")
+      ) {
+        onCancel();
+      }
+    } else {
+      onCancel();
+    }
+  };
 
-            {/* Action Buttons */}
-            <EditorToolbar
-                leftActions={[
-                    {
-                        label: "Cancel",
-                        onClick: handleCancel,
-                        disabled: isSaving,
-                        icon: <X className="w-3 h-3 mr-1" />
-                    },
-                    {
-                        label: isSaving ? "Saving..." : "Save",
-                        onClick: handleSave,
-                        disabled: !hasChanges || isSaving,
-                        icon: <Save className="w-3 h-3 mr-1" />,
-                        className: hasChanges 
-                            ? 'bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200' 
-                            : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
-                    }
-                ]}
-                rightActions={[
-                    {
-                        label: "Expand",
-                        onClick: onExpand,
-                        disabled: isSaving,
-                        icon: <Expand className="w-3 h-3 mr-1" />,
-                        variant: "outline"
-                    }
-                ]}
-            />
-        </div>
-    );
+  return (
+    <div className="space-y-3">
+      {/* Editor */}
+      <Textarea
+        ref={textareaRef}
+        value={editContent}
+        onChange={handleContentChange}
+        placeholder="Edit your thought..."
+        className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
+        autoFocus
+        style={{
+          caretColor: "#3b82f6",
+        }}
+      />
+
+      {/* Action Buttons */}
+      <EditorToolbar
+        leftActions={[
+          {
+            label: "Cancel",
+            onClick: handleCancel,
+            disabled: isSaving,
+            icon: <X className="w-3 h-3 mr-1" />,
+          },
+          {
+            label: isSaving ? "Saving..." : "Save",
+            onClick: handleSave,
+            disabled: !hasChanges || isSaving,
+            icon: <Save className="w-3 h-3 mr-1" />,
+            className: hasChanges
+              ? "bg-slate-600 hover:bg-slate-700 text-white shadow-sm border border-slate-500 transition-colors duration-200"
+              : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed",
+          },
+        ]}
+        rightActions={[
+          {
+            label: "Expand",
+            onClick: onExpand,
+            disabled: isSaving,
+            icon: <Expand className="w-3 h-3 mr-1" />,
+            variant: "outline",
+          },
+        ]}
+      />
+    </div>
+  );
 }

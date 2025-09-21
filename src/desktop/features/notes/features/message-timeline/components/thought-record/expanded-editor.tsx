@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Check, Loader2, Minimize2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useEditor } from "@/common/hooks/use-editor";
 
 interface ExpandedEditorProps {
   content: string;
@@ -22,6 +23,8 @@ export function ExpandedEditor({
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateContent } = useEditStateStore();
+  
+  useEditor({ textareaRef, updateContent, content });
 
   // Auto-focus when component mounts
   useEffect(() => {
@@ -64,6 +67,7 @@ export function ExpandedEditor({
     } else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       handleSave();
     }
+    // Tab handling is now managed by useEditor hook
   };
 
   return (
