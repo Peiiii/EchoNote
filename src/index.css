@@ -84,9 +84,9 @@
 .dark {
   --background: #191A1A;        /* 主内容区 - 最亮 */
   --foreground: oklch(0.985 0 0);
-  --card: #1C1D1E;              /* Channel List - 平衡的对比度 */
+  --card: #1F2021;              /* Channel List - 平衡的对比度 */
   --card-foreground: oklch(0.985 0 0);
-  --card-accent: #1A1B1C;       /* Channel List选中项 - 基于card的轻微变化 */
+  --card-accent: #232425;       /* Channel List选中项 - 基于card背景的对比 */
   --card-accent-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
@@ -111,7 +111,7 @@
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0.002 60);   /* 选中项 - 更明显的区分度 */
+  --sidebar-accent: oklch(0.25 0.002 60);   /* 选中项 - 更明显的区分度 */
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
