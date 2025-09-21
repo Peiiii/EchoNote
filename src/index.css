@@ -40,6 +40,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-card-accent: var(--card-accent);
+  --color-card-accent-foreground: var(--card-accent-foreground);
 }
 
 :root {
@@ -48,6 +50,8 @@
   --foreground: oklch(0.145 0 0);
   --card: oklch(0.97 0 0);              /* Channel List - 平衡的对比度 */
   --card-foreground: oklch(0.145 0 0);
+  --card-accent: oklch(0.94 0 0);       /* Channel List选中项 - 基于card的轻微变化 */
+  --card-accent-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.45 0.15 264);      /* Apple Blue */
@@ -71,7 +75,7 @@
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.92 0.002 60);   /* 选中项 - 更轻的微妙变化 */
+  --sidebar-accent: oklch(0.90 0.002 60);   /* 选中项 - 更明显的区分度 */
   --sidebar-accent-foreground: oklch(0.145 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
@@ -82,6 +86,8 @@
   --foreground: oklch(0.985 0 0);
   --card: #1C1D1E;              /* Channel List - 平衡的对比度 */
   --card-foreground: oklch(0.985 0 0);
+  --card-accent: #1A1B1C;       /* Channel List选中项 - 基于card的轻微变化 */
+  --card-accent-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.55 0.15 264);      /* Apple Blue for dark mode */
@@ -105,7 +111,7 @@
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.20 0.002 60);   /* 选中项 - 更轻的微妙变化 */
+  --sidebar-accent: oklch(0.22 0.002 60);   /* 选中项 - 更明显的区分度 */
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);

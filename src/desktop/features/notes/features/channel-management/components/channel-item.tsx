@@ -22,14 +22,14 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
             onClick={onClick}
         >
             <div className={`relative p-3 rounded-lg transition-all duration-200 ${isActive
-                ? 'bg-sidebar-accent dark:bg-sidebar-accent shadow-sm'
-                : 'bg-transparent hover:bg-sidebar-accent dark:hover:bg-sidebar-accent'
+                ? 'bg-card-accent dark:bg-card-accent shadow-sm'
+                : 'bg-transparent hover:bg-card-accent dark:hover:bg-card-accent'
                 }`}>
 
                 <div className="flex items-start gap-3">
                     {/* Channel Icon */}
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive
-                        ? 'bg-sidebar-accent dark:bg-sidebar-accent'
+                        ? 'bg-card-accent dark:bg-card-accent'
                         : 'bg-slate-100 dark:bg-slate-800'
                         }`}>
                         {channel.emoji ? (
