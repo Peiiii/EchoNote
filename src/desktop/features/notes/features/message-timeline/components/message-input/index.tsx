@@ -18,7 +18,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
     } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
 
     return (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-background">
+        <div className="bg-white dark:bg-background">
             {replyToMessage && (
                 <ReplyIndicator 
                     replyToMessage={replyToMessage} 
