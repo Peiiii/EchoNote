@@ -111,7 +111,7 @@ export function ReadMoreBaseWrapper({
         <>
           <div
             className={cn(
-              "pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background via-background/60 to-transparent z-0",
+              "pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background via-background/60 to-transparent transition-colors duration-200 group-hover:from-muted group-hover:via-muted/50 group-hover:to-transparent z-0",
               gradientClassName
             )}
           />
