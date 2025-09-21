@@ -54,8 +54,8 @@
   --card-accent-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.45 0.15 264);      /* Apple Blue */
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.3 0 0);            /* Dark gray for light mode - monochrome */
+  --primary-foreground: oklch(0.95 0 0);
   --secondary: oklch(0.96 0 0);         /* 更深的二级背景 */
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.95 0 0);             /* AI 助手 - 更明显的背景 */
@@ -65,7 +65,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.88 0 0);            /* 主要边框 */
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.45 0.15 264);         /* 使用Apple Blue作为ring */
+  --ring: oklch(0.3 0 0);               /* 使用深灰色作为ring - monochrome */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -90,8 +90,8 @@
   --card-accent-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.55 0.15 264);      /* Apple Blue for dark mode */
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.7 0 0);            /* Light gray for dark mode - monochrome */
+  --primary-foreground: oklch(0.2 0 0);
   --secondary: oklch(0.22 0 0);         /* 更深的二级背景 */
   --secondary-foreground: oklch(0.985 0 0);
   --muted: #2A2B2C;             /* AI 助手 - 更明显的背景 */
@@ -101,7 +101,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.25 0 0);            /* 主要边框 */
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.55 0.15 264);         /* 使用Apple Blue作为ring */
+  --ring: oklch(0.7 0 0);               /* 使用浅灰色作为ring - monochrome */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
