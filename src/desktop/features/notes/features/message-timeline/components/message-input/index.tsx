@@ -1,7 +1,7 @@
-import { ReplyIndicator } from "./components/reply-indicator";
-import { Toolbar } from "./components/toolbar";
 import { InputArea } from "./components/input-area";
+import { ReplyIndicator } from "./components/reply-indicator";
 import { SendButton } from "./components/send-button";
+import { Toolbar } from "./components/toolbar";
 import { useMessageInput } from "./hooks/use-message-input";
 import { MessageInputProps } from "./types";
 

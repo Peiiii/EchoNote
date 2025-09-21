@@ -6,7 +6,8 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { Bot, ChevronUp } from "lucide-react";
+import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { Bot, ChevronUp, PenLine } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
@@ -48,6 +49,9 @@ export const MessageTimeline = forwardRef<
   ) => {
     const { currentChannelId } = useNotesViewStore();
     const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
+    
+    // Use unified input collapse hook
+    const { inputCollapsed, handleExpandInput } = useInputCollapse();
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
       [],
@@ -59,6 +63,7 @@ export const MessageTimeline = forwardRef<
     const { showFloatingCollapse, handleScroll: handleCollapseScroll, collapseCurrent } = useGlobalCollapse(containerRef);
 
     const messageDataAttr = READ_MORE_DATA_ATTRS.messageId;
+
 
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
@@ -152,6 +157,16 @@ export const MessageTimeline = forwardRef<
         </div>
         <div className="absolute bottom-4 right-4 z-20 pointer-events-none">
           <div className="flex flex-col items-end gap-2">
+            {inputCollapsed && (
+              <div className="pointer-events-auto">
+                <FloatingActionButton
+                  onClick={handleExpandInput}
+                  ariaLabel="Show composer"
+                >
+                  <PenLine className="h-4 w-4" />
+                </FloatingActionButton>
+              </div>
+            )}
             <div className="pointer-events-auto">
               <FloatingActionButton
                 onClick={() => {

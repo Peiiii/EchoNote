@@ -15,7 +15,7 @@ interface TimelineContentProps {
 
 export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(({ 
     renderThoughtRecord,
-    className = ""
+    className = "",
 }, ref) => {
     const { currentChannelId } = useNotesViewStore();
 

@@ -18,6 +18,8 @@ export interface UIPreferencesState {
 
   // Timeline cover states keyed by channel id
   timelineCoverCollapsed: Record<string, boolean>;
+  // Timeline input states keyed by channel id
+  timelineInputCollapsed: Record<string, boolean>;
   
   // Actions
   toggleLeftSidebar: () => void;
@@ -28,6 +30,7 @@ export interface UIPreferencesState {
   setShowTimestamps: (show: boolean) => void;
   setShowUserAvatars: (show: boolean) => void;
   setTimelineCoverCollapsed: (channelId: string, collapsed: boolean) => void;
+  setTimelineInputCollapsed: (channelId: string, collapsed: boolean) => void;
 }
 
 export const useUIPreferencesStore = create<UIPreferencesState>()(
@@ -41,6 +44,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
       showTimestamps: true,
       showUserAvatars: true,
       timelineCoverCollapsed: {},
+      timelineInputCollapsed: {},
 
       // Actions
       toggleLeftSidebar: () => {
@@ -81,6 +85,15 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
           },
         }));
       },
+
+      setTimelineInputCollapsed: (channelId: string, collapsed: boolean) => {
+        set((state) => ({
+          timelineInputCollapsed: {
+            ...state.timelineInputCollapsed,
+            [channelId]: collapsed,
+          },
+        }));
+      },
     }),
     {
       name: "echonote-ui-preferences-storage",
@@ -93,6 +106,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
         showTimestamps: state.showTimestamps,
         showUserAvatars: state.showUserAvatars,
         timelineCoverCollapsed: state.timelineCoverCollapsed,
+        timelineInputCollapsed: state.timelineInputCollapsed,
       }),
     }
   )
