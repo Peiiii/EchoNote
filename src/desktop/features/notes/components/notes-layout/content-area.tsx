@@ -46,7 +46,7 @@ export const ContentArea = ({ children, rightSidebar, className = "" }: ContentA
                             setRightSidebarSize(size);
                         }}
                     >
-                        <div className="h-full border-l border-border bg-muted overflow-hidden">
+                        <div className="h-full border-l border-border/40 bg-muted overflow-hidden">
                             {rightSidebar}
                         </div>
                     </ResizablePanel>

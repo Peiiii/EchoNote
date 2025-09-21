@@ -45,12 +45,12 @@ export function AIAssistantCore({
         : "h-full flex flex-col bg-background w-full";
 
     const headerClasses = variant === 'sidebar'
-        ? "flex items-center justify-between p-4 border-b border-border flex-shrink-0"
-        : "flex items-center justify-start p-4 border-b border-border flex-shrink-0";
+        ? "flex items-center justify-between p-4 border-b border-border/60 flex-shrink-0"
+        : "flex items-center justify-start p-4 border-b border-border/60 flex-shrink-0";
 
     const footerClasses = variant === 'sidebar'
-        ? "p-3 border-t border-border bg-accent flex-shrink-0"
-        : "p-3 border-t border-border bg-muted flex-shrink-0";
+        ? "p-3 border-t border-border/60 bg-accent flex-shrink-0"
+        : "p-3 border-t border-border/60 bg-muted flex-shrink-0";
 
     return (
         <div className={`${containerClasses} ${className}`}>

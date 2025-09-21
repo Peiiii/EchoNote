@@ -51,7 +51,7 @@ export const MobileSidebarManager = () => {
                 <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
                     <SheetContent
                         side="bottom"
-                        className="h-[80vh] p-0 border-t border-border"
+                        className="h-[80vh] p-0 border-t border-border/60"
                         onOpenAutoFocus={(e) => e.preventDefault()}
                     >
                         <MobileAIAssistant
@@ -67,7 +67,7 @@ export const MobileSidebarManager = () => {
                 <Sheet open={isThreadOpen} onOpenChange={closeThread}>
                     <SheetContent
                         side="right"
-                        className="w-full max-w-md p-0 border-l border-border"
+                        className="w-full max-w-md p-0 border-l border-border/60"
                     >
                         <MobileThreadSidebar
                             onSendMessage={handleSendThreadMessage}
@@ -80,7 +80,7 @@ export const MobileSidebarManager = () => {
             <Sheet open={isSettingsOpen} onOpenChange={closeSettings}>
                 <SheetContent
                     side="right"
-                    className="w-full max-w-md p-0 border-l border-border"
+                    className="w-full max-w-md p-0 border-l border-border/60"
                 >
                     <MobileSettingsSidebar />
                 </SheetContent>
