@@ -120,8 +120,7 @@ export function ExpandedEditor({
               className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
               disabled={isSaving}
               style={{
-                caretColor: '#3b82f6',
-                minHeight: 'calc(100vh - 200px)'
+                caretColor: '#3b82f6'
               }}
             />
           </div>
