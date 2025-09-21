@@ -1,4 +1,5 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { useReadMoreStore } from '@/common/features/read-more/store/read-more.store'
 
 interface UseChatAutoScrollOptions {
   threshold?: number // px, distance from bottom to auto sticky
@@ -58,7 +59,10 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
     const check = () => {
       if (!el) return
       if (el.scrollHeight !== lastScrollHeight.current) {
-        scrollToBottom()
+        const suppressed = useReadMoreStore.getState().consumeAutoScrollSuppression()
+        if (!suppressed) {
+          scrollToBottom()
+        }
         lastScrollHeight.current = el.scrollHeight
       }
       frame = requestAnimationFrame(check)

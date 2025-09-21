@@ -28,6 +28,8 @@ interface ReadMoreStore {
   pendingCollapseId: string | null
   /** Latest layout sync callback registered by collapse hook */
   layoutSync: (() => void) | null
+  /** Whether the next auto-scroll should be suppressed */
+  autoScrollSuppressed: boolean
   /** Updates the status information for a specific message */
   setStatus: (id: string, status: StatusEntry) => void
   /** Updates which message is controlling the floating collapse button */
@@ -44,6 +46,10 @@ interface ReadMoreStore {
   registerLayoutSync: (cb: (() => void) | null) => void
   /** Notifies that read-more layout may have changed */
   notifyLayoutChange: () => void
+  /** Suppresses the next auto-scroll triggered by sticky mode */
+  suppressAutoScrollOnce: () => void
+  /** Consumes suppression flag, returning true if suppression was active */
+  consumeAutoScrollSuppression: () => boolean
 }
 
 /**
@@ -57,6 +63,7 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
   activeVisibleHeight: null,
   pendingCollapseId: null,
   layoutSync: null,
+  autoScrollSuppressed: false,
   setStatus: (id, status) => set((state) => ({
     statusMap: { ...state.statusMap, [id]: status },
   })),
@@ -72,6 +79,14 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
   notifyLayoutChange: () => {
     const cb = get().layoutSync
     cb?.()
+  },
+  suppressAutoScrollOnce: () => set({ autoScrollSuppressed: true }),
+  consumeAutoScrollSuppression: () => {
+    const suppressed = get().autoScrollSuppressed
+    if (suppressed) {
+      set({ autoScrollSuppressed: false })
+    }
+    return suppressed
   },
 }))
 
