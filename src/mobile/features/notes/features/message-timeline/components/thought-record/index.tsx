@@ -125,15 +125,13 @@ export const MobileThoughtRecord = ({
 
   return (
     <div className="w-full flex flex-col overflow-hidden group">
-      <div className="w-full h-px bg-slate-200/60 dark:bg-slate-700/80 mb-0"></div>
-
-      <div className="relative w-full px-4 py-4 bg-transparent hover:bg-slate-50/30 dark:hover:bg-slate-800/20 transition-all duration-200 ease-out">
+      <div className="relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out border-t-2 border-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
               <span>{formatTimeForSocial(message.timestamp)}</span>
             </div>
-            <div className="w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+            <div className="w-1 h-1 bg-muted-foreground/60 rounded-full"></div>
           </div>
 
           {/* More Actions Menu */}
