@@ -7,6 +7,7 @@ import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, Settings, U
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
+import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -50,11 +51,19 @@ export const ChannelCoverHeader = ({
   className = "",
   defaultCollapsed = false
 }: ChannelCoverHeaderProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const notifyLayoutChange = useReadMoreStore(
     useCallback((state) => state.notifyLayoutChange, [])
+  );
+  const setTimelineCoverCollapsed = useUIPreferencesStore(
+    useCallback((state) => state.setTimelineCoverCollapsed, [])
+  );
+  const isCollapsed = useUIPreferencesStore(
+    useCallback(
+      (state) => state.timelineCoverCollapsed[channel.id] ?? defaultCollapsed,
+      [channel.id, defaultCollapsed]
+    )
   );
   const { updateChannel } = useNotesDataStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
@@ -85,7 +94,8 @@ export const ChannelCoverHeader = ({
     if (isAnimating) return;
 
     setIsAnimating(true);
-    setIsCollapsed(!isCollapsed);
+    const nextCollapsed = !isCollapsed;
+    setTimelineCoverCollapsed(channel.id, nextCollapsed);
     notifyLayoutChange();
 
     setTimeout(() => {
@@ -178,14 +188,14 @@ export const ChannelCoverHeader = ({
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-            onClick={handleToggle}
-          >
-            <ChevronUp className="h-4 w-4 transition-transform duration-200" />
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+              onClick={handleToggle}
+            >
+              <ChevronUp className="h-4 w-4 transition-transform duration-200" />
+            </Button>
         </div>
       </div>
 
