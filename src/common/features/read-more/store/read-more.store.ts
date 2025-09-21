@@ -8,8 +8,8 @@ type StatusEntry = {
   long: boolean
   /** Whether the message is currently expanded (showing full content) */
   expanded: boolean
-  /** Whether the inline collapse button is visible (not overlapped by container edge) */
-  inlineVisible?: boolean
+  /** Visible height threshold at which collapsing stops being useful */
+  collapseThreshold: number
 }
 
 /**
@@ -18,16 +18,22 @@ type StatusEntry = {
 interface ReadMoreStore {
   /** Map of message IDs to their individual status information */
   statusMap: Record<string, StatusEntry>
-  /** ID of the currently focused message (closest to container center) */
-  focusedId: string | null
-  /** Whether the inline collapse button of the focused message is overlapped */
+  /** ID of the message that currently sits at the bottom edge of the viewport */
+  activeMessageId: string | null
+  /** Whether the inline collapse button of the active message is overlapped */
   inlineOverlap: boolean
+  /** Visible height (within viewport) of the active message */
+  activeVisibleHeight: number | null
   /** ID of the message that has a pending collapse request */
   pendingCollapseId: string | null
   /** Updates the status information for a specific message */
   setStatus: (id: string, status: StatusEntry) => void
-  /** Updates the focus information (which message is focused and if inline button is overlapped) */
-  setFocusInfo: (focusedId: string | null, inlineOverlap: boolean) => void
+  /** Updates which message is controlling the floating collapse button */
+  setActiveInfo: (
+    messageId: string | null,
+    inlineOverlap: boolean,
+    visibleHeight: number | null
+  ) => void
   /** Requests a collapse operation for a specific message */
   requestCollapse: (id: string) => void
   /** Acknowledges that a collapse request has been processed */
@@ -40,13 +46,19 @@ interface ReadMoreStore {
  */
 export const useReadMoreStore = create<ReadMoreStore>((set) => ({
   statusMap: {},
-  focusedId: null,
+  activeMessageId: null,
   inlineOverlap: false,
+  activeVisibleHeight: null,
   pendingCollapseId: null,
   setStatus: (id, status) => set((state) => ({
     statusMap: { ...state.statusMap, [id]: status },
   })),
-  setFocusInfo: (focusedId, inlineOverlap) => set({ focusedId, inlineOverlap }),
+  setActiveInfo: (messageId, inlineOverlap, visibleHeight) =>
+    set({
+      activeMessageId: messageId,
+      inlineOverlap,
+      activeVisibleHeight: visibleHeight,
+    }),
   requestCollapse: (id) => set({ pendingCollapseId: id }),
   acknowledgeCollapse: () => set({ pendingCollapseId: null }),
 }))
@@ -57,10 +69,13 @@ export const useReadMoreStore = create<ReadMoreStore>((set) => ({
  * @returns True if floating collapse button should be visible
  */
 export const selectShowFloatingCollapse = (state: ReadMoreStore) => {
-  const id = state.focusedId
+  const id = state.activeMessageId
   if (!id) return false
   const entry = state.statusMap[id]
   if (!entry) return false
-  return entry.long && entry.expanded && state.inlineOverlap
+  if (!entry.long || !entry.expanded) return false
+  if (!state.inlineOverlap) return false
+  if (entry.collapseThreshold <= 0) return true
+  if (state.activeVisibleHeight == null) return true
+  return state.activeVisibleHeight > entry.collapseThreshold + 1
 }
-

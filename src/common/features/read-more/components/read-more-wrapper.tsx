@@ -1,7 +1,6 @@
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getFloatOffset } from "../core/collapse-utils";
 import {
   selectShowFloatingCollapse,
   useReadMoreStore,
@@ -38,23 +37,13 @@ export function ReadMoreBaseWrapper({
     useCallback((state) => state.acknowledgeCollapse, [])
   );
 
-  const showFloatingCollapse = useReadMoreStore(selectShowFloatingCollapse);
-  const focusedId = useReadMoreStore(
-    useCallback((state) => state.focusedId, [])
-  );
-  const inlineOverlap = useReadMoreStore(
-    useCallback((state) => state.inlineOverlap, [])
-  );
-
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
-  const [collapseInlineVisible, setCollapseInlineVisible] = useState<
-    boolean | undefined
-  >(undefined);
-
   const contentRef = useRef<HTMLDivElement>(null);
-  const collapseBtnRef = useRef<HTMLButtonElement | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const showFloatingCollapse = useReadMoreStore(selectShowFloatingCollapse);
+  const activeMessageId = useReadMoreStore(
+    useCallback((state) => state.activeMessageId, [])
+  );
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -66,10 +55,9 @@ export function ReadMoreBaseWrapper({
     setStatus(messageId, {
       long: showReadMore,
       expanded: isExpanded,
-      inlineVisible:
-        collapseInlineVisible === undefined ? undefined : collapseInlineVisible,
+      collapseThreshold: maxHeight + clampMargin,
     });
-  }, [messageId, showReadMore, isExpanded, collapseInlineVisible, setStatus]);
+  }, [messageId, showReadMore, isExpanded, maxHeight, clampMargin, setStatus]);
 
   useEffect(() => {
     if (pendingCollapseId === messageId && isExpanded) {
@@ -78,39 +66,9 @@ export function ReadMoreBaseWrapper({
     }
   }, [pendingCollapseId, messageId, isExpanded, acknowledgeCollapse]);
 
-  useEffect(() => {
-    if (!isExpanded || !showReadMore) {
-      setCollapseInlineVisible(undefined);
-    }
-  }, [isExpanded, showReadMore]);
-
-  useEffect(() => {
-    observerRef.current?.disconnect();
-
-    if (!isExpanded || !showReadMore) return;
-    const root = contentRef.current?.closest(
-      '[data-component="message-timeline"]'
-    ) as HTMLElement | null;
-    const btn = collapseBtnRef.current;
-    if (!root || !btn) return;
-
-    const offset = getFloatOffset(root);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const vis = entries[0]?.isIntersecting ?? false;
-        setCollapseInlineVisible(vis);
-      },
-      { root, threshold: 0.01, rootMargin: `0px 0px ${-offset}px 0px` }
-    );
-    observer.observe(btn);
-    observerRef.current = observer;
-
-    return () => observer.disconnect();
-  }, [isExpanded, showReadMore]);
-
   const handleToggle = () => setIsExpanded((prev) => !prev);
   const inlineHidden =
-    showFloatingCollapse && inlineOverlap && messageId === focusedId;
+    showFloatingCollapse && activeMessageId === messageId && isExpanded;
 
   return (
     <div className={cn("relative group overflow-hidden", className)}>
@@ -149,7 +107,6 @@ export function ReadMoreBaseWrapper({
       {isExpanded && showReadMore && (
         <button
           type="button"
-          ref={collapseBtnRef}
           data-collapse-inline-for={messageId}
           onClick={handleToggle}
           className={cn(

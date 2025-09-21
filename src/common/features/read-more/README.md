@@ -21,7 +21,7 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
 - `common/features/read-more/components/read-more-wrapper.tsx`
   - `ReadMoreBaseWrapper` – shared pill UI & state for both mobile/desktop wrappers.
 - `common/features/read-more/hooks/use-global-collapse.ts`
-  - Ultra‑thin hook: computes focus/overlap with rAF, provides `{ showCollapse, handleScroll, collapseCurrent }`.
+  - Ultra‑thin hook: finds the message that intersects the bottom of the viewport, computes overlap, provides `{ showCollapse, handleScroll, collapseCurrent }`.
 - `message-timeline.tsx`
   - Integrates the hook; renders floating Collapse pill at the bottom center; ensures pointer‑events are correct.
 - Mobile
