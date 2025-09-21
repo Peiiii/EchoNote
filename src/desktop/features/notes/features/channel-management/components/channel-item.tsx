@@ -22,7 +22,7 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
             onClick={onClick}
         >
             <div className={`relative p-3 rounded-lg transition-all duration-200 ${isActive
-                ? 'bg-sidebar-accent dark:bg-sidebar-accent'
+                ? 'bg-sidebar-accent dark:bg-sidebar-accent shadow-sm'
                 : 'bg-transparent hover:bg-sidebar-accent dark:hover:bg-sidebar-accent'
                 }`}>
 

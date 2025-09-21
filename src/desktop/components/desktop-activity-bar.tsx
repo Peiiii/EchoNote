@@ -38,7 +38,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
       className={cn(
         "relative flex-shrink-0 h-full",
         "bg-sidebar dark:bg-card border-none",
-        "shadow-sm",
+        "shadow-md",
         className
       )}
     >
@@ -72,7 +72,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
                 key={item.id}
                 id={item.id}
                 className="activity-bar-item dark:bg-accent"
-                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                 collapsedLabel={item.collapsedLabel}
                 icon={
                   <div

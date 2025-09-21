@@ -63,9 +63,9 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     }
 
     return (
-        <div data-component="channel-list" className="flex flex-col h-full overflow-hidden">
+        <div data-component="channel-list" className="flex flex-col h-full overflow-hidden bg-card shadow-sm">
             {/* Header */}
-            <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between dark:border-slate-700">
+            <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between bg-secondary/50 backdrop-blur-sm">
                 <div className="flex-1 min-w-0">
                     <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
                         Thought Spaces
