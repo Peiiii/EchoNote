@@ -1,4 +1,5 @@
 import { firebaseNotesService } from "@/common/services/firebase/firebase-notes.service";
+import { getRandomEmoji } from "@/common/utils/emoji";
 import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
 import { DocumentSnapshot } from "firebase/firestore";
@@ -119,8 +120,13 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   },
 
   addChannel: withUserValidation(async (userId, channel) => {
+    // Assign a random emoji if none provided
+    const finalChannel = {
+      ...channel,
+      emoji: channel.emoji && channel.emoji.trim() ? channel.emoji : getRandomEmoji(),
+    };
     await withErrorHandling(
-      () => firebaseNotesService.createChannel(userId, channel),
+      () => firebaseNotesService.createChannel(userId, finalChannel),
       'createChannel'
     );
   }),
@@ -379,7 +385,6 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }, 'fetchChannels');
   },
 }));
-
 
 
 
