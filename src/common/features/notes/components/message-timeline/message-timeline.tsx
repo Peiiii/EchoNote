@@ -123,7 +123,7 @@ export const MessageTimeline = forwardRef<
 
                 {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
                 {/* Align separators: no extra padding on mobile (edge-to-edge), keep desktop alignment; ultra-light in light mode */}
-                <div className="px-0 md:px-6 divide-y divide-slate-200/10 dark:divide-slate-800/60">
+                <div className="px-0 md:px-6 divide-y divide-slate-200/20 dark:divide-slate-800/60">
                   {userMessages.map((message: Message) => {
                     const threadMessages = (messages ?? []).filter(
                       (msg) => msg.threadId === (message.threadId || message.id)
