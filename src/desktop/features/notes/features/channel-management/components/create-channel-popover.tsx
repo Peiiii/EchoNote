@@ -3,6 +3,7 @@ import { Input } from "@/common/components/ui/input";
 import { RefinedPopover } from "@/common/components/refined-popover";
 import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Plus } from "lucide-react";
+import { getRandomEmoji } from "@/common/utils/emoji";
 import { useState } from "react";
 
 interface CreateChannelPopoverProps {
@@ -13,7 +14,8 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const [isOpen, setIsOpen] = useState(false);
     const [newChannelName, setNewChannelName] = useState("");
     const [newChannelDescription, setNewChannelDescription] = useState("");
-    const [newChannelEmoji, setNewChannelEmoji] = useState("");
+    // Seed with a random emoji so users see a default right away
+    const [newChannelEmoji, setNewChannelEmoji] = useState<string>(() => getRandomEmoji());
 
     const handleAddChannel = () => {
         if (newChannelName.trim()) {
@@ -24,7 +26,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
             });
             setNewChannelName("");
             setNewChannelDescription("");
-            setNewChannelEmoji("");
+            setNewChannelEmoji(getRandomEmoji()); // prepare next open with a fresh random emoji
             setIsOpen(false);
         }
     };
@@ -32,7 +34,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const handleCancel = () => {
         setNewChannelName("");
         setNewChannelDescription("");
-        setNewChannelEmoji("");
+        setNewChannelEmoji(getRandomEmoji());
         setIsOpen(false);
     };
 
@@ -47,7 +49,18 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     };
 
     return (
-        <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
+        <RefinedPopover
+            open={isOpen}
+            onOpenChange={(open) => {
+                setIsOpen(open);
+                if (open) {
+                    // Reset fields and re-seed emoji when opening
+                    setNewChannelName("");
+                    setNewChannelDescription("");
+                    setNewChannelEmoji(getRandomEmoji());
+                }
+            }}
+        >
             <RefinedPopover.Trigger asChild>
                 <Button 
                     variant="ghost"

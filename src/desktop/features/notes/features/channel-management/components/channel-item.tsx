@@ -30,10 +30,7 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
 
                 <div className={`flex ${hasDescription ? 'items-start' : 'items-center'} gap-3`}>
                     {/* Channel Icon */}
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive
-                        ? 'bg-card-accent dark:bg-card-accent'
-                        : 'bg-slate-100 dark:bg-slate-800'
-                        }`}>
+                    <div className={"w-8 h-8 rounded-lg flex items-center justify-center"}>
                         {channel.emoji ? (
                             <span className="text-lg" title={`Emoji: ${channel.emoji}`}>{channel.emoji}</span>
                         ) : (
