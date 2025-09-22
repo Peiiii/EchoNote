@@ -121,36 +121,38 @@ export const MessageTimeline = forwardRef<
               >
                 <DateDivider date={date} />
 
-                {/* Elegant timeline of thoughts */}
-                {userMessages.map((message: Message) => {
-                  const threadMessages = (messages ?? []).filter(
-                    (msg) => msg.threadId === (message.threadId || message.id)
-                  );
-                  const threadCount =
-                    threadMessages.length > 1 ? threadMessages.length - 1 : 0;
+                {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
+                <div className="divide-y divide-slate-200/70 dark:divide-slate-800/60">
+                  {userMessages.map((message: Message) => {
+                    const threadMessages = (messages ?? []).filter(
+                      (msg) => msg.threadId === (message.threadId || message.id)
+                    );
+                    const threadCount =
+                      threadMessages.length > 1 ? threadMessages.length - 1 : 0;
 
-                  return (
-                    <div
-                      key={message.id}
-                      {...{ [messageDataAttr]: message.id }}
-                      className="w-full"
-                      style={{ height: "auto", minHeight: "auto" }}
-                    >
-                      {renderThoughtRecord ? (
-                        renderThoughtRecord(message, threadCount)
-                      ) : (
-                        <div className="p-4">
-                          <div className="text-sm text-muted-foreground">
-                            Message: {message.content}
+                    return (
+                      <div
+                        key={message.id}
+                        {...{ [messageDataAttr]: message.id }}
+                        className="w-full"
+                        style={{ height: "auto", minHeight: "auto" }}
+                      >
+                        {renderThoughtRecord ? (
+                          renderThoughtRecord(message, threadCount)
+                        ) : (
+                          <div className="p-4">
+                            <div className="text-sm text-muted-foreground">
+                              Message: {message.content}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Thread count: {threadCount}
+                            </div>
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Thread count: {threadCount}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
