@@ -1,16 +1,17 @@
-import { aiAgentFactory } from "../services/ai-agent-factory";
+import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
+import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
+import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AgentChatCore, useAgentSessionManager, useParseTools, UIMessage } from "@agent-labs/agent-chat";
+import { AgentChatCore, UIMessage, useAgentSessionManager, useParseTools } from "@agent-labs/agent-chat";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
-import { useCollectionDiff } from "@/common/lib/use-collection-diff";
-import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
-import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
+import { createModelSelectorExtension } from "../extensions/model-selector-extension";
+import { aiAgentFactory } from "../services/ai-agent-factory";
 
-import { ConversationChatProps } from "../types/conversation.types";
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
+import { ConversationChatProps } from "../types/conversation.types";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
@@ -52,7 +53,7 @@ interface AgentChatCoreWrapperProps {
 }
 
 function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
-  const agent = useMemo(() => aiAgentFactory.createAgent(), []);
+  const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
   const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
@@ -79,12 +80,14 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     items: sessionMessages,
     getId: (m) => (m.id ? m.id : null),
     hash,
-    onAdd: async (m) => { 
+    onAdd: async (m) => {
       console.log("[AgentChatCoreWrapper] onAdd", m);
-      await createMessage(m); },
-    onUpdate: async (m) => { 
+      await createMessage(m);
+    },
+    onUpdate: async (m) => {
       console.log("[AgentChatCoreWrapper] onUpdate", m);
-      await updateMessage(m); },
+      await updateMessage(m);
+    },
     resetKey: conversationId,
     debounceMs: 1000,
   });
@@ -98,6 +101,14 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     // Ensure store sees initial static messages too
     useConversationStore.getState().onMessagesSnapshot(conversationId, sessionMessages);
   }, [conversations, sessionMessages, conversationId, autoTitleDoneMap]);
+
+  const inputExtensions = useMemo(() => [
+    createModelSelectorExtension({
+      onModelChange: (modelId: string) => {
+        console.log('Model changed to:', modelId);
+      }
+    })
+  ], []);
 
   return (
     <AgentChatCore
@@ -120,6 +131,7 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
           }]);
         }
       }}
+      inputExtensions={inputExtensions}
     />
   );
 }

@@ -2,25 +2,74 @@ import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { IAgent } from "@agent-labs/agent-chat";
 import { channelToolsManager } from "./channel-tools-manager";
 import { channelContextManager } from "./channel-context-manager";
+import { ModelConfig, getDefaultModel } from "../config/model-config";
 
 export interface AIAgentConfig {
   apiKey?: string;
   baseURL?: string;
   model?: string;
   temperature?: number;
+  maxTokens?: number;
 }
 
 export class AIAgentFactory {
+  private agent: ExperimentalInBrowserAgent | null = null;
+
   /**
-   * Create HttpAgent instance
+   * Get or create agent instance with default configuration
    */
-  createAgent(): IAgent {
+  getAgent(): IAgent {
+    if (!this.agent) {
+      const defaultModel = getDefaultModel();
+      this.agent = new ExperimentalInBrowserAgent({
+        apiKey: defaultModel.apiKey,
+        model: defaultModel.model,
+        temperature: defaultModel.temperature,
+        maxTokens: defaultModel.maxTokens,
+        baseURL: defaultModel.apiUrl,
+      });
+    }
+    return this.agent;
+  }
+
+  updateAgentConfig(modelConfig: ModelConfig): void {
+    if (!this.agent) {
+      this.agent = new ExperimentalInBrowserAgent();
+    }
+    
+    this.agent.setConfig({
+      apiKey: modelConfig.apiKey,
+      model: modelConfig.model,
+      temperature: modelConfig.temperature,
+      maxTokens: modelConfig.maxTokens,
+      baseURL: modelConfig.apiUrl,
+    });
+  }
+
+  /**
+   * Create HttpAgent instance with custom model configuration
+   */
+  createAgentWithModel(modelConfig: ModelConfig): IAgent {
     return new ExperimentalInBrowserAgent({
-      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-      model: import.meta.env.VITE_OPENAI_MODEL,
-      temperature: 0.7,
-      maxTokens: 1000,
-      baseURL: import.meta.env.VITE_OPENAI_API_URL,
+      apiKey: modelConfig.apiKey,
+      model: modelConfig.model,
+      temperature: modelConfig.temperature,
+      maxTokens: modelConfig.maxTokens,
+      baseURL: modelConfig.apiUrl,
+    })
+  }
+
+  /**
+   * Create HttpAgent instance with custom configuration
+   */
+  createAgentWithConfig(config: AIAgentConfig): IAgent {
+    const defaultModel = getDefaultModel();
+    return new ExperimentalInBrowserAgent({
+      apiKey: config.apiKey || defaultModel.apiKey,
+      model: config.model || defaultModel.model,
+      temperature: config.temperature ?? defaultModel.temperature,
+      maxTokens: config.maxTokens ?? defaultModel.maxTokens,
+      baseURL: config.baseURL || defaultModel.apiUrl,
     })
   }
 

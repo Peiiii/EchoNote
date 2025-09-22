@@ -24,7 +24,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
 
     if (!this.currentConfig.apiKey) {
       throw new Error(
-        "OpenAI API key is required. Please set VITE_OPENAI_API_KEY environment variable."
+        "API key is required. Please set the appropriate API key environment variable."
       );
     }
 
@@ -88,25 +88,25 @@ export class ExperimentalInBrowserAgent implements IAgent {
     });
   }
 
-  // 设置API密钥
-  setApiKey(apiKey: string): void {
-    this.currentConfig.apiKey = apiKey;
+  setConfig(config: Partial<AgentConfig>): void {
+    this.currentConfig = {
+      ...this.currentConfig,
+      ...config,
+    };
+
+    if (!this.currentConfig.apiKey) {
+      throw new Error(
+        "API key is required. Please set the appropriate API key environment variable."
+      );
+    }
+
     this.openaiAgent = new OpenAIAgent(this.currentConfig);
   }
 
-  // 设置模型
-  setModel(model: string): void {
-    this.currentConfig.model = model;
-    this.openaiAgent = new OpenAIAgent(this.currentConfig);
-  }
-
-  // 获取当前配置
   getConfig() {
     return {
-      model: this.currentConfig.model,
+      ...this.currentConfig,
       hasApiKey: !!this.currentConfig.apiKey,
-      temperature: this.currentConfig.temperature,
-      maxTokens: this.currentConfig.maxTokens,
     };
   }
 }
