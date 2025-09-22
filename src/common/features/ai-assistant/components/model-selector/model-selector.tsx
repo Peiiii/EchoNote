@@ -17,6 +17,8 @@ const getModelBadgeVariant = (modelId: string): "default" | "secondary" | "destr
   if (modelId.includes('qwen')) return 'default';
   if (modelId.includes('gemini')) return 'secondary';
   if (modelId.includes('grok')) return 'outline';
+  if (modelId.includes('claude')) return 'secondary';
+  if (modelId.includes('glm')) return 'outline';
   return 'default';
 };
 

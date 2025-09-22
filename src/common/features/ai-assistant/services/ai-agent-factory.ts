@@ -3,6 +3,7 @@ import { IAgent } from "@agent-labs/agent-chat";
 import { channelToolsManager } from "./channel-tools-manager";
 import { channelContextManager } from "./channel-context-manager";
 import { ModelConfig, getDefaultModel } from "../config/model-config";
+import { useModelSelectionStore } from "../stores/model-selection.store";
 
 export interface AIAgentConfig {
   apiKey?: string;
@@ -20,13 +21,14 @@ export class AIAgentFactory {
    */
   getAgent(): IAgent {
     if (!this.agent) {
-      const defaultModel = getDefaultModel();
+      const { getSelectedModel } = useModelSelectionStore.getState();
+      const selectedModel = getSelectedModel();
       this.agent = new ExperimentalInBrowserAgent({
-        apiKey: defaultModel.apiKey,
-        model: defaultModel.model,
-        temperature: defaultModel.temperature,
-        maxTokens: defaultModel.maxTokens,
-        baseURL: defaultModel.apiUrl,
+        apiKey: selectedModel.apiKey,
+        model: selectedModel.model,
+        temperature: selectedModel.temperature,
+        maxTokens: selectedModel.maxTokens,
+        baseURL: selectedModel.apiUrl,
       });
     }
     return this.agent;
