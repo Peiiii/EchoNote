@@ -86,6 +86,17 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       }
     };
 
+    // Derive the active conversation's title for header display
+    const activeConversation = currentConversationId
+      ? conversations.find(c => c.id === currentConversationId)
+      : undefined;
+    const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
+    const headerTitle = view === "list"
+      ? "Conversations"
+      : activeConversation
+        ? (titleGeneratingMap[activeConversation.id] ? "Generating title..." : (activeConversation.title || "AI Chat"))
+        : "AI Chat";
+
     return (
       <div className="relative flex-1 flex flex-col">
         {/* Header Controls */}
@@ -114,7 +125,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
               </Button>
             )}
             <h3 className="font-semibold text-foreground truncate">
-              {view === "list" ? "Conversations" : "AI Chat"}
+              {headerTitle}
             </h3>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0 pr-8">
