@@ -88,9 +88,9 @@ export const MobileMessageInput = ({
                         onClick={handleSend}
                         disabled={!message.trim() || isSending}
                         size="icon"
-                        className={`absolute right-2 bottom-2 h-9 w-9 rounded-xl transition-colors duration-150 ${
+                        className={`absolute right-2 bottom-2 h-9 w-9 rounded-full transition-colors duration-150 ${
                             message.trim() && !isSending
-                                ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90'
+                                ? 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 shadow-sm'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                         }`}
                         aria-label="Send"
