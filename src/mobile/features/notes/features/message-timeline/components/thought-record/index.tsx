@@ -125,7 +125,7 @@ export const MobileThoughtRecord = ({
 
   return (
     <div className="w-full flex flex-col overflow-hidden group">
-      <div className="relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out border-t-2 border-border">
+      <div className="relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
