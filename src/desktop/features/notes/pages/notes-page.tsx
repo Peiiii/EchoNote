@@ -5,6 +5,7 @@ import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assista
 import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
 import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useEffect } from "react";
 
@@ -12,7 +13,6 @@ export function NotesPage() {
     // Use UI state store
     const { 
         isAIAssistantOpen, 
-        aiAssistantChannelId, 
         isThreadOpen, 
         currentThreadId,
         openAIAssistant, 
@@ -21,6 +21,7 @@ export function NotesPage() {
         closeThread,
         openSettings
     } = useUIStateStore();
+    const { currentChannelId } = useNotesViewStore();
 
     const handleOpenSettings = () => {
         console.log('Open channel settings');
@@ -75,7 +76,7 @@ export function NotesPage() {
                         <AIAssistantSidebar
                             isOpen={isAIAssistantOpen}
                             onClose={closeAIAssistant}
-                            channelId={aiAssistantChannelId || ''}
+                            channelId={currentChannelId || ''}
                         />
                     )
                 )

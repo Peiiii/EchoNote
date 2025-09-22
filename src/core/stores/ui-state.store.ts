@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface UIState {
   // AI Assistant state
@@ -32,60 +33,73 @@ export interface UIState {
   closeChannelList: () => void;
 }
 
-export const useUIStateStore = create<UIState>((set) => ({
-  // Initial state
-  isAIAssistantOpen: false,
-  aiAssistantChannelId: null,
-  isThreadOpen: false,
-  currentThreadId: null,
-  isSettingsOpen: false,
-  isChannelListOpen: false,
-  
-  // AI Assistant actions
-  openAIAssistant: (channelId: string) => {
-    set({
-      isAIAssistantOpen: true,
-      aiAssistantChannelId: channelId,
-    });
-  },
-  
-  closeAIAssistant: () => {
-    set({
+export const useUIStateStore = create<UIState>()(
+  persist(
+    (set) => ({
+      // Initial state
       isAIAssistantOpen: false,
       aiAssistantChannelId: null,
-    });
-  },
-  
-  // Thread actions
-  openThread: (messageId: string) => {
-    set({
-      isThreadOpen: true,
-      currentThreadId: messageId,
-    });
-  },
-  
-  closeThread: () => {
-    set({
       isThreadOpen: false,
       currentThreadId: null,
-    });
-  },
-  
-  // Settings actions
-  openSettings: () => {
-    set({ isSettingsOpen: true });
-  },
-  
-  closeSettings: () => {
-    set({ isSettingsOpen: false });
-  },
-  
-  // Mobile actions
-  openChannelList: () => {
-    set({ isChannelListOpen: true });
-  },
-  
-  closeChannelList: () => {
-    set({ isChannelListOpen: false });
-  },
-}));
+      isSettingsOpen: false,
+      isChannelListOpen: false,
+
+      // AI Assistant actions (mutually exclusive with thread sidebar)
+      openAIAssistant: (channelId: string) => {
+        set({
+          isAIAssistantOpen: true,
+          aiAssistantChannelId: channelId,
+          isThreadOpen: false,
+          currentThreadId: null,
+        });
+      },
+
+      closeAIAssistant: () => {
+        set({
+          isAIAssistantOpen: false,
+          aiAssistantChannelId: null,
+        });
+      },
+
+      // Thread actions (mutually exclusive with AI assistant)
+      openThread: (messageId: string) => {
+        set({
+          isThreadOpen: true,
+          currentThreadId: messageId,
+          isAIAssistantOpen: false,
+          aiAssistantChannelId: null,
+        });
+      },
+
+      closeThread: () => {
+        set({
+          isThreadOpen: false,
+          currentThreadId: null,
+        });
+      },
+
+      // Settings actions
+      openSettings: () => {
+        set({ isSettingsOpen: true });
+      },
+
+      closeSettings: () => {
+        set({ isSettingsOpen: false });
+      },
+
+      // Mobile actions
+      openChannelList: () => {
+        set({ isChannelListOpen: true });
+      },
+
+      closeChannelList: () => {
+        set({ isChannelListOpen: false });
+      },
+    }),
+    {
+      name: 'echonote-ui-state',
+      // Only persist the AI assistant open/close state to satisfy the requirement
+      partialize: (state) => ({ isAIAssistantOpen: state.isAIAssistantOpen }),
+    }
+  )
+);
