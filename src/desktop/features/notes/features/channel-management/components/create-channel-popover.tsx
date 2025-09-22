@@ -26,7 +26,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
             });
             setNewChannelName("");
             setNewChannelDescription("");
-            setNewChannelEmoji(getRandomEmoji()); // prepare next open with a fresh random emoji
+            // Do not reseed here to avoid visible emoji change on confirm; will reseed on next open
             setIsOpen(false);
         }
     };
@@ -34,7 +34,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const handleCancel = () => {
         setNewChannelName("");
         setNewChannelDescription("");
-        setNewChannelEmoji(getRandomEmoji());
+        // Do not reseed here; reseed when opening the popover
         setIsOpen(false);
     };
 
