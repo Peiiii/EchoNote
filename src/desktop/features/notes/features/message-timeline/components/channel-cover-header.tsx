@@ -61,8 +61,8 @@ export const ChannelCoverHeader = ({
   );
   const isCollapsed = useUIPreferencesStore(
     useCallback(
-      (state) => state.timelineCoverCollapsed[channel.id] ?? defaultCollapsed,
-      [channel.id, defaultCollapsed]
+      (state) => state.timelineCoverCollapsed ?? defaultCollapsed,
+      [defaultCollapsed]
     )
   );
   const isLeftSidebarCollapsed = useUIPreferencesStore(
@@ -101,7 +101,7 @@ export const ChannelCoverHeader = ({
 
     setIsAnimating(true);
     const nextCollapsed = !isCollapsed;
-    setTimelineCoverCollapsed(channel.id, nextCollapsed);
+    setTimelineCoverCollapsed(nextCollapsed);
     notifyLayoutChange();
 
     setTimeout(() => {
