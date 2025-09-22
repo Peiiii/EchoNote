@@ -122,7 +122,7 @@ export const MessageTimeline = forwardRef<
                 <DateDivider date={date} />
 
                 {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
-                <div className="divide-y divide-slate-200/70 dark:divide-slate-800/60">
+                <div className="divide-y divide-slate-200/30 dark:divide-slate-800/60">
                   {userMessages.map((message: Message) => {
                     const threadMessages = (messages ?? []).filter(
                       (msg) => msg.threadId === (message.threadId || message.id)
