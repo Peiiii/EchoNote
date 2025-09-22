@@ -20,14 +20,18 @@ export function MobileChannelItem({ channel, isActive, onClick, onDelete }: Mobi
                 isActive && "bg-muted/50"
             )}
         >
-            {/* Minimal icon */}
+            {/* Emoji or fallback icon */}
             <div className={cn(
                 "flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors",
                 isActive 
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground group-hover:bg-muted/80"
             )}>
-                <Hash className="w-3.5 h-3.5" />
+                {channel.emoji ? (
+                    <span className="text-base leading-none">{channel.emoji}</span>
+                ) : (
+                    <Hash className="w-3.5 h-3.5" />
+                )}
             </div>
             
             {/* Content */}

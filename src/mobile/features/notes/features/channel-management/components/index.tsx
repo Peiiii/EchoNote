@@ -14,7 +14,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
     const { channels, addChannel, deleteChannel } = useNotesDataStore();
     const { currentChannelId, setCurrentChannel } = useNotesViewStore();
 
-    const handleAddChannel = (channel: { name: string; description: string }) => {
+    const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
         addChannel(channel);
     };
 
