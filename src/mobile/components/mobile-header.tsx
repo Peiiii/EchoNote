@@ -19,16 +19,16 @@ export const MobileHeader = ({
         }
     };
     return (
-        <div className="flex-shrink-0 px-4 py-3 bg-background">
+        <div className="flex-shrink-0 px-4 py-2 bg-background">
             <div className="flex items-center justify-between">
                 {/* Left: Channel List Button */}
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={openChannelList}
-                    className="h-10 w-10 dark:text-primary"
+                    className="h-9 w-9 dark:text-primary"
                 >
-                    <Menu className="h-5 w-5" />
+                    <Menu className="h-6 w-6" />
                 </Button>
 
                 {/* Center: Current Channel Name */}
@@ -44,17 +44,17 @@ export const MobileHeader = ({
                         variant="ghost"
                         size="icon"
                         onClick={handleOpenAIAssistant}
-                        className="h-10 w-10 dark:text-primary"
+                        className="h-9 w-9 dark:text-primary"
                     >
-                        <Bot className="h-5 w-5" />
+                        <Bot className="h-6 w-6" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={openSettings}
-                        className="h-10 w-10 dark:text-primary"
+                        className="h-9 w-9 dark:text-primary"
                     >
-                        <Settings className="h-5 w-5" />
+                        <Settings className="h-6 w-6" />
                     </Button>
                 </div>
             </div>

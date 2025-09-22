@@ -69,9 +69,9 @@ export const MobileMessageInput = ({
                 </div>
             )}
 
-            {/* Input area - Perplexity style */}
-            <div className="flex items-end gap-3">
-                {/* Message input */}
+            {/* Input area - unified, with embedded actions (like top AI products) */}
+            <div className="flex items-end">
+                {/* Message input with inline send button */}
                 <div className="flex-1 relative">
                     <Textarea
                         ref={textareaRef}
@@ -79,25 +79,25 @@ export const MobileMessageInput = ({
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="What's on your mind?"
-                        className="min-h-[44px] max-h-[120px] resize-none rounded-2xl border-border/60 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md focus:border-transparent focus:outline-none transition-all duration-200 px-4 py-2 text-base"
+                        className="min-h-[44px] max-h-[120px] resize-none rounded-2xl border-border/60 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md focus:border-transparent focus:outline-none transition-all duration-200 pl-4 pr-12 py-2 text-base"
                         rows={1}
                     />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={handleSend}
+                        disabled={!message.trim() || isSending}
+                        size="icon"
+                        className="absolute right-1.5 bottom-1.5 h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                        aria-label="Send"
+                    >
+                        {isSending ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        ) : (
+                            <Send className="h-5 w-5" />
+                        )}
+                    </Button>
                 </div>
-
-                {/* Send button - Apple style */}
-                <Button
-                    variant="default"
-                    onClick={handleSend}
-                    disabled={!message.trim() || isSending}
-                    size="icon"
-                    className="h-11 w-11 flex-shrink-0 bg-primary rounded-2xl shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                    {isSending ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                    ) : (
-                        <Send className="h-5 w-5" />
-                    )}
-                </Button>
             </div>
         </div>
     );
