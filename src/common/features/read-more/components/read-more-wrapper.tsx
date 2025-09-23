@@ -98,7 +98,8 @@ export function ReadMoreBaseWrapper({
         ref={contentRef}
         className={cn(
           "transition-all duration-300 ease-in-out",
-          !isExpanded && showReadMore ? "overflow-hidden" : ""
+          !isExpanded && showReadMore ? "overflow-hidden" : "",
+          isExpanded && showReadMore ? "pb-12" : ""
         )}
         style={{
           maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : "none",
@@ -118,7 +119,7 @@ export function ReadMoreBaseWrapper({
           <button
             type="button"
             onClick={handleToggle}
-            className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-3 py-2 rounded-full bg-white/95 dark:bg-slate-900/80 backdrop-blur-sm text-muted-foreground shadow-lg border border-slate-200/50 dark:border-slate-700/50 flex items-center gap-1.5 active:scale-[0.98] transition-all duration-150 hover:bg-white dark:hover:bg-slate-900 hover:shadow-xl"
           >
             <span>{readMoreLabel}</span>
             <ChevronDown className="w-3 h-3" />
@@ -132,7 +133,7 @@ export function ReadMoreBaseWrapper({
           {...collapseInlineData}
           onClick={handleToggle}
           className={cn(
-            "absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98] transition-opacity duration-150",
+            "absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-xs px-3 py-2 rounded-full bg-white/95 dark:bg-slate-900/80 backdrop-blur-sm text-muted-foreground shadow-lg border border-slate-200/50 dark:border-slate-700/50 flex items-center gap-1.5 active:scale-[0.98] transition-all duration-150 hover:bg-white dark:hover:bg-slate-900 hover:shadow-xl",
             inlineHidden && "opacity-0 pointer-events-none"
           )}
         >
