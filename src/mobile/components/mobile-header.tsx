@@ -2,16 +2,24 @@ import { Button } from "@/common/components/ui/button";
 import { Menu, Bot, Settings } from "lucide-react";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { Channel } from "@/core/stores/notes-data.store";
+import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
+    currentChannel?: Channel;
+    channels?: Channel[];
 }
 
 export const MobileHeader = ({ 
-    currentChannelName 
+    currentChannelName,
+    currentChannel,
+    channels: _channels
 }: MobileHeaderProps) => {
     const { openChannelList, openAIAssistant, openSettings } = useUIStateStore();
-    const { currentChannelId } = useNotesViewStore();
+    const { currentChannelId, setCurrentChannel } = useNotesViewStore();
+    const { channels: allChannels } = useNotesDataStore();
     
     const handleOpenAIAssistant = () => {
         if (currentChannelId) {
@@ -31,11 +39,20 @@ export const MobileHeader = ({
                     <Menu className="h-6 w-6" />
                 </Button>
 
-                {/* Center: Current Channel Name */}
+                {/* Center: Current Channel Name or Dropdown */}
                 <div className="flex-1 text-center min-w-0">
-                    <h1 className="text-lg font-semibold text-foreground/90 truncate px-2 max-w-full">
-                        {currentChannelName || "Chat"}
-                    </h1>
+                    {currentChannel && allChannels.length > 1 ? (
+                        <MobileChannelDropdownSelector
+                            currentChannel={currentChannel}
+                            channels={allChannels}
+                            onChannelSelect={setCurrentChannel}
+                            className="w-full"
+                        />
+                    ) : (
+                        <h1 className="text-lg font-semibold text-foreground/90 truncate px-2 max-w-full">
+                            {currentChannelName || "Chat"}
+                        </h1>
+                    )}
                 </div>
 
                 {/* Right: AI Assistant and Settings Buttons */}
