@@ -61,7 +61,7 @@ export class Editor {
         if (index >= startLine && index <= endLine) {
           if (isShift) {
             // Shift+Tab: remove indentation from line start
-            const trimmed = line.replace(/^  /, '');
+            const trimmed = line.replace(/^ {2}/, '');
             const removedSpaces = line.length - trimmed.length;
             
             // Adjust cursor positions

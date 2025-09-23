@@ -2,11 +2,7 @@ import { FileText, Image, Mic, MoreHorizontal, PanelBottomClose, Phone, Smile, V
 import { ToolbarButton } from "./toolbar-button";
 import { useInputCollapse } from "../../../hooks/use-input-collapse";
 
-interface ToolbarProps {
-    // No props needed - everything comes from store
-}
-
-export function Toolbar({}: ToolbarProps) {
+export function Toolbar() {
     const { inputCollapsed, handleCollapseInput, handleExpandInput } = useInputCollapse();
 
     const leftButtons = [

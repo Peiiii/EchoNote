@@ -27,14 +27,14 @@ export const convertMessagesToUIMessages = (
             const assistantMessage = message as AssistantMessage
             if (assistantMessage.toolCalls && assistantMessage.toolCalls.length > 0) {
                 assistantMessage.toolCalls.forEach((toolCall: ToolCall) => {
-                    let parsedArgs: any = null;
+                    let parsedArgs: Record<string, unknown> | null = null;
                     try {
                         if (typeof toolCall.function.arguments === 'string') {
                             parsedArgs = JSON.parse(toolCall.function.arguments);
                         } else {
                             parsedArgs = toolCall.function.arguments;
                         }
-                    } catch (e) {
+                    } catch (_e) {
                         parsedArgs = { error: 'Invalid JSON', raw: toolCall.function.arguments };
                     }
                     toolCallMap.set(toolCall.id, {
@@ -50,14 +50,14 @@ export const convertMessagesToUIMessages = (
             const toolInvocation = toolCallMap.get(toolMessage.toolCallId)
             if (toolInvocation) {
                 // 更新工具调用的状态为结果
-                let parsedResult: any = null;
+                let parsedResult: Record<string, unknown> | null = null;
                 try {
                     if (typeof toolMessage.content === 'string') {
                         parsedResult = JSON.parse(toolMessage.content);
                     } else {
                         parsedResult = toolMessage.content;
                     }
-                } catch (e) {
+                } catch (_e) {
                     // 解析失败时，保留原始内容并标记错误
                     parsedResult = { error: 'Invalid JSON', raw: toolMessage.content };
                 }

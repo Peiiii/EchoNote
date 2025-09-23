@@ -208,7 +208,7 @@ export class FirebaseAIConversationService {
 
     await updateDoc(
       doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
-      updateData as any
+      updateData as { [x: string]: any }
     );
   }
   
