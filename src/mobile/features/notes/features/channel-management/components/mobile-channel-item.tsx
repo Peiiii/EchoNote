@@ -21,16 +21,11 @@ export function MobileChannelItem({ channel, isActive, onClick, onDelete }: Mobi
             )}
         >
             {/* Emoji or fallback icon */}
-            <div className={cn(
-                "flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors",
-                isActive 
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground group-hover:bg-muted/80"
-            )}>
+            <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {channel.emoji ? (
-                    <span className="text-base leading-none">{channel.emoji}</span>
+                    <span className="text-lg leading-none" title={`Emoji: ${channel.emoji}`}>{channel.emoji}</span>
                 ) : (
-                    <Hash className="w-3.5 h-3.5" />
+                    <Hash className="w-4 h-4 text-muted-foreground" />
                 )}
             </div>
             

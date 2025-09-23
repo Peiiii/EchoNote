@@ -60,7 +60,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
             >
                 <div className="flex flex-col h-full bg-background">
                     {/* Header - Consistent with Settings */}
-                    <div className="flex items-center justify-start p-4 border-b border-border">
+                    <div className="flex items-center justify-start p-4">
                         <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground">Spaces</h3>
                         </div>
@@ -80,7 +80,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
                     </div>
                     
                     {/* Create Channel Button - Consistent with Settings */}
-                    <div className="p-4 border-t border-border">
+                    <div className="p-4">
                         <MobileCreateChannelPopover onAddChannel={handleAddChannel} />
                     </div>
                 </div>
