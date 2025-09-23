@@ -21,7 +21,10 @@ export const PWAInstallPrompt = () => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowInstallPrompt(true);
+      // Only show prompt if not already installed and not previously dismissed
+      if (!isInstalled && localStorage.getItem('pwa-install-dismissed') !== 'true') {
+        setShowInstallPrompt(true);
+      }
     };
 
     const handleAppInstalled = () => {
@@ -30,19 +33,27 @@ export const PWAInstallPrompt = () => {
       setDeferredPrompt(null);
     };
 
+    // Check if app is already installed
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isInApp = (window.navigator as { standalone?: boolean }).standalone === true;
+      const installed = isStandalone || isInApp;
+      setIsInstalled(installed);
+      if (installed) {
+        setShowInstallPrompt(false);
+      }
+    };
+
+    checkInstalled();
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
-
-    // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, []);
+  }, [isInstalled]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;

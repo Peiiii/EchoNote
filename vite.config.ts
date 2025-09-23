@@ -16,7 +16,7 @@ export default defineConfig({
         name: 'EchoNote - AI-Powered Note Taking',
         short_name: 'EchoNote',
         description: 'AI-powered note taking application with intelligent features',
-        theme_color: '#d6d3d1',
+        theme_color: '#f0f0ef',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
