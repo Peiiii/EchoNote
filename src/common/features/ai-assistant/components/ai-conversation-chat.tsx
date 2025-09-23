@@ -55,12 +55,11 @@ interface AgentChatCoreWrapperProps {
 function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
-  const contexts = useMemo(() => aiAgentFactory.getChannelContext(channelId), [channelId]);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
-    getContexts: () => contexts,
+    getContexts: () => aiAgentFactory.getChannelContext(channelId),
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });

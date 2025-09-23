@@ -5,7 +5,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
  * Generate system instructions for AI Assistant
  */
 function generateSystemInstructions(channelName: string, messageCount: number): string {
-    return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
+  return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in the channel: ${channelName}
 This channel contains ${messageCount} thought records that represent the collective knowledge and ideas of the team.
@@ -63,7 +63,7 @@ export class ChannelContextManager {
   }> {
     // Get channel and message data
     const state = channelMessageService.dataContainer.get();
-    const channelState = state.messageByChannel[channelId];
+    const channelState = state.messageByChannel[channelId] ?? {};
     const channel = useNotesDataStore.getState().channels.find(ch => ch.id === channelId);
     const messages = channelState.messages || [];
 
