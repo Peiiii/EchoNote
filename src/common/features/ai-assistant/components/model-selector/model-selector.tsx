@@ -41,9 +41,9 @@ export function ModelSelector({
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="sm"
-            className="h-8 px-3 gap-2 bg-background/50 hover:bg-background/80 border-border/60"
+            className="h-8 px-3 gap-2 bg-transparent hover:bg-accent/50 text-muted-foreground hover:text-foreground"
           >
             <span className="text-sm font-medium">{selectedModel?.name || 'Select Model'}</span>
             <ChevronDown className="w-3 h-3 opacity-50" />
