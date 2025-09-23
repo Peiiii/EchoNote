@@ -99,7 +99,7 @@
   --accent: #252627;            /* 活动栏 - 更深的背景 */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.25 0 0);            /* 主要边框 */
+  --border: oklch(0.35 0 0);            /* 主要边框 - 提高对比度 */
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.7 0 0);               /* 使用浅灰色作为ring - monochrome */
   --chart-1: oklch(0.488 0.243 264.376);
