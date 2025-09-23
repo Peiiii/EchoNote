@@ -125,7 +125,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                                 onChange={(e) => setNewChannelName(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Enter space name..."
-                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-1 focus:ring-slate-400/20 dark:focus:ring-slate-500/20 hover:border-slate-300 dark:hover:border-slate-600"
+                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
                                 autoFocus
                             />
                         </div>
@@ -140,7 +140,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                                 onChange={(e) => setNewChannelDescription(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Describe the theme of this space..."
-                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-1 focus:ring-slate-400/20 dark:focus:ring-slate-500/20 hover:border-slate-300 dark:hover:border-slate-600"
+                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
                             />
                         </div>
                     </div>

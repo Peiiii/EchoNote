@@ -44,7 +44,7 @@ export const EmailPasswordForm = ({
         placeholder="Enter your email"
         value={email}
         onChange={(e) => onEmailChange(e.target.value)}
-        className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+        className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
         disabled={isAuthenticating}
         autoComplete="email"
       />
@@ -56,7 +56,7 @@ export const EmailPasswordForm = ({
           placeholder="Enter your password"
           value={password}
           onChange={(e) => onPasswordChange(e.target.value)}
-          className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
+          className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500  dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
           disabled={isAuthenticating}
           autoComplete={isSignUp ? "new-password" : "current-password"}
         />
@@ -87,7 +87,7 @@ export const EmailPasswordForm = ({
             placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
-            className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-slate-400 dark:focus:ring-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
+            className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500  dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
             disabled={isAuthenticating}
             autoComplete="new-password"
           />

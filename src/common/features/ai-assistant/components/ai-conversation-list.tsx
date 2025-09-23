@@ -35,7 +35,7 @@ export function AIConversationList({ conversations, currentConversationId, loadi
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search conversations"
-            className="w-full h-8 px-2 rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-8 px-2 rounded-md border bg-muted text-sm focus:outline-none"
           />
         </div>
         <Popover>

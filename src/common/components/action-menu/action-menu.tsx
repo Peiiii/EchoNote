@@ -44,7 +44,7 @@ export function ActionMenu({
         "h-8 w-8 p-0 transition-all duration-200 rounded-md",
         "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
         "hover:bg-slate-100 dark:hover:bg-slate-800",
-        "focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700",
+        "focus:outline-none",
         alwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
         triggerClassName
       )}
