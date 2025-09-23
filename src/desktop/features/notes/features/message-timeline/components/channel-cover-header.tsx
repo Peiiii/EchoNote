@@ -3,9 +3,11 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, PanelLeft, Settings, Users } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
+import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 
@@ -71,7 +73,8 @@ export const ChannelCoverHeader = ({
   const setLeftSidebarCollapsed = useUIPreferencesStore(
     useCallback((state) => state.setLeftSidebarCollapsed, [])
   );
-  const { updateChannel } = useNotesDataStore();
+  const { updateChannel, channels } = useNotesDataStore();
+  const { setCurrentChannel } = useNotesViewStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
   const isGradient = backgroundStyle.includes('gradient');
 
@@ -135,7 +138,7 @@ export const ChannelCoverHeader = ({
   };
 
   const collapsedContent = (
-    <div className="flex items-center space-x-2 min-w-0 flex-1">
+    <div className="flex items-center space-x-2 min-w-0">
       {/* Sidebar expand button when sidebar is collapsed */}
       {isLeftSidebarCollapsed && (
         <Button
@@ -149,19 +152,30 @@ export const ChannelCoverHeader = ({
         </Button>
       )}
       
-      {channel.emoji && (
-        <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
-          {channel.emoji}
-        </div>
+      {isLeftSidebarCollapsed ? (
+        <ChannelDropdownSelector
+          currentChannel={channel}
+          channels={channels}
+          onChannelSelect={setCurrentChannel}
+          className="flex-1"
+        />
+      ) : (
+        <>
+          {channel.emoji && (
+            <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
+              {channel.emoji}
+            </div>
+          )}
+          <div className="flex items-center space-x-1.5 min-w-0 flex-1">
+            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out">
+              {channel.name}
+            </h1>
+            <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
+              {channel.messageCount}
+            </Badge>
+          </div>
+        </>
       )}
-      <div className="flex items-center space-x-1.5 min-w-0 flex-1">
-        <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out">
-          {channel.name}
-        </h1>
-        <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
-          {channel.messageCount}
-        </Badge>
-      </div>
     </div>
   );
 
