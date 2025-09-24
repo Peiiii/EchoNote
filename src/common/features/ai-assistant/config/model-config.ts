@@ -23,6 +23,16 @@ export const PRESET_MODELS: ModelConfig[] = [
     isDefault: true,
   },
   {
+    id: 'qwen3-max',
+    name: 'Qwen3 Max',
+    description: 'Alibaba Cloud Qwen3 Max model via DashScope',
+    apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY || '',
+    model: 'qwen3-max',
+    apiUrl: import.meta.env.VITE_DASHSCOPE_API_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    temperature: 0.7,
+    maxTokens: 4000,
+  },
+  {
     id: 'gemini-2.5-pro',
     name: 'Gemini 2.5 Pro',
     description: 'Google Gemini model via OpenRouter',
