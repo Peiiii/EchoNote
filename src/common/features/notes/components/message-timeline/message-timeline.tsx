@@ -200,7 +200,7 @@ export const MessageTimeline = forwardRef<
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1"
+                className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1 hover:bg-secondary"
                 onClick={collapseCurrent}
                 aria-label="Collapse current"
               >
