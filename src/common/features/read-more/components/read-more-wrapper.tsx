@@ -48,8 +48,8 @@ export function ReadMoreBaseWrapper({
   const notifyLayoutChange = useReadMoreStore(
     useCallback((state) => state.notifyLayoutChange, [])
   );
-  const suppressAutoScrollOnce = useReadMoreStore(
-    useCallback((state) => state.suppressAutoScrollOnce, [])
+  const activateAutoScrollSuppression = useReadMoreStore(
+    useCallback((state) => state.activateAutoScrollSuppression, [])
   );
   const previousExpandedRef = useRef(false);
 
@@ -80,10 +80,10 @@ export function ReadMoreBaseWrapper({
 
   useEffect(() => {
     if (isExpanded && !previousExpandedRef.current) {
-      suppressAutoScrollOnce();
+      activateAutoScrollSuppression();
     }
     previousExpandedRef.current = isExpanded;
-  }, [isExpanded, suppressAutoScrollOnce]);
+  }, [isExpanded, activateAutoScrollSuppression]);
 
   const handleToggle = () => setIsExpanded((prev) => !prev);
   const inlineHidden =

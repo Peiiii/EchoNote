@@ -59,8 +59,8 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>(contai
     const check = () => {
       if (!el) return
       if (el.scrollHeight !== lastScrollHeight.current) {
-        const suppressed = useReadMoreStore.getState().consumeAutoScrollSuppression()
-        if (!suppressed) {
+        const shouldSuppress = useReadMoreStore.getState().shouldSuppressAutoScrollNow()
+        if (!shouldSuppress) {
           scrollToBottom()
         }
         lastScrollHeight.current = el.scrollHeight
