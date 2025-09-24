@@ -5,6 +5,8 @@ import { Plus, MessageSquare, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
 import { useRef } from "react";
+import { ConversationContextControl } from "@/common/features/ai-assistant/components/conversation-context-control";
+// removed: creation-time context dropdown; we now use in-chat context control
 
 interface AIAssistantSidebarProps {
     isOpen: boolean;
@@ -13,10 +15,9 @@ interface AIAssistantSidebarProps {
 }
 
 export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSidebarProps) {
-    const { channels } = useNotesDataStore();
-    const currentChannel = channels.find(ch => ch.id === channelId);
+    const { userId } = useNotesDataStore();
     const convRef = useRef<AIConversationInterfaceRef>(null);
-    const { currentConversation } = useConversationState();
+    const { currentConversation, createConversation } = useConversationState();
     const uiView = useConversationStore(s => s.uiView);
     const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
 
@@ -34,8 +35,12 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
                         <h3 className="font-semibold text-foreground truncate">{getTitle()}</h3>
-                        {currentChannel && (
-                            <span className="text-sm text-muted-foreground truncate">- {currentChannel.name}</span>
+                        {currentConversation && (
+                          <ConversationContextControl
+                            conversationId={currentConversation.id}
+                            fallbackChannelId={channelId}
+                            variant="inline"
+                          />
                         )}
                     </div>
                     <div className="flex items-center gap-1">
@@ -54,7 +59,7 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
                         <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => convRef.current?.createNew()}
+                            onClick={() => { if (userId) void createConversation(userId, 'New Conversation'); }}
                             aria-label="New conversation"
                         >
                             <Plus className="w-5 h-5" />

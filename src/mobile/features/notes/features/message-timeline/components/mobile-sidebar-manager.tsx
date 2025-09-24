@@ -52,11 +52,13 @@ export const MobileSidebarManager = () => {
                     <SheetContent
                         side="bottom"
                         className="h-[80vh] p-0 border-t border-border/60"
+                        hideClose
                         onOpenAutoFocus={(e) => e.preventDefault()}
                     >
                         <MobileAIAssistant
                             channelId={currentChannelId}
                             isOpen={isAIAssistantOpen}
+                            onClose={closeAIAssistant}
                         />
                     </SheetContent>
                 </Sheet>

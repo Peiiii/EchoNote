@@ -1,5 +1,4 @@
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { contextDataCache } from "./context-data-cache";
 
 /**
  * Generate system instructions for AI Assistant
@@ -61,17 +60,15 @@ export class ChannelContextManager {
     description: string;
     value: string;
   }> {
-    // Get channel and message data
-    const state = channelMessageService.dataContainer.get();
-    const channelState = state.messageByChannel[channelId] ?? {};
-    const channel = useNotesDataStore.getState().channels.find(ch => ch.id === channelId);
-    const messages = channelState.messages || [];
-
-    if (!channelState || !channel) {
+    const snap = contextDataCache.getSnapshot(channelId);
+    const channel = snap.channel;
+    const messages = snap.messages || [];
+    if (!channel) {
+      // still loading; return minimal payload but kick off fetch happened in getSnapshot
       return [{
         description: 'Channel Context',
         value: JSON.stringify({
-          error: 'Channel not found',
+          info: 'Channel meta loading...',
           channelId,
           timestamp: new Date().toISOString()
         })
@@ -87,6 +84,7 @@ export class ChannelContextManager {
       {
         description: `User's thoughts/notes in the channel`,
         value: JSON.stringify(messages.map(msg => ({
+          id: msg.id,
           content: msg.content,
           timestamp: msg.timestamp.toISOString(),
           sender: msg.sender

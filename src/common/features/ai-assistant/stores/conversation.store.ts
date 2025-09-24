@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AIConversation } from "@/common/types/ai-conversation";
+import { AIConversation, ConversationContextConfig } from "@/common/types/ai-conversation";
 import { firebaseAIConversationService } from "@/common/services/firebase/firebase-ai-conversation.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
@@ -48,8 +48,8 @@ type State = {
 };
 
 type Actions = {
-  createConversation: (userId: string, channelId: string, title: string) => Promise<AIConversation>;
-  loadConversations: (userId: string, channelId?: string) => Promise<void>;
+  createConversation: (userId: string, title: string, contexts?: ConversationContextConfig) => Promise<AIConversation>;
+  loadConversations: (userId: string) => Promise<void>;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (userId: string, conversationId: string, updates: Partial<AIConversation>) => Promise<void>;
@@ -85,23 +85,23 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   // autoTitleMode: 'deterministic',
   autoTitleMode: 'ai',
 
-  async createConversation(userId, channelId, title) {
+  async createConversation(userId, title, contexts) {
     set({ error: null });
     const tempId = `temp-${crypto.randomUUID()}`;
     const optimistic: AIConversation = {
       id: tempId,
       title,
-      channelId,
       userId,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastMessageAt: new Date(),
       messageCount: 0,
       isArchived: false,
+      ...(contexts ? { contexts } : {}),
     };
     set(s => ({ conversations: [optimistic, ...s.conversations], currentConversationId: tempId, uiView: 'chat' }));
     try {
-      const created = await firebaseAIConversationService.createConversation(userId, channelId, title);
+      const created = await firebaseAIConversationService.createConversation(userId, title, contexts);
       set(s => ({
         conversations: s.conversations.map(c => (c.id === tempId ? created : c)),
         currentConversationId: created.id,
@@ -118,10 +118,10 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
     }
   },
 
-  async loadConversations(userId, channelId) {
+  async loadConversations(userId) {
     set({ loading: true, error: null });
     try {
-      const list = await firebaseAIConversationService.getConversations(userId, channelId);
+      const list = await firebaseAIConversationService.getConversations(userId);
       const currentId = get().currentConversationId;
       set({ conversations: list, loading: false });
       if (list.length > 0 && !currentId) {
@@ -161,11 +161,14 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   async updateConversation(userId, conversationId, updates) {
+    // Optimistic update: apply locally first for instant UI feedback
+    const prev = get().conversations;
+    set(s => ({ conversations: s.conversations.map(c => (c.id === conversationId ? { ...c, ...updates } : c)) }));
     try {
       await firebaseAIConversationService.updateConversation(userId, conversationId, updates);
-      set(s => ({ conversations: s.conversations.map(c => (c.id === conversationId ? { ...c, ...updates } : c)) }));
     } catch (err) {
-      set({ error: err instanceof Error ? err.message : "Failed to update conversation" });
+      // Revert on failure
+      set({ conversations: prev, error: err instanceof Error ? err.message : "Failed to update conversation" });
       throw err as Error;
     }
   },

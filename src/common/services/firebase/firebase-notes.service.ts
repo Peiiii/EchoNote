@@ -94,6 +94,17 @@ const getMessagesCollectionRef = (userId: string) =>
 
 
 export class FirebaseNotesService {
+  async getChannel(userId: string, channelId: string): Promise<Channel | null> {
+    try {
+      const snap = await getDocs(query(getChannelsCollectionRef(userId), where("isDeleted", "==", false), where("__name__", "==", channelId)));
+      const docSnap = snap.docs[0];
+      if (!docSnap) return null;
+      return docToChannel(docSnap);
+    } catch (e) {
+      console.warn("[firebaseNotesService.getChannel] failed", e);
+      return null;
+    }
+  }
   // Channel Services
   subscribeToChannels = (
     userId: string,

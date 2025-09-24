@@ -12,6 +12,7 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
+import { contextDataCache } from "../services/context-data-cache";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
@@ -54,12 +55,22 @@ interface AgentChatCoreWrapperProps {
 
 function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
-  const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
+  // Select tool target channel based on conversation contexts; fallback to current channel
+  const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
+  const initialToolChannel = useMemo(() => {
+    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds && conv.contexts.channelIds.length > 0) {
+      return conv.contexts.channelIds[0];
+    }
+    return channelId;
+  }, [conv?.contexts, channelId]);
+  const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
+  const tools = useMemo(() => aiAgentFactory.getChannelTools(toolChannelId), [toolChannelId]);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
-    getContexts: () => aiAgentFactory.getChannelContext(channelId),
+    // Dynamic contexts: use conversation-bound contexts when available; fallback to current channel
+    getContexts: () => aiAgentFactory.getSessionContexts(conversationId, channelId),
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
@@ -72,6 +83,43 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     });
     return () => sub.unsubscribe();
   }, [agentSessionManager]);
+
+  // Prefetch context data for current tool channel and explicit contexts (to improve first response quality)
+  useEffect(() => {
+    void contextDataCache.ensureFetched(toolChannelId);
+    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds) {
+      conv.contexts.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
+    }
+    if (conv?.contexts?.mode === 'all') {
+      void contextDataCache.ensureTopIds(5).then(() => {
+        const ids = contextDataCache.getTopIdsSnapshot(5);
+        ids.forEach(id => void contextDataCache.ensureFetched(id));
+      });
+    }
+  }, [toolChannelId, conv?.contexts]);
+
+  // Auto mode: when conversation has no explicit contexts, keep tool target in sync with current channel
+  useEffect(() => {
+    if (!conv || conv.contexts) return; // manual mode when contexts exists
+    if (toolChannelId !== channelId) {
+      setToolChannelId(channelId);
+    }
+  }, [conv?.contexts, channelId]);
+
+  // When contexts change in manual mode, ensure tool target is valid
+  useEffect(() => {
+    if (!conv?.contexts) return; // auto mode handled above
+    const mode = conv.contexts.mode;
+    if (mode === 'channels') {
+      const ids = conv.contexts.channelIds || [];
+      if (!ids.includes(toolChannelId)) {
+        setToolChannelId(ids[0] || channelId);
+      }
+    } else {
+      // 'none' or 'all' -> default to current channel for tools
+      if (toolChannelId !== channelId) setToolChannelId(channelId);
+    }
+  }, [conv?.contexts, channelId]);
 
   // Use a safe hash that ignores functions/cycles inside tool parts
   const hash = (m: UIMessage) => safeHashMessage(m);
@@ -110,28 +158,32 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   ], []);
 
   return (
-    <AgentChatCore
-      agentSessionManager={agentSessionManager}
-      toolRenderers={toolRenderers}
-      className="h-full w-full"
-      messageItemProps={{
-        showAvatar: false,
-      }}
-      promptsProps={{
-        items: getChannelPrompts(channelId),
-        onItemClick: ({ prompt }) => {
-          agentSessionManager.handleAddMessages([{
-            id: crypto.randomUUID(),
-            role: "user",
-            parts: [{
-              type: "text",
-              text: prompt,
-            }],
-          }]);
-        }
-      }}
-      inputExtensions={inputExtensions}
-    />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0">
+        <AgentChatCore
+          agentSessionManager={agentSessionManager}
+          toolRenderers={toolRenderers}
+          className="h-full w-full"
+          messageItemProps={{
+            showAvatar: false,
+          }}
+          promptsProps={{
+            items: getChannelPrompts(channelId),
+            onItemClick: ({ prompt }) => {
+              agentSessionManager.handleAddMessages([{
+                id: crypto.randomUUID(),
+                role: "user",
+                parts: [{
+                  type: "text",
+                  text: prompt,
+                }],
+              }]);
+            }
+          }}
+          inputExtensions={inputExtensions}
+        />
+      </div>
+    </div>
   );
 }
 

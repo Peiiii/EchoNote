@@ -3,6 +3,7 @@ import { IAgent } from "@agent-labs/agent-chat";
 import { channelToolsManager } from "./channel-tools-manager";
 import { channelContextManager } from "./channel-context-manager";
 import { ModelConfig, getDefaultModel } from "../config/model-config";
+import { sessionContextManager } from "./session-context-manager";
 import { useModelSelectionStore } from "../stores/model-selection.store";
 
 export interface AIAgentConfig {
@@ -87,6 +88,13 @@ export class AIAgentFactory {
    */
   getChannelContext(channelId: string) {
     return channelContextManager.getChannelContext(channelId);
+  }
+
+  /**
+   * Get conversation-scoped contexts with dynamic binding (MVP v2 ready)
+   */
+  getSessionContexts(conversationId: string, fallbackChannelId: string) {
+    return sessionContextManager.getSessionContexts(conversationId, fallbackChannelId);
   }
 }
 

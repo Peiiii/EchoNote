@@ -27,8 +27,9 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
 
   const handleCreateConversation = useCallback(() => {
     if (!userId) return;
-    void createConversation(userId, channelId, "New Conversation");
-  }, [userId, channelId, createConversation]);
+    // MVP v1: conversations are global; default context is provided by UI (current channel)
+    void createConversation(userId, "New Conversation");
+  }, [userId, createConversation]);
 
   useImperativeHandle(ref, () => ({
     showList: () => singleRef.current?.showList(),
@@ -39,9 +40,10 @@ export const AIConversationInterface = forwardRef<ConversationInterfaceRef, Conv
 
   useEffect(() => {
     if (userId) {
-      loadConversations(userId, channelId);
+      // Load global conversations (decoupled from channels)
+      loadConversations(userId);
     }
-  }, [userId, channelId, loadConversations]);
+  }, [userId, loadConversations]);
 
 
   if (loading||!ready) {

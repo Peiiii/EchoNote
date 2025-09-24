@@ -1,13 +1,24 @@
+// Conversation context config for dynamic binding to channels
+export type ConversationContextMode = 'none' | 'channels' | 'all';
+
+export interface ConversationContextConfig {
+  // none: no context; channels: specific channels; all: use all channels
+  mode: ConversationContextMode;
+  // When mode === 'channels', the selected channel ids
+  channelIds?: string[];
+}
+
 export interface AIConversation {
   id: string;
   title: string;
-  channelId: string;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
   lastMessageAt: Date;
   messageCount: number;
   isArchived: boolean;
+  // Optional dynamic context binding (MVP v2)
+  contexts?: ConversationContextConfig | null;
 }
 
 export type UIMessage = import('@agent-labs/agent-chat').UIMessage;
@@ -21,7 +32,6 @@ export interface MessageListOptions {
 }
 
 export interface AIConversationFilters {
-  channelId?: string;
   isArchived?: boolean;
   searchQuery?: string;
   tags?: string[];

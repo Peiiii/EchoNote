@@ -18,6 +18,7 @@ export function AIConversationTwoPane({
           conversations={conversations}
           currentConversationId={currentConversationId}
           loading={loading}
+          currentChannelId={channelId}
           withHeader={false}
         />
       </div>

@@ -138,7 +138,7 @@ export const ChannelCoverHeader = ({
   };
 
   const collapsedContent = (
-    <div className="flex items-center space-x-2 min-w-0">
+    <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
       {/* Sidebar expand button when sidebar is collapsed */}
       {isLeftSidebarCollapsed && (
         <Button
@@ -157,7 +157,7 @@ export const ChannelCoverHeader = ({
           currentChannel={channel}
           channels={channels}
           onChannelSelect={setCurrentChannel}
-          className="flex-1"
+          className="flex-1 min-w-0 max-w-full"
         />
       ) : (
         <>
@@ -166,8 +166,8 @@ export const ChannelCoverHeader = ({
               {channel.emoji}
             </div>
           )}
-          <div className="flex items-center space-x-1.5 min-w-0 flex-1">
-            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out">
+          <div className="flex items-center space-x-1.5 min-w-0 flex-1 max-w-full overflow-hidden">
+            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0 flex-1">
               {channel.name}
             </h1>
             <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
@@ -202,7 +202,7 @@ export const ChannelCoverHeader = ({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out">
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out min-w-0">
               {channel.name}
             </h1>
             {channel.description && (
