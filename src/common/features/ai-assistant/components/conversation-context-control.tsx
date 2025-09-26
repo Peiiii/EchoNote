@@ -211,7 +211,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={6} className="p-3 w-[22rem] max-w-[90vw] max-h-[70vh] overflow-hidden" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
+        <PopoverContent align="start" sideOffset={6} className="p-3 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
           <div className="text-sm font-medium mb-2">Conversation Context</div>
           {anyLoading && (
             <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
