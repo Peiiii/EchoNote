@@ -50,23 +50,18 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
       );
     }
     
-    // Sort by: selected first, then by message count (most active), then alphabetically
+    // Sort by: message count (most active first), then alphabetically
+    // Remove selected-first sorting to keep order stable
     return filtered.sort((a, b) => {
-      const aSelected = draftChannelIds.includes(a.id);
-      const bSelected = draftChannelIds.includes(b.id);
-      
-      if (aSelected && !bSelected) return -1;
-      if (!aSelected && bSelected) return 1;
-      
-      // Then by message count (most active first)
+      // First by message count (most active first)
       if (a.messageCount !== b.messageCount) {
         return b.messageCount - a.messageCount;
       }
       
-      // Finally alphabetically
+      // Then alphabetically
       return a.name.localeCompare(b.name);
     });
-  }, [channels, searchQuery, draftChannelIds]);
+  }, [channels, searchQuery]);
 
   const label = useMemo(() => {
     const ctx = conv?.contexts;
