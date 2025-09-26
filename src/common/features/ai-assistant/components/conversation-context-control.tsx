@@ -1,16 +1,16 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
-import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import type { ConversationContextConfig } from "@/common/types/ai-conversation";
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/common/components/ui/popover";
 import { Checkbox } from "@/common/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
 import { Label } from "@/common/components/ui/label";
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
+import type { ConversationContextConfig } from "@/common/types/ai-conversation";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useCallback, useEffect, useMemo, useState } from "react";
 // import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { cn } from "@/common/lib/utils";
-import { SlidersHorizontal, Sparkles, Globe, Ban, Layers } from "lucide-react";
-import { useContextStatusStore } from "@/common/features/ai-assistant/stores/context-status.store";
 import { contextDataCache } from "@/common/features/ai-assistant/services/context-data-cache";
+import { useContextStatusStore } from "@/common/features/ai-assistant/stores/context-status.store";
+import { cn } from "@/common/lib/utils";
+import { Ban, Globe, Layers, SlidersHorizontal, Sparkles } from "lucide-react";
 
 interface Props {
   conversationId: string;
@@ -147,7 +147,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
 
   return (
     <div className={containerClass}>
-      <Popover>
+      <Popover modal>
         <PopoverTrigger asChild>
           {variant === 'compact' ? (
             <button
