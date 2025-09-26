@@ -283,16 +283,14 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                           <Checkbox 
                             id={id} 
                             checked={checked} 
-                            onCheckedChange={() => toggleChannel(ch.id)}
-                            className="w-3 h-3"
+                            className="w-3 h-3 pointer-events-none"
                           />
                           <span className="text-sm">{ch.emoji || '📝'}</span>
-                          <Label 
-                            htmlFor={id} 
-                            className="flex-1 min-w-0 truncate cursor-pointer"
+                          <div 
+                            className="flex-1 min-w-0 truncate text-xs"
                           >
                             {ch.name}
-                          </Label>
+                          </div>
                           {isFallback && (
                             <span className="text-xs text-blue-600 dark:text-blue-400">•</span>
                           )}
