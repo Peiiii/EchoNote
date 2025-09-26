@@ -255,6 +255,10 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                     className="pl-7 h-7 text-xs"
                   />
                 </div>
+                {/* Selection count */}
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {draftChannelIds.length} of {filteredChannels.length} selected
+                </div>
               </div>
 
               {/* Compact channels list */}
