@@ -294,7 +294,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                           <span className="text-sm">{ch.emoji || '📝'}</span>
                           <Label 
                             htmlFor={id} 
-                            className="flex-1 truncate cursor-pointer"
+                            className="flex-1 min-w-0 truncate cursor-pointer"
                           >
                             {ch.name}
                           </Label>
