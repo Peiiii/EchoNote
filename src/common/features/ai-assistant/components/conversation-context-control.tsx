@@ -1,4 +1,3 @@
-import { Checkbox } from "@/common/components/ui/checkbox";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
@@ -10,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { contextDataCache } from "@/common/features/ai-assistant/services/context-data-cache";
 import { useContextStatusStore } from "@/common/features/ai-assistant/stores/context-status.store";
 import { cn } from "@/common/lib/utils";
-import { Ban, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Ban, Check, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 interface Props {
   conversationId: string;
@@ -267,7 +266,6 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                 ) : (
                   <div className="p-1">
                     {filteredChannels.map(ch => {
-                      const id = `ctx-ch-${ch.id}`;
                       const checked = draftChannelIds.includes(ch.id);
                       const isFallback = ch.id === fallbackChannelId;
                       
@@ -280,20 +278,20 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                           )}
                           onClick={() => toggleChannel(ch.id)}
                         >
-                          <Checkbox 
-                            id={id} 
-                            checked={checked} 
-                            className="w-3 h-3 pointer-events-none"
-                          />
                           <span className="text-sm">{ch.emoji || '📝'}</span>
                           <div 
                             className="flex-1 min-w-0 truncate text-xs"
                           >
                             {ch.name}
                           </div>
-                          {isFallback && (
-                            <span className="text-xs text-blue-600 dark:text-blue-400">•</span>
-                          )}
+                          <div className="flex items-center gap-1">
+                            {isFallback && (
+                              <span className="text-xs text-blue-600 dark:text-blue-400">•</span>
+                            )}
+                            {checked && (
+                              <Check className="w-3 h-3 text-primary" />
+                            )}
+                          </div>
                         </div>
                       );
                     })}
