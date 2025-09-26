@@ -246,18 +246,20 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             <div className={cn("border rounded-sm bg-muted/30", isSelectedMode ? "" : "opacity-40 pointer-events-none")}>
               {/* Simple search */}
               <div className="p-2 border-b">
-                <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-7 h-7 text-xs"
-                  />
-                </div>
-                {/* Selection count */}
-                <div className="mt-2 text-xs text-muted-foreground">
-                  {draftChannelIds.length} of {filteredChannels.length} selected
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                    <Input
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-7 h-7 text-xs"
+                    />
+                  </div>
+                  {/* Selection count */}
+                  <div className="text-xs text-muted-foreground whitespace-nowrap">
+                    {draftChannelIds.length} of {filteredChannels.length}
+                  </div>
                 </div>
               </div>
 
