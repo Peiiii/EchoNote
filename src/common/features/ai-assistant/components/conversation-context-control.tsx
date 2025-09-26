@@ -1,4 +1,5 @@
 import { Checkbox } from "@/common/components/ui/checkbox";
+import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
@@ -6,11 +7,10 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
-// import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { contextDataCache } from "@/common/features/ai-assistant/services/context-data-cache";
 import { useContextStatusStore } from "@/common/features/ai-assistant/stores/context-status.store";
 import { cn } from "@/common/lib/utils";
-import { Ban, Globe, Layers, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Ban, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 interface Props {
   conversationId: string;
@@ -27,6 +27,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
 
   const [draftMode, setDraftMode] = useState<'auto' | ConversationContextConfig["mode"]>(conv?.contexts ? conv.contexts.mode : 'auto');
   const [draftChannelIds, setDraftChannelIds] = useState<string[]>(conv?.contexts?.mode === 'channels' ? (conv?.contexts?.channelIds || [fallbackChannelId]) : [fallbackChannelId]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Keep local draft in sync when switching conversations or when contexts updated externally
   useEffect(() => {
@@ -35,6 +36,37 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
   }, [conversationId, conv?.contexts, fallbackChannelId]);
 
   const getChannelName = useCallback((id: string) => channels.find(ch => ch.id === id)?.name || id, [channels]);
+
+  // Filter and sort channels for better UX
+  const filteredChannels = useMemo(() => {
+    let filtered = channels;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = channels.filter(ch => 
+        ch.name.toLowerCase().includes(query) || 
+        ch.description?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Sort by: selected first, then by message count (most active), then alphabetically
+    return filtered.sort((a, b) => {
+      const aSelected = draftChannelIds.includes(a.id);
+      const bSelected = draftChannelIds.includes(b.id);
+      
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      
+      // Then by message count (most active first)
+      if (a.messageCount !== b.messageCount) {
+        return b.messageCount - a.messageCount;
+      }
+      
+      // Finally alphabetically
+      return a.name.localeCompare(b.name);
+    });
+  }, [channels, searchQuery, draftChannelIds]);
 
   const label = useMemo(() => {
     const ctx = conv?.contexts;
@@ -70,6 +102,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
     // Do not prefetch on draft changes; only fetch after Apply
     setDraftChannelIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   };
+
 
   const apply = async () => {
     if (!userId || !conv) return;
@@ -216,20 +249,63 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               </div>
             </RadioGroup>
 
-            <div className={cn("border rounded-sm bg-muted/30", isSelectedMode ? "" : "opacity-40 pointer-events-none") }>
-              <div className="h-40 overflow-y-auto pr-1 -mr-1 touch-pan-y overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-                <div className="py-1 pr-1">
-                  {channels.map(ch => {
-                    const id = `ctx-ch-${ch.id}`;
-                    const checked = draftChannelIds.includes(ch.id);
-                    return (
-                      <div key={ch.id} className="flex items-center gap-2 px-2 py-1 w-full">
-                        <Checkbox id={id} checked={checked} onCheckedChange={() => toggleChannel(ch.id)} />
-                        <Label htmlFor={id} className="text-sm truncate cursor-pointer flex-1">{ch.name}</Label>
-                      </div>
-                    );
-                  })}
+            <div className={cn("border rounded-sm bg-muted/30", isSelectedMode ? "" : "opacity-40 pointer-events-none")}>
+              {/* Simple search */}
+              <div className="p-2 border-b">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                  <Input
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-7 h-7 text-xs"
+                  />
                 </div>
+              </div>
+
+              {/* Compact channels list */}
+              <div className="max-h-32 overflow-y-auto">
+                {filteredChannels.length === 0 ? (
+                  <div className="text-center py-4 text-xs text-muted-foreground">
+                    {searchQuery ? 'No channels found' : 'No channels'}
+                  </div>
+                ) : (
+                  <div className="p-1">
+                    {filteredChannels.map(ch => {
+                      const id = `ctx-ch-${ch.id}`;
+                      const checked = draftChannelIds.includes(ch.id);
+                      const isFallback = ch.id === fallbackChannelId;
+                      
+                      return (
+                        <div
+                          key={ch.id}
+                          className={cn(
+                            "flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-accent/50 cursor-pointer",
+                            checked && "bg-primary/10"
+                          )}
+                          onClick={() => toggleChannel(ch.id)}
+                        >
+                          <Checkbox 
+                            id={id} 
+                            checked={checked} 
+                            onCheckedChange={() => toggleChannel(ch.id)}
+                            className="w-3 h-3"
+                          />
+                          <span className="text-sm">{ch.emoji || '📝'}</span>
+                          <Label 
+                            htmlFor={id} 
+                            className="flex-1 truncate cursor-pointer"
+                          >
+                            {ch.name}
+                          </Label>
+                          {isFallback && (
+                            <span className="text-xs text-blue-600 dark:text-blue-400">•</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
