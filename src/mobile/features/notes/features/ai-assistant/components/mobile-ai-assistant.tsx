@@ -6,11 +6,13 @@ import { AIConversationMobile, MobileConversationRef } from "./ai-conversation-m
 interface MobileAIAssistantProps {
     channelId: string;
     isOpen: boolean;
+    onClose?: () => void;
 }
 
 export const MobileAIAssistant = ({ 
     channelId, 
-    isOpen, 
+    isOpen,
+    onClose,
 }: MobileAIAssistantProps) => {
     const { userId } = useNotesDataStore();
     const {
@@ -24,13 +26,14 @@ export const MobileAIAssistant = ({
 
     useEffect(() => {
         if (userId && isOpen) {
-            loadConversations(userId, channelId);
+            // Load global conversations (decoupled from channels)
+            loadConversations(userId);
         }
-    }, [userId, channelId, isOpen, loadConversations]);
+    }, [userId, isOpen, loadConversations]);
 
     const handleCreateConversation = () => {
         if (!userId) return;
-        void createConversation(userId, channelId, "New Conversation");
+        void createConversation(userId, "New Conversation");
     };
 
     if (!isOpen) return null;
@@ -43,6 +46,7 @@ export const MobileAIAssistant = ({
             loading={loading}
             onCreate={handleCreateConversation}
             channelId={channelId}
+            onClose={onClose}
         />
     );
 };

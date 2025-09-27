@@ -8,7 +8,7 @@ export const MobileSettingsSidebar = () => {
     return (
         <div className="h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="flex items-center justify-start p-4 border-b border-border">
+            <div className="flex items-center justify-start p-4">
                 <div className="flex items-center gap-2">
                     <Settings className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">Settings</h3>

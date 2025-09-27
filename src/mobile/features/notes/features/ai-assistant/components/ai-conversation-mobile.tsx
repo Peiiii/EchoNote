@@ -6,6 +6,8 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { AIConversation } from "@/common/types/ai-conversation";
 import { ArrowLeft, Loader2, MessageSquare, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
+import { ConversationContextControl } from "@/common/features/ai-assistant/components/conversation-context-control";
+// removed: creation-time context dropdown; we now use in-chat context control
 
 export type MobileConversationRef = {
   showList: () => void;
@@ -58,6 +60,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
         conversations={conversations}
         currentConversationId={currentConversationId}
         loading={loading}
+        currentChannelId={channelId}
         withHeader={false}
       />
     );
@@ -86,10 +89,21 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       }
     };
 
+    // Derive the active conversation's title for header display
+    const activeConversation = currentConversationId
+      ? conversations.find(c => c.id === currentConversationId)
+      : undefined;
+    const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
+    const headerTitle = view === "list"
+      ? "Conversations"
+      : activeConversation
+        ? (titleGeneratingMap[activeConversation.id] ? "Generating title..." : (activeConversation.title || "AI Chat"))
+        : "AI Chat";
+
     return (
       <div className="relative flex-1 flex flex-col">
         {/* Header Controls */}
-        <div className="flex items-center justify-between px-4 py-2 border-b bg-background">
+        <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-background">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {view === "chat" && (
               <Button
@@ -113,23 +127,40 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
-            <h3 className="font-semibold text-foreground truncate">
-              {view === "list" ? "Conversations" : "AI Chat"}
-            </h3>
+            <h3 className="font-semibold text-foreground truncate text-sm leading-6">{headerTitle}</h3>
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0 pr-8">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {view === 'chat' && currentConversationId && (
+              <ConversationContextControl
+                conversationId={currentConversationId}
+                fallbackChannelId={channelId}
+                variant="compact"
+              />
+            )}
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => {
-                onCreate();
-                showChat();
-              }}
               aria-label="New conversation"
               className="h-8 w-8"
+              onClick={() => { onCreate(); showChat(); }}
             >
               <Plus className="w-4 h-4" />
             </Button>
+            {onClose && (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Close"
+                className="h-8 w-8"
+                onClick={onClose}
+              >
+                <span className="sr-only">Close</span>
+                {/* Using the same icon size as default sheet close */}
+                <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden>
+                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </Button>
+            )}
           </div>
         </div>
 

@@ -48,8 +48,8 @@ export function ReadMoreBaseWrapper({
   const notifyLayoutChange = useReadMoreStore(
     useCallback((state) => state.notifyLayoutChange, [])
   );
-  const suppressAutoScrollOnce = useReadMoreStore(
-    useCallback((state) => state.suppressAutoScrollOnce, [])
+  const activateAutoScrollSuppression = useReadMoreStore(
+    useCallback((state) => state.activateAutoScrollSuppression, [])
   );
   const previousExpandedRef = useRef(false);
 
@@ -80,10 +80,10 @@ export function ReadMoreBaseWrapper({
 
   useEffect(() => {
     if (isExpanded && !previousExpandedRef.current) {
-      suppressAutoScrollOnce();
+      activateAutoScrollSuppression();
     }
     previousExpandedRef.current = isExpanded;
-  }, [isExpanded, suppressAutoScrollOnce]);
+  }, [isExpanded, activateAutoScrollSuppression]);
 
   const handleToggle = () => setIsExpanded((prev) => !prev);
   const inlineHidden =
@@ -98,7 +98,8 @@ export function ReadMoreBaseWrapper({
         ref={contentRef}
         className={cn(
           "transition-all duration-300 ease-in-out",
-          !isExpanded && showReadMore ? "overflow-hidden" : ""
+          !isExpanded && showReadMore ? "overflow-hidden" : "",
+          isExpanded && showReadMore ? "pb-12" : ""
         )}
         style={{
           maxHeight: !isExpanded && showReadMore ? `${maxHeight}px` : "none",
@@ -118,7 +119,7 @@ export function ReadMoreBaseWrapper({
           <button
             type="button"
             onClick={handleToggle}
-            className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98]"
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-sm border border-slate-200/30 dark:border-slate-700/30 flex items-center gap-1 active:scale-[0.98] transition-all duration-150 hover:bg-white/90 dark:hover:bg-slate-900/70 hover:shadow-md"
           >
             <span>{readMoreLabel}</span>
             <ChevronDown className="w-3 h-3" />
@@ -132,7 +133,7 @@ export function ReadMoreBaseWrapper({
           {...collapseInlineData}
           onClick={handleToggle}
           className={cn(
-            "absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-none border-0 flex items-center gap-1 active:scale-[0.98] transition-opacity duration-150",
+            "absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-xs px-2 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-sm border border-slate-200/30 dark:border-slate-700/30 flex items-center gap-1 active:scale-[0.98] transition-all duration-150 hover:bg-white/90 dark:hover:bg-slate-900/70 hover:shadow-md",
             inlineHidden && "opacity-0 pointer-events-none"
           )}
         >

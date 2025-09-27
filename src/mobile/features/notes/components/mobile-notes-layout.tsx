@@ -1,5 +1,6 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline";
 import { useRef } from "react";
@@ -28,6 +29,11 @@ export const MobileNotesLayout = ({
     });
 
     const viewportHeight = useMobileViewportHeight();
+    
+    // Get current channel and all channels for dropdown
+    const { currentChannelId } = useNotesViewStore();
+    const { channels } = useNotesDataStore();
+    const currentChannel = channels.find(channel => channel.id === currentChannelId);
 
     // Ref to access timeline content methods
     const timelineContentRef = useRef<MobileTimelineContentRef>(null);
@@ -58,6 +64,8 @@ export const MobileNotesLayout = ({
             {/* Header */}
             <MobileHeader
                 currentChannelName={currentChannelName}
+                currentChannel={currentChannel}
+                channels={channels}
             />
 
             {/* Main content area */}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useConversationStore } from '@/common/features/ai-assistant/stores/conversation.store';
-import { AIConversation } from '@/common/types/ai-conversation';
+import { AIConversation, ConversationContextConfig } from '@/common/types/ai-conversation';
 
 export interface ConversationState {
   conversations: AIConversation[];
@@ -11,8 +11,8 @@ export interface ConversationState {
 }
 
 export interface ConversationActions {
-  createConversation: (userId: string, channelId: string, title: string) => Promise<AIConversation>;
-  loadConversations: (userId: string, channelId?: string) => Promise<void>;
+  createConversation: (userId: string, title: string, contexts?: ConversationContextConfig) => Promise<AIConversation>;
+  loadConversations: (userId: string) => Promise<void>;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (userId: string, conversationId: string, updates: Partial<AIConversation>) => Promise<void>;

@@ -25,7 +25,7 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
               }}
               className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer ${
                 isCurrentBackground(option)
-                  ? 'border-primary ring-2 ring-primary/20'
+                  ? 'border-primary'
                   : 'border-border hover:border-primary/50'
               }`}
               style={{ background: option.preview }}
@@ -54,7 +54,7 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
               }}
               className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer ${
                 isCurrentBackground(option)
-                  ? 'border-primary ring-2 ring-primary/20'
+                  ? 'border-primary'
                   : 'border-border hover:border-primary/50'
               }`}
               style={{ background: option.preview }}

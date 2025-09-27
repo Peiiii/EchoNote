@@ -63,17 +63,15 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     }
 
     return (
-        <div data-component="channel-list" className="flex flex-col h-full overflow-hidden">
+        <div data-component="channel-list" className="flex flex-col h-full overflow-hidden bg-card shadow-sm">
             {/* Header */}
-            <div data-component="channel-list-header" className="px-4 py-3 dark:border-slate-700">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
-                            Thought Spaces
-                        </h3>
-                    </div>
-                    <CollapsibleSidebar.ToggleButton />
+            <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
+                        Thought Spaces
+                    </h3>
                 </div>
+                <CollapsibleSidebar.ToggleButton />
             </div>
 
             {/* Channel List */}
@@ -105,7 +103,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
             )}
 
             {/* Create Channel Button - Bottom Layout */}
-            <div data-component="channel-list-footer" className="p-3 border-t border-slate-200/30 dark:border-slate-700/30">
+            <div data-component="channel-list-footer" className="p-3">
                 <CreateChannelPopover onAddChannel={handleAddChannel} />
             </div>
 

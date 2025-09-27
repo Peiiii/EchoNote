@@ -8,10 +8,11 @@ import { useConversationStore } from "../stores/conversation.store";
 import { toast } from "sonner";
 
 import { useState } from "react";
+import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
-export function AIConversationList({ conversations, currentConversationId, loading }: ConversationListProps) {
+export function AIConversationList({ conversations, currentConversationId, loading, currentChannelId }: ConversationListProps) {
   const { selectConversation, deleteConversation, updateConversation } = useConversationState();
-  const { userId } = useNotesDataStore();
+  const { userId, channels } = useNotesDataStore();
   const deletingIds = useConversationStore(s => s.deletingIds);
   const showArchived = useConversationStore(s => s.showArchived);
   const setShowArchived = useConversationStore(s => s.setShowArchived);
@@ -27,6 +28,23 @@ export function AIConversationList({ conversations, currentConversationId, loadi
     const q = query.toLowerCase();
     return (c.title || '').toLowerCase().includes(q);
   });
+
+  const getChannelName = (id: string) => channels.find(ch => ch.id === id)?.name || id;
+  const getContextLabelParts = (c: { contexts?: ConversationContextConfig | null }): { text: string; more: number } => {
+    const ctx = c.contexts;
+    if (!ctx) {
+      if (currentChannelId) return { text: `Default: ${getChannelName(currentChannelId)}`, more: 0 };
+      return { text: 'Default', more: 0 };
+    }
+    if (ctx.mode === 'none') return { text: 'No Context', more: 0 };
+    if (ctx.mode === 'all') return { text: 'All Channels', more: 0 };
+    const ids = ctx.channelIds || [];
+    if (ids.length === 0) return { text: 'No Context', more: 0 };
+    const primary = getChannelName(ids[0]);
+    const more = Math.max(0, ids.length - 1);
+    // Only show first name in text; put "+N" in a separate badge to avoid being truncated away
+    return { text: primary, more };
+  };
   return (
     <div className="flex flex-col h-full">
       <div className="p-2 px-3 sticky top-0 bg-background z-10 border-b flex items-center gap-2">
@@ -35,7 +53,7 @@ export function AIConversationList({ conversations, currentConversationId, loadi
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search conversations"
-            className="w-full h-8 px-2 rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-8 px-2 rounded-md border bg-muted text-sm focus:outline-none"
           />
         </div>
         <Popover>
@@ -100,6 +118,19 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                     <span>{c.messageCount} messages</span>
                     <span>•</span>
                     <span>{formatTimeForSocial(c.lastMessageAt)}</span>
+                    <span>•</span>
+                    {(() => {
+                      const { text, more } = getContextLabelParts(c);
+                      return (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border text-[10px] leading-none bg-background max-w-[14rem]">
+                          <span>Context:</span>
+                          <span className="font-medium text-foreground/80 truncate max-w-[9rem]">{text}</span>
+                          {more > 0 && (
+                            <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">+{more}</span>
+                          )}
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
                 {userId && (

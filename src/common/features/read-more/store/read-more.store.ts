@@ -28,8 +28,10 @@ interface ReadMoreStore {
   pendingCollapseId: string | null
   /** Latest layout sync callback registered by collapse hook */
   layoutSync: (() => void) | null
-  /** Whether the next auto-scroll should be suppressed */
-  autoScrollSuppressed: boolean
+  /** Whether auto-scroll should be suppressed due to user interaction */
+  shouldSuppressAutoScroll: boolean
+  /** Timestamp when suppression was activated */
+  suppressionTimestamp: number | null
   /** Updates the status information for a specific message */
   setStatus: (id: string, status: StatusEntry) => void
   /** Updates which message is controlling the floating collapse button */
@@ -46,8 +48,10 @@ interface ReadMoreStore {
   registerLayoutSync: (cb: (() => void) | null) => void
   /** Notifies that read-more layout may have changed */
   notifyLayoutChange: () => void
-  /** Suppresses the next auto-scroll triggered by sticky mode */
-  suppressAutoScrollOnce: () => void
+  /** Activates auto-scroll suppression due to user interaction */
+  activateAutoScrollSuppression: () => void
+  /** Checks if auto-scroll should be suppressed (with time-based expiration) */
+  shouldSuppressAutoScrollNow: () => boolean
   /** Consumes suppression flag, returning true if suppression was active */
   consumeAutoScrollSuppression: () => boolean
 }
@@ -63,7 +67,8 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
   activeVisibleHeight: null,
   pendingCollapseId: null,
   layoutSync: null,
-  autoScrollSuppressed: false,
+  shouldSuppressAutoScroll: false,
+  suppressionTimestamp: null,
   setStatus: (id, status) => set((state) => ({
     statusMap: { ...state.statusMap, [id]: status },
   })),
@@ -80,11 +85,24 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
     const cb = get().layoutSync
     cb?.()
   },
-  suppressAutoScrollOnce: () => set({ autoScrollSuppressed: true }),
+  activateAutoScrollSuppression: () => set({ 
+    shouldSuppressAutoScroll: true, 
+    suppressionTimestamp: Date.now() 
+  }),
+  shouldSuppressAutoScrollNow: () => {
+    const state = get()
+    if (!state.shouldSuppressAutoScroll) return false
+    // Suppression expires after 300ms to handle multiple rapid scrollHeight changes
+    if (state.suppressionTimestamp && Date.now() - state.suppressionTimestamp > 500) {
+      set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null })
+      return false
+    }
+    return true
+  },
   consumeAutoScrollSuppression: () => {
-    const suppressed = get().autoScrollSuppressed
+    const suppressed = get().shouldSuppressAutoScroll
     if (suppressed) {
-      set({ autoScrollSuppressed: false })
+      set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null })
     }
     return suppressed
   },

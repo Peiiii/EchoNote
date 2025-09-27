@@ -2,7 +2,6 @@ import {
   collection,
   doc,
   query,
-  where,
   orderBy,
   getDocs,
   updateDoc,
@@ -16,27 +15,32 @@ import {
   limitToLast,
   startAfter,
   endBefore,
+  FieldValue,
 } from "firebase/firestore";
 import { db } from "@/common/config/firebase.config";
-import { AIConversation, UIMessage, MessageListOptions } from "@/common/types/ai-conversation";
+import { AIConversation, UIMessage, MessageListOptions, ConversationContextConfig } from "@/common/types/ai-conversation";
 import { sanitizeUIMessageForPersistence } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export class FirebaseAIConversationService {
   private db = db;
   
   // 对话管理
-  async createConversation(userId: string, channelId: string, title: string): Promise<AIConversation> {
+  async createConversation(
+    userId: string,
+    title: string,
+    contexts?: ConversationContextConfig
+  ): Promise<AIConversation> {
     const conversationId = crypto.randomUUID();
     const conversation: AIConversation = {
       id: conversationId,
       title,
-      channelId,
       userId,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastMessageAt: new Date(),
       messageCount: 0,
       isArchived: false,
+      ...(contexts ? { contexts } : {}),
     };
     
     await setDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
@@ -49,8 +53,8 @@ export class FirebaseAIConversationService {
     return conversation;
   }
   
-  async getConversations(userId: string, channelId?: string): Promise<AIConversation[]> {
-    const q = this.buildConversationsQuery(userId, channelId);
+  async getConversations(userId: string): Promise<AIConversation[]> {
+    const q = this.buildConversationsQuery(userId);
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToAIConversation(doc));
   }
@@ -208,7 +212,7 @@ export class FirebaseAIConversationService {
 
     await updateDoc(
       doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
-      updateData as any
+      updateData as { [x: string]: FieldValue | Partial<unknown> | undefined }
     );
   }
   
@@ -246,10 +250,9 @@ export class FirebaseAIConversationService {
   
   subscribeToConversations(
     userId: string, 
-    callback: (conversations: AIConversation[]) => void,
-    channelId?: string
+    callback: (conversations: AIConversation[]) => void
   ): () => void {
-    const q = this.buildConversationsQuery(userId, channelId);
+    const q = this.buildConversationsQuery(userId);
     
     return onSnapshot(q, (snapshot) => {
       const conversations = snapshot.docs.map(doc => this.docToAIConversation(doc));
@@ -258,25 +261,19 @@ export class FirebaseAIConversationService {
   }
   
   // 辅助方法
-  private buildConversationsQuery(userId: string, channelId?: string) {
+  private buildConversationsQuery(userId: string) {
     let q = query(
       collection(this.db, `users/${userId}/aiConversations`),
       orderBy('lastMessageAt', 'desc')
     );
-    
-    if (channelId) {
-      q = query(q, where('channelId', '==', channelId));
-    }
-    
     return q;
   }
 
   private docToAIConversation(doc: DocumentSnapshot): AIConversation {
     const data = doc.data()!;
-    return {
+    const base: AIConversation = {
       id: doc.id,
       title: data.title,
-      channelId: data.channelId,
       userId: data.userId,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
@@ -284,6 +281,14 @@ export class FirebaseAIConversationService {
       messageCount: data.messageCount || 0,
       isArchived: data.isArchived || false,
     };
+    // Backward compatibility: map legacy channelId to contexts
+    let contexts: ConversationContextConfig | null | undefined;
+    if (data.contexts) {
+      contexts = data.contexts as ConversationContextConfig;
+    } else if (data.channelId) {
+      contexts = { mode: 'channels', channelIds: [data.channelId] } as ConversationContextConfig;
+    }
+    return contexts ? { ...base, contexts } : base;
   }
   
   private docToUIMessage(doc: DocumentSnapshot): UIMessage {

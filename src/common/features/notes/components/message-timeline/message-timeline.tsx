@@ -6,7 +6,8 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { Bot, ChevronUp } from "lucide-react";
+import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { Bot, ChevronUp, PenLine } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
@@ -48,6 +49,9 @@ export const MessageTimeline = forwardRef<
   ) => {
     const { currentChannelId } = useNotesViewStore();
     const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
+    
+    // Use unified input collapse hook
+    const { inputCollapsed, handleExpandInput } = useInputCollapse();
 
     const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
       [],
@@ -59,6 +63,7 @@ export const MessageTimeline = forwardRef<
     const { showFloatingCollapse, handleScroll: handleCollapseScroll, collapseCurrent } = useGlobalCollapse(containerRef);
 
     const messageDataAttr = READ_MORE_DATA_ATTRS.messageId;
+
 
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
@@ -116,42 +121,55 @@ export const MessageTimeline = forwardRef<
               >
                 <DateDivider date={date} />
 
-                {/* Elegant timeline of thoughts */}
-                {userMessages.map((message: Message) => {
-                  const threadMessages = (messages ?? []).filter(
-                    (msg) => msg.threadId === (message.threadId || message.id)
-                  );
-                  const threadCount =
-                    threadMessages.length > 1 ? threadMessages.length - 1 : 0;
+                {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
+                {/* Align separators: no extra padding on mobile (edge-to-edge), keep desktop alignment; enhanced visibility in both modes */}
+                <div className="px-0 divide-y divide-slate-200/80 dark:divide-slate-800/80">
+                  {userMessages.map((message: Message) => {
+                    const threadMessages = (messages ?? []).filter(
+                      (msg) => msg.threadId === (message.threadId || message.id)
+                    );
+                    const threadCount =
+                      threadMessages.length > 1 ? threadMessages.length - 1 : 0;
 
-                  return (
-                    <div
-                      key={message.id}
-                      {...{ [messageDataAttr]: message.id }}
-                      className="w-full"
-                      style={{ height: "auto", minHeight: "auto" }}
-                    >
-                      {renderThoughtRecord ? (
-                        renderThoughtRecord(message, threadCount)
-                      ) : (
-                        <div className="p-4">
-                          <div className="text-sm text-muted-foreground">
-                            Message: {message.content}
+                    return (
+                      <div
+                        key={message.id}
+                        {...{ [messageDataAttr]: message.id }}
+                        className="w-full"
+                        style={{ height: "auto", minHeight: "auto" }}
+                      >
+                        {renderThoughtRecord ? (
+                          renderThoughtRecord(message, threadCount)
+                        ) : (
+                          <div className="p-4">
+                            <div className="text-sm text-muted-foreground">
+                              Message: {message.content}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Thread count: {threadCount}
+                            </div>
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Thread count: {threadCount}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </div>
         <div className="absolute bottom-4 right-4 z-20 pointer-events-none">
           <div className="flex flex-col items-end gap-2">
+            {inputCollapsed && (
+              <div className="pointer-events-auto">
+                <FloatingActionButton
+                  onClick={handleExpandInput}
+                  ariaLabel="Show composer"
+                >
+                  <PenLine className="h-4 w-4" />
+                </FloatingActionButton>
+              </div>
+            )}
             <div className="pointer-events-auto">
               <FloatingActionButton
                 onClick={() => {
@@ -182,7 +200,7 @@ export const MessageTimeline = forwardRef<
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1"
+                className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1 hover:bg-secondary"
                 onClick={collapseCurrent}
                 aria-label="Collapse current"
               >

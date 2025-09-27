@@ -3,9 +3,11 @@ import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
-import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, Settings, Users } from "lucide-react";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, PanelLeft, Settings, Users } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
+import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 
@@ -61,11 +63,18 @@ export const ChannelCoverHeader = ({
   );
   const isCollapsed = useUIPreferencesStore(
     useCallback(
-      (state) => state.timelineCoverCollapsed[channel.id] ?? defaultCollapsed,
-      [channel.id, defaultCollapsed]
+      (state) => state.timelineCoverCollapsed ?? defaultCollapsed,
+      [defaultCollapsed]
     )
   );
-  const { updateChannel } = useNotesDataStore();
+  const isLeftSidebarCollapsed = useUIPreferencesStore(
+    useCallback((state) => state.isLeftSidebarCollapsed, [])
+  );
+  const setLeftSidebarCollapsed = useUIPreferencesStore(
+    useCallback((state) => state.setLeftSidebarCollapsed, [])
+  );
+  const { updateChannel, channels } = useNotesDataStore();
+  const { setCurrentChannel } = useNotesViewStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
   const isGradient = backgroundStyle.includes('gradient');
 
@@ -95,13 +104,17 @@ export const ChannelCoverHeader = ({
 
     setIsAnimating(true);
     const nextCollapsed = !isCollapsed;
-    setTimelineCoverCollapsed(channel.id, nextCollapsed);
+    setTimelineCoverCollapsed(nextCollapsed);
     notifyLayoutChange();
 
     setTimeout(() => {
       setIsAnimating(false);
       notifyLayoutChange();
     }, 300);
+  };
+
+  const handleExpandSidebar = () => {
+    setLeftSidebarCollapsed(false);
   };
 
   const handleBackgroundChange = async ({ type, value }: { type: 'color' | 'image'; value: string }) => {
@@ -125,38 +138,75 @@ export const ChannelCoverHeader = ({
   };
 
   const collapsedContent = (
-    <div className="flex items-center space-x-3 min-w-0 flex-1">
-      {channel.emoji && (
-        <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
-          {channel.emoji}
-        </div>
+    <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
+      {/* Sidebar expand button when sidebar is collapsed */}
+      {isLeftSidebarCollapsed && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleExpandSidebar}
+          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
+          title="Expand sidebar"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
       )}
-      <div className="flex items-center space-x-2 min-w-0 flex-1">
-        <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out">
-          {channel.name}
-        </h1>
-        <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
-          {channel.messageCount}
-        </Badge>
-      </div>
+      
+      {isLeftSidebarCollapsed ? (
+        <ChannelDropdownSelector
+          currentChannel={channel}
+          channels={channels}
+          onChannelSelect={setCurrentChannel}
+          className="flex-1 min-w-0 max-w-full"
+        />
+      ) : (
+        <>
+          {channel.emoji && (
+            <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
+              {channel.emoji}
+            </div>
+          )}
+          <div className="flex items-center space-x-1.5 min-w-0 flex-1 max-w-full overflow-hidden">
+            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0 flex-1">
+              {channel.name}
+            </h1>
+            <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
+              {channel.messageCount}
+            </Badge>
+          </div>
+        </>
+      )}
     </div>
   );
 
   const expandedContent = (
     <>
       <div className="relative z-10 flex items-start justify-between">
-        <div className="flex items-center space-x-4 min-w-0 flex-1">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          {/* Sidebar expand button when sidebar is collapsed */}
+          {isLeftSidebarCollapsed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExpandSidebar}
+              className="h-8 w-8 p-0 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
+              title="Expand sidebar"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </Button>
+          )}
+          
           {channel.emoji && (
             <div className="text-4xl drop-shadow-lg flex-shrink-0 transition-all duration-300 ease-out">
               {channel.emoji}
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out">
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out min-w-0">
               {channel.name}
             </h1>
             {channel.description && (
-              <p className="text-white/90 text-sm mt-2 drop-shadow-md line-clamp-2 transition-all duration-300 ease-out">
+              <p className="text-white/90 text-sm mt-1.5 drop-shadow-md line-clamp-2 transition-all duration-300 ease-out">
                 {channel.description}
               </p>
             )}
@@ -238,7 +288,7 @@ export const ChannelCoverHeader = ({
       className={cn(
         "relative w-full overflow-hidden transition-all duration-300 ease-out",
         isCollapsed ? "h-12" : "h-52",
-        isCollapsed ? "flex items-center justify-between px-4 bg-muted/50 border-b border-border" : "",
+        isCollapsed ? "flex items-center justify-between px-4" : "",
         className
       )}
       style={!isCollapsed ? getBackgroundStyle() : {}}

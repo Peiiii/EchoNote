@@ -3,6 +3,7 @@ import { Input } from "@/common/components/ui/input";
 import { RefinedPopover } from "@/common/components/refined-popover";
 import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Plus } from "lucide-react";
+import { getRandomEmoji } from "@/common/utils/emoji";
 import { useState } from "react";
 
 interface CreateChannelPopoverProps {
@@ -13,7 +14,8 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const [isOpen, setIsOpen] = useState(false);
     const [newChannelName, setNewChannelName] = useState("");
     const [newChannelDescription, setNewChannelDescription] = useState("");
-    const [newChannelEmoji, setNewChannelEmoji] = useState("");
+    // Seed with a random emoji so users see a default right away
+    const [newChannelEmoji, setNewChannelEmoji] = useState<string>(() => getRandomEmoji());
 
     const handleAddChannel = () => {
         if (newChannelName.trim()) {
@@ -24,7 +26,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
             });
             setNewChannelName("");
             setNewChannelDescription("");
-            setNewChannelEmoji("");
+            // Do not reseed here to avoid visible emoji change on confirm; will reseed on next open
             setIsOpen(false);
         }
     };
@@ -32,7 +34,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     const handleCancel = () => {
         setNewChannelName("");
         setNewChannelDescription("");
-        setNewChannelEmoji("");
+        // Do not reseed here; reseed when opening the popover
         setIsOpen(false);
     };
 
@@ -47,7 +49,18 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
     };
 
     return (
-        <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
+        <RefinedPopover
+            open={isOpen}
+            onOpenChange={(open) => {
+                setIsOpen(open);
+                if (open) {
+                    // Reset fields and re-seed emoji when opening
+                    setNewChannelName("");
+                    setNewChannelDescription("");
+                    setNewChannelEmoji(getRandomEmoji());
+                }
+            }}
+        >
             <RefinedPopover.Trigger asChild>
                 <Button 
                     variant="ghost"
@@ -112,7 +125,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                                 onChange={(e) => setNewChannelName(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Enter space name..."
-                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-1 focus:ring-slate-400/20 dark:focus:ring-slate-500/20 hover:border-slate-300 dark:hover:border-slate-600"
+                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
                                 autoFocus
                             />
                         </div>
@@ -127,7 +140,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
                                 onChange={(e) => setNewChannelDescription(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Describe the theme of this space..."
-                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500 focus:ring-1 focus:ring-slate-400/20 dark:focus:ring-slate-500/20 hover:border-slate-300 dark:hover:border-slate-600"
+                                className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
                             />
                         </div>
                     </div>

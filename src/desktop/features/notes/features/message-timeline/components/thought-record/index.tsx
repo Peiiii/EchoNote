@@ -46,7 +46,7 @@ export function ThoughtRecord({
                     : 'hover:bg-gray-100/80 dark:hover:bg-gray-800/20'
             }`}>
                 {/* Record Header */}
-                <div className="flex items-center justify-between mb-4 px-8">
+                <div className="flex items-center justify-between mb-4 px-6">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
                             <Clock className="w-3 h-3" />
@@ -72,10 +72,10 @@ export function ThoughtRecord({
                         onCancel={handleCancel}
                         onExpand={handleExpand}
                         isSaving={isSaving}
-                        className="px-8"
+                        className="px-6"
                     />
                 ) : (
-                    <div className="px-8">
+                    <div className="px-6">
                         <ReadMoreWrapper maxHeight={300} messageId={message.id}>
                             <MarkdownContent content={message.content} />
                         </ReadMoreWrapper>
@@ -88,7 +88,7 @@ export function ThoughtRecord({
                     <ThoughtRecordSparks
                         message={message}
                         showAnalysis={showAnalysis}
-                        className="px-8 mx-8"
+                        className="px-6 mx-6"
                         onClose={handleToggleAnalysis}
                     />
                 )}

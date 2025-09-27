@@ -1,5 +1,5 @@
+import { convertUIMessagesToMessages } from "@/common/lib/runnable-agent/agent-utils/message-utils";
 import {
-  convertUIMessagesToMessages,
   EventType,
   RunErrorEvent,
   RunFinishedEvent,

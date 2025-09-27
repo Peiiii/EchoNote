@@ -4,6 +4,8 @@ import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { Textarea } from "@/common/components/ui/textarea";
 import { Plus } from "lucide-react";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
+import { getRandomEmoji } from "@/common/utils/emoji";
 import {
     Dialog,
     DialogContent,
@@ -15,35 +17,46 @@ import {
 } from "@/common/components/ui/dialog";
 
 interface MobileCreateChannelPopoverProps {
-    onAddChannel: (channel: { name: string; description: string }) => void;
+    onAddChannel: (channel: { name: string; description: string; emoji?: string }) => void;
 }
 
 export function MobileCreateChannelPopover({ onAddChannel }: MobileCreateChannelPopoverProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [emoji, setEmoji] = useState<string>(getRandomEmoji());
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (name.trim()) {
-            onAddChannel({
-                name: name.trim(),
-                description: description.trim(),
-            });
-            setName("");
-            setDescription("");
-            setOpen(false);
-        }
+        if (!name.trim()) return;
+        onAddChannel({
+            name: name.trim(),
+            description: description.trim(),
+            emoji: emoji?.trim() || undefined,
+        });
+        setOpen(false); // Do not reseed here; only reseed on next open
     };
 
     const handleCancel = () => {
         setName("");
         setDescription("");
+        // Do not reseed here; will reseed when dialog opens next time
         setOpen(false);
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (isOpen) {
+                    // Reset fields and reseed a new default emoji when opening
+                    setName("");
+                    setDescription("");
+                    setEmoji(getRandomEmoji());
+                }
+            }}
+        >
             <DialogTrigger asChild>
                 <Button 
                     variant="outline" 
@@ -61,6 +74,33 @@ export function MobileCreateChannelPopover({ onAddChannel }: MobileCreateChannel
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Emoji selection */}
+                    <div className="space-y-2">
+                        <Label htmlFor="emoji">Emoji</Label>
+                        <div className="flex items-center gap-2">
+                            <EmojiPickerComponent onSelect={setEmoji}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-10 w-16 text-sm"
+                                >
+                                    {emoji || "Select"}
+                                </Button>
+                            </EmojiPickerComponent>
+                            {emoji && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setEmoji("")}
+                                    className="h-10 px-2 text-muted-foreground"
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </div>
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input

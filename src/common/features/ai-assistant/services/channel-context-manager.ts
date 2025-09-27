@@ -1,11 +1,10 @@
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { contextDataCache } from "./context-data-cache";
 
 /**
  * Generate system instructions for AI Assistant
  */
 function generateSystemInstructions(channelName: string, messageCount: number): string {
-    return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
+  return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in the channel: ${channelName}
 This channel contains ${messageCount} thought records that represent the collective knowledge and ideas of the team.
@@ -61,17 +60,15 @@ export class ChannelContextManager {
     description: string;
     value: string;
   }> {
-    // Get channel and message data
-    const state = channelMessageService.dataContainer.get();
-    const channelState = state.messageByChannel[channelId];
-    const channel = useNotesDataStore.getState().channels.find(ch => ch.id === channelId);
-    const messages = channelState.messages || [];
-
-    if (!channelState || !channel) {
+    const snap = contextDataCache.getSnapshot(channelId);
+    const channel = snap.channel;
+    const messages = snap.messages || [];
+    if (!channel) {
+      // still loading; return minimal payload but kick off fetch happened in getSnapshot
       return [{
         description: 'Channel Context',
         value: JSON.stringify({
-          error: 'Channel not found',
+          info: 'Channel meta loading...',
           channelId,
           timestamp: new Date().toISOString()
         })
@@ -87,6 +84,7 @@ export class ChannelContextManager {
       {
         description: `User's thoughts/notes in the channel`,
         value: JSON.stringify(messages.map(msg => ({
+          id: msg.id,
           content: msg.content,
           timestamp: msg.timestamp.toISOString(),
           sender: msg.sender

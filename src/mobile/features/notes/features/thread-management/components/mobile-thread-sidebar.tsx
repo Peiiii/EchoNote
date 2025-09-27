@@ -20,7 +20,7 @@ export const MobileThreadSidebar = ({
     return (
         <div className="h-full flex flex-col bg-background">
             {/* Header */}
-            <div className="flex items-center justify-start p-4 border-b border-border">
+            <div className="flex items-center justify-start p-4">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">Thread</h3>
@@ -28,7 +28,7 @@ export const MobileThreadSidebar = ({
             </div>
 
             {/* Parent Message */}
-            <div className="p-4 border-b border-border bg-muted/50">
+            <div className="p-4 bg-muted/50">
                 <div className="text-sm text-muted-foreground mb-2">Parent Message</div>
                 <div className="text-sm text-foreground leading-relaxed">
                     {parentMessage?.content}
@@ -60,7 +60,7 @@ export const MobileThreadSidebar = ({
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t border-border">
+            <div className="p-4">
                 <div className="flex gap-2">
                     <input
                         type="text"

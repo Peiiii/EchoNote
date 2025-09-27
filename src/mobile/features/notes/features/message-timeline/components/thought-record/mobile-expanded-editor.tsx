@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { useEditor } from "@/common/hooks/use-editor";
 
 interface MobileExpandedEditorProps {
     originalContent: string;
@@ -20,11 +22,15 @@ export const MobileExpandedEditor = ({
 }: MobileExpandedEditorProps) => {
     const { editContent, updateContent } = useEditStateStore();
     const hasChanges = editContent !== originalContent;
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    
+    useEditor({ textareaRef, updateContent, content: editContent });
 
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newContent = e.target.value;
         updateContent(newContent);
     };
+
 
     const handleSave = () => {
         if (hasChanges) {
@@ -85,6 +91,7 @@ export const MobileExpandedEditor = ({
             {/* Editor */}
             <div className="flex-1 p-4 min-h-0">
                 <Textarea
+                    ref={textareaRef}
                     value={editContent}
                     onChange={handleContentChange}
                     placeholder="Edit your message..."

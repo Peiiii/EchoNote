@@ -27,5 +27,5 @@ export function ConversationContent({ currentConversationId, channelId, hasConve
     return <div className="flex-1" />;
   }
 
-  return <AIConversationEmptyPane onCreate={() => { if (userId) void createConversation(userId, channelId, "New Conversation"); }} />;
+  return <AIConversationEmptyPane onCreate={() => { if (userId) void createConversation(userId, "New Conversation"); }} />;
 }

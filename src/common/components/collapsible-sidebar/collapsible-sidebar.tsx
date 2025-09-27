@@ -87,8 +87,7 @@ const CollapsibleSidebarRoot = ({
                 </div>
             </div>
 
-            {/* Floating expand button when sidebar is collapsed */}
-            {isCollapsed && <CollapsibleSidebarExpandButton />}
+            {/* Floating expand button removed for cleaner design */}
         </CollapsibleSidebarContext.Provider>
     );
 };
@@ -136,24 +135,7 @@ const CollapsibleSidebarToggleButton = ({ className = "", children }: ToggleButt
     );
 };
 
-// Expand button component
-const CollapsibleSidebarExpandButton = () => {
-    const { toggleCollapse } = useCollapsibleSidebar();
-
-    return (
-        <div className="absolute left-0 top-4 z-10 animate-in fade-in slide-in-from-left-2 duration-300">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleCollapse}
-                className="h-8 w-8 p-0 rounded-r-md rounded-l-none border-l-0 bg-card hover:bg-muted shadow-md transition-all duration-300"
-                title="Expand sidebar"
-            >
-                <PanelLeft className="h-4 w-4" />
-            </Button>
-        </div>
-    );
-};
+// Expand button component removed for cleaner design
 
 // Content component
 interface ContentProps {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 
 // Types
 interface MobileSidebarState {
@@ -21,7 +22,9 @@ interface MobileSidebarActions {
 
 export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions => {
     const [isChannelListOpen, setIsChannelListOpen] = useState(false);
-    const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
+    const isAIAssistantOpen = useUIStateStore(s => s.isAIAssistantOpen);
+    const openAIAssistant = useUIStateStore(s => s.openAIAssistant);
+    const closeAIAssistant = useUIStateStore(s => s.closeAIAssistant);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     
     const { setCurrentChannel } = useNotesViewStore();
@@ -32,7 +35,10 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
         setIsChannelListOpen(false);
     };
 
-    useEffect(() => rxEventBusService.requestOpenAIAssistant$.listen(() => setIsAIAssistantOpen(true)), []);
+    useEffect(() => rxEventBusService.requestOpenAIAssistant$.listen(() => {
+        const { currentChannelId } = useNotesViewStore.getState();
+        if (currentChannelId) openAIAssistant(currentChannelId);
+    }), [openAIAssistant]);
 
     return {
         // State
@@ -43,8 +49,12 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
         // Actions
         openChannelList: () => setIsChannelListOpen(true),
         closeChannelList: () => setIsChannelListOpen(false),
-        openAIAssistant: () => setIsAIAssistantOpen(true),
-        closeAIAssistant: () => setIsAIAssistantOpen(false),
+        openAIAssistant: () => {
+            if (useNotesViewStore.getState().currentChannelId) {
+                openAIAssistant(useNotesViewStore.getState().currentChannelId!);
+            }
+        },
+        closeAIAssistant,
         openSettings: () => setIsSettingsOpen(true),
         closeSettings: () => setIsSettingsOpen(false),
         handleChannelSelect,

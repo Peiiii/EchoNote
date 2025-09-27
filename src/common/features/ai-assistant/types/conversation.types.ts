@@ -5,6 +5,8 @@ export interface ConversationListProps {
   currentConversationId: string | null;
   loading: boolean;
   withHeader?: boolean;
+  // Optional: current channel id to help render default context label
+  currentChannelId?: string;
 }
 
 export interface ConversationPaneProps {

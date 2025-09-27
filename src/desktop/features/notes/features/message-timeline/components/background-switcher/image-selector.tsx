@@ -98,7 +98,7 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
                 }}
                 className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer overflow-hidden ${
                   isCurrentBackground(option)
-                    ? 'border-primary ring-2 ring-primary/20'
+                    ? 'border-primary'
                     : 'border-border hover:border-primary/50'
                 }`}
                 title={option.name}
