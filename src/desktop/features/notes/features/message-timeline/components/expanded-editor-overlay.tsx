@@ -1,4 +1,5 @@
 import { ExpandedEditor } from "./thought-record/expanded-editor";
+import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 
 interface ExpandedEditorOverlayProps {
     isVisible: boolean;
@@ -11,25 +12,28 @@ interface ExpandedEditorOverlayProps {
 }
 
 export const ExpandedEditorOverlay = ({
-    isVisible,
-    editContent,
-    isSaving,
-    onSave,
-    onCancel,
-    onCollapse,
-    className = ""
+  isVisible,
+  editContent,
+  isSaving,
+  onSave,
+  onCancel,
+  onCollapse,
+  className = "",
 }: ExpandedEditorOverlayProps) => {
-    if (!isVisible) return null;
-    
-    return (
-        <div className={`absolute inset-0 z-50 bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-700 rounded-lg m-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-300 ease-out ${className}`}>
-            <ExpandedEditor
-                content={editContent}
-                onSave={onSave}
-                onCancel={onCancel}
-                onCollapse={onCollapse}
-                isSaving={isSaving}
-            />
-        </div>
-    );
+  return (
+    <Dialog open={isVisible} onOpenChange={(open) => { if (!open) onCancel(); }}>
+      <DialogContent
+        showCloseButton={false}
+        className={`p-0 sm:max-w-[95vw] md:max-w-5xl w-[95vw] h-[85vh] ${className}`}
+      >
+        <ExpandedEditor
+          content={editContent}
+          onSave={onSave}
+          onCancel={onCancel}
+          onCollapse={onCollapse}
+          isSaving={isSaving}
+        />
+      </DialogContent>
+    </Dialog>
+  );
 };

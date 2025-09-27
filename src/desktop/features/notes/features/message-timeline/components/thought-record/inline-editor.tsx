@@ -40,14 +40,12 @@ export function InlineEditor({
     setLocalContent(content);
   }, [content]);
 
-  // Auto-adjust textarea height
+  // Auto-adjust textarea height with a sensible max to avoid growing too tall
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(
-        textareaRef.current.scrollHeight,
-        200
-      )}px`;
+      const max = 300; // px
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, max)}px`;
     }
   }, [localContent]);
 
@@ -77,15 +75,15 @@ export function InlineEditor({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Editor Textarea - Borderless, like message input */}
-      <div className="relative">
+      {/* Editor area – highlight to emphasize editability */}
+      <div className="relative rounded-md border border-accent/40 bg-accent/20 p-2">
         <textarea
           ref={textareaRef}
           value={localContent}
           onChange={(e) => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Edit your thought..."
-          className="w-full min-h-[120px] max-h-[200px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
+          className="w-full min-h-[120px] max-h-[300px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
           disabled={isSaving}
           style={{
             caretColor: "#3b82f6", // Blue cursor like message input
