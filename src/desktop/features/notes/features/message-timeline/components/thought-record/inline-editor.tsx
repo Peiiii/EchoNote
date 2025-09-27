@@ -75,8 +75,8 @@ export function InlineEditor({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Editor area – highlight to emphasize editability */}
-      <div className="relative rounded-md border border-accent/40 bg-accent/20 p-2">
+      {/* Editor area – white background to emphasize editability (dark mode keeps contrast) */}
+      <div className="relative rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 shadow-sm">
         <textarea
           ref={textareaRef}
           value={localContent}
