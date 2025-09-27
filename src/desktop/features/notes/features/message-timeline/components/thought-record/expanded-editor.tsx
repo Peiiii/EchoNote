@@ -71,7 +71,8 @@ export function ExpandedEditor({
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
+    // Use min-h-0 on flex wrappers to prevent children from forcing overflow
+    <div className="w-full h-full min-h-0 flex flex-col">
       {/* Header - Edit mode indicator and actions */}
       <div className="flex items-center justify-between px-8 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
         <div className="flex items-center gap-3">
@@ -96,9 +97,9 @@ export function ExpandedEditor({
       </div>
 
       {/* Main editing area - Left Editor + Right Preview */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* Editor panel (left) */}
-        <div className="w-1/2 border-r border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+        <div className="w-1/2 min-h-0 border-r border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -110,7 +111,7 @@ export function ExpandedEditor({
             </div>
           </div>
           
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 min-h-0 p-6 overflow-y-auto">
             <textarea
               ref={textareaRef}
               value={localContent}
@@ -127,7 +128,7 @@ export function ExpandedEditor({
         </div>
 
         {/* Preview panel (right) */}
-        <div className="w-1/2 flex flex-col overflow-hidden">
+        <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -139,7 +140,7 @@ export function ExpandedEditor({
             </div>
           </div>
           
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 min-h-0 p-6 overflow-y-auto">
             <div className="prose prose-slate dark:prose-invert max-w-none">
               {localContent.trim() ? (
                 <MarkdownContent content={localContent} />
