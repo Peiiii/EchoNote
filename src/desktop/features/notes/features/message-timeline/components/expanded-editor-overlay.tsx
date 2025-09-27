@@ -24,7 +24,7 @@ export const ExpandedEditorOverlay = ({
     <Dialog open={isVisible} onOpenChange={(open) => { if (!open) onCancel(); }}>
       <DialogContent
         showCloseButton={false}
-        className={`p-0 sm:max-w-[95vw] md:max-w-5xl w-[95vw] h-[85vh] ${className}`}
+        className={`p-0 gap-0 overflow-hidden sm:max-w-[95vw] md:max-w-5xl w-[95vw] h-[85vh] ${className}`}
       >
         <ExpandedEditor
           content={editContent}
