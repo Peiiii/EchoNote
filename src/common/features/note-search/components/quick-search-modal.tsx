@@ -7,14 +7,15 @@ import { Search as SearchIcon, X } from 'lucide-react';
 import { noteSearchService, type NoteSearchMatch } from '@/common/features/note-search/services/note-search.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
 import { useNotesViewStore } from '@/core/stores/notes-view.store';
-import { READ_MORE_SELECTORS } from '@/common/features/read-more/core/dom-constants';
+// import { READ_MORE_SELECTORS } from '@/common/features/read-more/core/dom-constants';
+import { rxEventBusService } from '@/common/services/rx-event-bus.service';
 import { useQuickSearchModalStore } from './quick-search-modal.store';
 import { useValueFromObservable } from '@/common/features/note-search/hooks/use-value-from-observable';
 
 export function QuickSearchModal() {
   const open = useQuickSearchModalStore(s => s.open);
   const setOpen = useQuickSearchModalStore(s => s.setOpen);
-  const { currentChannelId, setCurrentChannel } = useNotesViewStore();
+  const { currentChannelId } = useNotesViewStore();
   const channels = useNotesDataStore(s => s.channels);
 
   const [q, setQ] = useState('');
@@ -108,12 +109,7 @@ export function QuickSearchModal() {
 
   const handlePick = (noteId: string, channelId: string) => {
     setOpen(false);
-    if (channelId && currentChannelId !== channelId) {
-      setCurrentChannel(channelId);
-      setTimeout(() => scrollToNote(noteId), 300);
-    } else {
-      scrollToNote(noteId);
-    }
+    rxEventBusService.requestJumpToMessage$.emit({ channelId, messageId: noteId });
   };
 
   return (
@@ -210,15 +206,7 @@ export function QuickSearchModal() {
   );
 }
 
-function scrollToNote(noteId: string) {
-  try {
-    const selector = READ_MORE_SELECTORS.messageById(noteId);
-    const el = document.querySelector(selector);
-    if (el) (el as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (_e) {
-    // ignore
-  }
-}
+// reserved: handled by NotesPage via rxEventBusService.requestJumpToMessage$
 
 // Highlight matched query segments (case-insensitive), similar to Spotlight/Google
 function Highlight({ text, query }: { text: string; query: string }) {

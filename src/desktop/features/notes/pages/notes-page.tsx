@@ -7,6 +7,9 @@ import { MessageTimelineFeature } from "@/desktop/features/notes/features/messag
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { READ_MORE_SELECTORS } from "@/common/features/read-more/core/dom-constants";
+import { filter, map, merge, take, timer, delay as rxDelay } from 'rxjs';
+import { useNotesViewStore as notesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect } from "react";
 
 export function NotesPage() {
@@ -55,6 +58,35 @@ export function NotesPage() {
     useEffect(() =>
         rxEventBusService.requestOpenSettings$.listen(() => {
             handleOpenSettings();
+        }), []);
+
+    // Handle cross-channel jump to a specific message (emitted by search modal)
+    useEffect(() =>
+        rxEventBusService.requestJumpToMessage$.listen(({ channelId, messageId }) => {
+            const { currentChannelId } = notesViewStore.getState();
+            if (currentChannelId !== channelId) {
+                notesViewStore.getState().setCurrentChannel(channelId);
+            }
+
+            const selector = READ_MORE_SELECTORS.messageById(messageId);
+            // Start polling slightly delayed to let React mount the list after channel switch
+            const poll$ = timer(120, 120).pipe(
+                map(() => document.querySelector(selector)),
+                filter((el): el is Element => Boolean(el)),
+                take(1),
+                rxDelay(60) // small delay for layout to stabilize
+            );
+            const timeout$ = timer(6000).pipe(map(() => null as Element | null));
+
+            const sub = merge(poll$, timeout$).pipe(take(1)).subscribe((el) => {
+                if (el) {
+                    (el as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    console.warn('[JumpToMessage] timeout: element not found', { channelId, messageId });
+                }
+            });
+
+            return () => sub.unsubscribe();
         }), []);
 
     return (
