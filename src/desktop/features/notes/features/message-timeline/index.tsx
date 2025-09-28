@@ -10,6 +10,8 @@ import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-ch
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { useRef } from "react";
+import { QuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
+import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 
 interface MessageTimelineFeatureProps {
     className?: string;
@@ -59,10 +61,14 @@ export const MessageTimelineFeature = ({
                 channel={currentChannel || undefined}
                 onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
                 content={
-                    <TimelineContent
-                        ref={timelineContentRef}
-                        renderThoughtRecord={renderThoughtRecord}
-                    />
+                    <div className="flex flex-col min-h-0 relative">
+                        <TimelineContent
+                            ref={timelineContentRef}
+                            renderThoughtRecord={renderThoughtRecord}
+                        />
+                        <QuickSearchModal />
+                        <QuickSearchHotkey />
+                    </div>
                 }
                 actions={
                     !inputCollapsed ? (

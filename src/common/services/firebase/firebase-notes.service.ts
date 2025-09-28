@@ -342,6 +342,34 @@ export class FirebaseNotesService {
     return { messages, lastVisible, allLoaded };
   };
 
+  // Fetch initial messages for a channel (any sender: includes user + ai)
+  fetchInitialMessagesAllSenders = async (
+    userId: string,
+    channelId: string,
+    messagesLimit: number
+  ) => {
+    console.log("🔔 [firebaseNotesService][fetchInitialMessagesAllSenders]:", { userId, channelId, messagesLimit });
+    const q = query(
+      getMessagesCollectionRef(userId),
+      where("isDeleted", "==", false),
+      where("channelId", "==", channelId),
+      orderBy("timestamp", "desc"),
+      limit(messagesLimit)
+    );
+
+    try {
+      const snapshot = await getDocs(q);
+      const messages = snapshot.docs.map(docToMessage);
+      const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+      const allLoaded = messages.length < messagesLimit;
+      console.log("🔔 [firebaseNotesService][fetchInitialMessagesAllSenders]: done", { count: messages.length });
+      return { messages, lastVisible, allLoaded };
+    } catch (err) {
+      console.error("❌ [firebaseNotesService][fetchInitialMessagesAllSenders] failed", err);
+      throw err;
+    }
+  };
+
   fetchMoreMessages = async (
     userId: string,
     channelId: string,

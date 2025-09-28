@@ -262,7 +262,7 @@ export class FirebaseAIConversationService {
   
   // 辅助方法
   private buildConversationsQuery(userId: string) {
-    let q = query(
+    const q = query(
       collection(this.db, `users/${userId}/aiConversations`),
       orderBy('lastMessageAt', 'desc')
     );

@@ -103,11 +103,11 @@ export class ContextDataCache {
   private notifyChannel(channelId: string) {
     const set = this.channelListeners.get(channelId);
     if (!set) return;
-    set.forEach(fn => { try { fn(); } catch {} });
+    set.forEach(fn => { try { fn(); } catch (_error) { /* ignore errors */ } });
   }
 
   private notifyTop() {
-    this.topListeners.forEach(fn => { try { fn(); } catch {} });
+    this.topListeners.forEach(fn => { try { fn(); } catch (_error) { /* ignore errors */ } });
   }
 }
 
