@@ -78,6 +78,7 @@ export function QuickSearchModal() {
       if (e.key === 'Escape') { e.preventDefault(); setOpen(false); return; }
       if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex(i => Math.min(i + 1, Math.max(0, results.length - 1))); return; }
       if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex(i => Math.max(0, i - 1)); return; }
+      if (e.key === 'Tab') { e.preventDefault(); setScope(s => s === 'current' ? 'all' : 'current'); return; }
       if (e.key === 'Enter') { if (results[activeIndex]) { e.preventDefault(); const r = results[activeIndex]; handlePick(r.id, r.channelId); } }
     };
     window.addEventListener('keydown', onKey);
@@ -163,7 +164,7 @@ export function QuickSearchModal() {
                 </span>
               </>
             ) : (
-              <span className="invisible">placeholder</span>
+              <span className="text-muted-foreground/90">Searching in <span className="font-medium">{channelName(currentChannelId || '') || 'current space'}</span>. Press Tab to switch.</span>
             )}
           </div>
         </div>
