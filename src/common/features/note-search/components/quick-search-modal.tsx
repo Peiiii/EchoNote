@@ -21,6 +21,7 @@ export function QuickSearchModal() {
   const [scope, setScope] = useState<'all' | 'current'>('current');
   const [results, setResults] = useState<NoteSearchMatch[]>([]);
   const [indexing, setIndexing] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const channelIds = useMemo(() => scope === 'current' && currentChannelId ? [currentChannelId] : undefined, [scope, currentChannelId]);
@@ -31,6 +32,7 @@ export function QuickSearchModal() {
       setQ('');
       setResults([]);
       setIndexing(false);
+      setActiveIndex(0);
     }
   }, [open]);
 
@@ -67,11 +69,24 @@ export function QuickSearchModal() {
     return () => { cancelled = true; };
   }, [open, scope, currentChannelId]);
 
+  // Keyboard navigation: ArrowUp/ArrowDown/Enter/Escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.preventDefault(); setOpen(false); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex(i => Math.min(i + 1, Math.max(0, results.length - 1))); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex(i => Math.max(0, i - 1)); return; }
+      if (e.key === 'Enter') { if (results[activeIndex]) { e.preventDefault(); const r = results[activeIndex]; handlePick(r.id, r.channelId); } }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, results, activeIndex]);
+
   // Subscribe to index stats to show lightweight progress
-  const indexStats = useValueFromObservable(() => noteSearchService.getIndexStats$(), { totalDocs: 0, indexedChannelIds: [] });
+  const indexStats = useValueFromObservable(noteSearchService.getIndexStats$(), { totalDocs: 0, indexedChannelIds: [] });
 
   const searchResults$ = useMemo(() => noteSearchService.search(q, { channelIds }), [q, channelIds]);
-  const obsResults = useValueFromObservable(() => searchResults$, [] as NoteSearchMatch[]);
+  const obsResults = useValueFromObservable(searchResults$, [] as NoteSearchMatch[]);
   useEffect(() => {
     setResults(obsResults);
     if (q) {
@@ -93,8 +108,8 @@ export function QuickSearchModal() {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) setOpen(false); }}>
-      <DialogContent showCloseButton={false} className="p-0 w-[96vw] sm:max-w-xl">
-        <div className="px-3 pt-3 pb-2 border-b">
+      <DialogContent showCloseButton={false} className="p-0 w-[96vw] sm:max-w-2xl">
+        <div className="px-4 pt-4 pb-3 border-b">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -116,29 +131,42 @@ export function QuickSearchModal() {
               <Button variant={scope === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setScope('all')}>All</Button>
             </div>
           </div>
-          {scope === 'all' && (
-            <div className="mt-2 text-xs text-muted-foreground flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>
-                {indexing ? 'Indexing all spaces… ' : 'Indexed: '}
-                {indexStats.totalDocs} docs in {indexStats.indexedChannelIds.length} spaces
-              </span>
-            </div>
-          )}
+          <div className="mt-2 h-5 text-xs text-muted-foreground flex items-center gap-2">
+            {scope === 'all' ? (
+              <>
+                <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span>
+                  {indexing ? 'Indexing all spaces… ' : 'Indexed: '} 
+                  {indexStats.totalDocs} docs in {indexStats.indexedChannelIds.length} spaces
+                </span>
+              </>
+            ) : (
+              <span className="invisible">placeholder</span>
+            )}
+          </div>
         </div>
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-96 min-h-[240px] overflow-y-auto py-2" role="listbox" aria-activedescendant={results[activeIndex]?.id}>
           {!q ? (
-            <div className="text-xs text-muted-foreground px-3 py-6">Type to search notes…</div>
+            <div className="text-xs text-muted-foreground px-4 py-6">Type to search notes…</div>
           ) : results.length === 0 ? (
-            <div className="text-xs text-muted-foreground px-3 py-6">No matches</div>
+            <div className="text-xs text-muted-foreground px-4 py-6">No matches</div>
           ) : (
-            results.map(r => (
-              <button key={r.id} className="w-full text-left px-3 py-2 hover:bg-accent/50" onClick={() => handlePick(r.id, r.channelId)}>
+            results.map((r, idx) => (
+              <button
+                key={r.id}
+                id={r.id}
+                type="button"
+                role="option"
+                aria-selected={idx === activeIndex}
+                className={`w-full text-left px-4 py-2 hover:bg-accent/50 focus:outline-none ${idx === activeIndex ? 'bg-accent/60' : ''}`}
+                onMouseEnter={() => setActiveIndex(idx)}
+                onClick={() => handlePick(r.id, r.channelId)}
+              >
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
                   <Badge variant="secondary" className="shrink-0">{channelName(r.channelId)}</Badge>
                   <span>{new Date(r.timestamp).toLocaleString()}</span>
                 </div>
-                <div className="text-sm text-foreground/90 line-clamp-2 mt-0.5">{r.snippet || '(no preview)'}</div>
+                <div className="text-sm text-foreground/90 line-clamp-2 mt-0.5">{r.snippet ? <Highlight text={r.snippet} query={q} /> : '(no preview)'}</div>
                 {r.matchedFields.length > 0 && (
                   <div className="mt-1 text-[10px] text-muted-foreground">{r.matchedFields.join(', ')}</div>
                 )}
@@ -159,4 +187,33 @@ function scrollToNote(noteId: string) {
   } catch (_e) {
     // ignore
   }
+}
+
+// Highlight matched query segments (case-insensitive), similar to Spotlight/Google
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!text || !query) return <>{text}</>;
+  const safe = escapeRegExp(query);
+  try {
+    const re = new RegExp(`(${safe})`, 'ig');
+    const parts = text.split(re);
+    return (
+      <>
+        {parts.map((part, i) => (
+          part.toLowerCase() === query.toLowerCase() ? (
+            <mark key={i} className="bg-yellow-200/80 dark:bg-yellow-600/50 text-foreground rounded px-0.5">
+              {part}
+            </mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        ))}
+      </>
+    );
+  } catch {
+    return <>{text}</>;
+  }
+}
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
