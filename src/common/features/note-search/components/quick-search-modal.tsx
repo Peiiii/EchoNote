@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog, DialogContent } from '@/common/components/ui/dialog';
 import { Input } from '@/common/components/ui/input';
 import { Badge } from '@/common/components/ui/badge';
-import { Button } from '@/common/components/ui/button';
+// import { Button } from '@/common/components/ui/button';
 import { Search as SearchIcon, X } from 'lucide-react';
 import { noteSearchService, type NoteSearchMatch } from '@/common/features/note-search/services/note-search.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
@@ -23,6 +23,7 @@ export function QuickSearchModal() {
   const [indexing, setIndexing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const channelIds = useMemo(() => scope === 'current' && currentChannelId ? [currentChannelId] : undefined, [scope, currentChannelId]);
 
@@ -89,10 +90,19 @@ export function QuickSearchModal() {
   const obsResults = useValueFromObservable(searchResults$, [] as NoteSearchMatch[]);
   useEffect(() => {
     setResults(obsResults);
+    setActiveIndex(0);
     if (q) {
       console.debug('[QuickSearch] search results', { q, scope, channelIds, count: obsResults.length });
     }
   }, [obsResults, q, scope, channelIds]);
+
+  // Keep the active item in view when navigating
+  useEffect(() => {
+    const id = results[activeIndex]?.id;
+    if (!id) return;
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex, results]);
 
   const channelName = (id: string) => channels.find(c => c.id === id)?.name || id;
 
@@ -108,7 +118,7 @@ export function QuickSearchModal() {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) setOpen(false); }}>
-      <DialogContent showCloseButton={false} className="p-0 w-[96vw] sm:max-w-2xl">
+      <DialogContent showCloseButton={false} className="p-0 w-[96vw] sm:max-w-2xl sm:top-[12vh] sm:translate-y-0">
         <div className="px-4 pt-4 pb-3 border-b">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -126,9 +136,25 @@ export function QuickSearchModal() {
                 </button>
               )}
             </div>
-            <div className="shrink-0 inline-flex items-center gap-1">
-              <Button variant={scope === 'current' ? 'default' : 'outline'} size="sm" onClick={() => setScope('current')}>Current</Button>
-              <Button variant={scope === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setScope('all')}>All</Button>
+            <div className="shrink-0 inline-flex items-center">
+              <div role="radiogroup" aria-label="Scope" className="inline-flex items-center rounded-md border bg-muted p-0.5">
+                <button
+                  role="radio"
+                  aria-checked={scope === 'current'}
+                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${scope === 'current' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => setScope('current')}
+                >
+                  Current
+                </button>
+                <button
+                  role="radio"
+                  aria-checked={scope === 'all'}
+                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${scope === 'all' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => setScope('all')}
+                >
+                  All
+                </button>
+              </div>
             </div>
           </div>
           <div className="mt-2 h-5 text-xs text-muted-foreground flex items-center gap-2">
@@ -145,7 +171,7 @@ export function QuickSearchModal() {
             )}
           </div>
         </div>
-        <div className="max-h-96 min-h-[240px] overflow-y-auto py-2" role="listbox" aria-activedescendant={results[activeIndex]?.id}>
+        <div ref={listRef} className="max-h-[56vh] overflow-y-auto py-2" role="listbox" aria-activedescendant={results[activeIndex]?.id}>
           {!q ? (
             <div className="text-xs text-muted-foreground px-4 py-6">Type to search notes…</div>
           ) : results.length === 0 ? (
@@ -158,21 +184,26 @@ export function QuickSearchModal() {
                 type="button"
                 role="option"
                 aria-selected={idx === activeIndex}
-                className={`w-full text-left px-4 py-2 hover:bg-accent/50 focus:outline-none ${idx === activeIndex ? 'bg-accent/60' : ''}`}
+                className={`w-full text-left px-4 py-2 hover:bg-accent/50 focus:outline-none transition-colors ${idx === activeIndex ? 'bg-accent/60' : ''}`}
                 onMouseEnter={() => setActiveIndex(idx)}
                 onClick={() => handlePick(r.id, r.channelId)}
               >
-                <div className="text-xs text-muted-foreground flex items-center gap-2">
-                  <Badge variant="secondary" className="shrink-0">{channelName(r.channelId)}</Badge>
-                  <span>{new Date(r.timestamp).toLocaleString()}</span>
+                <div className="text-xs text-muted-foreground flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Badge variant="secondary" className="shrink-0">{channelName(r.channelId)}</Badge>
+                    <span className="truncate">{r.matchedFields.join(', ')}</span>
+                  </div>
+                  <span className="whitespace-nowrap">
+                    {new Date(r.timestamp).toLocaleString()}
+                  </span>
                 </div>
                 <div className="text-sm text-foreground/90 line-clamp-2 mt-0.5">{r.snippet ? <Highlight text={r.snippet} query={q} /> : '(no preview)'}</div>
-                {r.matchedFields.length > 0 && (
-                  <div className="mt-1 text-[10px] text-muted-foreground">{r.matchedFields.join(', ')}</div>
-                )}
               </button>
             ))
           )}
+        </div>
+        <div className="px-4 py-2 border-t text-[11px] text-muted-foreground">
+          <span className="hidden sm:inline">↑/↓ Select • Enter Open • Esc Close</span>
         </div>
       </DialogContent>
     </Dialog>
