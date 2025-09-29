@@ -4,6 +4,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 import { MobileMessageInput, MobileTimelineContent, useMobileTimelineState, useMobileViewportHeight, type MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline";
 import { useRef } from "react";
+import { QuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 
 interface MobileNotesLayoutProps {
     currentChannelName?: string;
@@ -75,6 +76,8 @@ export const MobileNotesLayout = ({
                     ref={timelineContentRef}
                     onReply={timelineState.handleReply}
                 />
+                {/* Global quick search dialog */}
+                <QuickSearchModal />
 
                 {/* Input area */}
                 <div className="flex-shrink-0">

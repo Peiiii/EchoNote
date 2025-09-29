@@ -1,10 +1,11 @@
 import { Button } from "@/common/components/ui/button";
-import { Menu, Bot, Settings } from "lucide-react";
+import { Menu, Bot, Settings, Search } from "lucide-react";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Channel } from "@/core/stores/notes-data.store";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
@@ -57,6 +58,15 @@ export const MobileHeader = ({
 
                 {/* Right: AI Assistant and Settings Buttons */}
                 <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={openQuickSearchModal}
+                        className="h-9 w-9 dark:text-primary"
+                        title="Search"
+                    >
+                        <Search className="h-6 w-6" />
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"
