@@ -18,8 +18,8 @@ importers:
         specifier: ^0.0.36
         version: 0.0.36
       '@agent-labs/agent-chat':
-        specifier: ^1.20.22
-        version: 1.20.22(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
+        specifier: ^1.20.23
+        version: 1.20.23(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
       '@ai-sdk/openai':
         specifier: ^2.0.7
         version: 2.0.24(zod@3.25.76)
@@ -233,8 +233,8 @@ packages:
   '@ag-ui/proto@0.0.36':
     resolution: {integrity: sha512-yaWLwJQmBaCtFstSoZEALztVckCYv+RD8guU91kL5AvywRXvZPP5mjiN+bEwvtw8VU3idXoee1ZbJGpSlSAQ8A==}
 
-  '@agent-labs/agent-chat@1.20.22':
-    resolution: {integrity: sha512-QZI1CdovgcA6dS3o2Q2hNfgD7FjB75gX41+CHzig2gW4TOz1lpxLl+K9az44eoNlUTzhpdYvKi9/rgLklqBb+Q==}
+  '@agent-labs/agent-chat@1.20.23':
+    resolution: {integrity: sha512-LZmDOeIDjcberbYsgouXvzKiccXqJ1biQRG2nqCGMm3WDB1Y1LsOPy8/Uk5tnb1S2kiwNAdfgmeFARwxSSt8TA==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -5624,7 +5624,7 @@ snapshots:
       '@bufbuild/protobuf': 2.7.0
       '@protobuf-ts/protoc': 2.11.1
 
-  '@agent-labs/agent-chat@1.20.22(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))':
+  '@agent-labs/agent-chat@1.20.23(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))':
     dependencies:
       '@radix-ui/react-avatar': 1.1.10(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@radix-ui/react-slot': 1.2.3(@types/react@19.1.12)(react@19.1.1)

@@ -43,7 +43,6 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
             })
             return { status: 'deleted', message: 'Note deleted successfully' } as DeleteNoteRenderResult;
         },
-        cancelResult: { status: 'cancelled', message: 'Note deletion cancelled' },
     });
 
     if (invocation.status === ToolInvocationStatus.PARTIAL_CALL) {

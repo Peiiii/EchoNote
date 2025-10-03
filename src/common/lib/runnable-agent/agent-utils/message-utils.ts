@@ -156,14 +156,18 @@ export const convertMessageToMessages = (
                 },
             ],
         }
-        if (part.toolInvocation.status !== ToolInvocationStatus.RESULT) {
+        if ([ToolInvocationStatus.CALL, ToolInvocationStatus.PARTIAL_CALL].includes(part.toolInvocation.status)) {
             messages.push(toolCallMessage)
         } else {
             const toolResultMessage: ToolMessage = {
                 id: `${partId}-tool-result`,
                 role: 'tool',
                 toolCallId: part.toolInvocation.toolCallId,
-                content: JSON.stringify(part.toolInvocation.result),
+                content: JSON.stringify({
+                    result: part.toolInvocation.result,
+                    error: part.toolInvocation.error,
+                    cancelled: part.toolInvocation.status === ToolInvocationStatus.CANCELLED,
+                }),
             }
             messages.push(toolCallMessage, toolResultMessage)
         }

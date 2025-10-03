@@ -1,15 +1,14 @@
-import { useState } from 'react';
 import type { ToolInvocation, ToolResult } from '@agent-labs/agent-chat';
 import { ToolInvocationStatus } from '@agent-labs/agent-chat';
+import { useState } from 'react';
 
 interface UseConfirmActionOptions<ARGS, RESULT> {
   invocation: ToolInvocation<ARGS, RESULT>;
   onResult: (result: ToolResult) => void;
   confirm: () => Promise<RESULT>;
-  cancelResult: RESULT;
 }
 
-export function useConfirmAction<ARGS, RESULT>({ invocation, onResult, confirm, cancelResult }: UseConfirmActionOptions<ARGS, RESULT>) {
+export function useConfirmAction<ARGS, RESULT>({ invocation, onResult, confirm }: UseConfirmActionOptions<ARGS, RESULT>) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,8 +32,8 @@ export function useConfirmAction<ARGS, RESULT>({ invocation, onResult, confirm, 
   const handleCancel = () => {
     onResult({
       toolCallId: invocation.toolCallId,
-      result: cancelResult,
-      status: ToolInvocationStatus.RESULT,
+      status: ToolInvocationStatus.CANCELLED,
+      cancelled: true,
     });
   };
 

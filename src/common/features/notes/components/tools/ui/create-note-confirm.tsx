@@ -18,7 +18,6 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
       const newNoteId = await channelMessageService.sendMessage({ channelId, content, sender: 'user' });
       return { noteId: newNoteId, status: 'created', message: 'Note created successfully' };
     },
-    cancelResult: { status: 'cancelled', message: 'Note creation cancelled' },
   });
 
   if (invocation.status === ToolInvocationStatus.PARTIAL_CALL) {

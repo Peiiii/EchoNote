@@ -1,16 +1,16 @@
 //
 import { Alert, AlertDescription } from '@/common/components/ui/alert';
 import { Badge } from '@/common/components/ui/badge';
-import { Edit, CheckCircle, XCircle } from 'lucide-react';
 import { useNoteContent } from '@/common/features/notes/hooks/use-note-content';
+import { channelMessageService } from '@/core/services/channel-message.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
-import { ToolPanel } from './tool-panel';
-import { InteractiveToolProps, UpdateNoteRenderArgs, UpdateNoteRenderResult } from '../types';
 import { ToolInvocationStatus } from '@agent-labs/agent-chat';
+import { CheckCircle, Edit, XCircle } from 'lucide-react';
+import { InteractiveToolProps, UpdateNoteRenderArgs, UpdateNoteRenderResult } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { useConfirmAction } from '../utils/use-confirm-action';
 import { ConfirmFooter } from './confirm-footer';
-import { channelMessageService } from '@/core/services/channel-message.service';
+import { ToolPanel } from './tool-panel';
 
 export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
   const parsed = getParsedArgs<UpdateNoteRenderArgs>(invocation);
@@ -28,7 +28,6 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
       await channelMessageService.updateMessage({ messageId: noteId, channelId, updates: { content }, userId: useNotesDataStore.getState().userId! });
       return { noteId, status: 'updated', message: 'Note updated successfully' };
     },
-    cancelResult: { status: 'cancelled', message: 'Note update cancelled' },
   });
 
   if (invocation.status === ToolInvocationStatus.PARTIAL_CALL) {
