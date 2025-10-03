@@ -1,77 +1,51 @@
-import { ToolInvocationStatus } from '@agent-labs/agent-chat';
 import { AlertTriangle, FileText } from 'lucide-react';
-import { ReadNoteRenderProps } from '../types';
-import { ToolPanel } from './tool-panel';
+import { ReadNoteRenderProps, ReadNoteRenderArgs, ReadNoteRenderResult } from '../types';
+import { DisplayToolPanel } from './display-tool-panel';
 import { getParsedArgs } from '../utils/invocation-utils';
-    
-
-
 
 export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
     console.log("🔔 [ReadNoteRenderUI] invocation:", invocation);
-    const args = getParsedArgs<{ noteId: string }>(invocation);
+    const args = getParsedArgs<ReadNoteRenderArgs>(invocation);
     const noteId = args?.noteId;
 
-    if (invocation.status === ToolInvocationStatus.PARTIAL_CALL) {
-        return (
-            <ToolPanel
-                icon={<FileText className="h-5 w-5 text-blue-600" />}
-                title="Read Note"
-                status="loading"
-                statusText="Preparing parameters..."
-                headerCardClassName="border-blue-200 dark:border-blue-900"
-            />
-        );
-    }
-
-    if (invocation.status === ToolInvocationStatus.CALL) {
-        return (
-            <ToolPanel
-                icon={<FileText className="w-5 h-5 text-blue-600" />}
-                title="Read Note"
-                status="loading"
-                statusText={`Reading note ${noteId?.substring(0, 8) || 'unknown'}...`}
-                headerCardClassName="border-blue-200 dark:border-blue-900"
-            />
-        );
-    }
-
-    if (invocation.status === ToolInvocationStatus.RESULT) {
-        try {
-            console.log("🔔 [ReadNoteRenderUI][result] parsing:", {
-                result: invocation.result,
-                type: typeof invocation.result
-            });
-
-            // Handle both string and object results
-            const result = invocation.result!;
-
-            if (!result.found) {
-                return (
-                    <ToolPanel
-                        icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-                        title="Read Note"
-                        status="error"
-                        statusText="Note not found"
-                        headerCardClassName="border-red-200 dark:border-red-900"
-                        contentCardClassName="border-red-200 dark:border-red-900 mt-2"
-                    >
+    return (
+        <DisplayToolPanel<ReadNoteRenderArgs, ReadNoteRenderResult>
+            invocation={invocation}
+            icon={<FileText className="h-5 w-5 text-blue-600" />}
+            title="Read Note"
+            loadingText={`Reading note ${noteId?.substring(0, 8) || 'unknown'}...`}
+            successIcon={<FileText className="h-5 w-5 text-green-600" />}
+            errorIcon={<AlertTriangle className="w-5 h-5 text-red-600" />}
+            successStatusText={() => "Note loaded successfully"}
+            errorStatusText={(error) => {
+                if (error && typeof error === 'object' && 'found' in error && !error.found) {
+                    return "Note not found";
+                }
+                return "Failed to load note";
+            }}
+            readyStatusText="Preparing to read note..."
+            contentScrollable={true}
+            headerCardClassName="border-blue-200 dark:border-blue-900"
+            contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
+        >
+            {(_args, result, error) => {
+                if (error) {
+                    return (
                         <div className="text-red-700 dark:text-red-300 text-sm">
-                            {typeof invocation.error === 'string' ? invocation.error : 'Note not found'}
+                            {typeof error === 'string' ? error : 'An error occurred while loading the note'}
                         </div>
-                    </ToolPanel>
-                );
-            }
+                    );
+                }
 
-            return (
-                <ToolPanel
-                    icon={<FileText className="w-5 h-5 text-green-600" />}
-                    title="Read Note"
-                    status="success"
-                    statusText="Note loaded successfully"
-                    headerCardClassName="border-green-200 dark:border-green-900"
-                    contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
-                >
+                if (!result?.found) {
+                    return (
+                        <div className="text-red-700 dark:text-red-300 text-sm">
+                            Note not found
+                        </div>
+                    );
+                }
+
+                return (
                     <div className="space-y-3">
                         <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                             <span className="font-mono">{result.noteId}</span>
@@ -82,34 +56,8 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                             {result.content}
                         </div>
                     </div>
-                </ToolPanel>
-            );
-        } catch (error) {
-            console.error("🔔 [ReadNoteRenderUI][result] parse error:", error);
-            return (
-                <ToolPanel
-                    icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-                    title="Read Note"
-                    status="error"
-                    statusText="Failed to parse data"
-                    headerCardClassName="border-red-200 dark:border-red-900"
-                    contentCardClassName="border-red-200 dark:border-red-900 mt-2"
-                >
-                    <div className="text-red-700 dark:text-red-300 text-sm">
-                        Failed to parse note data: {error instanceof Error ? error.message : 'Unknown error'}
-                    </div>
-                </ToolPanel>
-            );
-        }
-    }
-
-    return (
-        <ToolPanel
-            icon={<FileText className="w-5 h-5 text-gray-500" />}
-            title="Read Note"
-            status="ready"
-            statusText="Preparing to read note..."
-            headerCardClassName="border-gray-200 dark:border-gray-800"
-        />
+                );
+            }}
+        </DisplayToolPanel>
     );
 }
