@@ -1,82 +1,122 @@
-import { channelMessageService } from '@/core/services/channel-message.service';
-import { Tool, ToolCall, ToolResult } from '@agent-labs/agent-chat';
-import { List } from 'lucide-react';
+import { Alert, AlertDescription } from '@/common/components/ui/alert';
+import { Badge } from '@/common/components/ui/badge';
+import { Clock, FileText, Hash, List } from 'lucide-react';
+import { ToolPanel } from './ui/tool-panel';
 
-// Render component - 极简设计，大道至简
+export interface NoteForDisplay {
+    noteId: string;
+    content: string;
+    contentLength: number;
+    timestamp: Date;
+    timestampReadable: string;
+}
+
+// Enhanced render component with better UI
 interface ListNotesToolRenderProps {
     limit: number;
     channelId: string;
+    notes?: Array<NoteForDisplay>;
+    isLoading?: boolean;
+    error?: string;
 }
 
-export function ListNotesToolRender({ limit, channelId }: ListNotesToolRenderProps) {
+export function ListNotesToolRender({ limit, notes, isLoading, error }: ListNotesToolRenderProps) {
+    console.log("🔔 [ListNotesToolRender][props]:", { limit, notes, isLoading, error, notesType: typeof notes, isArray: Array.isArray(notes) });
+    if (isLoading) {
+        return (
+            <ToolPanel
+                icon={<List className="w-5 h-5 text-blue-600" />}
+                title="List Notes"
+                status="loading"
+                statusText="Loading notes from channel..."
+                headerCardClassName="border-blue-200"
+            />
+        );
+    }
+
+    if (error) {
+        return (
+            <ToolPanel
+                icon={<FileText className="w-5 h-5 text-red-600" />}
+                title="List Notes"
+                status="error"
+                statusText="Failed to load notes"
+                
+                headerCardClassName="border-red-200"
+                contentCardClassName="border-red-200 mt-2"
+            >
+                <Alert variant="destructive">
+                    <AlertDescription>
+                        {typeof error === 'string' ? error : 'An error occurred while loading notes'}
+                    </AlertDescription>
+                </Alert>
+            </ToolPanel>
+        );
+    }
+
+    if (!notes || !Array.isArray(notes) || notes.length === 0) {
+        return (
+            <ToolPanel
+                icon={<FileText className="w-5 h-5 text-gray-500" />}
+                title="List Notes"
+                status="ready"
+                statusText="No notes found"
+                headerCardClassName="border-gray-200"
+                contentCardClassName="border-gray-200 mt-2"
+                expandable={false}
+            >
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileText className="w-4 h-4" />
+                    <span className="text-sm">No notes found in this channel</span>
+                </div>
+            </ToolPanel>
+        );
+    }
+    
+
     return (
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <List className="w-4 h-4" />
-            <span>Listing {limit} notes from channel {channelId}</span>
-        </div>
+        <ToolPanel
+            icon={<List className="w-5 h-5 text-blue-600" />}
+            title="Notes in Channel"
+            status="success"
+            statusText={`Found ${Array.isArray(notes) ? notes.length : 0} note${Array.isArray(notes) && notes.length !== 1 ? 's' : ''}`}
+            
+            headerCardClassName="border-blue-200"
+            contentCardClassName="border-gray-200 mt-2"
+        >
+            <div className="space-y-3">
+                <div className="text-sm text-gray-600 mb-3">
+                    Showing up to {limit} notes from the channel
+                </div>
+                {Array.isArray(notes) ? notes.map((note, index) => (
+                    <div key={note.noteId || index} className="p-3 bg-gray-50 rounded-md border">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2">
+                                <Hash className="w-3 h-3 text-gray-400" />
+                                <Badge variant="outline" className="text-xs font-mono">
+                                    {note.noteId?.substring(0, 8)}...
+                                </Badge>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <Clock className="w-3 h-3" />
+                                <span>{note.timestampReadable}</span>
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            {note.content}
+                        </p>
+                        {note.contentLength > 60 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                ({note.contentLength} characters total)
+                            </p>
+                        )}
+                    </div>
+                )) : (
+                    <div className="text-sm text-gray-500 italic">
+                        No valid notes data available
+                    </div>
+                )}
+            </div>
+        </ToolPanel>
     );
-}
-
-// Factory function to create the listNotes tool
-export function createListNotesTool(channelId: string): Tool {
-    return {
-        name: 'listNotes',
-        description: 'List all notes/thoughts in the current channel',
-        parameters: {
-            type: 'object',
-            properties: {
-                limit: {
-                    type: 'number',
-                    description: 'Maximum number of notes/thoughts to return (default: 10)'
-                }
-            },
-            required: []
-        },
-        // execute: 执行业务逻辑，返回结果给AI
-        execute: async (toolCall: ToolCall): Promise<ToolResult> => {
-            try {
-                const args = JSON.parse(toolCall.function.arguments);
-                const { limit = 10 } = args;
-
-                const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
-                const notes = channelState?.messages || [];
-                
-                console.log("🔔 [listNotesTool][notes]:", { notes, channelId, args, limit, channelState });
-                
-                const notesForDisplay = notes.map((note) => ({
-                    content: note.content.substring(0, 60) + (note.content.length > 60 ? '...' : ''),
-                    contentLength: note.content.length,
-                    timestamp: note.timestamp,
-                    timestampReadable: note.timestamp.toLocaleString(),
-                    noteId: note.id,
-                }));
-
-                return {
-                    toolCallId: toolCall.id,
-                    result: JSON.stringify(notesForDisplay),
-                    state: 'result' as const
-                };
-
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                return {
-                    toolCallId: toolCall.id,
-                    result: `Error: ${errorMessage}`,
-                    state: 'result' as const
-                };
-            }
-        },
-        // render: 极简展示
-        render: (toolInvocation) => {
-            const args = toolInvocation.args as { limit?: number };
-            const { limit = 10 } = args;
-
-            return (
-                <ListNotesToolRender
-                    limit={limit}
-                    channelId={channelId}
-                />
-            );
-        }
-    };
 }

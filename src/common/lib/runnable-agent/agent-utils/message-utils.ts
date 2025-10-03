@@ -1,12 +1,22 @@
-import type { AssistantMessage, Message, ToolCall, ToolMessage } from '@ag-ui/client'
-import type { TextUIPart, ToolInvocation, ToolInvocationUIPart, UIMessage } from '@agent-labs/agent-chat'
+import { AssistantMessage, Message, ToolCall, ToolMessage } from '@ag-ui/client'
+import { ToolInvocationStatus, type TextUIPart, type ToolInvocation, type ToolInvocationUIPart, type UIMessage } from '@agent-labs/agent-chat'
 
 export const toolCallToToolInvocation = (toolCall: ToolCall): ToolInvocation => {
     return {
         toolCallId: toolCall.id,
         toolName: toolCall.function.name,
         args: JSON.parse(toolCall.function.arguments),
-        state: "call",
+        status: ToolInvocationStatus.CALL,
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const tryParseJson = (json: string, defaultValue?: any): Record<string, unknown> | undefined => {
+    if (typeof json !== "string") return defaultValue;
+    try {
+        return JSON.parse(json);
+    } catch (_e) {
+        return defaultValue;
     }
 }
 
@@ -27,21 +37,12 @@ export const convertMessagesToUIMessages = (
             const assistantMessage = message as AssistantMessage
             if (assistantMessage.toolCalls && assistantMessage.toolCalls.length > 0) {
                 assistantMessage.toolCalls.forEach((toolCall: ToolCall) => {
-                    let parsedArgs: Record<string, unknown> | null = null;
-                    try {
-                        if (typeof toolCall.function.arguments === 'string') {
-                            parsedArgs = JSON.parse(toolCall.function.arguments);
-                        } else {
-                            parsedArgs = toolCall.function.arguments;
-                        }
-                    } catch (_e) {
-                        parsedArgs = { error: 'Invalid JSON', raw: toolCall.function.arguments };
-                    }
                     toolCallMap.set(toolCall.id, {
-                        state: 'call' as const,
+                        status: ToolInvocationStatus.CALL,
                         toolCallId: toolCall.id,
                         toolName: toolCall.function.name,
-                        args: parsedArgs,
+                        args: toolCall.function.arguments,
+                        parsedArgs: JSON.parse(toolCall.function.arguments),
                     })
                 })
             }
@@ -63,7 +64,7 @@ export const convertMessagesToUIMessages = (
                 }
                 toolCallMap.set(toolMessage.toolCallId, {
                     ...toolInvocation,
-                    state: 'result' as const,
+                    status: ToolInvocationStatus.RESULT,
                     result: parsedResult,
                 })
             }
@@ -150,12 +151,12 @@ export const convertMessageToMessages = (
                     type: 'function',
                     function: {
                         name: part.toolInvocation.toolName,
-                        arguments: JSON.stringify(part.toolInvocation.args),
+                        arguments: part.toolInvocation.args,
                     }
                 },
             ],
         }
-        if (part.toolInvocation.state !== "result") {
+        if (part.toolInvocation.status !== ToolInvocationStatus.RESULT) {
             messages.push(toolCallMessage)
         } else {
             const toolResultMessage: ToolMessage = {

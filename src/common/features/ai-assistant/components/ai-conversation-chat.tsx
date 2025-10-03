@@ -3,7 +3,7 @@ import { useConversationState } from "@/common/features/ai-assistant/hooks/use-c
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AgentChatCore, UIMessage, useAgentSessionManager, useParseTools } from "@agent-labs/agent-chat";
+import { AgentChatCore, UIMessage, useAgentSessionManager, useAgentSessionManagerState, useParseTools } from "@agent-labs/agent-chat";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { debounceTime } from "rxjs";
@@ -64,8 +64,16 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     return channelId;
   }, [conv?.contexts, channelId]);
   const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
-  const tools = useMemo(() => aiAgentFactory.getChannelTools(toolChannelId), [toolChannelId]);
+  const tools = useMemo(() => {
+    console.log("🔔 [AIConversationChat] getting tools for toolChannelId:", toolChannelId);
+    return aiAgentFactory.getChannelTools(toolChannelId);
+  }, [toolChannelId]);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
+  console.log("🔔 [AIConversationChat] parsed tools:", { 
+    toolDefs: toolDefs.map(t => ({ name: t.name, description: t.description })),
+    toolExecutors: Object.keys(toolExecutors),
+    toolRenderers: Object.keys(toolRenderers)
+  });
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
@@ -157,8 +165,11 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     })
   ], []);
 
+  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager)
+  console.log("🔔 [AIConversationChat] messages:", _messages);
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col agent-chat-fullwidth">
       <div className="flex-1 min-h-0">
         <AgentChatCore
           agentSessionManager={agentSessionManager}
