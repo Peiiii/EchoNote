@@ -12,6 +12,7 @@ interface ToolPanelProps {
   maxHeight?: string;
   defaultExpanded?: boolean; // default collapsed unless specified
   expandable?: boolean; // default true when children exist
+  forceExpanded?: boolean; // when true, always show content without a toggle
   headerCardClassName?: string;
   contentCardClassName?: string;
 }
@@ -30,24 +31,27 @@ export function ToolPanel({
   maxHeight = '400px',
   defaultExpanded,
   expandable,
+  forceExpanded,
   headerCardClassName,
   contentCardClassName,
 }: ToolPanelProps) {
   const hasContent = !!children;
-  const showDetails = expandable !== false && hasContent;
+  const canToggle = expandable !== false && hasContent && !forceExpanded;
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded ?? false);
+  const isExpanded = forceExpanded ? true : expanded;
 
   const header = useMemo(() => ({
     icon,
     title,
     status,
     statusText,
-    hasDetails: showDetails,
-    isExpanded: expanded,
-    onToggleExpanded: showDetails ? () => setExpanded(v => !v) : undefined,
-  }), [icon, title, status, statusText, showDetails, expanded]);
+    hasDetails: canToggle,
+    isExpanded,
+    onToggleExpanded: canToggle ? () => setExpanded(v => !v) : undefined,
+  }), [icon, title, status, statusText, canToggle, isExpanded]);
 
-  const content = showDetails ? { children, maxHeight, isExpanded: expanded } : undefined;
+  // Show content when toggle is available or when explicitly forced expanded
+  const content = hasContent ? { children, maxHeight, isExpanded } : undefined;
 
   return (
     <div className="w-full" data-echo-tool>
@@ -60,4 +64,3 @@ export function ToolPanel({
     </div>
   );
 }
-

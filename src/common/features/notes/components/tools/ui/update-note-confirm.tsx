@@ -10,6 +10,7 @@ import { ToolInvocationStatus } from '@agent-labs/agent-chat';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { useConfirmAction } from '../utils/use-confirm-action';
 import { ConfirmFooter } from './confirm-footer';
+import { channelMessageService } from '@/core/services/channel-message.service';
 
 export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
   const parsed = getParsedArgs<UpdateNoteRenderArgs>(invocation);
@@ -24,9 +25,7 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
     invocation,
     onResult,
     confirm: async () => {
-      const { updateMessage } = useNotesDataStore.getState();
-      await updateMessage(noteId, { content });
-      await new Promise(r => setTimeout(r, 1000));
+      await channelMessageService.updateMessage({ messageId: noteId, channelId, updates: { content }, userId: useNotesDataStore.getState().userId! });
       return { noteId, status: 'updated', message: 'Note updated successfully' };
     },
     cancelResult: { status: 'cancelled', message: 'Note update cancelled' },
@@ -40,14 +39,14 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
       </div>
     }
     const previewContent = (args?.content as string) || '';
-    
+
     return (
       <ToolPanel
         icon={<Edit className="h-5 w-5 text-blue-600" />}
         title="Update Note"
         status="loading"
         statusText="准备参数中..."
-        
+
         headerCardClassName="border-blue-200"
         contentCardClassName="border-gray-200 mt-2"
       >
@@ -79,7 +78,8 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
         title="Update Note"
         status="ready"
         statusText="Ready to update"
-        
+        forceExpanded={true}
+
         headerCardClassName="border-amber-200"
       >
         <div className="space-y-4 w-full">
@@ -122,7 +122,7 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
         title="Update Note"
         status="success"
         statusText="Note Updated Successfully!"
-        
+
         headerCardClassName="border-green-200 bg-green-50"
         contentCardClassName="border-gray-200 mt-2"
       >
@@ -151,7 +151,7 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
       title="Update Note"
       status={isLoading ? 'loading' : 'ready'}
       statusText={isLoading ? 'Updating...' : 'Ready to update'}
-      
+
       headerCardClassName="border-amber-200"
     >
       <div className="space-y-4 w-full">

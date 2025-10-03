@@ -1,12 +1,12 @@
 import { Alert, AlertDescription } from '@/common/components/ui/alert';
-import { useNotesDataStore } from '@/core/stores/notes-data.store';
-import { CheckCircle, FileText, XCircle } from 'lucide-react';
-import { InteractiveToolProps, CreateNoteRenderArgs, CreateNoteRenderResult } from '../types';
-import { ToolPanel } from './tool-panel';
+import { channelMessageService } from '@/core/services/channel-message.service';
 import { ToolInvocationStatus } from '@agent-labs/agent-chat';
+import { CheckCircle, FileText, XCircle } from 'lucide-react';
+import { CreateNoteRenderArgs, CreateNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { useConfirmAction } from '../utils/use-confirm-action';
 import { ConfirmFooter } from './confirm-footer';
+import { ToolPanel } from './tool-panel';
 
 export function CreateNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
   const args = getParsedArgs<CreateNoteRenderArgs>(invocation);
@@ -15,9 +15,7 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
     invocation,
     onResult,
     confirm: async () => {
-      const { addMessage } = useNotesDataStore.getState();
-      const newNoteId = await addMessage({ channelId, content, sender: 'user' });
-      await new Promise(r => setTimeout(r, 1000));
+      const newNoteId = await channelMessageService.sendMessage({ channelId, content, sender: 'user' });
       return { noteId: newNoteId, status: 'created', message: 'Note created successfully' };
     },
     cancelResult: { status: 'cancelled', message: 'Note creation cancelled' },
@@ -30,7 +28,7 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
         title="Create Note"
         status="loading"
         statusText="准备参数中..."
-        
+
         headerCardClassName="border-blue-200"
         contentCardClassName="border-gray-200 mt-2"
       >
@@ -50,7 +48,8 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
         title="Create Note"
         status="ready"
         statusText="Ready to create"
-        
+        forceExpanded={true}
+
         headerCardClassName="border-amber-200"
       >
         <div className="space-y-4 w-full">
@@ -83,7 +82,7 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
         title="Create Note"
         status="success"
         statusText="Note Created Successfully!"
-        
+
         headerCardClassName="border-green-200 bg-green-50"
         contentCardClassName="border-gray-200 mt-2"
       >

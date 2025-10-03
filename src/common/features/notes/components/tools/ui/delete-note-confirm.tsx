@@ -1,15 +1,15 @@
 import { Alert, AlertDescription } from '@/common/components/ui/alert';
 import { Badge } from '@/common/components/ui/badge';
 import { channelMessageService } from '@/core/services/channel-message.service';
-import { useNotesDataStore } from '@/core/stores/notes-data.store';
+import { useNotesViewStore } from '@/core/stores/notes-view.store';
+import { ToolInvocationStatus } from '@agent-labs/agent-chat';
 import { AlertTriangle, Trash2, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import { InteractiveToolProps, DeleteNoteRenderArgs, DeleteNoteRenderResult } from '../types';
-import { ToolPanel } from './tool-panel';
-import { ToolInvocationStatus } from '@agent-labs/agent-chat';
+import { DeleteNoteRenderArgs, DeleteNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { useConfirmAction } from '../utils/use-confirm-action';
 import { ConfirmFooter } from './confirm-footer';
+import { ToolPanel } from './tool-panel';
 
 export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
     const [noteContent, setNoteContent] = useState<string>('');
@@ -36,9 +36,11 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
         invocation,
         onResult,
         confirm: async () => {
-            const { deleteMessage } = useNotesDataStore.getState();
-            await deleteMessage(noteId);
-            await new Promise(r => setTimeout(r, 1000));
+            await channelMessageService.deleteMessage({
+                messageId: noteId,
+                channelId: useNotesViewStore.getState().currentChannelId!
+
+            })
             return { status: 'deleted', message: 'Note deleted successfully' } as DeleteNoteRenderResult;
         },
         cancelResult: { status: 'cancelled', message: 'Note deletion cancelled' },
@@ -51,7 +53,7 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
                 title="Delete Note"
                 status="loading"
                 statusText="准备参数中..."
-                
+
                 headerCardClassName="border-blue-200"
                 contentCardClassName="border-gray-200 mt-2"
             >
@@ -69,17 +71,18 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
         );
     }
 
-    if (invocation.status === ToolInvocationStatus.CALL) {
-        return (
-            <ToolPanel
-                icon={<Trash2 className="h-5 w-5 text-amber-600" />}
-                title="Delete Note"
-                status="ready"
-                statusText="Ready to delete"
-                
-                headerCardClassName="border-amber-200"
-            >
-                <div className="space-y-4 w-full">
+  if (invocation.status === ToolInvocationStatus.CALL) {
+    return (
+      <ToolPanel
+        icon={<Trash2 className="h-5 w-5 text-amber-600" />}
+        title="Delete Note"
+        status="ready"
+        statusText="Ready to delete"
+        forceExpanded={true}
+        
+        headerCardClassName="border-amber-200"
+      >
+        <div className="space-y-4 w-full">
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
@@ -122,7 +125,7 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
                 title="Delete Note"
                 status="success"
                 statusText="Note Deleted Successfully!"
-                
+
                 headerCardClassName="border-green-200 bg-green-50"
                 contentCardClassName="border-gray-200 mt-2"
             >
