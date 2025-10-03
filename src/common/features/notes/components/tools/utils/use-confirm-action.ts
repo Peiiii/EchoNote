@@ -39,4 +39,3 @@ export function useConfirmAction<ARGS, RESULT>({ invocation, onResult, confirm }
 
   return { isLoading, error, handleConfirm, handleCancel } as const;
 }
-

@@ -15,8 +15,8 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
     invocation,
     onResult,
     confirm: async () => {
-      const newNoteId = await channelMessageService.sendMessage({ channelId, content, sender: 'user' });
-      return { noteId: newNoteId, status: 'created', message: 'Note created successfully' };
+      await channelMessageService.sendMessage({ channelId, content, sender: 'user' });
+      return { status: 'created', message: 'Note created successfully' };
     },
   });
 
