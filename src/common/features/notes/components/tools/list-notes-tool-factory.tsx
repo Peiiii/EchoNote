@@ -1,7 +1,7 @@
-import { channelMessageService } from '@/core/services/channel-message.service';
-import { ensureChannelMessagesLoaded } from '@/common/features/notes/utils/ensure-channel-messages-loaded';
 import { Tool, ToolInvocationStatus } from '@agent-labs/agent-chat';
 import { ListNotesToolRender, NoteForDisplay } from './list-notes.tool';
+import { firebaseNotesService } from '@/common/services/firebase/firebase-notes.service';
+import { useNotesDataStore } from '@/core/stores/notes-data.store';
 
 export interface ListNotesToolResult {
     notes: NoteForDisplay[];
@@ -9,6 +9,7 @@ export interface ListNotesToolResult {
 
 export interface ListNotesToolArgs {
     limit: number;
+    order?: 'asc' | 'desc';
 }
 
 
@@ -16,40 +17,51 @@ export interface ListNotesToolArgs {
 export function createListNotesTool(channelId: string): Tool<ListNotesToolArgs, ListNotesToolResult> {
     return {
         name: 'listNotes',
-        description: 'List all notes/thoughts in the current channel',
+        description: 'List notes/thoughts in the current channel, optionally sorted by time',
         parameters: {
             type: 'object',
             properties: {
                 limit: {
                     type: 'number',
                     description: 'Maximum number of notes/thoughts to return (default: 10)'
+                },
+                order: {
+                    type: 'string',
+                    enum: ['asc', 'desc'],
+                    description: 'Sort order by timestamp (default: desc)'
                 }
             },
             required: []
         },
-        // execute: 执行业务逻辑，返回结果给AI
+        // execute: 直接通过底层 service 拉取数据，避免缓存导致的顺序问题
         execute: async (toolCallArgs) => {
             try {
-                const { limit = 10 } = toolCallArgs;
-                // Ensure messages are loaded for this channel
-                await ensureChannelMessagesLoaded(channelId);
+                console.log("🔔 [listNotesTool][execute][toolCallArgs]:", toolCallArgs);
+                const { limit = 10, order = 'desc' } = toolCallArgs;
+                const { userId } = useNotesDataStore.getState();
+                if (!userId) throw new Error('User not signed in');
 
-                const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
-                const notes = channelState?.messages || [];
+                const { messages } = await firebaseNotesService.fetchInitialMessagesAllSenders(
+                    userId,
+                    channelId,
+                    limit
+                );
 
-                const notesForDisplay = notes
-                    .slice(0, limit)
-                    .map((note) => ({
-                        content: note.content.substring(0, 200) + (note.content.length > 200 ? '...' : ''),
-                        contentLength: note.content.length,
-                        timestamp: note.timestamp,
-                        timestampReadable: note.timestamp.toLocaleString(),
-                        noteId: note.id,
-                    }));
+                console.log("🔔 [listNotesTool][execute][messages]:", messages);
 
-                return {
-                    notes: notesForDisplay,
-                };
+                const sorted = order === 'asc'
+                    ? [...messages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+                    : [...messages].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+                const notesForDisplay: NoteForDisplay[] = sorted.map((note) => ({
+                    content: note.content.substring(0, 200) + (note.content.length > 200 ? '...' : ''),
+                    contentLength: note.content.length,
+                    timestamp: note.timestamp,
+                    timestampReadable: note.timestamp.toLocaleString(),
+                    noteId: note.id,
+                }));
+
+                return { notes: notesForDisplay };
 
             } catch (error) {
                 console.error("🔔 [listNotesTool][execute][error]:", error);
