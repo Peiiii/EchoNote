@@ -3,7 +3,7 @@ import { ToolContainer } from './tool-container';
 
 export type ToolStatus = 'loading' | 'ready' | 'success' | 'error';
 
-interface ToolPanelProps {
+export interface ToolPanelProps {
   icon: React.ReactNode;
   title: string;
   status: ToolStatus;
@@ -13,6 +13,7 @@ interface ToolPanelProps {
   defaultExpanded?: boolean; // default collapsed unless specified
   expandable?: boolean; // default true when children exist
   forceExpanded?: boolean; // when true, always show content without a toggle
+  contentScrollable?: boolean; // control content scroll; default true
   headerCardClassName?: string;
   contentCardClassName?: string;
 }
@@ -32,6 +33,7 @@ export function ToolPanel({
   defaultExpanded,
   expandable,
   forceExpanded,
+  contentScrollable,
   headerCardClassName,
   contentCardClassName,
 }: ToolPanelProps) {
@@ -51,7 +53,7 @@ export function ToolPanel({
   }), [icon, title, status, statusText, canToggle, isExpanded]);
 
   // Show content when toggle is available or when explicitly forced expanded
-  const content = hasContent ? { children, maxHeight, isExpanded } : undefined;
+  const content = hasContent ? { children, maxHeight, isExpanded, scrollable: contentScrollable !== false } : undefined;
 
   return (
     <div className="w-full" data-echo-tool>

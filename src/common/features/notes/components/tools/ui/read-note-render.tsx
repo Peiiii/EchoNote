@@ -18,8 +18,8 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                 icon={<FileText className="h-5 w-5 text-blue-600" />}
                 title="Read Note"
                 status="loading"
-                statusText="准备参数中..."
-                headerCardClassName="border-blue-200"
+                statusText="Preparing parameters..."
+                headerCardClassName="border-blue-200 dark:border-blue-900"
             />
         );
     }
@@ -31,7 +31,7 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                 title="Read Note"
                 status="loading"
                 statusText={`Reading note ${noteId?.substring(0, 8) || 'unknown'}...`}
-                headerCardClassName="border-blue-200"
+                headerCardClassName="border-blue-200 dark:border-blue-900"
             />
         );
     }
@@ -53,11 +53,10 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                         title="Read Note"
                         status="error"
                         statusText="Note not found"
-                        
-                        headerCardClassName="border-red-200"
-                        contentCardClassName="border-red-200 mt-2"
+                        headerCardClassName="border-red-200 dark:border-red-900"
+                        contentCardClassName="border-red-200 dark:border-red-900 mt-2"
                     >
-                        <div className="text-red-700 text-sm">
+                        <div className="text-red-700 dark:text-red-300 text-sm">
                             {typeof invocation.error === 'string' ? invocation.error : 'Note not found'}
                         </div>
                     </ToolPanel>
@@ -70,17 +69,16 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                     title="Read Note"
                     status="success"
                     statusText="Note loaded successfully"
-                    
-                    headerCardClassName="border-green-200"
-                    contentCardClassName="border-gray-200 mt-2"
+                    headerCardClassName="border-green-200 dark:border-green-900"
+                    contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
                 >
                     <div className="space-y-3">
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                             <span className="font-mono">{result.noteId}</span>
                             <span>{result.timestampReadable}</span>
                             <span>{result.contentLength} chars</span>
                         </div>
-                        <div className="text-sm whitespace-pre-wrap bg-gray-50 p-3 rounded-md border">
+                        <div className="text-sm whitespace-pre-wrap bg-gray-50 dark:bg-gray-900 p-3 rounded-md border dark:border-gray-800 dark:text-gray-200">
                             {result.content}
                         </div>
                     </div>
@@ -94,11 +92,10 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
                     title="Read Note"
                     status="error"
                     statusText="Failed to parse data"
-                    
-                    headerCardClassName="border-red-200"
-                    contentCardClassName="border-red-200 mt-2"
+                    headerCardClassName="border-red-200 dark:border-red-900"
+                    contentCardClassName="border-red-200 dark:border-red-900 mt-2"
                 >
-                    <div className="text-red-700 text-sm">
+                    <div className="text-red-700 dark:text-red-300 text-sm">
                         Failed to parse note data: {error instanceof Error ? error.message : 'Unknown error'}
                     </div>
                 </ToolPanel>
@@ -112,7 +109,7 @@ export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
             title="Read Note"
             status="ready"
             statusText="Preparing to read note..."
-            headerCardClassName="border-gray-200"
+            headerCardClassName="border-gray-200 dark:border-gray-800"
         />
     );
 }

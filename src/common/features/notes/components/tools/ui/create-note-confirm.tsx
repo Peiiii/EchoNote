@@ -11,13 +11,13 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
     <ToolInvocationPanel<CreateNoteRenderArgs, CreateNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
-      icon={<FileText className="h-5 w-5 text-amber-600" />}
+      icon={<FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
       title="Create Note"
-      loadingText="准备参数中..."
+      loadingText="Preparing parameters..."
       callStatusText="Ready to create"
       preview={() => (
         <div className="space-y-3">
-          <div className="bg-gray-50 rounded-md border p-3">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3">
             <p className="text-sm whitespace-pre-wrap">{content || 'Loading content...'}</p>
           </div>
         </div>
@@ -31,10 +31,10 @@ export function CreateNoteConfirmUI({ invocation, onResult, channelId }: Interac
       resultStatusText={() => 'Note Created Successfully!'}
       resultContent={() => (
         <div className="space-y-3">
-          <div className="bg-green-50 rounded-md border border-green-200 p-3">
+          <div className="bg-green-50 dark:bg-green-950 rounded-md border border-green-200 dark:border-green-900 p-3">
             <p className="text-sm whitespace-pre-wrap">{content}</p>
           </div>
-          <p className="text-sm text-green-600">Your note has been saved to the channel.</p>
+          <p className="text-sm text-green-600 dark:text-green-400">Your note has been saved to the channel.</p>
         </div>
       )}
       cancelStatusText="Creation Cancelled"

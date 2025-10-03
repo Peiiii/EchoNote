@@ -27,9 +27,9 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
     <ToolInvocationPanel<DeleteNoteRenderArgs, DeleteNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
-      icon={<Trash2 className="h-5 w-5 text-amber-600" />}
+      icon={<Trash2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
       title="Delete Note"
-      loadingText="准备参数中..."
+      loadingText="Preparing parameters..."
       callStatusText="Ready to delete"
       preview={() => (
         <div className="space-y-4 w-full">
@@ -41,8 +41,8 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId || 'Loading...'}</Badge>
           </div>
-          <div className="bg-gray-50 rounded-md border max-h-32 overflow-y-auto p-3">
-            <p className="text-sm whitespace-pre-wrap text-gray-600">{noteContent || 'Loading note content...'}</p>
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 max-h-32 overflow-y-auto p-3">
+            <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{noteContent || 'Loading note content...'}</p>
           </div>
         </div>
       )}
@@ -64,8 +64,8 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId}</Badge>
           </div>
-          <div className="bg-red-50 rounded-md border border-red-200 p-3">
-            <p className="text-sm whitespace-pre-wrap text-gray-600">{noteContent || 'Deleted note content'}</p>
+          <div className="bg-red-50 dark:bg-red-950 rounded-md border border-red-200 dark:border-red-900 p-3">
+            <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{noteContent || 'Deleted note content'}</p>
           </div>
         </div>
       )}

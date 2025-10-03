@@ -39,9 +39,11 @@ export function ToolDisplayHeader({
     >
       {title}
     </div>
-    <div className="flex-shrink-0 flex items-center gap-2">
-      {config.icon}
-      <span className={`text-sm font-medium ${config.color}`}>{statusText}</span>
+    <div className="flex items-center gap-2 overflow-hidden">
+      <div className="flex-shrink-0">
+        {config.icon}
+      </div>
+      <span className={`text-sm font-medium truncate overflow-hidden ${config.color}`}>{statusText}</span>
     </div>
     <div className="flex-1 w-[9999px]" />
     {hasDetails && (

@@ -17,21 +17,23 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
     <ToolInvocationPanel<UpdateNoteRenderArgs, UpdateNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
-      icon={<Edit className="h-5 w-5 text-amber-600" />}
+      icon={<Edit className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
       title="Update Note"
-      loadingText="准备参数中..."
+      loadingText="Preparing parameters..."
       callStatusText="Ready to update"
+      contentScrollable={false}
+      stickyFooter={false}
       preview={() => (
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId || 'Loading...'}</Badge>
           </div>
           <div className="space-y-3">
-            <div className="bg-gray-50 rounded-md border p-3">
-              <p className="text-sm whitespace-pre-wrap text-gray-600">{originalContent || 'Loading original content...'}</p>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3 max-h-48 overflow-y-auto">
+              <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{originalContent || 'Loading original content...'}</p>
             </div>
-            <div className="bg-blue-50 rounded-md border border-blue-200 p-3">
-              <p className="text-sm whitespace-pre-wrap">{content}</p>
+            <div className="bg-blue-50 dark:bg-blue-950 rounded-md border border-blue-200 dark:border-blue-900 p-3 max-h-48 overflow-y-auto">
+              <p className="text-sm whitespace-pre-wrap dark:text-gray-200">{content}</p>
             </div>
           </div>
         </div>
@@ -49,11 +51,11 @@ export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: Interac
             <Badge variant="outline" className="font-mono text-xs">{noteId}</Badge>
           </div>
           <div className="space-y-3">
-            <div className="bg-gray-50 rounded-md border p-3">
-              <p className="text-sm whitespace-pre-wrap text-gray-600">{originalContent || 'Original content'}</p>
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3 max-h-48 overflow-y-auto">
+              <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{originalContent || 'Original content'}</p>
             </div>
-            <div className="bg-green-50 rounded-md border border-green-200 p-3">
-              <p className="text-sm whitespace-pre-wrap">{content}</p>
+            <div className="bg-green-50 dark:bg-green-950 rounded-md border border-green-200 dark:border-green-900 p-3 max-h-48 overflow-y-auto">
+              <p className="text-sm whitespace-pre-wrap dark:text-gray-200">{content}</p>
             </div>
           </div>
         </div>

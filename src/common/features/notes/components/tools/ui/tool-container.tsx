@@ -19,6 +19,7 @@ interface ToolContainerProps {
     children: React.ReactNode;
     maxHeight?: string;
     isExpanded?: boolean;
+    scrollable?: boolean;
   };
   headerCardClassName?: string;
   contentCardClassName?: string;
@@ -28,8 +29,8 @@ export function ToolContainer({
   children, 
   header, 
   content, 
-  headerCardClassName = "border-blue-200",
-  contentCardClassName = "border-gray-200 mt-2"
+  headerCardClassName = "border-gray-200 dark:border-gray-800",
+  contentCardClassName = "border-gray-200 dark:border-gray-800 mt-2"
 }: ToolContainerProps) {
   return (
     <div className="w-full flex flex-col" data-echo-tool>
@@ -44,7 +45,7 @@ export function ToolContainer({
       {content && content.isExpanded && (
         <div className="w-full">
           <Card className={contentCardClassName}>
-            <ToolDisplayContent {...content} />
+          <ToolDisplayContent {...content} />
           </Card>
         </div>
       )}

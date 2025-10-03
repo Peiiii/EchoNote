@@ -23,6 +23,8 @@ export interface ToolInvocationPanelProps<Args, Result> {
   resultStatusText: (result: Result) => string;
   resultContent: (args: Partial<Args>, result: Result) => React.ReactNode;
   cancelStatusText?: string; // CANCELLED
+  contentScrollable?: boolean; // pass to ToolPanel content
+  stickyFooter?: boolean; // default true
 }
 
 // Generic panel to render a tool invocation lifecycle (partial -> call -> result/cancelled)
@@ -42,6 +44,8 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
     resultStatusText,
     resultContent,
     cancelStatusText,
+    contentScrollable,
+    stickyFooter = true,
   } = props;
 
   const args = getParsedArgs<Args>(invocation) || ({} as Partial<Args>);
@@ -58,8 +62,9 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
         title={title}
         status="loading"
         statusText={loadingText}
-        headerCardClassName="border-blue-200"
-        contentCardClassName="border-gray-200 mt-2"
+        contentScrollable={contentScrollable}
+        headerCardClassName="border-blue-200 dark:border-blue-800"
+        contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
       >
         {preview(args)}
       </ToolPanel>
@@ -74,25 +79,50 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
         status="ready"
         statusText={callStatusText}
         forceExpanded={true}
-        headerCardClassName="border-amber-200"
+        contentScrollable={contentScrollable}
+        headerCardClassName="border-amber-200 dark:border-amber-800"
       >
-        <div className="space-y-4 w-full">
-          {preview(args)}
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <ConfirmFooter
-            confirmLabel={confirmLabel}
-            loadingLabel={`${confirmLabel}...`}
-            onConfirm={handleConfirm}
-            onCancel={handleCancel}
-            isLoading={isLoading}
-            confirmIcon={confirmIcon}
-            variant={confirmVariant}
-          />
-        </div>
+        {stickyFooter ? (
+          <div className="relative w-full">
+            <div className="space-y-4 w-full pb-16">
+              {preview(args)}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+            <div className="sticky bottom-0 w-full bg-background border-t dark:border-gray-800 pt-3 pb-3">
+              <ConfirmFooter
+                confirmLabel={confirmLabel}
+                loadingLabel={`${confirmLabel}...`}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+                isLoading={isLoading}
+                confirmIcon={confirmIcon}
+                variant={confirmVariant}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 w-full">
+            {preview(args)}
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <ConfirmFooter
+              confirmLabel={confirmLabel}
+              loadingLabel={`${confirmLabel}...`}
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+              isLoading={isLoading}
+              confirmIcon={confirmIcon}
+              variant={confirmVariant}
+            />
+          </div>
+        )}
       </ToolPanel>
     );
   }
@@ -105,8 +135,9 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
         title={title}
         status={'success'}
         statusText={resultStatusText(result)}
-        headerCardClassName={'border-green-200 bg-green-50'}
-        contentCardClassName="border-gray-200 mt-2"
+        contentScrollable={contentScrollable}
+        headerCardClassName={'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950'}
+        contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
       >
         {resultContent(args, result)}
       </ToolPanel>
@@ -120,8 +151,9 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
         title={title}
         status={'ready'}
         statusText={cancelStatusText || 'Cancelled'}
-        headerCardClassName={'border-gray-200'}
-        contentCardClassName="border-gray-200 mt-2"
+        contentScrollable={contentScrollable}
+        headerCardClassName={'border-gray-200 dark:border-gray-800'}
+        contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
       >
         {preview(args)}
       </ToolPanel>
@@ -134,8 +166,7 @@ export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProp
       title={title}
       status="ready"
       statusText=""
-      headerCardClassName="border-gray-200"
+      headerCardClassName="border-gray-200 dark:border-gray-800"
     />
   );
 }
-
