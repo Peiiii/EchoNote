@@ -1,8 +1,7 @@
-import { Alert, AlertDescription } from '@/common/components/ui/alert';
-import { Badge } from '@/common/components/ui/badge';
-import { Clock, FileText, Hash, List } from 'lucide-react';
+import { FileText, List } from 'lucide-react';
 import { DisplayToolPanel } from '../panels/display-tool-panel';
 import { ToolInvocation } from '@agent-labs/agent-chat';
+import { NoteListItem, EmptyState, ErrorMessage } from '../components';
 
 export interface NoteForDisplay {
     noteId: string;
@@ -45,20 +44,20 @@ export function ListNotesToolRenderer({ invocation }: ListNotesToolRendererProps
             {(_args, result, error) => {
                 if (error) {
                     return (
-                        <Alert variant="destructive">
-                            <AlertDescription>
-                                {typeof error === 'string' ? error : 'An error occurred while loading notes'}
-                            </AlertDescription>
-                        </Alert>
+                        <ErrorMessage 
+                            error={error}
+                            fallbackMessage="An error occurred while loading notes"
+                            variant="alert"
+                        />
                     );
                 }
 
                 if (!result?.notes || !Array.isArray(result.notes) || result.notes.length === 0) {
                     return (
-                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                            <FileText className="w-4 h-4" />
-                            <span className="text-sm">No notes found in this channel</span>
-                        </div>
+                        <EmptyState 
+                            icon={FileText}
+                            message="No notes found in this channel"
+                        />
                     );
                 }
 
@@ -68,28 +67,13 @@ export function ListNotesToolRenderer({ invocation }: ListNotesToolRendererProps
                             Showing up to {limit} notes from the channel
                         </div>
                         {result.notes.map((note, index) => (
-                            <div key={note.noteId || index} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800">
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <Hash className="w-3 h-3 text-gray-400 dark:text-gray-500" />
-                                        <Badge variant="outline" className="text-xs font-mono">
-                                            {note.noteId?.substring(0, 8)}...
-                                        </Badge>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                        <Clock className="w-3 h-3" />
-                                        <span>{note.timestampReadable}</span>
-                                    </div>
-                                </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                                    {note.content}
-                                </p>
-                                {note.contentLength > 60 && (
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        ({note.contentLength} characters total)
-                                    </p>
-                                )}
-                            </div>
+                            <NoteListItem
+                                key={note.noteId || index}
+                                noteId={note.noteId}
+                                content={note.content}
+                                contentLength={note.contentLength}
+                                timestampReadable={note.timestampReadable}
+                            />
                         ))}
                     </div>
                 );
