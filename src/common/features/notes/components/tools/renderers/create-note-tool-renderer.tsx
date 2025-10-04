@@ -3,6 +3,7 @@ import { CheckCircle, FileText } from 'lucide-react';
 import { CreateNoteRenderArgs, CreateNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
+import { NoteContent } from '../components';
 
 export function CreateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
   const args = getParsedArgs<CreateNoteRenderArgs>(invocation);
@@ -16,11 +17,11 @@ export function CreateNoteToolRenderer({ invocation, onResult, channelId }: Inte
       loadingText="Preparing parameters..."
       callStatusText="Ready to create"
       preview={() => (
-        <div className="space-y-3">
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3">
-            <p className="text-sm whitespace-pre-wrap">{content || 'Loading content...'}</p>
-          </div>
-        </div>
+        <NoteContent 
+          content={content} 
+          variant="preview"
+          showMetadata={false}
+        />
       )}
       confirm={async () => {
         await channelMessageService.sendMessage({ channelId, content, sender: 'user' });
@@ -31,9 +32,11 @@ export function CreateNoteToolRenderer({ invocation, onResult, channelId }: Inte
       resultStatusText={() => 'Note Created Successfully!'}
       resultContent={() => (
         <div className="space-y-3">
-          <div className="bg-green-50 dark:bg-green-950 rounded-md border border-green-200 dark:border-green-900 p-3">
-            <p className="text-sm whitespace-pre-wrap">{content}</p>
-          </div>
+          <NoteContent 
+            content={content} 
+            variant="detail"
+            showMetadata={false}
+          />
           <p className="text-sm text-green-600 dark:text-green-400">Your note has been saved to the channel.</p>
         </div>
       )}

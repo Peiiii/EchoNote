@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { DeleteNoteRenderArgs, DeleteNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
+import { NoteContent } from '../components';
 
 export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
   const [noteContent, setNoteContent] = useState<string>('');
@@ -41,9 +42,13 @@ export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: Inte
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId || 'Loading...'}</Badge>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 max-h-32 overflow-y-auto p-3">
-            <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{noteContent || 'Loading note content...'}</p>
-          </div>
+                  <NoteContent
+                    content={noteContent}
+                    variant="preview"
+                    showMetadata={false}
+                    maxHeight="max-h-32"
+                    placeholder="Loading note content..."
+                  />
         </div>
       )}
       confirm={async () => {
@@ -63,9 +68,12 @@ export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: Inte
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId}</Badge>
           </div>
-          <div className="bg-red-50 dark:bg-red-950 rounded-md border border-red-200 dark:border-red-900 p-3">
-            <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{noteContent || 'Deleted note content'}</p>
-          </div>
+          <NoteContent
+            content={noteContent}
+            variant="error"
+            showMetadata={false}
+            placeholder="Deleted note content"
+          />
         </div>
       )}
     />

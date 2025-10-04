@@ -6,6 +6,7 @@ import { CheckCircle, Edit } from 'lucide-react';
 import { InteractiveToolProps, UpdateNoteRenderArgs, UpdateNoteRenderResult } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
+import { ComparisonLayout } from '../components';
 
 export function UpdateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
   const parsed = getParsedArgs<UpdateNoteRenderArgs>(invocation);
@@ -28,14 +29,19 @@ export function UpdateNoteToolRenderer({ invocation, onResult, channelId }: Inte
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId || 'Loading...'}</Badge>
           </div>
-          <div className="space-y-3">
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3 max-h-48 overflow-y-auto">
-              <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{originalContent || 'Loading original content...'}</p>
-            </div>
-            <div className="bg-blue-50 dark:bg-blue-950 rounded-md border border-blue-200 dark:border-blue-900 p-3 max-h-48 overflow-y-auto">
-              <p className="text-sm whitespace-pre-wrap dark:text-gray-200">{content}</p>
-            </div>
-          </div>
+          <ComparisonLayout
+            original={{ 
+              content: originalContent || '', 
+              label: 'Original',
+              placeholder: 'Loading original content...'
+            }}
+            updated={{ 
+              content, 
+              label: 'Updated',
+              placeholder: 'Loading updated content...'
+            }}
+            showLabels={true}
+          />
         </div>
       )}
       confirm={async () => {
@@ -50,14 +56,19 @@ export function UpdateNoteToolRenderer({ invocation, onResult, channelId }: Inte
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="font-mono text-xs">{noteId}</Badge>
           </div>
-          <div className="space-y-3">
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-md border dark:border-gray-800 p-3 max-h-48 overflow-y-auto">
-              <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-300">{originalContent || 'Original content'}</p>
-            </div>
-            <div className="bg-green-50 dark:bg-green-950 rounded-md border border-green-200 dark:border-green-900 p-3 max-h-48 overflow-y-auto">
-              <p className="text-sm whitespace-pre-wrap dark:text-gray-200">{content}</p>
-            </div>
-          </div>
+          <ComparisonLayout
+            original={{ 
+              content: originalContent || '', 
+              label: 'Original',
+              placeholder: 'Original content'
+            }}
+            updated={{ 
+              content, 
+              label: 'Updated',
+              placeholder: 'Updated content'
+            }}
+            showLabels={true}
+          />
         </div>
       )}
       cancelStatusText="Update Cancelled"

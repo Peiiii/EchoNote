@@ -2,6 +2,7 @@ import { AlertTriangle, FileText } from 'lucide-react';
 import { ReadNoteRenderProps, ReadNoteRenderArgs, ReadNoteRenderResult } from '../types';
 import { DisplayToolPanel } from '../panels/display-tool-panel';
 import { getParsedArgs } from '../utils/invocation-utils';
+import { NoteContent, ErrorMessage } from '../components';
 
 export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
     console.log("🔔 [ReadNoteToolRenderer] invocation:", invocation);
@@ -31,31 +32,33 @@ export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
             {(_args, result, error) => {
                 if (error) {
                     return (
-                        <div className="text-red-700 dark:text-red-300 text-sm">
-                            {typeof error === 'string' ? error : 'An error occurred while loading the note'}
-                        </div>
+                        <ErrorMessage 
+                            error={error}
+                            fallbackMessage="An error occurred while loading the note"
+                        />
                     );
                 }
 
                 if (!result?.found) {
                     return (
-                        <div className="text-red-700 dark:text-red-300 text-sm">
-                            Note not found
-                        </div>
+                        <ErrorMessage 
+                            error="Note not found"
+                            fallbackMessage="Note not found"
+                        />
                     );
                 }
 
                 return (
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                            <span className="font-mono">{result.noteId}</span>
-                            <span>{result.timestampReadable}</span>
-                            <span>{result.contentLength} chars</span>
-                        </div>
-                        <div className="text-sm whitespace-pre-wrap bg-gray-50 dark:bg-gray-900 p-3 rounded-md border dark:border-gray-800 dark:text-gray-200">
-                            {result.content}
-                        </div>
-                    </div>
+                    <NoteContent
+                        content={result.content}
+                        variant="detail"
+                        showMetadata={true}
+                        metadata={{
+                            noteId: result.noteId,
+                            timestamp: result.timestampReadable,
+                            contentLength: result.contentLength,
+                        }}
+                    />
                 );
             }}
         </DisplayToolPanel>
