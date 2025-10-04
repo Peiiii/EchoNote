@@ -1,5 +1,5 @@
 import { Tool } from '@agent-labs/agent-chat';
-import { ListNotesToolRender, NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from './list-notes.tool';
+import { ListNotesToolRenderer, NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from './renderers/list-notes-tool-renderer';
 import { firebaseNotesService } from '@/common/services/firebase/firebase-notes.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
 
@@ -61,7 +61,7 @@ export function createListNotesTool(channelId: string): Tool<ListNotesToolArgs, 
         },
         // render: Use the new DisplayToolPanel-based component
         render: (toolInvocation) => {
-            return <ListNotesToolRender invocation={toolInvocation} />;
+            return <ListNotesToolRenderer invocation={toolInvocation} />;
         }
     };
 }

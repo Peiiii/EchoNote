@@ -8,7 +8,7 @@ import { getParsedArgs } from '../utils/invocation-utils';
 
 type Variant = 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
 
-export interface ToolInvocationPanelProps<Args, Result> {
+export interface InteractiveToolPanelProps<Args, Result> {
   invocation: ToolInvocation<Args, Result>;
   onResult: (result: ToolResult) => void;
   icon: React.ReactNode;
@@ -28,7 +28,7 @@ export interface ToolInvocationPanelProps<Args, Result> {
 }
 
 // Generic panel to render a tool invocation lifecycle (partial -> call -> result/cancelled)
-export function ToolInvocationPanel<Args, Result>(props: ToolInvocationPanelProps<Args, Result>) {
+export function InteractiveToolPanel<Args, Result>(props: InteractiveToolPanelProps<Args, Result>) {
   const {
     invocation,
     onResult,

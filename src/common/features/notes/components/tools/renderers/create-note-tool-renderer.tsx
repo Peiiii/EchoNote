@@ -2,13 +2,13 @@ import { channelMessageService } from '@/core/services/channel-message.service';
 import { CheckCircle, FileText } from 'lucide-react';
 import { CreateNoteRenderArgs, CreateNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
-import { ToolInvocationPanel } from './tool-invocation-panel';
+import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
 
-export function CreateNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
+export function CreateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
   const args = getParsedArgs<CreateNoteRenderArgs>(invocation);
   const content = args?.content || '';
   return (
-    <ToolInvocationPanel<CreateNoteRenderArgs, CreateNoteRenderResult>
+    <InteractiveToolPanel<CreateNoteRenderArgs, CreateNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
       icon={<FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />}

@@ -1,4 +1,4 @@
-import { CreateNoteConfirmUI, DeleteNoteConfirmUI, ReadNoteRenderUI, UpdateNoteConfirmUI } from "@/common/features/notes/components/tools/interactive-note-tools.ui";
+import { CreateNoteToolRenderer, DeleteNoteToolRenderer, ReadNoteToolRenderer, UpdateNoteToolRenderer } from "@/common/features/notes/components/tools/interactive-note-tools.ui";
 import { createListNotesTool } from "@/common/features/notes/components/tools/list-notes-tool-factory";
 import { ReadNoteRenderArgs, ReadNoteRenderResult } from "@/common/features/notes/components/tools/types";
 import { channelMessageService } from "@/core/services/channel-message.service";
@@ -40,7 +40,7 @@ export class ChannelToolsManager {
             },
             // No execute: we will do actual creation inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(CreateNoteConfirmUI, { invocation, onResult, channelId }),
+                React.createElement(CreateNoteToolRenderer, { invocation, onResult, channelId }),
         };
     }
 
@@ -96,7 +96,7 @@ export class ChannelToolsManager {
                 }
             },
             render: (invocation) => {
-                return React.createElement(ReadNoteRenderUI, {
+                return React.createElement(ReadNoteToolRenderer, {
                     invocation,
                     channelId
                 });
@@ -122,7 +122,7 @@ export class ChannelToolsManager {
             },
             // No execute: we will do actual update inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(UpdateNoteConfirmUI, { invocation, onResult, channelId }),
+                React.createElement(UpdateNoteToolRenderer, { invocation, onResult, channelId }),
         };
     }
 
@@ -143,7 +143,7 @@ export class ChannelToolsManager {
             },
             // No execute: we will do actual deletion inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(DeleteNoteConfirmUI, { invocation, onResult, channelId }),
+                React.createElement(DeleteNoteToolRenderer, { invocation, onResult, channelId }),
         };
     }
 

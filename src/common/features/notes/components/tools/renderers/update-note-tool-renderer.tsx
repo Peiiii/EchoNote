@@ -5,16 +5,16 @@ import { useNotesDataStore } from '@/core/stores/notes-data.store';
 import { CheckCircle, Edit } from 'lucide-react';
 import { InteractiveToolProps, UpdateNoteRenderArgs, UpdateNoteRenderResult } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
-import { ToolInvocationPanel } from './tool-invocation-panel';
+import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
 
-export function UpdateNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
+export function UpdateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
   const parsed = getParsedArgs<UpdateNoteRenderArgs>(invocation);
   const noteId = parsed?.noteId || '';
   const content = parsed?.content || '';
   const originalContent = useNoteContent(noteId, channelId);
 
   return (
-    <ToolInvocationPanel<UpdateNoteRenderArgs, UpdateNoteRenderResult>
+    <InteractiveToolPanel<UpdateNoteRenderArgs, UpdateNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
       icon={<Edit className="h-5 w-5 text-amber-600 dark:text-amber-400" />}

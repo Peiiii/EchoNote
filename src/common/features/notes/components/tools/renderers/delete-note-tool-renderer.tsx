@@ -6,9 +6,9 @@ import { Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { DeleteNoteRenderArgs, DeleteNoteRenderResult, InteractiveToolProps } from '../types';
 import { getParsedArgs } from '../utils/invocation-utils';
-import { ToolInvocationPanel } from './tool-invocation-panel';
+import { InteractiveToolPanel } from '../panels/interactive-tool-panel';
 
-export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
+export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
   const [noteContent, setNoteContent] = useState<string>('');
   const args = getParsedArgs<DeleteNoteRenderArgs>(invocation);
   const noteId = args?.noteId || '';
@@ -24,7 +24,7 @@ export function DeleteNoteConfirmUI({ invocation, onResult, channelId }: Interac
   }, [noteId, channelId]);
 
   return (
-    <ToolInvocationPanel<DeleteNoteRenderArgs, DeleteNoteRenderResult>
+    <InteractiveToolPanel<DeleteNoteRenderArgs, DeleteNoteRenderResult>
       invocation={invocation}
       onResult={onResult}
       icon={<Trash2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />}

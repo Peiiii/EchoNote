@@ -1,10 +1,10 @@
 import { AlertTriangle, FileText } from 'lucide-react';
 import { ReadNoteRenderProps, ReadNoteRenderArgs, ReadNoteRenderResult } from '../types';
-import { DisplayToolPanel } from './display-tool-panel';
+import { DisplayToolPanel } from '../panels/display-tool-panel';
 import { getParsedArgs } from '../utils/invocation-utils';
 
-export function ReadNoteRenderUI({ invocation }: ReadNoteRenderProps) {
-    console.log("🔔 [ReadNoteRenderUI] invocation:", invocation);
+export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
+    console.log("🔔 [ReadNoteToolRenderer] invocation:", invocation);
     const args = getParsedArgs<ReadNoteRenderArgs>(invocation);
     const noteId = args?.noteId;
 

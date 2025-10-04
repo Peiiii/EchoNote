@@ -1,7 +1,7 @@
 import { Alert, AlertDescription } from '@/common/components/ui/alert';
 import { Badge } from '@/common/components/ui/badge';
 import { Clock, FileText, Hash, List } from 'lucide-react';
-import { DisplayToolPanel } from './ui/display-tool-panel';
+import { DisplayToolPanel } from '../panels/display-tool-panel';
 import { ToolInvocation } from '@agent-labs/agent-chat';
 
 export interface NoteForDisplay {
@@ -21,11 +21,11 @@ export interface ListNotesToolResult {
     notes: Array<NoteForDisplay>;
 }
 
-interface ListNotesToolRenderProps {
+interface ListNotesToolRendererProps {
     invocation: ToolInvocation<ListNotesToolArgs, ListNotesToolResult>;
 }
 
-export function ListNotesToolRender({ invocation }: ListNotesToolRenderProps) {
+export function ListNotesToolRenderer({ invocation }: ListNotesToolRendererProps) {
     const args = invocation.parsedArgs || {};
     const limit = args.limit || 10;
 
