@@ -52,7 +52,6 @@ export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: Inte
           channelId: useNotesViewStore.getState().currentChannelId!,
         });
         // Keep UX similar to others: slight delay to show transition
-        await new Promise(r => setTimeout(r, 500));
         return { status: 'deleted', message: 'Note deleted successfully' } as DeleteNoteRenderResult;
       }}
       confirmLabel="Delete Note"
