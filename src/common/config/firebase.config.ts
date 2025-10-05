@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { initializeFirestore } from 'firebase/firestore';
 
 // Firebase配置
@@ -15,10 +15,17 @@ const firebaseConfig = {
 
 // 初始化Firebase
 export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const _auth = getAuth(app);
 // export const db = getFirestore(app);
 export const db = initializeFirestore(app, {
   host: 'firebase-api.agentverse.cc',
   ssl: true,
+  ignoreUndefinedProperties: true, // 这是一个常用的设置，也可以加上
+  experimentalForceLongPolling: false, // 另一个可配置项
 });
 // connectFirestoreEmulator(db, 'firebase-api.agentverce.cc', 443);
+connectAuthEmulator(_auth, 'http://firebase-auth-api.agentverse.cc', {
+  disableWarnings: true
+}); // 确保是正确的 agentverse.cc
+
+export const auth = _auth;
