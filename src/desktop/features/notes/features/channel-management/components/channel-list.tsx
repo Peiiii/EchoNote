@@ -4,7 +4,7 @@ import { ChannelItem } from "./channel-item";
 import { CreateChannelPopover } from "./create-channel-popover";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 
 interface ChannelListProps {
     showFadeEffect?: boolean;
@@ -49,6 +49,20 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
         }
     };
 
+    // Sort channels by activity:
+    // 1) lastMessageTime (desc) if exists
+    // 2) else updatedAt (desc)
+    // 3) else createdAt (desc)
+    const orderedChannels = useMemo(() => {
+        const getActivity = (c: typeof channels[number]) => {
+            const t1 = c.lastMessageTime?.getTime();
+            const t2 = c.updatedAt?.getTime();
+            const t3 = c.createdAt?.getTime?.() ? c.createdAt.getTime() : 0;
+            return t1 ?? t2 ?? t3 ?? 0;
+        };
+        return [...channels].sort((a, b) => getActivity(b) - getActivity(a));
+    }, [channels]);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (scrollContainerRef.current) {
@@ -84,7 +98,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                     msOverflowStyle: 'none'
                 }}
             >
-                {channels.map((channel) => (
+                {orderedChannels.map((channel) => (
                     <ChannelItem
                         key={channel.id}
                         channel={channel}

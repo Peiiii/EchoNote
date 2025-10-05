@@ -57,6 +57,7 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     description: data.description,
     emoji: data.emoji,
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+    updatedAt: data.updatedAt ? (data.updatedAt as Timestamp).toDate() : undefined,
     messageCount: data.messageCount || 0,
     lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),
     backgroundImage: data.backgroundImage,
@@ -189,6 +190,7 @@ export class FirebaseNotesService {
     const docRef = await addDoc(getChannelsCollectionRef(userId), {
       ...filteredChannelData,
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       messageCount: 0,
       isDeleted: false,
       lastMessageTime: serverTimestamp(), // Initialize last message time
@@ -214,6 +216,8 @@ export class FirebaseNotesService {
         processedUpdates[key] = value;
       }
     }
+    // Always bump updatedAt
+    processedUpdates.updatedAt = serverTimestamp();
     
     await updateDoc(channelRef, processedUpdates);
   };

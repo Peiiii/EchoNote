@@ -3,6 +3,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileChannelItem } from "./mobile-channel-item";
 import { MobileCreateChannelPopover } from "./mobile-create-channel-popover";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
+import { useMemo } from "react";
 
 interface MobileChannelListProps {
     isOpen: boolean;
@@ -52,6 +53,17 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
         }
     };
 
+    // Sort channels by activity for consistent ordering
+    const orderedChannels = useMemo(() => {
+        const getActivity = (c: typeof channels[number]) => {
+            const t1 = c.lastMessageTime?.getTime();
+            const t2 = c.updatedAt?.getTime();
+            const t3 = c.createdAt?.getTime?.() ? c.createdAt.getTime() : 0;
+            return t1 ?? t2 ?? t3 ?? 0;
+        };
+        return [...channels].sort((a, b) => getActivity(b) - getActivity(a));
+    }, [channels]);
+
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent 
@@ -68,7 +80,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
                     
                     {/* Channel List - Consistent with Settings */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                        {channels.map((channel) => (
+                        {orderedChannels.map((channel) => (
                             <MobileChannelItem
                                 key={channel.id}
                                 channel={channel}

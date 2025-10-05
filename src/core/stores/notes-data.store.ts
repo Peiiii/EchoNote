@@ -38,6 +38,7 @@ export interface Channel {
   description: string;
   emoji?: string;
   createdAt: Date;
+  updatedAt?: Date;
   messageCount: number;
   lastMessageTime?: Date;
   backgroundImage?: string;
@@ -385,6 +386,5 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }, 'fetchChannels');
   },
 }));
-
 
 
