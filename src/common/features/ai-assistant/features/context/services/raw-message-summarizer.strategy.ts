@@ -1,4 +1,4 @@
-import type { Message } from "@/core/stores/notes-data.store";
+import { useNotesDataStore, type Message } from "@/core/stores/notes-data.store";
 import type { ContextItem, MessageSummarizer } from "../types/message-summarizer.types";
 
 export class RawMessageSummarizer implements MessageSummarizer {
@@ -10,7 +10,7 @@ export class RawMessageSummarizer implements MessageSummarizer {
    */
   summarizeMessages(messages: Message[], _maxTokens?: number): ContextItem[] {
     const userMessages = messages.filter(msg => msg.sender === 'user');
-    
+
     if (userMessages.length === 0) {
       return [{
         description: 'No user content available',
@@ -32,14 +32,16 @@ export class RawMessageSummarizer implements MessageSummarizer {
 
     // Process each channel separately
     Object.entries(messagesByChannel).forEach(([channelId, channelMessages]) => {
+      const channelInfo = useNotesDataStore.getState().channels.find(c => c.id === channelId);
       // Sort messages by timestamp (newest first) within each channel
       const sortedMessages = channelMessages.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-      
+
       contextItems.push({
         description: `Channel ${channelId} - All messages (${sortedMessages.length} messages)`,
         value: JSON.stringify({
           channelId,
-          messageCount: sortedMessages.length,
+          messageCount: channelInfo?.messageCount,
+          channelName: channelInfo?.name,
           messages: sortedMessages.map(msg => ({
             id: msg.id,
             content: msg.content,

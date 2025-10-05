@@ -3,23 +3,25 @@ import { ConversationContextMode, type ConversationContextConfig } from "@/commo
 import { channelMessageService } from "@/core/services/channel-message.service";
 import type { Message } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { TieredMessageSummarizer } from "./tiered-message-summarizer.strategy";
+import { HybridMessageSummarizer } from "./hybrid-message-summarizer.strategy";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 
 const MESSAGE_LIMIT_PER_CHANNEL = 1000;
 
+
 export class SessionContextManager {
-  private summarizer = new TieredMessageSummarizer();
+  private summarizer = new HybridMessageSummarizer();
 
   /**
    * Generate system instructions for unified context
    */
   private generateSystemInstructions(channelCount: number, totalNotes: number, channelNames: string[], primaryChannelId: string): string {
     const isMultiChannel = channelCount > 1;
-    const channelContext = isMultiChannel 
+    const channelContext = isMultiChannel
       ? `a multi-channel context spanning ${channelCount} channels: ${channelNames.join(', ')}`
       : `the channel: ${channelNames[0]}`;
-    
+
     const contextUnderstanding = isMultiChannel
       ? `- You have access to notes from multiple channels, each representing different topics or contexts
 - Notes are organized by recency with different detail levels across all channels
@@ -95,7 +97,7 @@ Always be concise, actionable, and focused on helping users maximize their poten
     if (!contexts) {
       // Auto mode: ensure fallback channel is loaded
       const channelState = channelMessageService.dataContainer.get().messageByChannel[fallbackChannelId];
-      if (!channelState) {
+      if (!channelState || channelState.hasMore) {
         channelMessageService.requestLoadInitialMessages$.next({ channelId: fallbackChannelId, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
       }
       return;
@@ -103,11 +105,20 @@ Always be concise, actionable, and focused on helping users maximize their poten
 
     const { mode, channelIds } = contexts;
 
+    if (mode === ConversationContextMode.AUTO) {
+      const currentChannelId = useNotesViewStore.getState().currentChannelId!
+      const channelState = channelMessageService.dataContainer.get().messageByChannel[currentChannelId];
+      if (!channelState || channelState.hasMore) {
+        channelMessageService.requestLoadInitialMessages$.next({ channelId: currentChannelId, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
+      }
+      return;
+    }
+
     if (mode === ConversationContextMode.CHANNELS && channelIds) {
       // Load specific channels
       channelIds.forEach(id => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
-        if (!channelState) {
+        if (!channelState || channelState.hasMore) {
           channelMessageService.requestLoadInitialMessages$.next({ channelId: id, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
         }
       });
@@ -116,7 +127,7 @@ Always be concise, actionable, and focused on helping users maximize their poten
       const { channels } = useNotesDataStore.getState();
       channels.forEach(channel => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
-        if (!channelState) {
+        if (!channelState || channelState.hasMore) {
           channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
         }
       });
@@ -221,12 +232,12 @@ Always be concise, actionable, and focused on helping users maximize their poten
     const channelNames = channelInfo.map(ch => ch.name);
     const totalNotes = allMessages.length;
     const systemInstructions = this.generateSystemInstructions(
-      channelIds.length, 
-      totalNotes, 
+      channelIds.length,
+      totalNotes,
       channelNames,
       channelIds[0] // primary channel ID for tool usage
     );
-    
+
     return [
       {
         description: 'System Instructions',

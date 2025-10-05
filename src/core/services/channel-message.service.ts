@@ -60,11 +60,14 @@ export class ChannelMessageService {
     });
 
     handleRequestWorkflow$ = this.requestLoadInitialMessages$.pipe(
-        distinctUntilChanged((prev, curr) => prev.channelId === curr.channelId),
-        filter(request => !this.dataContainer.get().messageByChannel[request.channelId]),
-        switchMap(request => this.loadInitialMessages({ 
-            channelId: request.channelId, 
-            messagesLimit: request.messageLimit || 20 
+        distinctUntilChanged((prev, curr) => prev.channelId === curr.channelId && prev.messageLimit === curr.messageLimit),
+        filter(request => {
+            const channelState = this.dataContainer.get().messageByChannel[request.channelId];
+            return !channelState || (channelState.hasMore && !channelState.loading);
+        }),
+        switchMap(request => this.loadInitialMessages({
+            channelId: request.channelId,
+            messagesLimit: request.messageLimit || 20
         }))
     )
 
@@ -146,6 +149,7 @@ export class ChannelMessageService {
     }
 
     loadInitialMessages = async ({ channelId, messagesLimit }: { channelId: string, messagesLimit: number }) => {
+        console.log("[ChannelMessageService] loadInitialMessages", { channelId, messagesLimit });
         const { currentUser } = useNotesViewStore.getState();
         const userId = currentUser?.uid;
         console.log("[ChannelMessageService] loadInitialMessages", { channelId, messagesLimit, userId });
@@ -312,3 +316,6 @@ export class ChannelMessageService {
 }
 
 export const channelMessageService = new ChannelMessageService();
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).channelMessageService = channelMessageService;

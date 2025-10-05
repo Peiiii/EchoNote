@@ -26,8 +26,8 @@ export function useConversationContextDraft({
     conv?.contexts ? conv.contexts.mode : ConversationContextMode.AUTO
   );
   const [draftChannelIds, setDraftChannelIds] = useState<string[]>(
-    conv?.contexts?.mode === ConversationContextMode.CHANNELS 
-      ? (conv?.contexts?.channelIds || [fallbackChannelId]) 
+    conv?.contexts?.mode === ConversationContextMode.CHANNELS
+      ? (conv?.contexts?.channelIds || [fallbackChannelId])
       : [fallbackChannelId]
   );
 
@@ -35,23 +35,23 @@ export function useConversationContextDraft({
   useEffect(() => {
     setDraftMode(conv?.contexts ? conv.contexts.mode : ConversationContextMode.AUTO);
     setDraftChannelIds(
-      conv?.contexts?.mode === ConversationContextMode.CHANNELS 
-        ? (conv?.contexts?.channelIds || [fallbackChannelId]) 
+      conv?.contexts?.mode === ConversationContextMode.CHANNELS
+        ? (conv?.contexts?.channelIds || [fallbackChannelId])
         : [fallbackChannelId]
     );
   }, [conversationId, conv?.contexts, fallbackChannelId]);
 
   const toggleChannel = useCallback((id: string) => {
-    setDraftChannelIds(prev => 
+    setDraftChannelIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   }, []);
 
   const apply = useCallback(async () => {
     if (!userId || !conv) return;
-    
+
     if (draftMode === ConversationContextMode.AUTO) {
-      await updateConversation(userId, conv.id, { contexts: null });
+      await updateConversation(userId, conv.id, { contexts: { mode: ConversationContextMode.AUTO } });
       return;
     }
 
@@ -63,10 +63,10 @@ export function useConversationContextDraft({
     } else {
       const ids = draftChannelIds.length ? draftChannelIds : [fallbackChannelId];
       next = { mode: ConversationContextMode.CHANNELS, channelIds: ids };
-      
+
       if (onActiveToolChannelChange) {
-        const ensure = (activeToolChannelId && ids.includes(activeToolChannelId)) 
-          ? activeToolChannelId 
+        const ensure = (activeToolChannelId && ids.includes(activeToolChannelId))
+          ? activeToolChannelId
           : ids[0];
         onActiveToolChannelChange(ensure);
       }

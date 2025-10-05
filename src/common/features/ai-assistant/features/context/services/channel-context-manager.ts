@@ -1,7 +1,7 @@
+import { HybridMessageSummarizer } from "@/common/features/ai-assistant/features/context/services/hybrid-message-summarizer.strategy";
 import { MessageSummarizer } from "@/common/features/ai-assistant/features/context/types/message-summarizer.types";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { TieredMessageSummarizer } from "./tiered-message-summarizer.strategy";
 
 /**
  * Generate system instructions for AI Assistant
@@ -62,10 +62,9 @@ In every conversation, you should:
 Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
 }
 
-export type SummarizerType = 'tiered' | 'raw';
 
 export class ChannelContextManager {
-  private summarizer: MessageSummarizer = new TieredMessageSummarizer();
+  private summarizer: MessageSummarizer = new HybridMessageSummarizer();
 
   /**
    * Get channel context for AI - provides intelligent context with tiered summarization
