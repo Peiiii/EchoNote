@@ -9,10 +9,11 @@ import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '@/common/lib/agent-tools-ui';
 import { NoteContent } from '@/common/features/agent-tools';
 
-export function DeleteNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
+export function DeleteNoteToolRenderer({ invocation, onResult }: InteractiveToolProps<DeleteNoteRenderArgs, DeleteNoteRenderResult>) {
   const [noteContent, setNoteContent] = useState<string>('');
   const args = getParsedArgs<DeleteNoteRenderArgs>(invocation);
   const noteId = args?.noteId || '';
+  const channelId = args?.channelId || '';
 
   React.useEffect(() => {
     try {

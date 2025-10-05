@@ -1,14 +1,14 @@
 import { Tool } from '@agent-labs/agent-chat';
-import { ListNotesToolRenderer, NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from './renderers/list-notes-tool-renderer';
+import { ListNotesToolRenderer, NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from '@/common/features/agent-tools/renderers/list-notes-tool-renderer';
 import { firebaseNotesService } from '@/common/services/firebase/firebase-notes.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
 
 
 // Factory function to create the listNotes tool
-export function createListNotesTool(channelId: string): Tool<ListNotesToolArgs, ListNotesToolResult> {
+export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResult> {
     return {
         name: 'listNotes',
-        description: 'List notes/thoughts in the current channel, optionally sorted by time',
+        description: 'List notes/thoughts in the specified channel, optionally sorted by time',
         parameters: {
             type: 'object',
             properties: {
@@ -20,15 +20,19 @@ export function createListNotesTool(channelId: string): Tool<ListNotesToolArgs, 
                     type: 'string',
                     enum: ['asc', 'desc'],
                     description: 'Sort order by timestamp (default: desc)'
+                },
+                channelId: {
+                    type: 'string',
+                    description: 'ID of the channel to list notes from'
                 }
             },
-            required: []
+            required: ['channelId']
         },
         // execute: 直接通过底层 service 拉取数据，避免缓存导致的顺序问题
         execute: async (toolCallArgs) => {
             try {
                 console.log("🔔 [listNotesTool][execute][toolCallArgs]:", toolCallArgs);
-                const { limit = 10, order = 'desc' } = toolCallArgs;
+                const { limit = 10, order = 'desc', channelId } = toolCallArgs as ListNotesToolArgs;
                 const { userId } = useNotesDataStore.getState();
                 if (!userId) throw new Error('User not signed in');
 

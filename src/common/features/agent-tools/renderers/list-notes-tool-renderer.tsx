@@ -15,6 +15,7 @@ export interface NoteForDisplay {
 export interface ListNotesToolArgs {
     limit?: number;
     order?: 'asc' | 'desc';
+    channelId: string;
 }
 
 export interface ListNotesToolResult {
@@ -27,7 +28,7 @@ interface ListNotesToolRendererProps {
 
 export function ListNotesToolRenderer({ invocation }: ListNotesToolRendererProps) {
     const args = invocation.parsedArgs || {};
-    const limit = args.limit || 10;
+    const limit = (args as ListNotesToolArgs).limit || 10;
 
     return (
         <DisplayToolPanel<ListNotesToolArgs, ListNotesToolResult>

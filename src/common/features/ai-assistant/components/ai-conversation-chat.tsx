@@ -65,9 +65,9 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   }, [conv?.contexts, channelId]);
   const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
   const tools = useMemo(() => {
-    console.log("🔔 [AIConversationChat] getting tools for toolChannelId:", toolChannelId);
-    return aiAgentFactory.getChannelTools(toolChannelId);
-  }, [toolChannelId]);
+    console.log("🔔 [AIConversationChat] getting tools");
+    return aiAgentFactory.getChannelTools();
+  }, []);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
   console.log("🔔 [AIConversationChat] parsed tools:", { 
     toolDefs: toolDefs.map(t => ({ name: t.name, description: t.description })),

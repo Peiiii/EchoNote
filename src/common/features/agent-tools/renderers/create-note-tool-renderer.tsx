@@ -5,9 +5,10 @@ import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '@/common/lib/agent-tools-ui';
 import { NoteContent } from '@/common/features/agent-tools';
 
-export function CreateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
+export function CreateNoteToolRenderer({ invocation, onResult }: InteractiveToolProps<CreateNoteRenderArgs, CreateNoteRenderResult>) {
   const args = getParsedArgs<CreateNoteRenderArgs>(invocation);
   const content = args?.content || '';
+  const channelId = args?.channelId || '';
   return (
     <InteractiveToolPanel<CreateNoteRenderArgs, CreateNoteRenderResult>
       invocation={invocation}

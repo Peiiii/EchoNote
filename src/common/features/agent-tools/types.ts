@@ -2,6 +2,7 @@ import { ToolInvocation, ToolResult } from "@agent-labs/agent-chat";
 
 export interface ReadNoteRenderArgs {
   noteId: string;
+  channelId: string;
 }
 
 export interface ReadNoteRenderResult {
@@ -14,6 +15,7 @@ export interface ReadNoteRenderResult {
 
 export interface DeleteNoteRenderArgs {
   noteId: string;
+  channelId: string;
 }
 
 export interface DeleteNoteRenderResult {
@@ -24,6 +26,7 @@ export interface DeleteNoteRenderResult {
 export interface UpdateNoteRenderArgs {
   noteId: string;
   content: string;
+  channelId: string;
 }
 
 export interface UpdateNoteRenderResult {
@@ -33,6 +36,7 @@ export interface UpdateNoteRenderResult {
 
 export interface CreateNoteRenderArgs {
   content: string;
+  channelId: string;
 }
 
 export interface CreateNoteRenderResult {
@@ -43,10 +47,8 @@ export interface CreateNoteRenderResult {
 export interface InteractiveToolProps<ARGS, RESULT> {
   invocation: ToolInvocation<ARGS, RESULT>;
   onResult: (result: ToolResult) => void;
-  channelId: string;
 }
 
 export interface ReadNoteRenderProps {
   invocation: ToolInvocation<ReadNoteRenderArgs, ReadNoteRenderResult>;
-  channelId: string;
 }

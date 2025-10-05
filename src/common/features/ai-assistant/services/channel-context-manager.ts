@@ -3,7 +3,7 @@ import { contextDataCache } from "./context-data-cache";
 /**
  * Generate system instructions for AI Assistant
  */
-function generateSystemInstructions(channelName: string, messageCount: number): string {
+function generateSystemInstructions(channelName: string, messageCount: number, channelId: string): string {
   return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in the channel: ${channelName}
@@ -49,6 +49,13 @@ In every conversation, you should:
 - Provide specific and actionable suggestions
 - Always prioritize user growth and happiness as the ultimate goal
 
+## Tool Usage Guidelines:
+- When using any tool (createNote, readNote, updateNote, deleteNote, listNotes), you MUST provide the channelId parameter
+- The channelId should be the ID of the channel you want to operate on
+- For operations in the current channel, use the channelId: "${channelId}"
+- For operations in other channels, use the specific channel ID provided by the user
+- Always specify the channelId explicitly - it is a required parameter for all tools
+
 Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
 }
 
@@ -78,7 +85,7 @@ export class ChannelContextManager {
       {
         description: 'System Instructions',
         value: JSON.stringify({
-          instructions: generateSystemInstructions(channel.name, messages.length)
+          instructions: generateSystemInstructions(channel.name, messages.length, channelId)
         })
       },
       {

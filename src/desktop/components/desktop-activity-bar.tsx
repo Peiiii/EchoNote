@@ -15,8 +15,7 @@ interface DesktopActivityBarProps {
 }
 
 export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
-  const { expanded, setExpanded, activeId, setActiveId, items } =
-    useActivityBarStore();
+  const { activeId, setActiveId, items } = useActivityBarStore();
 
   const mainGroupItems = items.filter(
     (item) => item.group === ActivityBarGroup.MAIN
@@ -24,10 +23,6 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
   const footerItems = items.filter(
     (item) => item.group === ActivityBarGroup.FOOTER
   );
-
-  const handleExpandedChange = (newExpanded: boolean) => {
-    setExpanded(newExpanded);
-  };
 
   const handleActiveChange = (activeId: string) => {
     setActiveId(activeId);
@@ -44,10 +39,10 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
     >
       <ActivityBar.Root
         toggleable={false}
-        expanded={expanded}
+        expanded={false}
         activeId={activeId}
         expandedWidth={240}
-        onExpandedChange={handleExpandedChange}
+        onExpandedChange={() => {}}
         onActiveChange={handleActiveChange}
         className="relative z-10 h-full bg-transparent border-none"
       >
@@ -92,9 +87,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
           </ActivityBar.Group>
         </ActivityBar.GroupList>
 
-        {/* Footer - 设置区域 */}
         <ActivityBar.Footer className="bg-sidebar">
-          {/* Auth Status Section - 统一的认证状态显示 */}
           <div className="px-2 py-2 flex justify-center">
             <AuthStatus />
           </div>

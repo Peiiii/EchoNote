@@ -8,10 +8,11 @@ import { getParsedArgs } from '../utils/invocation-utils';
 import { InteractiveToolPanel } from '@/common/lib/agent-tools-ui';
 import { ComparisonLayout } from '@/common/lib/agent-tools-ui';
 
-export function UpdateNoteToolRenderer({ invocation, onResult, channelId }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
+export function UpdateNoteToolRenderer({ invocation, onResult }: InteractiveToolProps<UpdateNoteRenderArgs, UpdateNoteRenderResult>) {
   const parsed = getParsedArgs<UpdateNoteRenderArgs>(invocation);
   const noteId = parsed?.noteId || '';
   const content = parsed?.content || '';
+  const channelId = parsed?.channelId || '';
   const originalContent = useNoteContent(noteId, channelId);
 
   return (

@@ -1,6 +1,6 @@
 import { CreateNoteToolRenderer, DeleteNoteToolRenderer, ReadNoteToolRenderer, UpdateNoteToolRenderer } from "@/common/features/notes/components/tools/interactive-note-tools.ui";
 import { createListNotesTool } from "@/common/features/notes/components/tools/list-notes-tool-factory";
-import { ReadNoteRenderArgs, ReadNoteRenderResult } from "@/common/features/notes/components/tools/types";
+import { ReadNoteRenderArgs, ReadNoteRenderResult } from "@/common/features/agent-tools/types";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { ensureChannelMessagesLoaded } from "@/common/features/notes/utils/ensure-channel-messages-loaded";
 import { Tool } from "@agent-labs/agent-chat";
@@ -10,14 +10,14 @@ export class ChannelToolsManager {
     /**
      * Get channel-specific CRUD tools
      */
-    getChannelTools(channelId: string): Tool[] {
-        console.log("🔔 [ChannelToolsManager][getChannelTools] creating tools for channel:", channelId);
+    getChannelTools(): Tool[] {
+        console.log("🔔 [ChannelToolsManager][getChannelTools] creating tools");
         const tools = [
-            this.createNoteTool(channelId),
-            this.readNoteTool(channelId),
-            this.updateNoteTool(channelId),
-            this.deleteNoteTool(channelId),
-            this.listNotesTool(channelId)
+            this.createNoteTool(),
+            this.readNoteTool(),
+            this.updateNoteTool(),
+            this.deleteNoteTool(),
+            this.listNotesTool()
         ];
         console.log("🔔 [ChannelToolsManager][getChannelTools] created tools:", tools.map(t => ({ name: t.name, description: t.description })));
         return tools;
@@ -26,43 +26,48 @@ export class ChannelToolsManager {
     /**
      * Create a new note/thought
      */
-    private createNoteTool(channelId: string): Tool {
+    private createNoteTool(): Tool {
         // Switch to User-Interaction pattern: require explicit user confirmation
         return {
             name: 'createNote',
-            description: 'Create a new note/thought in the current channel (requires user confirmation).',
+            description: 'Create a new note/thought in the specified channel (requires user confirmation).',
             parameters: {
                 type: 'object',
                 properties: {
                     content: { type: 'string', description: 'Content of the note/thought' },
+                    channelId: { type: 'string', description: 'ID of the channel to create the note in' },
                 },
-                required: ['content'],
+                required: ['content', 'channelId'],
             },
             // No execute: we will do actual creation inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(CreateNoteToolRenderer, { invocation, onResult, channelId }),
+                React.createElement(CreateNoteToolRenderer, { invocation, onResult }),
         };
     }
 
     /**
      * Read a specific note/thought by ID
      */
-    private readNoteTool(channelId: string): Tool<ReadNoteRenderArgs, ReadNoteRenderResult> {
+    private readNoteTool(): Tool<ReadNoteRenderArgs, ReadNoteRenderResult> {
         return {
             name: 'readNote',
-            description: 'Read a specific note/thought by its ID',
+            description: 'Read a specific note/thought by its ID from the specified channel',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: {
                         type: 'string',
                         description: 'ID of the note/thought to read'
+                    },
+                    channelId: {
+                        type: 'string',
+                        description: 'ID of the channel to read the note from'
                     }
                 },
-                required: ['noteId']
+                required: ['noteId', 'channelId']
             },
             execute: async (toolCallArgs) => {
-                const { noteId } = toolCallArgs;
+                const { noteId, channelId } = toolCallArgs;
                 try {
                     // Ensure messages loaded before searching
                     await ensureChannelMessagesLoaded(channelId);
@@ -97,8 +102,7 @@ export class ChannelToolsManager {
             },
             render: (invocation) => {
                 return React.createElement(ReadNoteToolRenderer, {
-                    invocation,
-                    channelId
+                    invocation
                 });
             }
         };
@@ -107,51 +111,53 @@ export class ChannelToolsManager {
     /**
      * Update an existing note/thought
      */
-    private updateNoteTool(channelId: string): Tool {
+    private updateNoteTool(): Tool {
         // Switch to User-Interaction pattern: require explicit user confirmation
         return {
             name: 'updateNote',
-            description: 'Update an existing note/thought by its ID (requires user confirmation).',
+            description: 'Update an existing note/thought by its ID in the specified channel (requires user confirmation).',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: { type: 'string', description: 'ID of the note/thought to update' },
                     content: { type: 'string', description: 'New content for the note/thought' },
+                    channelId: { type: 'string', description: 'ID of the channel containing the note' },
                 },
-                required: ['noteId', 'content'],
+                required: ['noteId', 'content', 'channelId'],
             },
             // No execute: we will do actual update inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(UpdateNoteToolRenderer, { invocation, onResult, channelId }),
+                React.createElement(UpdateNoteToolRenderer, { invocation, onResult }),
         };
     }
 
     /**
      * Delete a note/thought by ID
      */
-    private deleteNoteTool(channelId: string): Tool {
+    private deleteNoteTool(): Tool {
         // Switch to User-Interaction pattern: require explicit user confirmation
         return {
             name: 'deleteNote',
-            description: 'Delete a note/thought by its ID (requires user confirmation).',
+            description: 'Delete a note/thought by its ID from the specified channel (requires user confirmation).',
             parameters: {
                 type: 'object',
                 properties: {
                     noteId: { type: 'string', description: 'ID of the note/thought to delete' },
+                    channelId: { type: 'string', description: 'ID of the channel containing the note' },
                 },
-                required: ['noteId'],
+                required: ['noteId', 'channelId'],
             },
             // No execute: we will do actual deletion inside the confirm UI
             render: (invocation, onResult) =>
-                React.createElement(DeleteNoteToolRenderer, { invocation, onResult, channelId }),
+                React.createElement(DeleteNoteToolRenderer, { invocation, onResult }),
         };
     }
 
     /**
      * List all notes in the channel
      */
-    private listNotesTool(channelId: string): Tool {
-        return createListNotesTool(channelId);
+    private listNotesTool(): Tool {
+        return createListNotesTool();
     }
 }
 
