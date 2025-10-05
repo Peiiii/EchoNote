@@ -99,8 +99,8 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
       conv.contexts.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
     }
     if (conv?.contexts?.mode === 'all') {
-      void contextDataCache.ensureTopIds(5).then(() => {
-        const ids = contextDataCache.getTopIdsSnapshot(5);
+      void contextDataCache.ensureAllMetas().then(() => {
+        const ids = contextDataCache.getAllIdsSnapshot();
         ids.forEach(id => void contextDataCache.ensureFetched(id));
       });
     }

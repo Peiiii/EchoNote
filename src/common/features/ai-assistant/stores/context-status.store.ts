@@ -43,8 +43,11 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
       const byChannel: Record<string, ChannelStatus> = { ...(current?.byChannel || {}) };
       for (const id of ids) {
         const snap = contextDataCache.getSnapshot(id);
+        // Consider a channel as ready when it has been fetched at least once (lastFetched > 0),
+        // regardless of message count (empty channel is still valid and "ready").
+        const isReady = !snap.fetching && snap.lastFetched > 0;
         byChannel[id] = {
-          status: snap.fetching ? 'loading' : (snap.channel ? 'ready' : 'loading'),
+          status: isReady ? 'ready' : 'loading',
           lastFetched: snap.lastFetched,
           messageCount: snap.messages?.length,
           channelName: snap.channel?.name,
@@ -58,7 +61,10 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
             channelIds: channelIds || [],
             resolvedChannelIds: ids,
             byChannel,
-            topStatus: mode === 'all' ? (ids.length ? 'ready' : 'loading') : 'idle',
+            // In 'all' mode, only mark 'ready' when all channels are fetched at least once
+            topStatus: mode === 'all'
+              ? (ids.length && ids.every(id => byChannel[id]?.status === 'ready') ? 'ready' : 'loading')
+              : 'idle',
           },
         },
       }));
@@ -71,14 +77,14 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
     } else if (mode === 'channels') {
       ids = (channelIds && channelIds.length ? channelIds : [fallbackChannelId]);
     } else {
-      // all
-      ids = contextDataCache.getTopIdsSnapshot(5);
-      contextDataCache.ensureTopIds(5).then(() => {
-        ids = contextDataCache.getTopIdsSnapshot(5);
+      // all: use the full index so status reflects truly all channels
+      ids = contextDataCache.getAllIdsSnapshot();
+      contextDataCache.ensureAllMetas().then(() => {
+        ids = contextDataCache.getAllIdsSnapshot();
         ids.forEach(id => void contextDataCache.ensureFetched(id));
         updateFromCache();
       });
-      topUnsub = contextDataCache.onTopIdsUpdate(() => updateFromCache());
+      topUnsub = contextDataCache.onAllMetasUpdate(() => updateFromCache());
     }
 
     // Prefetch and subscribe per-channel updates
@@ -96,4 +102,3 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
     };
   },
 }));
-

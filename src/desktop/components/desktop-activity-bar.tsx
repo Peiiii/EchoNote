@@ -46,7 +46,6 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
         onActiveChange={handleActiveChange}
         className="relative z-10 h-full bg-transparent border-none"
       >
-        {/* Header - 简洁的标题区域 */}
         <ActivityBar.Header
           icon={
             <div className="flex items-center justify-center w-6 h-6">

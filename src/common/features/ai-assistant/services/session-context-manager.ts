@@ -30,19 +30,45 @@ export class SessionContextManager {
     }
 
     // mode === 'all'
-    // Use snapshot for immediate sync return; ensure background refresh & prefetch
-    const snap = contextDataCache.getTopIdsSnapshot(5);
-    if (snap.length === 0) {
-      // trigger background compute and fall back to current channel for this call
-      void contextDataCache.ensureTopIds(5).then(() => {
-        const ids = contextDataCache.getTopIdsSnapshot(5);
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
+    // Architecture-level improvement:
+    // - Build a global channels index so the agent "knows" all channels up-front
+    // - Prefetch all channel contexts progressively (concurrency-limited) without blocking
+    // - Return a blended context: global index + a few hydrated channels for immediate quality
+
+    const metas = contextDataCache.getAllMetasSnapshot();
+    if (metas.length === 0) {
+      // Kick off background fetch of the full index and then hydrate
+      void contextDataCache.ensureAllMetas().then(() => {
+        void contextDataCache.prefetchAllChannelsMessages(4);
       });
+      // Fallback to current channel context while global index hydrates
       return channelContextManager.getChannelContext(fallbackChannelId);
     }
-    // prefetch contexts in background
-    snap.forEach(id => void contextDataCache.ensureFetched(id));
-    return snap.flatMap(id => channelContextManager.getChannelContext(id));
+
+    // Start progressive hydration in background
+    void contextDataCache.prefetchAllChannelsMessages(4);
+
+    // Provide a compact global index so the agent is aware of all channels immediately
+    const index = metas.map(m => ({ id: m.id, name: m.name, messageCount: m.messageCount }));
+    const indexContext = [{
+      description: 'Available Channels Index',
+      value: JSON.stringify({ total: metas.length, channels: index })
+    }];
+
+    // Include detailed context for channels that have been fetched at least once.
+    // Order by last active first (metas is already sorted that way in cache).
+    const readyIds = metas
+      .map(m => m.id)
+      .filter(id => {
+        const snap = contextDataCache.getSnapshot(id);
+        return !snap.fetching && snap.lastFetched > 0; // fetched at least once
+      });
+    if (readyIds.length === 0) {
+      // No hydrated channels yet; return index + fallback channel so the model has some concrete context
+      return [...indexContext, ...channelContextManager.getChannelContext(fallbackChannelId)];
+    }
+    const detailed = readyIds.flatMap(id => channelContextManager.getChannelContext(id));
+    return [...indexContext, ...detailed];
   }
 }
 

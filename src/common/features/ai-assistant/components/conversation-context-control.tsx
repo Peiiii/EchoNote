@@ -125,8 +125,9 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
       next.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
     }
     if (next?.mode === 'all') {
-      void contextDataCache.ensureTopIds(5).then(() => {
-        const ids = contextDataCache.getTopIdsSnapshot(5);
+      void contextDataCache.ensureAllMetas().then(() => {
+        const ids = contextDataCache.getAllIdsSnapshot();
+        // Progressive hydration; do not block UI
         ids.forEach(id => void contextDataCache.ensureFetched(id));
       });
     }
@@ -151,6 +152,8 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
   const sessionAnyLoading = useMemo(() => {
     const s = session;
     if (!s) return false;
+    // Now that topStatus('all') reflects full hydration (all channels fetched at least once),
+    // a single flag is enough for the status dot.
     if (s.topStatus === 'loading') return true;
     return s.resolvedChannelIds.some(id => s.byChannel[id]?.status === 'loading');
   }, [session]);

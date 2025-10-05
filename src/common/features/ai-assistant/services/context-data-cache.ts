@@ -21,6 +21,11 @@ export class ContextDataCache {
   private topFetched = 0;
   private channelListeners = new Map<string, Set<() => void>>();
   private topListeners = new Set<() => void>();
+  // Full index for "all" mode so we don't depend on what the UI has loaded
+  private allMetas: Channel[] = [];
+  private allFetchedAt = 0;
+  private allFetching = false;
+  private allListeners = new Set<() => void>();
 
   getSnapshot(channelId: string): ChannelContextSnapshot {
     const snap = this.cache.get(channelId);
@@ -83,6 +88,68 @@ export class ContextDataCache {
     }
   }
 
+  /**
+   * Return a snapshot of all channel metadata currently known to the cache.
+   * This list is independent from UI store and comes from firebaseNotesService.fetchChannels.
+   */
+  getAllMetasSnapshot(): Channel[] {
+    return this.allMetas.slice();
+  }
+
+  /**
+   * Return a snapshot of all channel ids currently known to the cache.
+   */
+  getAllIdsSnapshot(): string[] {
+    if (!this.allMetas.length) return [];
+    return this.allMetas.map(c => c.id);
+  }
+
+  /**
+   * Ensure we have fetched the full list of channels for the current user.
+   * Throttled to avoid excessive reads.
+   */
+  async ensureAllMetas(): Promise<void> {
+    const { userId } = useNotesDataStore.getState();
+    if (!userId) return;
+    const now = Date.now();
+    if (this.allFetching) return;
+    if (now - this.allFetchedAt < 15_000 && this.allMetas.length) return;
+
+    this.allFetching = true;
+    try {
+      const list = await firebaseNotesService.fetchChannels(userId);
+      // Sort by last active first for more relevant prefetch ordering
+      this.allMetas = [...list].sort((a, b) => (b.lastMessageTime?.getTime() || 0) - (a.lastMessageTime?.getTime() || 0));
+      this.allFetchedAt = Date.now();
+      this.notifyAll();
+    } catch (e) {
+      console.warn("[ContextDataCache] ensureAllMetas failed", e);
+    } finally {
+      this.allFetching = false;
+    }
+  }
+
+  /**
+   * Prefetch messages for many channels with simple concurrency control.
+   * Use this in "all" mode to progressively hydrate cache without blocking UI.
+   */
+  async prefetchAllChannelsMessages(concurrency = 4, limit?: number): Promise<void> {
+    const ids = this.getAllIdsSnapshot();
+    const target = typeof limit === 'number' ? ids.slice(0, Math.max(0, limit)) : ids;
+    let index = 0;
+    const workers = new Array(Math.min(concurrency, target.length)).fill(0).map(async () => {
+      while (index < target.length) {
+        const id = target[index++];
+        try {
+          await this.ensureFetched(id);
+        } catch (_e) {
+          // ignore individual failures; continue
+        }
+      }
+    });
+    await Promise.all(workers);
+  }
+
   onChannelUpdate(channelId: string, cb: () => void): () => void {
     const set = this.channelListeners.get(channelId) || new Set<() => void>();
     set.add(cb);
@@ -108,6 +175,15 @@ export class ContextDataCache {
 
   private notifyTop() {
     this.topListeners.forEach(fn => { try { fn(); } catch (_error) { /* ignore errors */ } });
+  }
+
+  private notifyAll() {
+    this.allListeners.forEach(fn => { try { fn(); } catch (_error) { /* ignore errors */ } });
+  }
+
+  onAllMetasUpdate(cb: () => void): () => void {
+    this.allListeners.add(cb);
+    return () => this.allListeners.delete(cb);
   }
 }
 
