@@ -43,7 +43,6 @@
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.13.3",
     "firebase": "^12.1.0",
-    "js-tiktoken": "^1.0.21",
     "lowlight": "2.8.0",
     "lucide-react": "^0.536.0",
     "openai": "^5.12.2",

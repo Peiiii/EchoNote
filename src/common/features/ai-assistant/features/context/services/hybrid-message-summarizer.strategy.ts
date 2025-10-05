@@ -15,8 +15,7 @@ export class HybridMessageSummarizer implements MessageSummarizer {
   private rawSummarizer = new RawMessageSummarizer();
   private tieredSummarizer = new TieredMessageSummarizer();
   
-  // Token limit threshold - when raw strategy exceeds this, switch to tiered
-  private readonly TOKEN_LIMIT = 50000;
+  private readonly LENGTH_LIMIT = 200000;
   
   /**
    * Summarize messages using hybrid strategy
@@ -31,33 +30,24 @@ export class HybridMessageSummarizer implements MessageSummarizer {
     // First, try raw strategy
     const rawContext = this.rawSummarizer.summarizeMessages(messages);
     
-    // Calculate total content length
     const totalLength = this.calculateTotalLength(rawContext);
     
-    // If within limits, return raw context
-    if (totalLength <= this.TOKEN_LIMIT) {
+    if (totalLength <= this.LENGTH_LIMIT) {
       console.log(`[HybridMessageSummarizer] Using raw strategy (${totalLength} chars)`);
       return rawContext;
     }
     
-    // If exceeds limits, fall back to tiered strategy
     console.log(`[HybridMessageSummarizer] Raw strategy exceeds limit (${totalLength} chars), switching to tiered strategy`);
     const tieredContext = this.tieredSummarizer.summarizeMessages(messages);
     
-    // Log the tiered strategy result length for comparison
     const tieredLength = this.calculateTotalLength(tieredContext);
     console.log(`[HybridMessageSummarizer] Tiered strategy result: ${tieredLength} chars`);
     
     return tieredContext;
   }
   
-  /**
-   * Calculate total character length of all context items
-   */
   private calculateTotalLength(contextItems: ContextItem[]): number {
-    return contextItems.reduce((total, item) => {
-      return total + (item.value?.length || 0);
-    }, 0);
+    return contextItems.reduce((total, item) => total + (item.value?.length || 0), 0);
   }
   
   /**
@@ -75,7 +65,7 @@ export class HybridMessageSummarizer implements MessageSummarizer {
     
     const rawLength = this.calculateTotalLength(rawContext);
     const tieredLength = this.calculateTotalLength(tieredContext);
-    const withinLimit = rawLength <= this.TOKEN_LIMIT;
+    const withinLimit = rawLength <= this.LENGTH_LIMIT;
     const strategyUsed = withinLimit ? 'raw' : 'tiered';
     
     return {

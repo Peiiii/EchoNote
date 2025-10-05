@@ -1,22 +1,19 @@
-import { encodingForModel } from 'js-tiktoken';
 import type { Message } from "@/core/stores/notes-data.store";
 import type { ContextItem, MessageSummarizer } from "../types/message-summarizer.types";
 
 export class TieredMessageSummarizer implements MessageSummarizer {
-  private encoder = encodingForModel('gpt-4');
   
-  // Character limits for different tiers
   private readonly TIER_LIMITS = {
-    latest: 20000,    // Latest message (full content)
-    recent: 2000,     // Messages 2-5
-    historical: 200,  // Messages 6-30
-    archive: 30,      // Messages 31+
+    latest: 20000,
+    recent: 2000,
+    historical: 200,
+    archive: 30,
   } as const;
   
-  private readonly MAX_TOKENS = 50000;
+  private readonly MAX_LENGTH = 200000;
 
-  summarizeMessages(messages: Message[], maxTokens?: number): ContextItem[] {
-    const tokenLimit = maxTokens || this.MAX_TOKENS;
+  summarizeMessages(messages: Message[], maxLength?: number): ContextItem[] {
+    const _lengthLimit = maxLength || this.MAX_LENGTH;
     const userMessages = messages.filter(msg => msg.sender === 'user');
     
     if (userMessages.length === 0) {
@@ -30,7 +27,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     const tieredMessages = this.groupMessagesByTier(userMessages);
     
     // Build JSON context
-    const jsonContext = this.buildContextJSON(tieredMessages, tokenLimit);
+    const jsonContext = this.buildContextJSON(tieredMessages, _lengthLimit);
     
     return [{
       description: 'User Notes Context (Structured)',
@@ -93,7 +90,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     description: string;
     items: Message[];
     charLimit: number;
-  }>, tokenLimit: number): Record<string, unknown> {
+  }>, lengthLimit: number): Record<string, unknown> {
     const allMessages = messageGroups.flatMap(group => group.items);
     if (allMessages.length === 0) {
       return { 
@@ -107,7 +104,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
       sampling_rules: this.getSamplingRulesDescription(),
       groups: []
     };
-    let totalTokens = 0;
+    let totalLength = 0;
     let processedCount = 0;
 
     // Process groups in priority order
@@ -115,11 +112,11 @@ export class TieredMessageSummarizer implements MessageSummarizer {
       if (group.items.length === 0) continue;
 
       const groupData = this.buildGroupJSON(group);
-      const groupTokens = this.countTokens(JSON.stringify(groupData));
+      const groupLength = this.getTextLength(JSON.stringify(groupData));
       
-      if (totalTokens + groupTokens <= tokenLimit) {
+      if (totalLength + groupLength <= lengthLimit) {
         (context.groups as Record<string, unknown>[]).push(groupData);
-        totalTokens += groupTokens;
+        totalLength += groupLength;
         processedCount += group.items.length;
       } else {
         break;
@@ -205,8 +202,8 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     return `${startPart}${separator}${endPart}`;
   }
 
-  private countTokens(text: string): number {
-    return this.encoder.encode(text).length;
+  private getTextLength(text: string): number {
+    return text?.length || 0;
   }
 
   private getSamplingRulesDescription(): string {
@@ -266,7 +263,7 @@ Groups are processed in priority order (1 → 2-5 → 6-30 → 31+) until token 
       try {
         const parsed = JSON.parse(result[0].value);
         console.log('📋 Parsed JSON:', parsed);
-        console.log('📏 Token Count:', this.countTokens(result[0].value));
+        console.log('📏 Length:', this.getTextLength(result[0].value));
         console.log('📐 Character Count:', result[0].value.length);
       } catch (e) {
         console.error('❌ Failed to parse JSON:', e);
