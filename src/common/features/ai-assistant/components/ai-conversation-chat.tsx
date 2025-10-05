@@ -1,3 +1,6 @@
+
+
+
 import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
@@ -12,7 +15,7 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
-import { contextDataCache } from "@/common/features/ai-assistant/features/context/services/context-data-cache";
+import { contextDataCache } from "@/common/features/ai-assistant/features/context";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();

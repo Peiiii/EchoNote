@@ -1,8 +1,7 @@
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { IAgent } from "@agent-labs/agent-chat";
 import { channelToolsManager } from "./channel-tools-manager";
-import { channelContextManager } from "@/common/features/ai-assistant/features/context/services/channel-context-manager";
-import { sessionContextManager } from "@/common/features/ai-assistant/features/context/services/session-context-manager";
+import { channelContextManager, sessionContextManager } from "@/common/features/ai-assistant/features/context";
 import { ModelConfig, getDefaultModel } from "../config/model-config";
 import { useModelSelectionStore } from "../stores/model-selection.store";
 

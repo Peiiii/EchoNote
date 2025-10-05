@@ -6,7 +6,7 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { AIConversation } from "@/common/types/ai-conversation";
 import { ArrowLeft, Loader2, MessageSquare, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
-import { ConversationContextControl } from "@/common/features/ai-assistant/features/context/components/conversation-context-control";
+import { ConversationContextControl } from "@/common/features/ai-assistant/features/context";
 // removed: creation-time context dropdown; we now use in-chat context control
 
 export type MobileConversationRef = {
