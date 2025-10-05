@@ -53,7 +53,7 @@ export const MessageTimelineFeature = ({
                 channel={currentChannel || undefined}
                 onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
                 content={
-                    <div className="flex flex-col min-h-0 relative">
+                    <div className="flex flex-1 flex-col min-h-0 relative">
                         <TimelineContent
                             ref={timelineContentRef}
                             renderThoughtRecord={renderThoughtRecord}
