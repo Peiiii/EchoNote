@@ -3,6 +3,7 @@ import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-me
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 import { MessageInputProps } from "../types";
 
 export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
@@ -41,8 +42,8 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
         setMessage("");
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && isModifierKeyPressed(e)) {
             e.preventDefault();
             handleSend();
         }
@@ -60,8 +61,8 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
     }, [message]);
 
     const placeholder = replyToMessage 
-        ? "Reply to this message... (Enter to send, Shift+Enter for new line)"
-        : "Record your thoughts... (Enter to send, Shift+Enter for new line)";
+        ? `Reply to this message... (${SHORTCUTS.SEND} to send, Enter for new line)`
+        : `Record your thoughts... (${SHORTCUTS.SEND} to send, Enter for new line)`;
 
     return {
         message,
@@ -69,7 +70,7 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
         replyToMessage,
         isAddingMessage,
         handleSend,
-        handleKeyPress,
+        handleKeyDown,
         handleMessageChange,
         placeholder,
         currentChannelId

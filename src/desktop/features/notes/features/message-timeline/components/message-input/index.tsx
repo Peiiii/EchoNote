@@ -12,7 +12,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
         replyToMessage,
         isAddingMessage,
         handleSend,
-        handleKeyPress,
+        handleKeyDown,
         handleMessageChange,
         placeholder
     } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
@@ -32,7 +32,7 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
                 <InputArea
                     message={message}
                     onMessageChange={handleMessageChange}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     disabled={isAddingMessage}
                     textareaRef={textareaRef}

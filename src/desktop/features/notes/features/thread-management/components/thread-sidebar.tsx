@@ -1,6 +1,7 @@
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { Bot, ChevronDown, ChevronUp, MessageCircle, Send, User, X } from "lucide-react";
 import { useState } from "react";
+import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 
 interface ThreadSidebarProps {
     isOpen: boolean;
@@ -34,8 +35,8 @@ export const ThreadSidebar = ({
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && isModifierKeyPressed(e)) {
             e.preventDefault();
             handleSend();
         }
@@ -159,8 +160,8 @@ export const ThreadSidebar = ({
                         <textarea
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            placeholder="Add to the discussion..."
+                            onKeyDown={handleKeyDown}
+                            placeholder={`Add to the discussion... (${SHORTCUTS.SEND} to send)`}
                             className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder:text-slate-500 resize-none focus:outline-none  focus:border-transparent"
                             rows={2}
                         />

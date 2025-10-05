@@ -22,7 +22,7 @@ export interface ReplyIndicatorProps {
 export interface InputAreaProps {
     message: string;
     onMessageChange: (message: string) => void;
-    onKeyPress: (e: React.KeyboardEvent) => void;
+    onKeyDown: (e: React.KeyboardEvent) => void;
     placeholder: string;
     disabled: boolean;
     textareaRef: React.RefObject<HTMLTextAreaElement | null>;

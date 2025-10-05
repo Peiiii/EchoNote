@@ -3,7 +3,7 @@ import { InputAreaProps } from "../types";
 export function InputArea({ 
     message, 
     onMessageChange, 
-    onKeyPress, 
+    onKeyDown, 
     placeholder, 
     disabled, 
     textareaRef 
@@ -16,7 +16,7 @@ export function InputArea({
                         ref={textareaRef}
                         value={message}
                         onChange={(e) => onMessageChange(e.target.value)}
-                        onKeyPress={onKeyPress}
+                        onKeyDown={onKeyDown}
                         placeholder={placeholder}
                         className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
                         disabled={disabled}

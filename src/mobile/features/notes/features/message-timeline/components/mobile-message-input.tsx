@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
 import { Send } from "lucide-react";
 import { cn } from "@/common/lib/utils";
+import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 
 interface MobileMessageInputProps {
     onSend: (message: string) => void;
@@ -42,7 +43,7 @@ export const MobileMessageInput = ({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === "Enter" && isModifierKeyPressed(e)) {
             e.preventDefault();
             handleSend();
         }
@@ -78,7 +79,7 @@ export const MobileMessageInput = ({
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="What's on your mind?"
+                        placeholder={`What's on your mind? (${SHORTCUTS.SEND} to send)`}
                         className="min-h-[52px] max-h-[120px] resize-none rounded-2xl border border-border/50 dark:border-border/50 bg-background/90 backdrop-blur-sm shadow-none focus:shadow-none focus:outline-none transition-all duration-200 pl-4 pr-12 py-3 text-base"
                         rows={1}
                     />

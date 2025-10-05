@@ -4,6 +4,7 @@ import { Check, X, Loader2, Maximize2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { cn } from "@/common/lib/utils";
 import { useEditor } from "@/common/hooks/use-editor";
+import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 
 interface InlineEditorProps {
   content: string;
@@ -67,7 +68,7 @@ export function InlineEditor({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       handleCancel();
-    } else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    } else if (e.key === "Enter" && isModifierKeyPressed(e)) {
       handleSave();
     }
     // Tab handling is now managed by useEditor hook
@@ -96,11 +97,11 @@ export function InlineEditor({
         {/* Left side - Keyboard shortcuts hint */}
         <div className="text-xs text-slate-500 dark:text-slate-400">
           <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700">
-            ⌘+Enter
+            {SHORTCUTS.SAVE}
           </kbd>
           <span className="ml-2">to save,</span>
           <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700 ml-2">
-            Esc
+            {SHORTCUTS.CANCEL}
           </kbd>
           <span className="ml-2">to cancel</span>
         </div>
