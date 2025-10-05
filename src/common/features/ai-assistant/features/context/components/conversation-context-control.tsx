@@ -6,8 +6,8 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { contextDataCache } from "@/common/features/ai-assistant/services/context-data-cache";
-import { useContextStatusStore } from "@/common/features/ai-assistant/stores/context-status.store";
+import { contextDataCache } from "../services/context-data-cache";
+import { useContextStatusStore } from "../stores/context-status.store";
 import { cn } from "@/common/lib/utils";
 import { Ban, Check, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 

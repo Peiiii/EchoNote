@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { contextDataCache } from "@/common/features/ai-assistant/services/context-data-cache";
+import { contextDataCache } from "../services/context-data-cache";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';

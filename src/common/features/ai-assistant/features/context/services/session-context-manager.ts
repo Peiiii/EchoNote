@@ -1,5 +1,5 @@
 import { channelContextManager } from "./channel-context-manager";
-import { useConversationStore } from "../stores/conversation.store";
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { contextDataCache } from "./context-data-cache";
 
 export class SessionContextManager {

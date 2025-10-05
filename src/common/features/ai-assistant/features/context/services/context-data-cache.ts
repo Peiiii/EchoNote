@@ -2,7 +2,7 @@ import { firebaseNotesService } from "@/common/services/firebase/firebase-notes.
 import type { Message, Channel } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
-type ChannelContextSnapshot = {
+export type ChannelContextSnapshot = {
   channel?: Channel | null;
   messages: Message[];
   lastFetched: number;

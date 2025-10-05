@@ -12,7 +12,7 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
-import { contextDataCache } from "../services/context-data-cache";
+import { contextDataCache } from "@/common/features/ai-assistant/features/context/services/context-data-cache";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();

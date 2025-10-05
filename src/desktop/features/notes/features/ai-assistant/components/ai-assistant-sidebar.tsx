@@ -5,7 +5,7 @@ import { Plus, MessageSquare, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
 import { useRef } from "react";
-import { ConversationContextControl } from "@/common/features/ai-assistant/components/conversation-context-control";
+import { ConversationContextControl } from "@/common/features/ai-assistant/features/context/components/conversation-context-control";
 // removed: creation-time context dropdown; we now use in-chat context control
 
 interface AIAssistantSidebarProps {
