@@ -42,7 +42,7 @@ export const useChannelMessages = ({
     }, []);
     useEffect(() => {
         if (currentChannelId) {
-            channelMessageService.requestLoadInitialMessages$.next(currentChannelId);
+            channelMessageService.requestLoadInitialMessages$.next({ channelId: currentChannelId });
         }
     }, [currentChannelId]);
 

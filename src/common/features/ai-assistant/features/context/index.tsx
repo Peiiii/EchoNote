@@ -1,8 +1,8 @@
 // Context Feature - AI Assistant Context Management
-// This sub-feature provides context data management, caching, and UI controls for AI conversations
+// This sub-feature provides context data management and UI controls for AI conversations
+// Now uses ChannelMessageService for data management instead of separate cache
 
 // Services - Core context management services
-export { contextDataCache } from './services/context-data-cache';
 export { channelContextManager } from './services/channel-context-manager';
 export { sessionContextManager } from './services/session-context-manager';
 

@@ -15,7 +15,7 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
-import { contextDataCache } from "@/common/features/ai-assistant/features/context";
+import { channelMessageService } from "@/core/services/channel-message.service";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
@@ -95,16 +95,29 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     return () => sub.unsubscribe();
   }, [agentSessionManager]);
 
-  // Prefetch context data for current tool channel and explicit contexts (to improve first response quality)
+  // Trigger loading for context data for current tool channel and explicit contexts (to improve first response quality)
   useEffect(() => {
-    void contextDataCache.ensureFetched(toolChannelId);
-    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds) {
-      conv.contexts.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
+    const channelState = channelMessageService.dataContainer.get().messageByChannel[toolChannelId];
+    if (!channelState) {
+      channelMessageService.requestLoadInitialMessages$.next({ channelId: toolChannelId });
     }
+    
+    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds) {
+      conv.contexts.channelIds.forEach(id => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
+        }
+      });
+    }
+    
     if (conv?.contexts?.mode === 'all') {
-      void contextDataCache.ensureAllMetas().then(() => {
-        const ids = contextDataCache.getAllIdsSnapshot();
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
+      const { channels } = useNotesDataStore.getState();
+      channels.forEach(channel => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
+        }
       });
     }
   }, [toolChannelId, conv?.contexts]);

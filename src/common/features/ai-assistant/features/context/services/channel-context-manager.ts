@@ -1,4 +1,5 @@
-import { contextDataCache } from "./context-data-cache";
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 /**
  * Generate system instructions for AI Assistant
@@ -67,11 +68,13 @@ export class ChannelContextManager {
     description: string;
     value: string;
   }> {
-    const snap = contextDataCache.getSnapshot(channelId);
-    const channel = snap.channel;
-    const messages = snap.messages || [];
+    const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
+    const { channels } = useNotesDataStore.getState();
+    const channel = channels.find(c => c.id === channelId);
+    const messages = channelState?.messages || [];
+    
     if (!channel) {
-      // still loading; return minimal payload but kick off fetch happened in getSnapshot
+      // still loading; return minimal payload
       return [{
         description: 'Channel Context',
         value: JSON.stringify({
@@ -81,16 +84,20 @@ export class ChannelContextManager {
         })
       }];
     }
+    
+    // Filter to only user messages for context
+    const userMessages = messages.filter(msg => msg.sender === 'user');
+    
     return [
       {
         description: 'System Instructions',
         value: JSON.stringify({
-          instructions: generateSystemInstructions(channel.name, messages.length, channelId)
+          instructions: generateSystemInstructions(channel.name, userMessages.length, channelId)
         })
       },
       {
         description: `User's thoughts/notes in the channel`,
-        value: JSON.stringify(messages.map(msg => ({
+        value: JSON.stringify(userMessages.map(msg => ({
           id: msg.id,
           content: msg.content,
           timestamp: msg.timestamp.toISOString(),

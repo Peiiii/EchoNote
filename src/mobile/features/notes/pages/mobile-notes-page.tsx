@@ -103,7 +103,7 @@ function useMobileJumpToMessage() {
           const MAX_WAIT_MS = 8000;
           const startedAt = Date.now();
           let loadAttempts = 0;
-          channelMessageService.requestLoadInitialMessages$.next(channelId);
+          channelMessageService.requestLoadInitialMessages$.next({ channelId });
           while (Date.now() - startedAt < MAX_WAIT_MS) {
             if (tryScroll()) return;
             const state = channelMessageService.dataContainer.get().messageByChannel[channelId];

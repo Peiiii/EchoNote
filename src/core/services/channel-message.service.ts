@@ -4,7 +4,7 @@ import { Message, useNotesDataStore } from '@/core/stores/notes-data.store';
 import { useNotesViewStore } from '@/core/stores/notes-view.store';
 import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { createDataContainer, createSlice } from 'rx-nested-bean';
-import { distinctUntilChanged, filter, ReplaySubject, switchMap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, of, ReplaySubject, switchMap } from 'rxjs';
 import { v4 } from 'uuid';
 
 const withOptimisticUpdate = async (
@@ -33,27 +33,51 @@ export type ChannelState = {
     };
 }
 
+export type LoadInitialMessagesRequest = {
+    channelId: string;
+    messageLimit?: number; // Optional, defaults to 20 if not provided
+}
+
 export class ChannelMessageService {
 
     moreMessageLoadedEvent$ = new RxEvent<{ channelId: string, messages: Message[] }>();
 
-    requestLoadInitialMessages$ = new ReplaySubject<string>(1);
+    /**
+     * Request to load initial messages for a channel
+     * @param request.channelId - The channel ID to load messages for
+     * @param request.messageLimit - Optional message limit (defaults to 20)
+     * 
+     * Usage examples:
+     * - channelMessageService.requestLoadInitialMessages$.next({ channelId: "channel-123" })
+     * - channelMessageService.requestLoadInitialMessages$.next({ channelId: "channel-123", messageLimit: 50 })
+     */
+    requestLoadInitialMessages$ = new ReplaySubject<LoadInitialMessagesRequest>(1);
 
     dataContainer = createDataContainer<{
         messageByChannel: Record<string, ChannelState>;
     }>({
-        messageByChannel: {}
+        messageByChannel: {},
     });
 
     handleRequestWorkflow$ = this.requestLoadInitialMessages$.pipe(
-        distinctUntilChanged(),
-        filter(cId => !this.dataContainer.get().messageByChannel[cId]),
-        switchMap(cId => this.loadInitialMessages({ channelId: cId, messagesLimit: 20 }))
+        distinctUntilChanged((prev, curr) => prev.channelId === curr.channelId),
+        filter(request => !this.dataContainer.get().messageByChannel[request.channelId]),
+        switchMap(request => this.loadInitialMessages({ 
+            channelId: request.channelId, 
+            messagesLimit: request.messageLimit || 20 
+        }))
     )
 
     connectToRequestWorkflow = () => {
         const subscription = this.handleRequestWorkflow$.subscribe();
         return () => subscription.unsubscribe();
+    }
+
+    getIsAnyChannelLoading$ = (channelIds: string[]) => {
+        if (!channelIds.length) return of(false);
+        return combineLatest(channelIds.map(cId => createSlice(this.dataContainer, `messageByChannel.${cId}.loading`).$)).pipe(
+            map(loadings => loadings.some(loading => loading))
+        );
     }
 
     getChannelStateControl = (channelId: string) => {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { contextDataCache } from "../services/context-data-cache";
+import { channelMessageService } from "@/core/services/channel-message.service";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
 interface UseConversationContextDraftProps {
@@ -73,14 +73,22 @@ export function useConversationContextDraft({
 
     await updateConversation(userId, conv.id, { contexts: next });
 
-    // Prefetch contexts after apply
+    // Trigger loading for contexts after apply
     if (next?.mode === 'channels' && next.channelIds) {
-      next.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
+      next.channelIds.forEach(id => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
+        }
+      });
     }
     if (next?.mode === 'all') {
-      void contextDataCache.ensureAllMetas().then(() => {
-        const ids = contextDataCache.getAllIdsSnapshot();
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
+      const { channels } = useNotesDataStore.getState();
+      channels.forEach(channel => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
+        }
       });
     }
   }, [userId, conv, draftMode, draftChannelIds, fallbackChannelId, onActiveToolChannelChange, activeToolChannelId, updateConversation]);

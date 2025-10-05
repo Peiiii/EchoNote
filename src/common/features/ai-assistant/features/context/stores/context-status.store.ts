@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import { contextDataCache } from "../services/context-data-cache";
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
 
 export interface ChannelStatus {
   status: Status;
-  lastFetched?: number;
   messageCount?: number;
   channelName?: string;
 }
@@ -36,23 +36,26 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
   observeSession: ({ conversationId, mode, channelIds, fallbackChannelId }) => {
     // Determine target IDs
     let ids: string[] = [];
-    let topUnsub: (() => void) | null = null;
 
-    const updateFromCache = () => {
+    const updateFromChannelService = () => {
       const current = get().sessions[conversationId];
       const byChannel: Record<string, ChannelStatus> = { ...(current?.byChannel || {}) };
+      const channelStates = channelMessageService.dataContainer.get().messageByChannel;
+      const { channels } = useNotesDataStore.getState();
+      
       for (const id of ids) {
-        const snap = contextDataCache.getSnapshot(id);
-        // Consider a channel as ready when it has been fetched at least once (lastFetched > 0),
-        // regardless of message count (empty channel is still valid and "ready").
-        const isReady = !snap.fetching && snap.lastFetched > 0;
+        const channelState = channelStates[id];
+        const channel = channels.find(c => c.id === id);
+        
+        // Consider a channel as ready when it has messages loaded (not loading)
+        const isReady = channelState && !channelState.loading && channelState.messages.length >= 0;
         byChannel[id] = {
           status: isReady ? 'ready' : 'loading',
-          lastFetched: snap.lastFetched,
-          messageCount: snap.messages?.length,
-          channelName: snap.channel?.name,
+          messageCount: channelState?.messages?.length || 0,
+          channelName: channel?.name,
         };
       }
+      
       set(s => ({
         sessions: {
           ...s.sessions,
@@ -61,7 +64,7 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
             channelIds: channelIds || [],
             resolvedChannelIds: ids,
             byChannel,
-            // In 'all' mode, only mark 'ready' when all channels are fetched at least once
+            // In 'all' mode, only mark 'ready' when all channels are loaded
             topStatus: mode === 'all'
               ? (ids.length && ids.every(id => byChannel[id]?.status === 'ready') ? 'ready' : 'loading')
               : 'idle',
@@ -77,28 +80,34 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
     } else if (mode === 'channels') {
       ids = (channelIds && channelIds.length ? channelIds : [fallbackChannelId]);
     } else {
-      // all: use the full index so status reflects truly all channels
-      ids = contextDataCache.getAllIdsSnapshot();
-      contextDataCache.ensureAllMetas().then(() => {
-        ids = contextDataCache.getAllIdsSnapshot();
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
-        updateFromCache();
-      });
-      topUnsub = contextDataCache.onAllMetasUpdate(() => updateFromCache());
+      // all: use all channels from notes data store
+      const { channels } = useNotesDataStore.getState();
+      ids = channels.map(c => c.id);
     }
 
-    // Prefetch and subscribe per-channel updates
+    // Trigger loading for channels that need it
+    ids.forEach(id => {
+      const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
+      if (!channelState) {
+        // Request loading if not already loaded
+        channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
+      }
+    });
+
+    // Subscribe to channel loading state changes
     const unsubs: Array<() => void> = [];
     ids.forEach(id => {
-      void contextDataCache.ensureFetched(id);
-      const off = contextDataCache.onChannelUpdate(id, () => updateFromCache());
-      unsubs.push(off);
+      // Use ChannelMessageService's loading state observation
+      const loadingState$ = channelMessageService.getIsAnyChannelLoading$([id]);
+      const sub = loadingState$.subscribe(() => updateFromChannelService());
+      unsubs.push(() => sub.unsubscribe());
     });
-    updateFromCache();
+
+    // Initial update
+    updateFromChannelService();
 
     return () => {
       unsubs.forEach(fn => fn());
-      if (topUnsub) topUnsub();
     };
   },
 }));

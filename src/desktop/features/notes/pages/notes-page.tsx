@@ -154,7 +154,7 @@ export function NotesPage() {
                     let loadMoreAttempts = 0;
 
                     // Ensure initial messages requested for this channel
-                    channelMessageService.requestLoadInitialMessages$.next(channelId);
+                    channelMessageService.requestLoadInitialMessages$.next({ channelId });
 
                     // Loop: try find → load more if possible → wait → retry
                     while (Date.now() - startedAt < MAX_WAIT_MS) {

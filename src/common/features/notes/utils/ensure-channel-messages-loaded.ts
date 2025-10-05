@@ -19,7 +19,7 @@ export async function ensureChannelMessagesLoaded(channelId: string, opts?: { ti
 
   // Trigger load if missing
   if (!state) {
-    channelMessageService.requestLoadInitialMessages$.next(channelId);
+    channelMessageService.requestLoadInitialMessages$.next({ channelId });
   }
 
   const started = Date.now();

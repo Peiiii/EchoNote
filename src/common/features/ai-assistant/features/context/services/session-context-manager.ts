@@ -1,6 +1,7 @@
 import { channelContextManager } from "./channel-context-manager";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { contextDataCache } from "./context-data-cache";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { channelMessageService } from "@/core/services/channel-message.service";
 
 export class SessionContextManager {
   /**
@@ -30,43 +31,37 @@ export class SessionContextManager {
     }
 
     // mode === 'all'
-    // Architecture-level improvement:
-    // - Build a global channels index so the agent "knows" all channels up-front
-    // - Prefetch all channel contexts progressively (concurrency-limited) without blocking
-    // - Return a blended context: global index + a few hydrated channels for immediate quality
-
-    const metas = contextDataCache.getAllMetasSnapshot();
-    if (metas.length === 0) {
-      // Kick off background fetch of the full index and then hydrate
-      void contextDataCache.ensureAllMetas().then(() => {
-        void contextDataCache.prefetchAllChannelsMessages(4);
-      });
-      // Fallback to current channel context while global index hydrates
-      return channelContextManager.getChannelContext(fallbackChannelId);
-    }
-
-    // Start progressive hydration in background
-    void contextDataCache.prefetchAllChannelsMessages(4);
+    // Use all channels from notes data store and trigger loading for them
+    const { channels } = useNotesDataStore.getState();
+    const channelStates = channelMessageService.dataContainer.get().messageByChannel;
+    
+    // Trigger loading for all channels that haven't been loaded yet
+    channels.forEach(channel => {
+      if (!channelStates[channel.id]) {
+        channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
+      }
+    });
 
     // Provide a compact global index so the agent is aware of all channels immediately
-    const index = metas.map(m => ({ id: m.id, name: m.name, messageCount: m.messageCount }));
+    const index = channels.map(c => ({ id: c.id, name: c.name, messageCount: c.messageCount }));
     const indexContext = [{
       description: 'Available Channels Index',
-      value: JSON.stringify({ total: metas.length, channels: index })
+      value: JSON.stringify({ total: channels.length, channels: index })
     }];
 
-    // Include detailed context for channels that have been fetched at least once.
-    // Order by last active first (metas is already sorted that way in cache).
-    const readyIds = metas
-      .map(m => m.id)
+    // Include detailed context for channels that have been loaded
+    const readyIds = channels
+      .map(c => c.id)
       .filter(id => {
-        const snap = contextDataCache.getSnapshot(id);
-        return !snap.fetching && snap.lastFetched > 0; // fetched at least once
+        const channelState = channelStates[id];
+        return channelState && !channelState.loading; // loaded and not currently loading
       });
+      
     if (readyIds.length === 0) {
-      // No hydrated channels yet; return index + fallback channel so the model has some concrete context
+      // No loaded channels yet; return index + fallback channel so the model has some concrete context
       return [...indexContext, ...channelContextManager.getChannelContext(fallbackChannelId)];
     }
+    
     const detailed = readyIds.flatMap(id => channelContextManager.getChannelContext(id));
     return [...indexContext, ...detailed];
   }
