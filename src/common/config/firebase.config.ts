@@ -24,7 +24,7 @@ export const db = initializeFirestore(app, {
   experimentalForceLongPolling: false, // 另一个可配置项
 });
 // connectFirestoreEmulator(db, 'firebase-api.agentverce.cc', 443);
-connectAuthEmulator(_auth, 'http://firebase-auth-api.agentverse.cc', {
+connectAuthEmulator(_auth, 'https://firebase-auth-api.agentverse.cc', {
   disableWarnings: true
 }); // 确保是正确的 agentverse.cc
 
