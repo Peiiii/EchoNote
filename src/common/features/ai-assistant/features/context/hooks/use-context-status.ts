@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { sessionContextManager } from "../services/session-context-manager";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
@@ -56,18 +57,10 @@ export function useContextStatus({
   const channelStates = channelMessageService.dataContainer.use();
   const { channels } = useNotesDataStore();
 
-  // Trigger loading for channels that need it
+  // Trigger loading for channels that need it using centralized method
   useEffect(() => {
-    const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;
-    const channelIds = getChannelIds(mode, contexts, fallbackChannelId, channels);
-    
-    channelIds.forEach(id => {
-      const channelState = channelStates.messageByChannel[id];
-      if (!channelState) {
-        channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
-      }
-    });
-  }, [conversationId, fallbackChannelId, contexts, channels, channelStates]);
+    sessionContextManager.ensureContextsLoaded(contexts || null, fallbackChannelId);
+  }, [conversationId, fallbackChannelId, contexts]);
 
   const { anyLoading, tooltip } = useMemo(() => {
     const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;

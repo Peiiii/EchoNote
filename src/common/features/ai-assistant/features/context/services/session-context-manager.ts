@@ -2,9 +2,46 @@ import { channelContextManager } from "./channel-context-manager";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { ConversationContextMode } from "@/common/types/ai-conversation";
+import { ConversationContextMode, type ConversationContextConfig } from "@/common/types/ai-conversation";
 
 export class SessionContextManager {
+  /**
+   * Ensure that all channels required for the given context configuration are loaded.
+   * This method triggers loading for channels that haven't been loaded yet.
+   */
+  ensureContextsLoaded(contexts: ConversationContextConfig | null, fallbackChannelId: string) {
+    if (!contexts) {
+      // Auto mode: ensure fallback channel is loaded
+      const channelState = channelMessageService.dataContainer.get().messageByChannel[fallbackChannelId];
+      if (!channelState) {
+        channelMessageService.requestLoadInitialMessages$.next({ channelId: fallbackChannelId });
+      }
+      return;
+    }
+
+    const { mode, channelIds } = contexts;
+    
+    if (mode === ConversationContextMode.CHANNELS && channelIds) {
+      // Load specific channels
+      channelIds.forEach(id => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
+        }
+      });
+    } else if (mode === ConversationContextMode.ALL) {
+      // Load all channels
+      const { channels } = useNotesDataStore.getState();
+      channels.forEach(channel => {
+        const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
+        if (!channelState) {
+          channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
+        }
+      });
+    }
+    // NONE mode doesn't require any channel loading
+  }
+
   /**
    * Get conversation-scoped contexts. Fallback to a provided channel when no explicit contexts are set.
    */

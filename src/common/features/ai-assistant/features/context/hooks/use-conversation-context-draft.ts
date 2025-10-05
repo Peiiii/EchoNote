@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { channelMessageService } from "@/core/services/channel-message.service";
+import { sessionContextManager } from "../services/session-context-manager";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
@@ -74,24 +74,8 @@ export function useConversationContextDraft({
 
     await updateConversation(userId, conv.id, { contexts: next });
 
-    // Trigger loading for contexts after apply
-    if (next?.mode === ConversationContextMode.CHANNELS && next.channelIds) {
-      next.channelIds.forEach(id => {
-        const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
-        if (!channelState) {
-          channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
-        }
-      });
-    }
-    if (next?.mode === ConversationContextMode.ALL) {
-      const { channels } = useNotesDataStore.getState();
-      channels.forEach(channel => {
-        const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
-        if (!channelState) {
-          channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
-        }
-      });
-    }
+    // Trigger loading for contexts after apply using centralized method
+    sessionContextManager.ensureContextsLoaded(next, fallbackChannelId);
   }, [userId, conv, draftMode, draftChannelIds, fallbackChannelId, onActiveToolChannelChange, activeToolChannelId, updateConversation]);
 
   return {
