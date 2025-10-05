@@ -8,10 +8,12 @@ export { UpdateNoteToolRenderer } from './renderers/update-note-tool-renderer';
 export { DeleteNoteToolRenderer } from './renderers/delete-note-tool-renderer';
 export { ReadNoteToolRenderer } from './renderers/read-note-tool-renderer';
 export { ListNotesToolRenderer } from './renderers/list-notes-tool-renderer';
+export { GrepToolRenderer } from './renderers/grep-tool-renderer';
 
 // Types
 export type { NoteContentProps } from './components/note-content';
 export type { NoteListItemProps } from './components/note-list-item';
 export type { NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from './renderers/list-notes-tool-renderer';
+export type { GrepToolArgs, GrepToolResult } from './renderers/grep-tool-renderer';
 export type { ReadNoteRenderProps, ReadNoteRenderArgs, ReadNoteRenderResult } from './types';
 export type { InteractiveToolProps } from './types';

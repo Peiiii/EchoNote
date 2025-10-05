@@ -1,5 +1,6 @@
 import { CreateNoteToolRenderer, DeleteNoteToolRenderer, ReadNoteToolRenderer, UpdateNoteToolRenderer } from "@/common/features/notes/components/tools/interactive-note-tools.ui";
 import { createListNotesTool } from "@/common/features/notes/components/tools/list-notes-tool-factory";
+import { createGrepTool } from "@/common/features/notes/components/tools/grep-tool-factory";
 import { ReadNoteRenderArgs, ReadNoteRenderResult } from "@/common/features/agent-tools/types";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { ensureChannelMessagesLoaded } from "@/common/features/notes/utils/ensure-channel-messages-loaded";
@@ -17,7 +18,8 @@ export class ChannelToolsManager {
             this.readNoteTool(),
             this.updateNoteTool(),
             this.deleteNoteTool(),
-            this.listNotesTool()
+            this.listNotesTool(),
+            this.grepNotesTool()
         ];
         console.log("🔔 [ChannelToolsManager][getChannelTools] created tools:", tools.map(t => ({ name: t.name, description: t.description })));
         return tools;
@@ -158,6 +160,13 @@ export class ChannelToolsManager {
      */
     private listNotesTool(): Tool {
         return createListNotesTool();
+    }
+
+    /**
+     * Grep-like search across notes (local, grep semantics)
+     */
+    private grepNotesTool(): Tool {
+        return createGrepTool();
     }
 }
 
