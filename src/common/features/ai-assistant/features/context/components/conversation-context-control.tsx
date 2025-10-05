@@ -3,11 +3,12 @@ import { Label } from "@/common/components/ui/label";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { contextDataCache } from "../services/context-data-cache";
-import { useContextStatusStore } from "../stores/context-status.store";
+import { useCallback } from "react";
+import { useConversationContextDraft } from "../hooks/use-conversation-context-draft";
+import { useContextStatus } from "../hooks/use-context-status";
+import { useChannelFiltering } from "../hooks/use-channel-filtering";
+import { useContextDisplay } from "../hooks/use-context-display";
 import { cn } from "@/common/lib/utils";
 import { Ban, Check, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
@@ -21,117 +22,43 @@ interface Props {
 
 export function ConversationContextControl({ conversationId, fallbackChannelId, onActiveToolChannelChange, activeToolChannelId, variant = 'inline' }: Props) {
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
-  const updateConversation = useConversationStore(s => s.updateConversation);
-  const { userId, channels } = useNotesDataStore();
-
-  const [draftMode, setDraftMode] = useState<'auto' | ConversationContextConfig["mode"]>(conv?.contexts ? conv.contexts.mode : 'auto');
-  const [draftChannelIds, setDraftChannelIds] = useState<string[]>(conv?.contexts?.mode === 'channels' ? (conv?.contexts?.channelIds || [fallbackChannelId]) : [fallbackChannelId]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Keep local draft in sync when switching conversations or when contexts updated externally
-  useEffect(() => {
-    setDraftMode(conv?.contexts ? conv.contexts.mode : 'auto');
-    setDraftChannelIds(conv?.contexts?.mode === 'channels' ? (conv?.contexts?.channelIds || [fallbackChannelId]) : [fallbackChannelId]);
-  }, [conversationId, conv?.contexts, fallbackChannelId]);
+  const { channels } = useNotesDataStore();
 
   const getChannelName = useCallback((id: string) => channels.find(ch => ch.id === id)?.name || id, [channels]);
 
-  // Filter and sort channels for better UX
-  const filteredChannels = useMemo(() => {
-    let filtered = channels;
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = channels.filter(ch => 
-        ch.name.toLowerCase().includes(query) || 
-        ch.description?.toLowerCase().includes(query)
-      );
-    }
-    
-    // Sort by: message count (most active first), then alphabetically
-    // Remove selected-first sorting to keep order stable
-    return filtered.sort((a, b) => {
-      // First by message count (most active first)
-      if (a.messageCount !== b.messageCount) {
-        return b.messageCount - a.messageCount;
-      }
-      
-      // Then alphabetically
-      return a.name.localeCompare(b.name);
-    });
-  }, [channels, searchQuery]);
+  // Use custom hooks for different concerns
+  const {
+    draftMode,
+    setDraftMode,
+    draftChannelIds,
+    toggleChannel,
+    apply,
+    isSelectedMode
+  } = useConversationContextDraft({
+    conversationId,
+    fallbackChannelId,
+    onActiveToolChannelChange,
+    activeToolChannelId
+  });
 
-  const label = useMemo(() => {
-    const ctx = conv?.contexts;
-    if (!ctx) return `Auto (${getChannelName(fallbackChannelId)})`;
-    if (ctx.mode === 'none') return 'No Context';
-    if (ctx.mode === 'all') return 'All Channels';
-    const ids = ctx.channelIds || [];
-    if (ids.length === 0) return 'No Context';
-    if (ids.length === 1) return getChannelName(ids[0]);
-    // Only render the first name in the truncated label; we will render +N as a separate badge to avoid truncation hiding it
-    return getChannelName(ids[0]);
-  }, [conv?.contexts, fallbackChannelId, getChannelName]);
+  const { searchQuery, setSearchQuery, filteredChannels } = useChannelFiltering(channels);
 
-  const otherCount = useMemo(() => {
-    const ctx = conv?.contexts;
-    if (!ctx || ctx.mode !== 'channels') return 0;
-    const ids = ctx.channelIds || [];
-    return Math.max(0, ids.length - 1);
-  }, [conv?.contexts]);
+  const { anyLoading, tooltip } = useContextStatus({
+    conversationId,
+    fallbackChannelId,
+    contexts: conv?.contexts,
+    getChannelName
+  });
 
-  // Total count for compact/mobile where no names are shown
-  const totalCount = useMemo(() => {
-    const ctx = conv?.contexts;
-    if (!ctx) return 1; // Auto -> current channel
-    if (ctx.mode === 'none') return 0;
-    if (ctx.mode === 'all') return channels.length;
-    const ids = ctx.channelIds || [];
-    return ids.length;
-  }, [conv?.contexts, channels.length]);
-
-  const isSelectedMode = draftMode === 'channels';
-  const toggleChannel = (id: string) => {
-    // Do not prefetch on draft changes; only fetch after Apply
-    setDraftChannelIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
-  };
+  const { label, otherCount, totalCount } = useContextDisplay({
+    contexts: conv?.contexts,
+    fallbackChannelId,
+    getChannelName,
+    channelsLength: channels.length
+  });
 
 
-  const apply = async () => {
-    if (!userId || !conv) return;
-    if (draftMode === 'auto') {
-      // Clear contexts (store null to unset) so it follows current channel automatically
-      await updateConversation(userId, conv.id, { contexts: null });
-      return;
-    }
-    let next: ConversationContextConfig | undefined;
-    if (draftMode === 'none') {
-      next = { mode: 'none' };
-    } else if (draftMode === 'all') {
-      next = { mode: 'all' };
-    } else {
-      const ids = draftChannelIds.length ? draftChannelIds : [fallbackChannelId];
-      next = { mode: 'channels', channelIds: ids };
-      // If active tool channel not in list, adjust
-      if (onActiveToolChannelChange) {
-        const ensure = (activeToolChannelId && ids.includes(activeToolChannelId)) ? activeToolChannelId : ids[0];
-        onActiveToolChannelChange(ensure);
-      }
-    }
-    await updateConversation(userId, conv.id, { contexts: next });
-    // After apply, prefetch contexts to reflect loading/ready quickly (applied state only)
-    if (next?.mode === 'channels' && next.channelIds) {
-      next.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
-    }
-    if (next?.mode === 'all') {
-      void contextDataCache.ensureAllMetas().then(() => {
-        const ids = contextDataCache.getAllIdsSnapshot();
-        // Progressive hydration; do not block UI
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
-      });
-    }
-  };
+
 
   const containerClass = variant === 'banner'
     ? 'flex items-center gap-2 px-3 py-2 border-b bg-background/60'
@@ -139,41 +66,6 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
       ? 'inline-flex items-center'
       : 'inline-flex items-center gap-1';
 
-  // Observe and compute loading status for status dot
-  const observe = useContextStatusStore(s => s.observeSession);
-  const session = useContextStatusStore(s => s.sessions[conversationId]);
-  useEffect(() => {
-    const mode: 'auto' | 'none' | 'all' | 'channels' = conv?.contexts ? conv.contexts.mode : 'auto';
-    const ids = conv?.contexts?.mode === 'channels' ? (conv.contexts.channelIds || []) : undefined;
-    const off = observe({ conversationId, mode, channelIds: ids, fallbackChannelId });
-    return () => off();
-  }, [conversationId, fallbackChannelId, conv?.contexts, observe]);
-
-  const sessionAnyLoading = useMemo(() => {
-    const s = session;
-    if (!s) return false;
-    // Now that topStatus('all') reflects full hydration (all channels fetched at least once),
-    // a single flag is enough for the status dot.
-    if (s.topStatus === 'loading') return true;
-    return s.resolvedChannelIds.some(id => s.byChannel[id]?.status === 'loading');
-  }, [session]);
-  // Only reflect loading for applied contexts; do not trigger loads or loading UI for drafts
-  const anyLoading = sessionAnyLoading;
-
-  const tooltip = useMemo(() => {
-    const s = session;
-    if (!s) return label;
-    if (s.mode === 'channels') {
-      const parts = s.resolvedChannelIds.map(id => {
-        const st = s.byChannel[id];
-        const name = st?.channelName || getChannelName(id);
-        const stat = st?.status || 'idle';
-        return `${name}(${stat})`;
-      });
-      return parts.join(', ');
-    }
-    return label;
-  }, [session, label, getChannelName]);
 
   return (
     <div className={containerClass}>
@@ -183,7 +75,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             <button
               type="button"
               aria-label={`Context: ${label}`}
-              title={tooltip}
+              title={tooltip || label}
               className="relative h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
             >
               {(() => {
@@ -204,7 +96,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               <span className={"absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full " + (anyLoading ? 'bg-primary animate-pulse' : 'bg-emerald-500')} />
             </button>
           ) : (
-            <button type="button" title={tooltip} className="relative inline-flex items-center gap-2 text-xs px-2 py-1 rounded-sm border hover:bg-accent">
+            <button type="button" title={tooltip || label} className="relative inline-flex items-center gap-2 text-xs px-2 py-1 rounded-sm border hover:bg-accent">
               <span className="text-muted-foreground">Context</span>
               <span className="font-medium text-foreground/90 truncate max-w-[10rem]">{label}</span>
               {otherCount > 0 && (

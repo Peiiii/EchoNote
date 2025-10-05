@@ -9,6 +9,5 @@ export { sessionContextManager } from './services/session-context-manager';
 // Components - Context UI controls
 export { ConversationContextControl } from './components/conversation-context-control';
 
-// Types - Context-related type definitions
-export type { ChannelContextSnapshot } from './services/context-data-cache';
-export type { ContextMode, ConversationContexts, ContextStatus, SessionStatus } from './types/context.types';
+// Note: Hooks and types are kept internal to the context module
+// They are only used within the context feature and not by external consumers
