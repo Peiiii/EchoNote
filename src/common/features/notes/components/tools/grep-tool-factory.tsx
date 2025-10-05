@@ -125,7 +125,7 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
         await localDataManager.updateAll();
       }
       allNotes = await firstValueFrom(localDataManager.getNotes(filters));
-    } catch (e) {
+    } catch (_e) {
       // ignore refresh error
     }
   }

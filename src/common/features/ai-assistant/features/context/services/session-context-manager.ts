@@ -32,16 +32,9 @@ export class SessionContextManager {
     }
 
     // mode === ConversationContextMode.ALL
-    // Use all channels from notes data store and trigger loading for them
+    // Use all channels from notes data store (loading should be triggered by context control)
     const { channels } = useNotesDataStore.getState();
     const channelStates = channelMessageService.dataContainer.get().messageByChannel;
-    
-    // Trigger loading for all channels that haven't been loaded yet
-    channels.forEach(channel => {
-      if (!channelStates[channel.id]) {
-        channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id });
-      }
-    });
 
     // Provide a compact global index so the agent is aware of all channels immediately
     const index = channels.map(c => ({ id: c.id, name: c.name, messageCount: c.messageCount }));
