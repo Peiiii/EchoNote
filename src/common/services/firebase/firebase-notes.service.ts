@@ -67,12 +67,31 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
 
 const docToMessage = (doc: DocumentSnapshot): Message => {
   const data = doc.data()!;
+  
+  // More robust timestamp conversion with logging
+  let timestamp: Date;
+  if (data.timestamp) {
+    if (data.timestamp instanceof Timestamp) {
+      timestamp = data.timestamp.toDate();
+    } else if (data.timestamp.toDate && typeof data.timestamp.toDate === 'function') {
+      timestamp = data.timestamp.toDate();
+    } else if (data.timestamp instanceof Date) {
+      timestamp = data.timestamp;
+    } else {
+      console.warn('Invalid timestamp format in document:', doc.id, data.timestamp);
+      timestamp = new Date();
+    }
+  } else {
+    console.warn('Missing timestamp in document:', doc.id);
+    timestamp = new Date();
+  }
+  
   return {
     id: doc.id,
     content: data.content,
     sender: data.sender,
     channelId: data.channelId,
-    timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
+    timestamp,
     tags: data.tags,
     parentId: data.parentId,
     threadId: data.threadId,

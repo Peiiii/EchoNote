@@ -1,10 +1,12 @@
+import { MessageSummarizer } from "@/common/features/ai-assistant/features/context/types/message-summarizer.types";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { TieredMessageSummarizer } from "./tiered-message-summarizer.strategy";
 
 /**
  * Generate system instructions for AI Assistant
  */
-function generateSystemInstructions(channelName: string, messageCount: number, channelId: string): string {
+export function generateSystemInstructions(channelName: string, messageCount: number, channelId: string): string {
   return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in the channel: ${channelName}
@@ -60,9 +62,13 @@ In every conversation, you should:
 Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
 }
 
+export type SummarizerType = 'tiered' | 'raw';
+
 export class ChannelContextManager {
+  private summarizer: MessageSummarizer = new TieredMessageSummarizer();
+
   /**
-   * Get channel context for AI - provides simple channel data
+   * Get channel context for AI - provides intelligent context with tiered summarization
    */
   getChannelContext(channelId: string): Array<{
     description: string;
@@ -72,7 +78,7 @@ export class ChannelContextManager {
     const { channels } = useNotesDataStore.getState();
     const channel = channels.find(c => c.id === channelId);
     const messages = channelState?.messages || [];
-    
+
     if (!channel) {
       // still loading; return minimal payload
       return [{
@@ -84,10 +90,15 @@ export class ChannelContextManager {
         })
       }];
     }
-    
-    // Filter to only user messages for context
-    const userMessages = messages.filter(msg => msg.sender === 'user');
-    
+
+    // Filter to only user messages for context and sort by timestamp (newest first)
+    const userMessages = messages
+      .filter(msg => msg.sender === 'user')
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+    // Use message summarizer to process messages
+    const contextItems = this.summarizer.summarizeMessages(userMessages);
+
     return [
       {
         description: 'System Instructions',
@@ -95,17 +106,10 @@ export class ChannelContextManager {
           instructions: generateSystemInstructions(channel.name, userMessages.length, channelId)
         })
       },
-      {
-        description: `User's thoughts/notes in the channel`,
-        value: JSON.stringify(userMessages.map(msg => ({
-          id: msg.id,
-          content: msg.content,
-          timestamp: msg.timestamp.toISOString(),
-          sender: msg.sender
-        })))
-      }
+      ...contextItems
     ];
   }
 }
 
+// Default instance with tiered summarization (new behavior)
 export const channelContextManager = new ChannelContextManager();

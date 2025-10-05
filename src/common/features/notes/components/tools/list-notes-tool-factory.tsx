@@ -2,6 +2,7 @@ import { Tool } from '@agent-labs/agent-chat';
 import { ListNotesToolRenderer, NoteForDisplay, ListNotesToolArgs, ListNotesToolResult } from '@/common/features/agent-tools/renderers/list-notes-tool-renderer';
 import { firebaseNotesService } from '@/common/services/firebase/firebase-notes.service';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
+import { formatTimeForSocial } from '@/common/lib/time-utils';
 
 
 // Factory function to create the listNotes tool
@@ -52,7 +53,7 @@ export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResu
                     content: note.content.substring(0, 200) + (note.content.length > 200 ? '...' : ''),
                     contentLength: note.content.length,
                     timestamp: note.timestamp,
-                    timestampReadable: note.timestamp.toLocaleString(),
+                    timestampReadable: formatTimeForSocial(note.timestamp),
                     noteId: note.id,
                 }));
 
