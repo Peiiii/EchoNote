@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import type { ConversationContextConfig } from "@/common/types/ai-conversation";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -13,7 +13,7 @@ export interface ChannelStatus {
 
 interface SessionStatusState {
   sessions: Record<string, {
-    mode: 'auto' | ConversationContextConfig['mode'];
+    mode: ConversationContextMode;
     channelIds: string[];
     resolvedChannelIds: string[];
     byChannel: Record<string, ChannelStatus>;
@@ -24,7 +24,7 @@ interface SessionStatusState {
 interface Actions {
   observeSession: (params: {
     conversationId: string;
-    mode: 'auto' | ConversationContextConfig['mode'];
+    mode: ConversationContextMode;
     channelIds?: string[];
     fallbackChannelId: string;
   }) => () => void;
@@ -65,7 +65,7 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
             resolvedChannelIds: ids,
             byChannel,
             // In 'all' mode, only mark 'ready' when all channels are loaded
-            topStatus: mode === 'all'
+            topStatus: mode === ConversationContextMode.ALL
               ? (ids.length && ids.every(id => byChannel[id]?.status === 'ready') ? 'ready' : 'loading')
               : 'idle',
           },
@@ -73,11 +73,11 @@ export const useContextStatusStore = create<SessionStatusState & Actions>((set, 
       }));
     };
 
-    if (mode === 'auto') {
+    if (mode === ConversationContextMode.AUTO) {
       ids = [fallbackChannelId];
-    } else if (mode === 'none') {
+    } else if (mode === ConversationContextMode.NONE) {
       ids = [];
-    } else if (mode === 'channels') {
+    } else if (mode === ConversationContextMode.CHANNELS) {
       ids = (channelIds && channelIds.length ? channelIds : [fallbackChannelId]);
     } else {
       // all: use all channels from notes data store

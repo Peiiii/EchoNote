@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 interface UseContextDisplayProps {
   contexts?: ConversationContextConfig | null;
@@ -17,8 +18,8 @@ export function useContextDisplay({
   const label = useMemo(() => {
     const ctx = contexts;
     if (!ctx) return `Auto (${getChannelName(fallbackChannelId)})`;
-    if (ctx.mode === 'none') return 'No Context';
-    if (ctx.mode === 'all') return 'All Channels';
+    if (ctx.mode === ConversationContextMode.NONE) return 'No Context';
+    if (ctx.mode === ConversationContextMode.ALL) return 'All Channels';
     const ids = ctx.channelIds || [];
     if (ids.length === 0) return 'No Context';
     if (ids.length === 1) return getChannelName(ids[0]);
@@ -28,7 +29,7 @@ export function useContextDisplay({
 
   const otherCount = useMemo(() => {
     const ctx = contexts;
-    if (!ctx || ctx.mode !== 'channels') return 0;
+    if (!ctx || ctx.mode !== ConversationContextMode.CHANNELS) return 0;
     const ids = ctx.channelIds || [];
     return Math.max(0, ids.length - 1);
   }, [contexts]);
@@ -36,8 +37,8 @@ export function useContextDisplay({
   const totalCount = useMemo(() => {
     const ctx = contexts;
     if (!ctx) return 1; // Auto -> current channel
-    if (ctx.mode === 'none') return 0;
-    if (ctx.mode === 'all') return channelsLength;
+    if (ctx.mode === ConversationContextMode.NONE) return 0;
+    if (ctx.mode === ConversationContextMode.ALL) return channelsLength;
     const ids = ctx.channelIds || [];
     return ids.length;
   }, [contexts, channelsLength]);

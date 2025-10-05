@@ -11,6 +11,7 @@ import { useChannelFiltering } from "../hooks/use-channel-filtering";
 import { useContextDisplay } from "../hooks/use-context-display";
 import { cn } from "@/common/lib/utils";
 import { Ban, Check, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 interface Props {
   conversationId: string;
@@ -81,9 +82,9 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               {(() => {
                 const ctx = conv?.contexts;
                 if (!ctx) return <Sparkles className="w-4 h-4" />; // Auto
-                if (ctx.mode === 'none') return <Ban className="w-4 h-4" />;
-                if (ctx.mode === 'all') return <Globe className="w-4 h-4" />;
-                if (ctx.mode === 'channels') return <Layers className="w-4 h-4" />;
+                if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4" />;
+                if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4" />;
+                if (ctx.mode === ConversationContextMode.CHANNELS) return <Layers className="w-4 h-4" />;
                 return <SlidersHorizontal className="w-4 h-4" />;
               })()}
               {/* Total count badge (top-right). Show total instead of +N since compact does not show names */}

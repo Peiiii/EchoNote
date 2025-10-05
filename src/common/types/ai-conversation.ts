@@ -1,5 +1,10 @@
 // Conversation context config for dynamic binding to channels
-export type ConversationContextMode = 'none' | 'channels' | 'all';
+export enum ConversationContextMode {
+  NONE = 'none',
+  CHANNELS = 'channels', 
+  ALL = 'all',
+  AUTO = 'auto'
+}
 
 export interface ConversationContextConfig {
   // none: no context; channels: specific channels; all: use all channels

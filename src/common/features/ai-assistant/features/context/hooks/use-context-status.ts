@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useContextStatusStore } from "../stores/context-status.store";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 interface UseContextStatusProps {
   conversationId: string;
@@ -19,8 +20,8 @@ export function useContextStatus({
   const session = useContextStatusStore(s => s.sessions[conversationId]);
 
   useEffect(() => {
-    const mode: 'auto' | 'none' | 'all' | 'channels' = contexts ? contexts.mode : 'auto';
-    const ids = contexts?.mode === 'channels' ? (contexts.channelIds || []) : undefined;
+    const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;
+    const ids = contexts?.mode === ConversationContextMode.CHANNELS ? (contexts.channelIds || []) : undefined;
     const off = observe({ conversationId, mode, channelIds: ids, fallbackChannelId });
     return () => off();
   }, [conversationId, fallbackChannelId, contexts, observe]);
@@ -35,7 +36,7 @@ export function useContextStatus({
   const tooltip = useMemo(() => {
     const s = session;
     if (!s) return '';
-    if (s.mode === 'channels') {
+    if (s.mode === ConversationContextMode.CHANNELS) {
       const parts = s.resolvedChannelIds.map(id => {
         const st = s.byChannel[id];
         const name = st?.channelName || getChannelName(id);

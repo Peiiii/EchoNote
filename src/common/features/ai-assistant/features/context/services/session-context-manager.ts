@@ -2,6 +2,7 @@ import { channelContextManager } from "./channel-context-manager";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 export class SessionContextManager {
   /**
@@ -14,7 +15,7 @@ export class SessionContextManager {
     }
 
     const { mode, channelIds } = conv.contexts;
-    if (mode === 'none') {
+    if (mode === ConversationContextMode.NONE) {
       return [
         {
           description: 'System Instructions',
@@ -23,14 +24,14 @@ export class SessionContextManager {
       ];
     }
 
-    if (mode === 'channels') {
+    if (mode === ConversationContextMode.CHANNELS) {
       const ids = channelIds || [];
       if (ids.length === 0) return [];
       // Concatenate contexts for each selected channel
       return ids.flatMap(id => channelContextManager.getChannelContext(id));
     }
 
-    // mode === 'all'
+    // mode === ConversationContextMode.ALL
     // Use all channels from notes data store and trigger loading for them
     const { channels } = useNotesDataStore.getState();
     const channelStates = channelMessageService.dataContainer.get().messageByChannel;

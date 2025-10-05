@@ -3,6 +3,7 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
+import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 interface UseConversationContextDraftProps {
   conversationId: string;
@@ -21,20 +22,20 @@ export function useConversationContextDraft({
   const updateConversation = useConversationStore(s => s.updateConversation);
   const { userId } = useNotesDataStore();
 
-  const [draftMode, setDraftMode] = useState<'auto' | ConversationContextConfig["mode"]>(
-    conv?.contexts ? conv.contexts.mode : 'auto'
+  const [draftMode, setDraftMode] = useState<ConversationContextMode>(
+    conv?.contexts ? conv.contexts.mode : ConversationContextMode.AUTO
   );
   const [draftChannelIds, setDraftChannelIds] = useState<string[]>(
-    conv?.contexts?.mode === 'channels' 
+    conv?.contexts?.mode === ConversationContextMode.CHANNELS 
       ? (conv?.contexts?.channelIds || [fallbackChannelId]) 
       : [fallbackChannelId]
   );
 
   // Keep local draft in sync when switching conversations or when contexts updated externally
   useEffect(() => {
-    setDraftMode(conv?.contexts ? conv.contexts.mode : 'auto');
+    setDraftMode(conv?.contexts ? conv.contexts.mode : ConversationContextMode.AUTO);
     setDraftChannelIds(
-      conv?.contexts?.mode === 'channels' 
+      conv?.contexts?.mode === ConversationContextMode.CHANNELS 
         ? (conv?.contexts?.channelIds || [fallbackChannelId]) 
         : [fallbackChannelId]
     );
@@ -49,19 +50,19 @@ export function useConversationContextDraft({
   const apply = useCallback(async () => {
     if (!userId || !conv) return;
     
-    if (draftMode === 'auto') {
+    if (draftMode === ConversationContextMode.AUTO) {
       await updateConversation(userId, conv.id, { contexts: null });
       return;
     }
 
     let next: ConversationContextConfig | undefined;
-    if (draftMode === 'none') {
-      next = { mode: 'none' };
-    } else if (draftMode === 'all') {
-      next = { mode: 'all' };
+    if (draftMode === ConversationContextMode.NONE) {
+      next = { mode: ConversationContextMode.NONE };
+    } else if (draftMode === ConversationContextMode.ALL) {
+      next = { mode: ConversationContextMode.ALL };
     } else {
       const ids = draftChannelIds.length ? draftChannelIds : [fallbackChannelId];
-      next = { mode: 'channels', channelIds: ids };
+      next = { mode: ConversationContextMode.CHANNELS, channelIds: ids };
       
       if (onActiveToolChannelChange) {
         const ensure = (activeToolChannelId && ids.includes(activeToolChannelId)) 
@@ -74,7 +75,7 @@ export function useConversationContextDraft({
     await updateConversation(userId, conv.id, { contexts: next });
 
     // Trigger loading for contexts after apply
-    if (next?.mode === 'channels' && next.channelIds) {
+    if (next?.mode === ConversationContextMode.CHANNELS && next.channelIds) {
       next.channelIds.forEach(id => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
         if (!channelState) {
@@ -82,7 +83,7 @@ export function useConversationContextDraft({
         }
       });
     }
-    if (next?.mode === 'all') {
+    if (next?.mode === ConversationContextMode.ALL) {
       const { channels } = useNotesDataStore.getState();
       channels.forEach(channel => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
@@ -99,6 +100,6 @@ export function useConversationContextDraft({
     draftChannelIds,
     toggleChannel,
     apply,
-    isSelectedMode: draftMode === 'channels'
+    isSelectedMode: draftMode === ConversationContextMode.CHANNELS
   };
 }
