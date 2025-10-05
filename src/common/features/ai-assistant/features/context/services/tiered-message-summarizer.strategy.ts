@@ -4,13 +4,13 @@ import type { ContextItem, MessageSummarizer } from "../types/message-summarizer
 export class TieredMessageSummarizer implements MessageSummarizer {
   
   private readonly TIER_LIMITS = {
-    latest: 20000,
+    latest: 10000,
     recent: 2000,
-    historical: 200,
+    historical: 300,
     archive: 30,
   } as const;
   
-  private readonly MAX_LENGTH = 200000;
+  private readonly MAX_LENGTH = 35000;
 
   summarizeMessages(messages: Message[], maxLength?: number): ContextItem[] {
     const _lengthLimit = maxLength || this.MAX_LENGTH;

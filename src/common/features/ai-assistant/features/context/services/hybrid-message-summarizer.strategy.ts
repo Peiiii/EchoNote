@@ -15,7 +15,7 @@ export class HybridMessageSummarizer implements MessageSummarizer {
   private rawSummarizer = new RawMessageSummarizer();
   private tieredSummarizer = new TieredMessageSummarizer();
   
-  private readonly LENGTH_LIMIT = 50000;
+  private readonly LENGTH_LIMIT = 30000;
   
   /**
    * Summarize messages using hybrid strategy
