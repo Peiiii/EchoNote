@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
-import { useContextStatusStore } from "../stores/context-status.store";
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
@@ -10,43 +11,77 @@ interface UseContextStatusProps {
   getChannelName: (id: string) => string;
 }
 
+function getChannelIds(
+  mode: ConversationContextMode,
+  contexts: ConversationContextConfig | null | undefined,
+  fallbackChannelId: string,
+  channels: Array<{ id: string; name: string }>
+): string[] {
+  if (mode === ConversationContextMode.AUTO) {
+    return [fallbackChannelId];
+  } else if (mode === ConversationContextMode.NONE) {
+    return [];
+  } else if (mode === ConversationContextMode.CHANNELS) {
+    const ids = contexts?.channelIds || [];
+    return ids.length > 0 ? ids : [fallbackChannelId];
+  } else {
+    // ALL mode
+    return channels.map(c => c.id);
+  }
+}
+
+function generateTooltip(
+  channelIds: string[],
+  channelStates: Record<string, { loading?: boolean }>,
+  getChannelName: (id: string) => string
+): string {
+  if (channelIds.length === 0) return '';
+  
+  const parts = channelIds.map(id => {
+    const channelState = channelStates[id];
+    const name = getChannelName(id);
+    const status = channelState?.loading ? 'loading' : 'ready';
+    return `${name}(${status})`;
+  });
+  
+  return parts.join(', ');
+}
+
 export function useContextStatus({
   conversationId,
   fallbackChannelId,
   contexts,
   getChannelName
 }: UseContextStatusProps) {
-  const observe = useContextStatusStore(s => s.observeSession);
-  const session = useContextStatusStore(s => s.sessions[conversationId]);
+  const channelStates = channelMessageService.dataContainer.use();
+  const { channels } = useNotesDataStore();
 
+  // Trigger loading for channels that need it
   useEffect(() => {
     const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;
-    const ids = contexts?.mode === ConversationContextMode.CHANNELS ? (contexts.channelIds || []) : undefined;
-    const off = observe({ conversationId, mode, channelIds: ids, fallbackChannelId });
-    return () => off();
-  }, [conversationId, fallbackChannelId, contexts, observe]);
+    const channelIds = getChannelIds(mode, contexts, fallbackChannelId, channels);
+    
+    channelIds.forEach(id => {
+      const channelState = channelStates.messageByChannel[id];
+      if (!channelState) {
+        channelMessageService.requestLoadInitialMessages$.next({ channelId: id });
+      }
+    });
+  }, [conversationId, fallbackChannelId, contexts, channels, channelStates]);
 
-  const anyLoading = useMemo(() => {
-    const s = session;
-    if (!s) return false;
-    if (s.topStatus === 'loading') return true;
-    return s.resolvedChannelIds.some(id => s.byChannel[id]?.status === 'loading');
-  }, [session]);
-
-  const tooltip = useMemo(() => {
-    const s = session;
-    if (!s) return '';
-    if (s.mode === ConversationContextMode.CHANNELS) {
-      const parts = s.resolvedChannelIds.map(id => {
-        const st = s.byChannel[id];
-        const name = st?.channelName || getChannelName(id);
-        const stat = st?.status || 'idle';
-        return `${name}(${stat})`;
-      });
-      return parts.join(', ');
-    }
-    return '';
-  }, [session, getChannelName]);
+  const { anyLoading, tooltip } = useMemo(() => {
+    const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;
+    const channelIds = getChannelIds(mode, contexts, fallbackChannelId, channels);
+    
+    const loadingStates = channelIds.map(id => 
+      channelStates.messageByChannel[id]?.loading || false
+    );
+    
+    const anyLoading = loadingStates.some(loading => loading);
+    const tooltip = generateTooltip(channelIds, channelStates.messageByChannel, getChannelName);
+    
+    return { anyLoading, tooltip };
+  }, [contexts, fallbackChannelId, channels, channelStates, getChannelName]);
 
   return {
     anyLoading,
