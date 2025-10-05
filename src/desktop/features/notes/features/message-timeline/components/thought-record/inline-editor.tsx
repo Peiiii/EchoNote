@@ -25,7 +25,8 @@ export function InlineEditor({
 }: InlineEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { updateContent } = useEditStateStore();
+  // Select only the updater to avoid subscribing to edit content changes here
+  const updateContent = useEditStateStore((s) => s.updateContent);
 
   useEditor({ textareaRef, updateContent, content });
 

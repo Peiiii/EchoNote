@@ -18,7 +18,9 @@ export function MobileInlineEditor({
   onExpand,
   isSaving,
 }: MobileInlineEditorProps) {
-  const { editContent, originalContent, updateContent } = useEditStateStore();
+  const editContent = useEditStateStore((s) => s.editContent);
+  const originalContent = useEditStateStore((s) => s.originalContent);
+  const updateContent = useEditStateStore((s) => s.updateContent);
   const hasChanges = editContent !== originalContent;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

@@ -28,19 +28,19 @@ export const MobileThoughtRecord = ({
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
 
   // Edit state management
-  const {
-    editingMessageId,
-    editMode,
-    isSaving,
-    startEditing: startEdit,
-    save,
-    cancel,
-    switchToExpandedMode,
-    switchToInlineMode,
-  } = useEditStateStore();
+  const editingMessageId = useEditStateStore((s) => s.editingMessageId);
+  const globalEditMode = useEditStateStore((s) => s.editMode);
+  const globalIsSaving = useEditStateStore((s) => s.isSaving);
+  const startEdit = useEditStateStore((s) => s.startEditing);
+  const save = useEditStateStore((s) => s.save);
+  const cancel = useEditStateStore((s) => s.cancel);
+  const switchToExpandedMode = useEditStateStore((s) => s.switchToExpandedMode);
+  const switchToInlineMode = useEditStateStore((s) => s.switchToInlineMode);
 
   const isEditing = editingMessageId === message.id;
-  const isExpandedEditing = isEditing && editMode === "expanded";
+  const isExpandedEditing = isEditing && globalEditMode === 'expanded';
+  const isSaving = isEditing ? globalIsSaving : false;
+  const editMode = isEditing ? globalEditMode : 'inline';
 
 
   // 重置自动生成标志

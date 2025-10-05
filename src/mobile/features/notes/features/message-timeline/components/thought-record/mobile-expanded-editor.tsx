@@ -20,7 +20,8 @@ export const MobileExpandedEditor = ({
     onCollapse,
     isSaving
 }: MobileExpandedEditorProps) => {
-    const { editContent, updateContent } = useEditStateStore();
+    const editContent = useEditStateStore((s) => s.editContent);
+    const updateContent = useEditStateStore((s) => s.updateContent);
     const hasChanges = editContent !== originalContent;
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     

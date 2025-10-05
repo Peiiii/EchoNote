@@ -8,7 +8,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { Bot, ChevronUp, PenLine } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
 import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
@@ -91,6 +91,16 @@ export const MessageTimeline = forwardRef<
     useEffect(() => {
       scrollToBottom({ behavior: "instant" });
     }, [scrollToBottom]);
+    
+    // Build a cache of thread counts once per messages change to avoid O(n^2) work on render
+    const threadCounts = useMemo(() => {
+      const map = new Map<string, number>();
+      for (const m of messages ?? []) {
+        const key = m.threadId || m.id;
+        map.set(key, (map.get(key) ?? 0) + 1);
+      }
+      return map;
+    }, [messages]);
 
   return (
       <>
@@ -112,6 +122,7 @@ export const MessageTimeline = forwardRef<
             const userMessages = (dayMessages as Message[]).filter(
               (msg: Message) => msg.sender === "user" && !msg.parentId // Ensure only main messages are shown, not thread messages
             );
+            // Use cached thread counts to derive per-message thread size quickly
 
             return (
               <div
@@ -125,11 +136,9 @@ export const MessageTimeline = forwardRef<
                 {/* Align separators: no extra padding on mobile (edge-to-edge), keep desktop alignment; enhanced visibility in both modes */}
                 <div className="px-0 divide-y divide-slate-200/80 dark:divide-slate-800/80">
                   {userMessages.map((message: Message) => {
-                    const threadMessages = (messages ?? []).filter(
-                      (msg) => msg.threadId === (message.threadId || message.id)
-                    );
-                    const threadCount =
-                      threadMessages.length > 1 ? threadMessages.length - 1 : 0;
+                    const groupKey = message.threadId || message.id;
+                    const count = threadCounts.get(groupKey) ?? 0;
+                    const threadCount = count > 1 ? count - 1 : 0;
 
                     return (
                       <div

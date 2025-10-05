@@ -13,18 +13,20 @@ export function useThoughtRecord(message: Message) {
     
     const deleteMessage = channelMessageService.deleteMessage;
 
-    const {
-        editingMessageId,
-        editContent,
-        editMode,
-        isSaving,
-        startEditing,
-        save,
-        cancel,
-        switchToExpandedMode
-    } = useEditStateStore();
+    // Select only the relevant slices for this message to avoid re-rendering all items while typing
+    const editingMessageId = useEditStateStore((s) => s.editingMessageId);
+    const globalEditContent = useEditStateStore((s) => s.editContent);
+    const globalEditMode = useEditStateStore((s) => s.editMode);
+    const globalIsSaving = useEditStateStore((s) => s.isSaving);
+    const startEditing = useEditStateStore((s) => s.startEditing);
+    const save = useEditStateStore((s) => s.save);
+    const cancel = useEditStateStore((s) => s.cancel);
+    const switchToExpandedMode = useEditStateStore((s) => s.switchToExpandedMode);
 
     const isEditing = editingMessageId === message.id;
+    const editContent = isEditing ? globalEditContent : message.content;
+    const editMode = isEditing ? globalEditMode : 'inline';
+    const isSaving = isEditing ? globalIsSaving : false;
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
