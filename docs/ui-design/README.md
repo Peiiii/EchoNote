@@ -1,8 +1,8 @@
-# EchoNote UI Design System
+# StillRoot UI Design System
 
 ## 📁 Documentation Structure
 
-This directory contains the complete design system documentation for EchoNote's UI transformation.
+This directory contains the complete design system documentation for StillRoot's UI transformation.
 
 ### 📋 Documents
 
@@ -11,7 +11,7 @@ This directory contains the complete design system documentation for EchoNote's 
 
 ## 🎯 Design Goals
 
-Transform EchoNote from a basic white interface to a sophisticated, Apple-inspired design with:
+Transform StillRoot from a basic white interface to a sophisticated, Apple-inspired design with:
 
 - **Layered Visual Hierarchy** - Rich depth through background layers
 - **Apple Aesthetic** - Clean, modern, and intuitive interface

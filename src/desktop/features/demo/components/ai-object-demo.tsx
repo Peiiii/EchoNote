@@ -12,7 +12,7 @@ interface TodoItem {
 }
 
 export function AiObjectDemo() {
-  const [prompt, setPrompt] = useState('You are a creative assistant in EchoNote. Generate a short todo item with title, completion status, and tags array (2-3 items).')
+  const [prompt, setPrompt] = useState('You are a creative assistant in StillRoot. Generate a short todo item with title, completion status, and tags array (2-3 items).')
   const [result, setResult] = useState<TodoItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

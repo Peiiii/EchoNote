@@ -31,7 +31,7 @@ export class SessionContextManager {
 - Notes are organized by recency with different detail levels
 - Use this context to understand the user's thinking patterns and provide relevant insights`;
 
-    return `You are EchoNote AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
+    return `You are StillRoot AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in ${channelContext}
 This context contains ${totalNotes} thought records, representing the collective knowledge and ideas.

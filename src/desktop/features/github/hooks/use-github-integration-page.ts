@@ -84,7 +84,7 @@ Created: ${timestamp}
 ${noteContent}
 
 ---
-*This note was automatically synchronized to GitHub by EchoNote*
+*This note was automatically synchronized to GitHub by StillRoot*
 `;
 
       await (storageService as { storeMarkdown: (path: string, content: string, options: { message?: string }) => Promise<void> }).storeMarkdown(`notes/${fileName}`, markdownContent, {

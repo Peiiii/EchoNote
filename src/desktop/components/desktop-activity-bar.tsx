@@ -52,7 +52,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
               <LayoutDashboard className="w-5 h-5" />
             </div>
           }
-          title="EchoNote"
+          title="StillRoot"
           showSearch={false}
           showSeparator={false}
           className="bg-sidebar"

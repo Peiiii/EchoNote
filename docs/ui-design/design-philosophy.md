@@ -1,4 +1,4 @@
-# EchoNote UI Design Philosophy
+# StillRoot UI Design Philosophy
 
 ## 🎯 Design Goals
 

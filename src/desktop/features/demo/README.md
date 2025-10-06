@@ -1,6 +1,6 @@
 # Demo Extension
 
-This is an extension that demonstrates the usage of EchoNote's plugin architecture.
+This is an extension that demonstrates the usage of StillRoot's plugin architecture.
 
 ## Features
 

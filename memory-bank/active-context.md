@@ -1,4 +1,4 @@
-# EchoNote 当前工作上下文
+# StillRoot 当前工作上下文
 
 ## 项目状态
 

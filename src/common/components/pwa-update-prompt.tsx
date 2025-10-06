@@ -74,7 +74,7 @@ export const PWAUpdatePrompt = () => {
             </Button>
           </div>
           <CardDescription>
-            A new version of EchoNote is available. Update now for the latest features and improvements.
+            A new version of StillRoot is available. Update now for the latest features and improvements.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

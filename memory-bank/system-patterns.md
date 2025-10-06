@@ -1,4 +1,4 @@
-# EchoNote 系统架构模式
+# StillRoot 系统架构模式
 
 ## 整体架构设计
 

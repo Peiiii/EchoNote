@@ -51,9 +51,9 @@ export const DemoPage: React.FC = () => {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-4">EchoNote 功能演示</h1>
+        <h1 className="text-4xl font-bold mb-4">StillRoot 功能演示</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          体验 EchoNote 的各种功能特性，了解如何构建智能笔记和AI助手应用
+          体验 StillRoot 的各种功能特性，了解如何构建智能笔记和AI助手应用
         </p>
       </div>
 
@@ -92,9 +92,9 @@ export const DemoPage: React.FC = () => {
       </div>
 
       <div className="mt-12 text-center">
-        <h2 className="text-2xl font-semibold mb-4">关于 EchoNote</h2>
+        <h2 className="text-2xl font-semibold mb-4">关于 StillRoot</h2>
         <p className="text-muted-foreground max-w-3xl mx-auto">
-          EchoNote 是一个智能笔记应用，通过AI助手帮助用户更好地组织和管理信息。
+          StillRoot 是一个智能笔记应用，通过AI助手帮助用户更好地组织和管理信息。
           它能够理解上下文、自动分类、提供洞察，让知识管理变得简单而高效。
         </p>
       </div>

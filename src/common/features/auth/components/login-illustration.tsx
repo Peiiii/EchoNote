@@ -1,11 +1,37 @@
+
 export const LoginIllustration = () => {
   return (
     <div className="hidden lg:flex flex-1 items-center justify-center p-8 relative overflow-hidden">
-      <div className="relative z-10 text-center">
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-8">Write something good.</h2>
+      <div className="relative z-10 max-w-lg">
+        {/* Brand Message */}
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-6 leading-tight">
+            <span className="italic text-slate-600 dark:text-slate-400">"</span>
+            <span className="bg-gradient-to-r from-emerald-700 via-slate-800 to-slate-700 dark:from-emerald-400 dark:via-slate-300 dark:to-slate-400 bg-clip-text text-transparent">
+              StillRoot: where thoughts take root
+            </span>
+            <span className="italic text-slate-600 dark:text-slate-400">"</span>
+          </h2>
+
+          <div className="space-y-3 text-slate-600 dark:text-slate-300">
+            <p className="text-lg font-medium leading-relaxed opacity-90">
+              For your <span className="italic text-emerald-600 dark:text-emerald-400">fleeting ideas</span>.
+            </p>
+            <p className="text-lg font-medium leading-relaxed opacity-90">
+              For your <span className="italic text-teal-600 dark:text-teal-400">emerging insights</span>.
+            </p>
+            <p className="text-lg font-medium leading-relaxed opacity-90">
+              For your <span className="italic text-cyan-600 dark:text-cyan-400">evolving self</span>.
+            </p>
+          </div>
+        </div>
         
+        {/* Decorative Illustration */}
         <div className="relative">
-          <svg width="400" height="300" viewBox="0 0 400 300" className="mx-auto">
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-200 to-cyan-200 dark:from-emerald-800 dark:to-cyan-800 animate-pulse"></div>
+          </div>
+          <svg width="400" height="300" viewBox="0 0 400 300" className="mx-auto relative z-10">
             <g transform="translate(150, 80)">
               <ellipse cx="0" cy="40" rx="25" ry="35" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600 dark:text-slate-400"/>
               <circle cx="0" cy="-10" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600 dark:text-slate-400"/>

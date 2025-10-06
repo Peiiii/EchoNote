@@ -28,7 +28,7 @@ export const demoExtension = defineExtension({
     name: "Demo Extension",
     description: "Demonstrates the usage of plugin architecture",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "test-tube",
   },
   activate: ({ subscriptions }) => {

@@ -67,7 +67,7 @@ VITE_GITHUB_DEFAULT_REPO=echonote-data
 1. Visit https://github.com/settings/developers
 2. Click "New OAuth App"
 3. Fill in application information:
-   - Application name: EchoNote
+   - Application name: StillRoot
    - Homepage URL: http://localhost:3000
    - Authorization callback URL: http://localhost:3000/#/github/auth/callback
 4. Get Client ID after registration

@@ -56,7 +56,7 @@ export async function generateSparksForText(config: SparksGenerationConfig): Pro
   }
 
   const prompt = `<role>
-You are EchoNote's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
+You are StillRoot's intelligent thinking expansion assistant, designed to help users deepen their thoughts and promote cognitive growth.
 </role>
 
 <task>

@@ -5,8 +5,8 @@ import { Button } from '@/common/components/ui/button'
 import { generateText } from '@/common/services/ai/generate-text'
 
 export function AiQuickTest() {
-  const [prompt, setPrompt] = useState('Summarize EchoNote current architecture in 3 points.')
-  const [system, setSystem] = useState<string | undefined>('You are a creative AI companion in EchoNote, a personal thought recording and reflection application. You help users explore ideas, solve problems, and think creatively. Keep answers concise but insightful.')
+  const [prompt, setPrompt] = useState('Summarize StillRoot current architecture in 3 points.')
+  const [system, setSystem] = useState<string | undefined>('You are a creative AI companion in StillRoot, a personal thought recording and reflection application. You help users explore ideas, solve problems, and think creatively. Keep answers concise but insightful.')
   const [answer, setAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

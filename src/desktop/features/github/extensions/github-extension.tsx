@@ -16,7 +16,7 @@ export const githubExtension = defineExtension({
     name: "GitHub Integration",
     description: "Integrate with GitHub for data storage and synchronization",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "github",
   },
   activate: ({ subscriptions }) => {

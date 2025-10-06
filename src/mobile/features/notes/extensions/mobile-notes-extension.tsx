@@ -16,7 +16,7 @@ export const mobileNotesExtension = defineExtension({
     name: "Mobile Notes Extension",
     description: "Mobile-optimized conversational AI note-taking feature",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "notebook",
   },
   activate: ({ subscriptions }) => {

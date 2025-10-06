@@ -16,7 +16,7 @@ export const notesExtension = defineExtension({
     name: "Notes Extension",
     description: "Conversational AI note-taking feature",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "notebook",
   },
   activate: ({ subscriptions }) => {

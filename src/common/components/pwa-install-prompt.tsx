@@ -86,7 +86,7 @@ export const PWAInstallPrompt = () => {
       <Card className="border-2 border-blue-500 shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Install EchoNote</CardTitle>
+            <CardTitle className="text-lg">Install StillRoot</CardTitle>
             <Button
               variant="ghost"
               size="sm"
@@ -97,7 +97,7 @@ export const PWAInstallPrompt = () => {
             </Button>
           </div>
           <CardDescription>
-            Install EchoNote for a better experience with offline access and faster loading.
+            Install StillRoot for a better experience with offline access and faster loading.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

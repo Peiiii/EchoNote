@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'echonote-icon-modern.svg', 'echonote-icon-simple.svg', 'echonote-icon.svg'],
       manifest: {
-        name: 'EchoNote - AI-Powered Note Taking',
-        short_name: 'EchoNote',
+        name: 'StillRoot - Where Thoughts Take Root',
+        short_name: 'StillRoot',
         description: 'AI-powered note taking application with intelligent features',
         theme_color: '#f0f0ef',
         background_color: '#ffffff',

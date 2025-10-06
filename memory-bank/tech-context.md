@@ -1,4 +1,4 @@
-# EchoNote 技术上下文
+# StillRoot 技术上下文
 
 ## 当前技术栈
 

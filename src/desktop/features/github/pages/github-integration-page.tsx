@@ -15,7 +15,7 @@ export function GitHubIntegrationPage() {
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold">GitHub Integration</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Store and synchronize your EchoNote data in your GitHub repository. 
+              Store and synchronize your StillRoot data in your GitHub repository. 
               Get version control, backup, and access from anywhere.
             </p>
           </div>
