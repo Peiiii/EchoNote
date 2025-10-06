@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor } from "./types";
 
 /**
@@ -13,6 +13,7 @@ export class AddIsDeletedToChannelsMigration implements MigrationExecutor {
   createdAt = new Date("2025-01-27");
 
   async execute(userId: string): Promise<void> {
+    const db = firebaseConfig.getDb();
     const channelsCollectionRef = collection(db, `users/${userId}/channels`);
     const channelsSnapshot = await getDocs(channelsCollectionRef);
     let migratedCount = 0;

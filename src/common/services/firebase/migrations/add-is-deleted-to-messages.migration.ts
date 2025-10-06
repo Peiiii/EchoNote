@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor } from "./types";
 
 /**
@@ -13,6 +13,7 @@ export class AddIsDeletedToMessagesMigration implements MigrationExecutor {
   createdAt = new Date("2025-01-27");
 
   async execute(userId: string): Promise<void> {
+    const db = firebaseConfig.getDb();
     const messagesCollectionRef = collection(db, `users/${userId}/messages`);
     const messagesSnapshot = await getDocs(messagesCollectionRef);
     let migratedCount = 0;

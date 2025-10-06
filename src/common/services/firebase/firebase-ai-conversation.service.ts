@@ -17,12 +17,14 @@ import {
   endBefore,
   FieldValue,
 } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { AIConversation, UIMessage, MessageListOptions, ConversationContextConfig } from "@/common/types/ai-conversation";
 import { sanitizeUIMessageForPersistence } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export class FirebaseAIConversationService {
-  private db = db;
+  private getDb() {
+    return firebaseConfig.getDb();
+  }
   
   // 对话管理
   async createConversation(
@@ -43,7 +45,7 @@ export class FirebaseAIConversationService {
       ...(contexts ? { contexts } : {}),
     };
     
-    await setDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
+    await setDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
       ...conversation,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -60,7 +62,7 @@ export class FirebaseAIConversationService {
   }
   
   async getConversation(userId: string, conversationId: string): Promise<AIConversation | null> {
-    const docRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}`);
+    const docRef = doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) return null;
@@ -69,18 +71,18 @@ export class FirebaseAIConversationService {
   
   async deleteConversation(userId: string, conversationId: string): Promise<void> {
     // 删除对话下的所有消息
-    const messagesRef = collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`);
+    const messagesRef = collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`);
     const messagesSnapshot = await getDocs(messagesRef);
     const deletePromises = messagesSnapshot.docs.map(doc => deleteDoc(doc.ref));
     await Promise.all(deletePromises);
     
     // 删除对话
-    await deleteDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`));
+    await deleteDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`));
   }
   
   async updateConversation(userId: string, conversationId: string, updates: Partial<AIConversation>): Promise<void> {
     await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}`),
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`),
       {
         ...updates,
         updatedAt: serverTimestamp(),
@@ -89,7 +91,7 @@ export class FirebaseAIConversationService {
   }
   
   async addMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
-    const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
+    const messageRef = doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
     const messageDoc = await getDoc(messageRef);
     const isNewMessage = !messageDoc.exists();
     
@@ -131,11 +133,11 @@ export class FirebaseAIConversationService {
       updateData.messageCount = increment(1);
     }
     
-    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), updateData);
+    await updateDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), updateData);
   }
 
   async createMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
-    const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
+    const messageRef = doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
     const messageDoc = await getDoc(messageRef);
     if (messageDoc.exists()) {
       return;
@@ -146,7 +148,7 @@ export class FirebaseAIConversationService {
       conversationId,
       timestamp: serverTimestamp(),
     });
-    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
+    await updateDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
       lastMessageAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       messageCount: increment(1),
@@ -155,7 +157,7 @@ export class FirebaseAIConversationService {
   
   async getMessages(userId: string, conversationId: string): Promise<UIMessage[]> {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
       orderBy('timestamp', 'asc')
     );
     
@@ -171,7 +173,7 @@ export class FirebaseAIConversationService {
     const { limit = 50, orderBy: order = 'asc', startAfter: startAfterId, endBefore: endBeforeId } = options;
     
     let q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
       orderBy('timestamp', order)
     );
     
@@ -180,12 +182,12 @@ export class FirebaseAIConversationService {
     }
     
     if (startAfterId) {
-      const startAfterDoc = await getDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${startAfterId}`));
+      const startAfterDoc = await getDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${startAfterId}`));
       q = query(q, startAfter(startAfterDoc));
     }
     
     if (endBeforeId) {
-      const endBeforeDoc = await getDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${endBeforeId}`));
+      const endBeforeDoc = await getDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${endBeforeId}`));
       q = query(q, endBefore(endBeforeDoc));
     }
     
@@ -211,19 +213,19 @@ export class FirebaseAIConversationService {
     }
 
     await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
       updateData as { [x: string]: FieldValue | Partial<unknown> | undefined }
     );
   }
   
   async deleteMessage(userId: string, conversationId: string, messageId: string): Promise<void> {
     await deleteDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`)
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`)
     );
     
     // 更新对话的 messageCount
     await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}`),
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`),
       {
         messageCount: increment(-1),
         updatedAt: serverTimestamp(),
@@ -238,7 +240,7 @@ export class FirebaseAIConversationService {
     callback: (messages: UIMessage[]) => void
   ): () => void {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
       orderBy('timestamp', 'asc')
     );
     
@@ -263,7 +265,7 @@ export class FirebaseAIConversationService {
   // 辅助方法
   private buildConversationsQuery(userId: string) {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations`),
+      collection(this.getDb(), `users/${userId}/aiConversations`),
       orderBy('lastMessageAt', 'desc')
     );
     return q;

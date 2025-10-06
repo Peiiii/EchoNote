@@ -10,8 +10,19 @@ export const useFirebaseAuth = () => {
   } = useAuthStore();
 
   useEffect(() => {
-    const unsubscribe = initAuthListener();
-    return () => unsubscribe();
+    let unsubscribe: (() => void) | undefined;
+    
+    const setupListener = async () => {
+      unsubscribe = await initAuthListener();
+    };
+    
+    setupListener();
+    
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [initAuthListener]);
 
   return {

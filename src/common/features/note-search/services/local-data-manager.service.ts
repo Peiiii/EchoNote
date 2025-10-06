@@ -59,7 +59,7 @@ export class LocalDataManagerService {
   async updateAll(): Promise<void> {
     this.setUpdateStatus({ isUpdating: true, lastUpdateTime: 0 });
     try {
-      const user = firebaseAuthService.getCurrentUser();
+      const user = await firebaseAuthService.getCurrentUser();
       const userId = user?.uid;
       if (!userId) return;
 
@@ -153,7 +153,7 @@ export class LocalDataManagerService {
   async updateChannel(channelId: string): Promise<void> {
     this.setChannelUpdateStatus(channelId, { isUpdating: true, lastUpdateTime: 0 });
     try {
-      const user = firebaseAuthService.getCurrentUser();
+      const user = await firebaseAuthService.getCurrentUser();
       const userId = user?.uid;
       if (!userId) return;
 

@@ -29,7 +29,7 @@ export interface AuthState {
   setAuthenticating: (authenticating: boolean) => void;
   
   // 初始化认证监听器
-  initAuthListener: () => (() => void);
+  initAuthListener: () => Promise<() => void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -134,7 +134,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // 初始化认证监听器
-      initAuthListener: () => {
+      initAuthListener: async () => {
         // 检查是否有缓存数据
         const hasCachedUser = get().currentUser !== null;
         
@@ -146,7 +146,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isInitializing: true, authIsReady: false });
         }
 
-        const unsubscribe = firebaseAuthService.onAuthStateChanged((user) => {
+        const unsubscribe = await firebaseAuthService.onAuthStateChanged((user) => {
           // 更新用户状态
           get().setAuth(user);
           

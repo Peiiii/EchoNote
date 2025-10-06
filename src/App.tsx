@@ -14,8 +14,12 @@ import { useEffect } from "react";
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user, isInitializing } = useFirebaseAuth();
+  console.log('[App] ', {
+    user,
+    isInitializing,
+  });
   const setNotesViewAuth = useNotesViewStore((state) => state.setAuth);
-  
+
 
   useEffect(() => {
     setNotesViewAuth(user);

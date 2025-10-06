@@ -6,7 +6,7 @@ import {
   setDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor, UserMigrationState } from "./migrations/types";
 import {
   AddIsDeletedToMessagesMigration,
@@ -16,8 +16,9 @@ import {
 import { MigrationLogger } from "./migrations/migration-logger";
 
 class MigrationStateManager {
-  private getMigrationsCollectionRef = (userId: string) =>
-    collection(db, `users/${userId}/migrations`);
+  private getMigrationsCollectionRef = (userId: string) => {
+    return collection(firebaseConfig.getDb(), `users/${userId}/migrations`);
+  };
 
   async getUserMigrationState(userId: string): Promise<UserMigrationState> {
     try {
@@ -196,12 +197,12 @@ class FirebaseMigrateService {
         currentState.completedMigrations.includes(m.version)
       );
       
-      const messagesSnapshot = await getDocs(collection(db, `users/${userId}/messages`));
+      const messagesSnapshot = await getDocs(collection(firebaseConfig.getDb(), `users/${userId}/messages`));
       const messagesNeedMigration = messagesSnapshot.docs.filter(
         doc => doc.data().isDeleted === undefined
       ).length;
 
-      const channelsSnapshot = await getDocs(collection(db, `users/${userId}/channels`));
+      const channelsSnapshot = await getDocs(collection(firebaseConfig.getDb(), `users/${userId}/channels`));
       const channelsNeedMigration = channelsSnapshot.docs.filter(
         doc => !doc.data().lastMessageTime
       ).length;

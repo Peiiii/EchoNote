@@ -1,9 +1,22 @@
-import { initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { initializeFirestore } from 'firebase/firestore';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Auth, browserLocalPersistence, connectAuthEmulator, getAuth, initializeAuth } from 'firebase/auth';
+import { Firestore, initializeFirestore } from 'firebase/firestore';
 
-// Firebase配置
-const firebaseConfig = {
+interface FirebaseConfigOptions {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId?: string;
+}
+
+const PROXY_URL_AUTH = 'https://firebase-auth-api.agentverse.cc';
+const PROXY_HOST_API = 'firebase-api.agentverse.cc';
+
+
+const config: FirebaseConfigOptions = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -13,19 +26,97 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// 初始化Firebase
-export const app = initializeApp(firebaseConfig);
-const _auth = getAuth(app);
-// export const db = getFirestore(app);
-export const db = initializeFirestore(app, {
-  host: 'firebase-api.agentverse.cc',
+const app = initializeApp(config);
+const db = initializeFirestore(app, {
+  host: PROXY_HOST_API,
   ssl: true,
-  ignoreUndefinedProperties: true, // 这是一个常用的设置，也可以加上
-  experimentalForceLongPolling: false, // 另一个可配置项
+  ignoreUndefinedProperties: true,
+  experimentalForceLongPolling: false,
 });
-// connectFirestoreEmulator(db, 'firebase-api.agentverce.cc', 443);
-connectAuthEmulator(_auth, 'https://firebase-auth-api.agentverse.cc', {
-  disableWarnings: true
-}); // 确保是正确的 agentverse.cc
 
-export const auth = _auth;
+const tryLoadRegionFromLocalStorage = (defaultRegion: string): string => {
+  const region = localStorage.getItem('region');
+  if (region) {
+    return region;
+  }
+  return defaultRegion;
+}
+
+
+const saveRegionToLocalStorage = (region: string): void => {
+  localStorage.setItem('region', region);
+}
+
+
+const CN_REGION = "CN";
+
+export class FirebaseConfig {
+  private static instance: FirebaseConfig | null = null;
+  private app: FirebaseApp = app;
+  private auth: Auth | null = null;
+  private db: Firestore = db;
+  private region: string = tryLoadRegionFromLocalStorage(CN_REGION);
+  private constructor() {
+    console.log('[FirebaseConfig] constructor, region', this.region);
+    this.getAuth();
+    this.validateRegionAndMaybeReloadPage();
+  }
+
+  static getInstance(): FirebaseConfig {
+    if (!FirebaseConfig.instance) {
+      FirebaseConfig.instance = new FirebaseConfig();
+    }
+    return FirebaseConfig.instance;
+  }
+
+
+  getApp(): FirebaseApp {
+    return this.app;
+  }
+
+  private async fetchRegion(): Promise<string> {
+    let country = '';
+    try {
+      const response = await fetch(`${PROXY_URL_AUTH}/api/location`);
+      if (response.ok) {
+        country = (await response.json()).country || 'XX';
+      }
+    } catch (e) {
+      console.error('Failed to fetch user country, using restricted auth.', e);
+    }
+    return country;
+  }
+
+
+  private async validateRegionAndMaybeReloadPage(): Promise<void> {
+    const region = await this.fetchRegion();
+    saveRegionToLocalStorage(region);
+    if(region !== this.region) {
+      window.location.reload();
+    }
+  }
+
+
+   getAuth(): Auth {
+    if (!this.auth) {
+      if (this.region === CN_REGION) {
+        this.auth = initializeAuth(this.getApp(), {
+          persistence: browserLocalPersistence
+        });
+      } else {
+        this.auth = getAuth(this.getApp());
+      }
+
+      connectAuthEmulator(this.auth, PROXY_URL_AUTH, {
+        disableWarnings: true
+      });
+    }
+    return this.auth;
+  }
+
+  getDb(): Firestore {
+    return this.db;
+  }
+}
+
+export const firebaseConfig = FirebaseConfig.getInstance();

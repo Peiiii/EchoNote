@@ -18,7 +18,7 @@ import {
   increment,
   FieldValue,
 } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/notes-data.store";
 
 /**
@@ -108,15 +108,16 @@ const docToMessage = (doc: DocumentSnapshot): Message => {
 
 // Helper functions to get collection references
 const getChannelsCollectionRef = (userId: string) =>
-  collection(db, `users/${userId}/channels`);
+  collection(firebaseConfig.getDb(), `users/${userId}/channels`);
 const getMessagesCollectionRef = (userId: string) =>
-  collection(db, `users/${userId}/messages`);
+  collection(firebaseConfig.getDb(), `users/${userId}/messages`);
 
 
 export class FirebaseNotesService {
   async getChannel(userId: string, channelId: string): Promise<Channel | null> {
     try {
-      const snap = await getDocs(query(getChannelsCollectionRef(userId), where("isDeleted", "==", false), where("__name__", "==", channelId)));
+      const channelsRef = await getChannelsCollectionRef(userId);
+      const snap = await getDocs(query(channelsRef, where("isDeleted", "==", false), where("__name__", "==", channelId)));
       const docSnap = snap.docs[0];
       if (!docSnap) return null;
       return docToChannel(docSnap);
@@ -481,7 +482,7 @@ export class FirebaseNotesService {
     messageId: string,
     updates: Partial<Message>
   ): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, updates);
   };
 
@@ -489,13 +490,13 @@ export class FirebaseNotesService {
     userId: string,
     messageId: string
   ): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await deleteDoc(messageRef);
     };
 
   // Soft delete message
   softDeleteMessage = async (userId: string, messageId: string): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: true,
       deletedAt: serverTimestamp(),
@@ -505,7 +506,7 @@ export class FirebaseNotesService {
 
   // Restore message
   restoreMessage = async (userId: string, messageId: string): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: false,
       deletedAt: null,

@@ -1,16 +1,16 @@
-import { auth } from '@/common/config/firebase.config';
+import { firebaseConfig } from '@/common/config/firebase.config';
 import { useNotesDataStore } from '@/core/stores/notes-data.store';
 import {
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-  updateProfile
+  updateProfile,
+  User
 } from 'firebase/auth';
 
 let isRegistering = false;
@@ -19,8 +19,12 @@ let isSigningIn = false;
 export const firebaseAuthService = {
 
   signInWithGoogle: async (): Promise<User | null> => {
+    console.log("[firebaseAuthService] signInWithGoogle");
+    // const GoogleAuthProvider = await import('firebase/auth').then(mod => mod.GoogleAuthProvider);
+    // const signInWithPopup = await import('firebase/auth').then(mod => mod.signInWithPopup);
     const provider = new GoogleAuthProvider();
     try {
+      const auth = await firebaseConfig.getAuth();
       const result = await signInWithPopup(auth, provider);
       await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       return result.user; 
@@ -37,6 +41,7 @@ export const firebaseAuthService = {
       
       try {
         // 尝试创建用户账户
+        const auth = await firebaseConfig.getAuth();
         const result = await createUserWithEmailAndPassword(auth, email, password);
         
         // 更新用户资料
@@ -56,6 +61,7 @@ export const firebaseAuthService = {
         if ((createError as { code?: string }).code === 'auth/email-already-in-use') {
           try {
             // 尝试登录现有账户
+            const auth = await firebaseConfig.getAuth();
             const signInResult = await signInWithEmailAndPassword(auth, email, password);
             
             // 检查邮箱是否已验证
@@ -99,6 +105,7 @@ export const firebaseAuthService = {
 
   signUpWithEmail: async (email: string, password: string, displayName?: string): Promise<{ user: User; verificationSent: boolean }> => {
     try {
+      const auth = await firebaseConfig.getAuth();
       const result = await createUserWithEmailAndPassword(auth, email, password);
       
       if (displayName) {
@@ -131,6 +138,7 @@ export const firebaseAuthService = {
       isSigningIn = true;
       console.log("🔐 isSigningIn set to true");
       
+      const auth = await firebaseConfig.getAuth();
       const result = await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ Firebase authentication successful");
       console.log("📧 Email verified:", result.user.emailVerified);
@@ -167,6 +175,7 @@ export const firebaseAuthService = {
 
   sendPasswordReset: async (email: string): Promise<void> => {
     try {
+      const auth = await firebaseConfig.getAuth();
       await sendPasswordResetEmail(auth, email);
     } catch (error) {
       console.error("Password Reset Error:", error);
@@ -175,11 +184,13 @@ export const firebaseAuthService = {
   },
 
   signOut: async (): Promise<void> => {
+    const auth = await firebaseConfig.getAuth();
     await signOut(auth);
     useNotesDataStore.getState().cleanupListeners();
   },
 
-  onAuthStateChanged: (callback: (user: User | null) => void): (() => void) => {
+  onAuthStateChanged: async (callback: (user: User | null) => void): Promise<() => void> => {
+    const auth = await firebaseConfig.getAuth();
     return onAuthStateChanged(auth, async (user) => {
       console.log("🔄 Auth state changed:", user ? `User: ${user.email} (verified: ${user.emailVerified})` : "No user");
       console.log("🔐 isRegistering:", isRegistering, "isSigningIn:", isSigningIn);
@@ -217,11 +228,13 @@ export const firebaseAuthService = {
     });
   },
 
-  getCurrentUser: (): User | null => {
+  getCurrentUser: async (): Promise<User | null> => {
+    const auth = await firebaseConfig.getAuth();
     return auth.currentUser;
   },
 
   checkEmailVerification: async (): Promise<boolean> => {
+    const auth = await firebaseConfig.getAuth();
     const user = auth.currentUser;
     if (!user) return false;
     
