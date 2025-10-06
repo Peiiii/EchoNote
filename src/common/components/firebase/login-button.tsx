@@ -1,9 +1,12 @@
 import { Button } from '@/common/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
 import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
+import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
 import { LogIn } from 'lucide-react';
 
 export const LoginButton = () => {
+  const { isGoogleAuthSupported } = useGoogleAuthSupport();
+
   const handleGoogleLogin = async () => {
     try {
       const user = await firebaseAuthService.signInWithGoogle();
@@ -14,6 +17,10 @@ export const LoginButton = () => {
       console.error('Login failed:', error);
     }
   };
+
+  if (!isGoogleAuthSupported) {
+    return null;
+  }
 
   return (
     <TooltipProvider>

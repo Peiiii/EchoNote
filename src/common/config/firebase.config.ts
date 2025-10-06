@@ -50,6 +50,7 @@ const saveRegionToLocalStorage = (region: string): void => {
 
 const CN_REGION = "CN";
 
+
 export class FirebaseConfig {
   private static instance: FirebaseConfig | null = null;
   private app: FirebaseApp = app;
@@ -72,6 +73,19 @@ export class FirebaseConfig {
 
   getApp(): FirebaseApp {
     return this.app;
+  }
+
+  /**
+   * 
+   * @returns true if the region is CN
+   * not support google auth in this region
+   */
+  isInCNRegion(): boolean {
+    return this.region === CN_REGION;
+  }
+
+  supportGoogleAuth(): boolean {
+    return !this.isInCNRegion();
   }
 
   private async fetchRegion(): Promise<string> {
@@ -99,7 +113,7 @@ export class FirebaseConfig {
 
    getAuth(): Auth {
     if (!this.auth) {
-      if (this.region === CN_REGION) {
+      if (this.isInCNRegion()) {
         this.auth = initializeAuth(this.getApp(), {
           persistence: browserLocalPersistence
         });

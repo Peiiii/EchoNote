@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from 'firebase/auth';
 import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
+import { firebaseConfig } from '@/common/config/firebase.config';
 
 export interface AuthState {
   currentUser: User | null;
@@ -43,6 +44,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticating: false,
 
       signInWithGoogle: async () => {
+        if (!firebaseConfig.supportGoogleAuth()) {
+          throw new Error('Google authentication is not supported in this region');
+        }
         set({ isAuthenticating: true });
         try {
           await firebaseAuthService.signInWithGoogle();

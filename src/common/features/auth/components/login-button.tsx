@@ -1,8 +1,10 @@
 import { Button } from '@/common/components/ui/button';
 import { useAuthStore } from '@/core/stores/auth.store';
+import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
 
 export const LoginButton = () => {
   const { currentUser, signInWithGoogle, signOut } = useAuthStore();
+  const { isGoogleAuthSupported } = useGoogleAuthSupport();
 
   const handleLogin = async () => {
     await signInWithGoogle();
@@ -20,6 +22,14 @@ export const LoginButton = () => {
           Logout
         </Button>
       </div>
+    );
+  }
+
+  if (!isGoogleAuthSupported) {
+    return (
+      <Button disabled>
+        Sign in (Email only)
+      </Button>
     );
   }
 

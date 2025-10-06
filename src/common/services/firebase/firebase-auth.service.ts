@@ -20,6 +20,11 @@ export const firebaseAuthService = {
 
   signInWithGoogle: async (): Promise<User | null> => {
     console.log("[firebaseAuthService] signInWithGoogle");
+    
+    if (!firebaseConfig.supportGoogleAuth()) {
+      throw new Error('Google authentication is not supported in this region');
+    }
+    
     // const GoogleAuthProvider = await import('firebase/auth').then(mod => mod.GoogleAuthProvider);
     // const signInWithPopup = await import('firebase/auth').then(mod => mod.signInWithPopup);
     const provider = new GoogleAuthProvider();
