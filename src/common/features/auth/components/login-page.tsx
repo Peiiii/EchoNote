@@ -1,24 +1,25 @@
+import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
 import { useAuthStore } from '@/core/stores/auth.store';
-import { toast } from 'sonner';
 import { useState } from 'react';
-import { SocialLogin } from './social-login';
-import { EmailPasswordForm } from './email-password-form';
+import { toast } from 'sonner';
 import { AuthMessages } from './auth-messages';
-import { LoginHeader } from './login-header';
+import { EmailPasswordForm } from './email-password-form';
 import { LoginFooter } from './login-footer';
+import { LoginHeader } from './login-header';
 import { LoginIllustration } from './login-illustration';
+import { SocialLogin } from './social-login';
 
 export const LoginPage = () => {
-  const { 
-    signInWithGoogle, 
-    signInWithEmail, 
+  const {
+    signInWithGoogle,
+    signInWithEmail,
     sendSignUpLink,
     sendPasswordReset,
     sendEmailVerification,
-    isAuthenticating 
+    isAuthenticating
   } = useAuthStore();
-  
-  
+
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -36,7 +37,7 @@ export const LoginPage = () => {
     } catch (error: unknown) {
       console.error('Google login failed:', error);
       const firebaseError = error as { code?: string; message?: string };
-      
+
       // 处理Google登录的Firebase错误
       switch (firebaseError.code) {
         case 'auth/popup-closed-by-user':
@@ -83,20 +84,20 @@ export const LoginPage = () => {
     try {
       setError('');
       setStatusMessage('');
-      
+
       if (isSignUp) {
         toast.loading("Creating your account...", {
           id: "creating-account",
           duration: 1000
         });
-        
+
         const result = await sendSignUpLink(email, password);
         if (result.verificationSent) {
           setPendingUser({ email });
           setIsEmailVerificationSent(true);
           setError('');
           setStatusMessage('');
-          
+
           toast.success("Account created! Please check your email to verify your account.", {
             id: "creating-account",
             duration: 3000
@@ -107,9 +108,9 @@ export const LoginPage = () => {
           id: "signing-in",
           duration: 1000
         });
-        
+
         await signInWithEmail(email, password);
-        
+
         toast.success("Login successful! Welcome back!", {
           id: "signing-in",
           duration: 1500
@@ -118,11 +119,11 @@ export const LoginPage = () => {
     } catch (error: unknown) {
       console.error('Email auth failed:', error);
       setStatusMessage('');
-      
+
       // 处理常见的Firebase错误，转换为用户友好的错误信息
       const firebaseError = error as { code?: string; message?: string };
       let errorMessage = '';
-      
+
       switch (firebaseError.code) {
         case 'auth/user-not-found':
           errorMessage = 'No account found with this email address';
@@ -167,7 +168,7 @@ export const LoginPage = () => {
             errorMessage = 'Authentication failed. Please check your credentials and try again.';
           }
       }
-      
+
       setError(errorMessage);
       toast.error(errorMessage, {
         id: isSignUp ? "creating-account" : "signing-in",
@@ -189,7 +190,7 @@ export const LoginPage = () => {
     } catch (error: unknown) {
       console.error('Password reset failed:', error);
       const firebaseError = error as { code?: string; message?: string };
-      
+
       // 处理密码重置的Firebase错误
       switch (firebaseError.code) {
         case 'auth/user-not-found':
@@ -223,7 +224,7 @@ export const LoginPage = () => {
     } catch (error: unknown) {
       console.error('Resend verification failed:', error);
       const firebaseError = error as { code?: string; message?: string };
-      
+
       switch (firebaseError.code) {
         case 'auth/too-many-requests':
           setError('Too many verification attempts. Please try again later.');
@@ -255,24 +256,29 @@ export const LoginPage = () => {
     setConfirmPassword('');
   };
 
+  const { isGoogleAuthSupported } = useGoogleAuthSupport();
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 flex">
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <LoginHeader />
-          
+
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
-            <SocialLogin onGoogleLogin={handleGoogleLogin} isAuthenticating={isAuthenticating} />
-
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200 dark:border-slate-600" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">or</span>
-              </div>
-            </div>
-
+            {
+              isGoogleAuthSupported && <>
+                <SocialLogin onGoogleLogin={handleGoogleLogin} isAuthenticating={isAuthenticating} />
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200 dark:border-slate-600" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">or</span>
+                  </div>
+                </div>
+              </>
+            }
             <EmailPasswordForm
               email={email}
               password={password}
