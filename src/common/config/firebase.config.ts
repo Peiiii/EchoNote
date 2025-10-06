@@ -117,13 +117,14 @@ export class FirebaseConfig {
         this.auth = initializeAuth(this.getApp(), {
           persistence: browserLocalPersistence
         });
+        connectAuthEmulator(this.auth, PROXY_URL_AUTH, {
+          disableWarnings: true
+        });
       } else {
         this.auth = getAuth(this.getApp());
       }
 
-      connectAuthEmulator(this.auth, PROXY_URL_AUTH, {
-        disableWarnings: true
-      });
+     
     }
     return this.auth;
   }
