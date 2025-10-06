@@ -1,10 +1,11 @@
+import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
+import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
-import { CreateChannelPopover } from "./create-channel-popover";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
-import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { CreateChannelPopover } from "./create-channel-popover";
 
 interface ChannelListProps {
     showFadeEffect?: boolean;
@@ -13,6 +14,7 @@ interface ChannelListProps {
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     const { channels, channelsLoading, addChannel, deleteChannel } = useNotesDataStore();
     const { currentChannelId, setCurrentChannel } = useNotesViewStore();
+    useAutoSelectFirstChannel();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasScroll, setHasScroll] = useState(false);
 

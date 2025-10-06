@@ -387,4 +387,3 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   },
 }));
 
-

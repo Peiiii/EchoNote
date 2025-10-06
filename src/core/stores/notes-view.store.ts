@@ -38,7 +38,7 @@ export const useNotesViewStore = create<NotesViewState>()(
   persist(
     (set, get) => ({
       // Initial view state
-      currentChannelId: "general",
+      currentChannelId: null,
       isAddingMessage: false,
       isUpdatingMessage: false,
       isDeletingMessage: false,
