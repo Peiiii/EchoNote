@@ -1,6 +1,6 @@
 {
-  "name": "EchoNote - AI-Powered Note Taking",
-  "short_name": "EchoNote",
+  "name": "StillRoot - Where Thoughts Take Root",
+  "short_name": "StillRoot",
   "description": "AI-powered note taking application with intelligent features",
   "start_url": "/",
   "display": "standalone",
