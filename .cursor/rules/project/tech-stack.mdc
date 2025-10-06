@@ -1,0 +1,62 @@
+---
+alwaysApply: true
+---
+
+
+# Project Technology Stack Documentation
+
+## Current Technology Stack
+
+### Core Technologies
+- **Package Manager**: pnpm
+- **Build Tool**: Vite
+- **Frontend Framework**: React
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+
+## Development Guidelines
+
+### Language Requirements
+- **All code must be written in English**
+- **All comments must be in English**
+- **All variable names, function names, and file names must be in English**
+
+### shadcn/ui Commands
+- **Add new component**: `pnpm dlx shadcn@latest add xxx`
+
+---
+
+*This document will be updated as new technologies are added to the project.*
+
+
+*This document serves as the single source of truth for the project's technology stack and should be referenced when making architectural decisions.*
+
+# Project Technology Stack Documentation
+
+## Current Technology Stack
+
+### Core Technologies
+- **Package Manager**: pnpm
+- **Build Tool**: Vite
+- **Frontend Framework**: React
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+
+## Development Guidelines
+
+### Language Requirements
+- **All code must be written in English**
+- **All comments must be in English**
+- **All variable names, function names, and file names must be in English**
+
+### shadcn/ui Commands
+- **Add new component**: `pnpm dlx shadcn@latest add xxx`
+
+---
+
+*This document will be updated as new technologies are added to the project.*
+
+
+*This document serves as the single source of truth for the project's technology stack and should be referenced when making architectural decisions.*

@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+# Project Configuration
+
+## Application Language
+- **Primary Language**: English
+- **Code Language**: English
+- **Documentation Language**: English
+- **UI Language**: English
+
+## User Rules
+- try not to use `any` type in the code unless there is no other way.
+- avoid over-engineering the code.
+- **Never add comments to the code unless explicitly requested by the user.**

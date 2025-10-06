@@ -1,0 +1,15 @@
+---
+alwaysApply: true
+description: "English UI Language Rule - Ensures all user interface text is in English"
+---
+
+这是一个English-fisrt的应用和项目，从界面展示到项目代码和注释都必须用英文。
+
+Always Use English in UI ， Always use English in Coding. The UI should not display Any Chinese by default.
+
+这个项目必须用英文开发！！！不能出现中文！！！
+
+代码里注释必须用英文。
+界面展示也必须用英文。
+开发和展示都应该用英文。
+Use English Only.
