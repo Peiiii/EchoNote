@@ -11,6 +11,7 @@ import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -56,6 +57,7 @@ export const ChannelCoverHeader = ({
 }: ChannelCoverHeaderProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const featuresConfig = getFeaturesConfig();
   const notifyLayoutChange = useReadMoreStore(
     useCallback((state) => state.notifyLayoutChange, [])
   );
@@ -224,14 +226,16 @@ export const ChannelCoverHeader = ({
           >
             <Search className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-            onClick={onOpenSettings}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          {featuresConfig.channel.settings.enabled && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+              onClick={onOpenSettings}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          )}
           <BackgroundSwitcher
             currentBackground={{
               type: channel.backgroundColor ? 'color' : 'image',
@@ -332,14 +336,16 @@ export const ChannelCoverHeader = ({
               onBackgroundChange={handleBackgroundChange}
               onRemoveBackground={handleRemoveBackground}
             />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={onOpenSettings}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
+            {featuresConfig.channel.settings.enabled && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+                onClick={onOpenSettings}
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
