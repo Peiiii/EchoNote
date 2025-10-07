@@ -36,7 +36,7 @@ export const MobileHeader = ({
                     onClick={openChannelList}
                     className="h-9 w-9 dark:text-primary"
                 >
-                    <Menu className="h-6 w-6" />
+                    <Menu className="size-5"/>
                 </Button>
 
                 {/* Center: Current Channel Name or Dropdown */}
@@ -64,7 +64,7 @@ export const MobileHeader = ({
                         className="h-9 w-9 dark:text-primary"
                         title="Search"
                     >
-                        <Search className="h-6 w-6" />
+                        <Search className="size-5"/>
                     </Button>
                     <Button
                         variant="ghost"
@@ -72,15 +72,15 @@ export const MobileHeader = ({
                         onClick={handleOpenAIAssistant}
                         className="h-9 w-9 dark:text-primary"
                     >
-                        <Bot className="h-6 w-6" />
+                        <Bot className="size-5"/>
                     </Button>
                         <Button
                             variant="ghost"
-                            size="icon"
+                            size="lg"
                             onClick={openSettings}
                             className="h-9 w-9 dark:text-primary"
                         >
-                            <Settings className="h-6 w-6" />
+                            <Settings className="size-5"/>
                         </Button>
                 </div>
             </div>
