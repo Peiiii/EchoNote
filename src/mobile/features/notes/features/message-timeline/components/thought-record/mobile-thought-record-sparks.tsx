@@ -1,9 +1,8 @@
 import { Lightbulb } from 'lucide-react';
-import { Button } from '@/common/components/ui/button';
 import { Message, useNotesDataStore } from '@/core/stores/notes-data.store';
 import { generateSparksForTextSimple } from '@/desktop/features/notes/features/ai-assistant/services/insights.service';
 import { channelMessageService } from '@/core/services/channel-message.service';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getFeaturesConfig } from '@/core/config/features.config';
 
 interface MobileThoughtRecordSparksProps {
@@ -11,7 +10,7 @@ interface MobileThoughtRecordSparksProps {
     className?: string;
     showAnalysis: boolean;
     onToggleAnalysis: () => void;
-    autoGenerate?: boolean; // 是否自动生成 sparks
+    autoGenerate?: boolean;
 }
 
 export function MobileThoughtRecordSparks({ 
@@ -26,14 +25,7 @@ export function MobileThoughtRecordSparks({
     const aiAnalysis = message.aiAnalysis;
     const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
-    // 自动生成 sparks 的逻辑
-    useEffect(() => {
-        if (autoGenerate && showAnalysis && !hasSparks && !isGenerating) {
-            handleGenerateSparks();
-        }
-    }, [autoGenerate, showAnalysis, hasSparks, isGenerating]);
-
-    async function handleGenerateSparks() {
+    const handleGenerateSparks = useCallback(async () => {
         try {
             setIsGenerating(true);
             const sparks = await generateSparksForTextSimple(message.content);
@@ -65,35 +57,37 @@ export function MobileThoughtRecordSparks({
         } finally {
             setIsGenerating(false);
         }
-    }
+    }, [message.content, message.id, message.channelId, aiAnalysis]);
 
-    // 如果功能开关关闭，不显示组件
+    useEffect(() => {
+        if (autoGenerate && showAnalysis && !hasSparks && !isGenerating) {
+            handleGenerateSparks();
+        }
+    }, [autoGenerate, showAnalysis, hasSparks, isGenerating, handleGenerateSparks]);
+
     if (!getFeaturesConfig().channel.thoughtRecord.sparks.enabled) {
         return null;
     }
 
-    // 如果有 sparks，总是显示组件（用于底部图标）
-    // 如果没有 sparks 但 showAnalysis 为 true，显示生成状态
     if (!hasSparks && !showAnalysis) {
         return null;
     }
 
     return (
         <div className={className}>
-            {/* 如果有 sparks，显示展开/收起按钮 */}
             {hasSparks ? (
                 <div className="space-y-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                    <button
                         onClick={onToggleAnalysis}
-                        className="h-7 px-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 group"
+                        title={showAnalysis ? "Hide sparks" : "Show sparks"}
                     >
-                        <Lightbulb className="w-3 h-3 mr-1" />
-                        {showAnalysis ? 'Hide' : `${aiAnalysis!.insights.length} Sparks`}
-                    </Button>
+                        <Lightbulb className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                            {aiAnalysis!.insights.length}
+                        </span>
+                    </button>
                     
-                    {/* Sparks Content - 只在展开时显示 */}
                     {showAnalysis && (
                         <div className="space-y-2">
                             {aiAnalysis!.insights.map((insight: string, index: number) => (
@@ -108,7 +102,6 @@ export function MobileThoughtRecordSparks({
                     )}
                 </div>
             ) : (
-                /* 如果没有 sparks，显示生成状态 */
                 <div className="flex items-center justify-center py-4">
                     {isGenerating ? (
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
