@@ -2,6 +2,7 @@ import { FooterItem } from "./footer-item";
 import { ThreadIndicator } from "./thread-indicator";
 import { TagSection } from "./tag-section";
 import { MessageFooterProps } from "../types";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 export function MessageFooter({ 
     message, 
@@ -19,7 +20,7 @@ export function MessageFooter({
                     {message.content.length} characters
                 </FooterItem>
                 
-                {hasSparks && (
+                {hasSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled && (
                     <>
                         <span className="text-slate-300 dark:text-slate-600">•</span>
                         <FooterItem onClick={onToggleAnalysis}>
@@ -28,18 +29,22 @@ export function MessageFooter({
                     </>
                 )}
                 
-                <TagSection 
-                    tags={editingTags}
-                    onTagsChange={onTagsChange}
-                    maxTags={10}
-                />
+                {getFeaturesConfig().channel.thoughtRecord.tags.enabled && (
+                    <TagSection 
+                        tags={editingTags}
+                        onTagsChange={onTagsChange}
+                        maxTags={10}
+                    />
+                )}
             </div>
 
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                <ThreadIndicator
-                    threadCount={threadCount}
-                    messageId={message.id}
-                />
+                {getFeaturesConfig().channel.thoughtRecord.thread.enabled && (
+                    <ThreadIndicator
+                        threadCount={threadCount}
+                        messageId={message.id}
+                    />
+                )}
             </div>
         </div>
     );

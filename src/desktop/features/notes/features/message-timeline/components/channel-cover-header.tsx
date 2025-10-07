@@ -57,7 +57,6 @@ export const ChannelCoverHeader = ({
 }: ChannelCoverHeaderProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const featuresConfig = getFeaturesConfig();
   const notifyLayoutChange = useReadMoreStore(
     useCallback((state) => state.notifyLayoutChange, [])
   );
@@ -226,7 +225,7 @@ export const ChannelCoverHeader = ({
           >
             <Search className="h-4 w-4" />
           </Button>
-          {featuresConfig.channel.settings.enabled && (
+          {getFeaturesConfig().channel.settings.enabled && (
             <Button
               variant="ghost"
               size="sm"
@@ -336,7 +335,7 @@ export const ChannelCoverHeader = ({
               onBackgroundChange={handleBackgroundChange}
               onRemoveBackground={handleRemoveBackground}
             />
-            {featuresConfig.channel.settings.enabled && (
+            {getFeaturesConfig().channel.settings.enabled && (
               <Button
                 variant="ghost"
                 size="sm"

@@ -12,7 +12,7 @@ export function ToolbarButton({
     
     return (
         <button
-            onClick={onClick}
+            onClick={() => onClick?.()}
             disabled={disabled}
             className={`${baseClasses} ${disabledClasses} ${className}`}
             title={title}

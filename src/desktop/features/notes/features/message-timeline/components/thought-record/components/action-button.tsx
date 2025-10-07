@@ -3,7 +3,7 @@ import { ActionButtonProps } from "../types";
 export function ActionButton({ icon: Icon, onClick, title, disabled, active }: ActionButtonProps) {
     return (
         <button
-            onClick={onClick}
+            onClick={() => onClick?.()}
             disabled={disabled}
             className={`p-2 transition-all duration-200 rounded-lg hover:scale-105 ${
                 active 

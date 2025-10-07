@@ -31,6 +31,29 @@ export const getFeaturesConfig = () => {
                     enabled: false,
                 },
             },
+            thoughtRecord: {
+                edit: {
+                    enabled: true,
+                },
+                sparks: {
+                    enabled: true,
+                },
+                viewDetails: {
+                    enabled: false,
+                },
+                bookmark: {
+                    enabled: false,
+                },
+                reply: {
+                    enabled: false,
+                },
+                tags: {
+                    enabled: true,
+                },
+                thread: {
+                    enabled: false,
+                },
+            },
         },
     }
 }
