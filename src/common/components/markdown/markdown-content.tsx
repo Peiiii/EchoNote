@@ -85,42 +85,42 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
 
                     h1({ children, ...props }) {
                         return (
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-8" {...props}>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 mt-5 leading-7" {...props}>
                                 {children}
                             </h1>
                         );
                     },
                     h2({ children, ...props }) {
                         return (
-                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-7" {...props}>
+                            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-4 leading-6" {...props}>
                                 {children}
                             </h2>
                         );
                     },
                     h3({ children, ...props }) {
                         return (
-                            <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 mt-3 leading-5" {...props}>
                                 {children}
                             </h3>
                         );
                     },
                     h4({ children, ...props }) {
                         return (
-                            <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
+                            <h4 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 mt-3 leading-5" {...props}>
                                 {children}
                             </h4>
                         );
                     },
                     h5({ children, ...props }) {
                         return (
-                            <h5 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
+                            <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 mt-3 leading-5" {...props}>
                                 {children}
                             </h5>
                         );
                     },
                     h6({ children, ...props }) {
                         return (
-                            <h6 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4 mt-6 leading-6" {...props}>
+                            <h6 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 mt-3 leading-5" {...props}>
                                 {children}
                             </h6>
                         );

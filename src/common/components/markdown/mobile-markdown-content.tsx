@@ -84,45 +84,45 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                     // 移动端优化的标题样式
                     h1({ children, ...props }) {
                         return (
-                            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2" {...props}>
+                            <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 mt-3 leading-6" {...props}>
                                 {children}
                             </h1>
                         );
                     },
                     h2({ children, ...props }) {
                         return (
-                            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2 text-blue-600 dark:text-blue-400" {...props}>
+                            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-2 mt-3 leading-5" {...props}>
                                 {children}
                             </h2>
                         );
                     },
                     h3({ children, ...props }) {
                         return (
-                            <h3 className="text-base font-medium text-slate-800 dark:text-slate-200 mb-2" {...props}>
+                            <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1 mt-2 leading-5" {...props}>
                                 {children}
                             </h3>
                         );
                     },
                     h4({ children, ...props }) {
                         return (
-                            <h4 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2" {...props}>
+                            <h4 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1 mt-2 leading-5" {...props}>
                                 {children}
                             </h4>
                         );
                     },
                     h5({ children, ...props }) {
                         return (
-                            <h5 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1" {...props}>
+                            <h5 className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1 mt-2 leading-4" {...props}>
                                 {children}
                             </h5>
                         );
                     },
                     h6({ children, ...props }) {
                         return (
-                            <h6 className="text-xs font-medium text-slate-800 dark:text-slate-200 mb-1" {...props}>
+                            <h6 className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 mt-2 leading-4" {...props}>
                                 {children}
                             </h6>
-                            );
+                        );
                     },
 
                     // 移动端优化的段落样式
