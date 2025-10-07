@@ -1,12 +1,10 @@
 import { Button } from "@/common/components/ui/button";
-import { Menu, Bot, Settings, Search } from "lucide-react";
-import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { Channel } from "@/core/stores/notes-data.store";
-import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
-import { getFeaturesConfig } from "@/core/config/features.config";
+import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
+import { Bot, Menu, Search, Settings } from "lucide-react";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
@@ -76,7 +74,6 @@ export const MobileHeader = ({
                     >
                         <Bot className="h-6 w-6" />
                     </Button>
-                    {getFeaturesConfig().channel.settings.enabled && (
                         <Button
                             variant="ghost"
                             size="icon"
@@ -85,7 +82,6 @@ export const MobileHeader = ({
                         >
                             <Settings className="h-6 w-6" />
                         </Button>
-                    )}
                 </div>
             </div>
         </div>
