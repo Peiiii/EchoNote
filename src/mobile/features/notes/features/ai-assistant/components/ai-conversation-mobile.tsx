@@ -4,7 +4,7 @@ import { AIConversationEmptyPane } from "@/common/features/ai-assistant/componen
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { AIConversation } from "@/common/types/ai-conversation";
-import { ArrowLeft, Loader2, MessageSquare, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, History, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { ConversationContextControl } from "@/common/features/ai-assistant/features/context";
 // removed: creation-time context dropdown; we now use in-chat context control
@@ -113,7 +113,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 aria-label="Show conversations"
                 className="h-8 w-8 flex-shrink-0"
               >
-                <MessageSquare className="w-4 h-4" />
+                <History className="w-4 h-4" />
               </Button>
             )}
             {view === "list" && (

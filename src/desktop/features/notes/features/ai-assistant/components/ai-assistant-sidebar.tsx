@@ -1,7 +1,7 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { Plus, MessageSquare, X } from "lucide-react";
+import { Plus, History, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
 import { useRef } from "react";
@@ -54,7 +54,7 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
                             }}
                             aria-label="Conversations"
                         >
-                            <MessageSquare className="w-5 h-5" />
+                            <History className="w-5 h-5" />
                         </Button>
                         <Button
                             variant="ghost"
