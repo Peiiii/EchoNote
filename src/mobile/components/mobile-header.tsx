@@ -6,6 +6,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Channel } from "@/core/stores/notes-data.store";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
@@ -75,14 +76,16 @@ export const MobileHeader = ({
                     >
                         <Bot className="h-6 w-6" />
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={openSettings}
-                        className="h-9 w-9 dark:text-primary"
-                    >
-                        <Settings className="h-6 w-6" />
-                    </Button>
+                    {getFeaturesConfig().channel.settings.enabled && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={openSettings}
+                            className="h-9 w-9 dark:text-primary"
+                        >
+                            <Settings className="h-6 w-6" />
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

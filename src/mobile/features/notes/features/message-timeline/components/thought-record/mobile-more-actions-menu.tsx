@@ -9,6 +9,7 @@ import {
   Trash2 
 } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 interface MobileMoreActionsMenuProps {
   message: Message;
@@ -48,7 +49,7 @@ export function MobileMoreActionsMenu({
       id: "primary",
       showSeparator: false,
       items: [
-        ...(onEdit ? [{
+        ...(onEdit && getFeaturesConfig().channel.thoughtRecord.edit.enabled ? [{
           id: "edit",
           icon: <Edit2 className="w-4 h-4" />,
           title: "Edit",
@@ -64,7 +65,7 @@ export function MobileMoreActionsMenu({
           variant: "default" as const,
           disabled: isEditing
         },
-        ...(onReply ? [{
+        ...(onReply && getFeaturesConfig().channel.thoughtRecord.reply.enabled ? [{
           id: "reply",
           icon: <MessageCircle className="w-4 h-4" />,
           title: "Reply",
@@ -78,7 +79,7 @@ export function MobileMoreActionsMenu({
       id: "ai",
       showSeparator: true,
       items: [
-        ...(onGenerateSparks ? [{
+        ...(onGenerateSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled ? [{
           id: "generate-sparks",
           icon: <Lightbulb className="w-4 h-4" />,
           title: "Generate Sparks",
@@ -92,7 +93,7 @@ export function MobileMoreActionsMenu({
       id: "secondary",
       showSeparator: true,
       items: [
-        ...(onViewDetails ? [{
+        ...(onViewDetails && getFeaturesConfig().channel.thoughtRecord.viewDetails.enabled ? [{
           id: "view-details",
           icon: <Eye className="w-4 h-4" />,
           title: "View Details",
@@ -100,7 +101,7 @@ export function MobileMoreActionsMenu({
           variant: "default" as const,
           disabled: isEditing
         }] : []),
-        ...(onBookmark ? [{
+        ...(onBookmark && getFeaturesConfig().channel.thoughtRecord.bookmark.enabled ? [{
           id: "bookmark",
           icon: <Bookmark className="w-4 h-4" />,
           title: "Bookmark",

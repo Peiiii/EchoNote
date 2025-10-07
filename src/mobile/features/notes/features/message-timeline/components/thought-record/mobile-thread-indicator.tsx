@@ -1,6 +1,7 @@
 import { Button } from '@/common/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 import { rxEventBusService } from '@/common/services/rx-event-bus.service';
+import { getFeaturesConfig } from '@/core/config/features.config';
 
 interface MobileThreadIndicatorProps {
     threadCount: number;
@@ -11,6 +12,10 @@ export function MobileThreadIndicator({
     threadCount, 
     messageId 
 }: MobileThreadIndicatorProps) {
+    if (!getFeaturesConfig().channel.thoughtRecord.thread.enabled) {
+        return null;
+    }
+
     const handleOpenThread = () => {
         rxEventBusService.requestOpenThread$.emit({ messageId });
     };

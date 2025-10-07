@@ -4,6 +4,7 @@ import { Message, useNotesDataStore } from '@/core/stores/notes-data.store';
 import { generateSparksForTextSimple } from '@/desktop/features/notes/features/ai-assistant/services/insights.service';
 import { channelMessageService } from '@/core/services/channel-message.service';
 import { useState, useEffect } from 'react';
+import { getFeaturesConfig } from '@/core/config/features.config';
 
 interface MobileThoughtRecordSparksProps {
     message: Message;
@@ -64,6 +65,11 @@ export function MobileThoughtRecordSparks({
         } finally {
             setIsGenerating(false);
         }
+    }
+
+    // 如果功能开关关闭，不显示组件
+    if (!getFeaturesConfig().channel.thoughtRecord.sparks.enabled) {
+        return null;
     }
 
     // 如果有 sparks，总是显示组件（用于底部图标）
