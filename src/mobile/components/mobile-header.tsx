@@ -18,13 +18,11 @@ export const MobileHeader = ({
     channels: _channels
 }: MobileHeaderProps) => {
     const { openChannelList, openAIAssistant, openSettings } = useUIStateStore();
-    const { currentChannelId, setCurrentChannel } = useNotesViewStore();
+    const { setCurrentChannel } = useNotesViewStore();
     const { channels: allChannels } = useNotesDataStore();
     
     const handleOpenAIAssistant = () => {
-        if (currentChannelId) {
-            openAIAssistant(currentChannelId);
-        }
+        openAIAssistant();
     };
     return (
         <div className="flex-shrink-0 px-4 py-2 bg-background">

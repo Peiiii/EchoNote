@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { isMobile } from "@/common/lib/breakpoint-utils";
 
 export interface UIState {
   // AI Assistant state
   isAIAssistantOpen: boolean;
-  aiAssistantChannelId: string | null;
   
   // Thread sidebar state
   isThreadOpen: boolean;
@@ -17,7 +17,7 @@ export interface UIState {
   isChannelListOpen: boolean;
   
   // Actions for AI Assistant
-  openAIAssistant: (channelId: string) => void;
+  openAIAssistant: () => void;
   closeAIAssistant: () => void;
   
   // Actions for Thread
@@ -36,19 +36,17 @@ export interface UIState {
 export const useUIStateStore = create<UIState>()(
   persist(
     (set) => ({
-      // Initial state
-      isAIAssistantOpen: false,
-      aiAssistantChannelId: null,
+      // Initial state - open on desktop, closed on mobile
+      isAIAssistantOpen: !isMobile(),
       isThreadOpen: false,
       currentThreadId: null,
       isSettingsOpen: false,
       isChannelListOpen: false,
 
       // AI Assistant actions (mutually exclusive with thread sidebar)
-      openAIAssistant: (channelId: string) => {
+      openAIAssistant: () => {
         set({
           isAIAssistantOpen: true,
-          aiAssistantChannelId: channelId,
           isThreadOpen: false,
           currentThreadId: null,
         });
@@ -57,7 +55,6 @@ export const useUIStateStore = create<UIState>()(
       closeAIAssistant: () => {
         set({
           isAIAssistantOpen: false,
-          aiAssistantChannelId: null,
         });
       },
 
@@ -67,7 +64,6 @@ export const useUIStateStore = create<UIState>()(
           isThreadOpen: true,
           currentThreadId: messageId,
           isAIAssistantOpen: false,
-          aiAssistantChannelId: null,
         });
       },
 

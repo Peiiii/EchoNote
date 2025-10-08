@@ -1,18 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-
-/**
- * Application breakpoint configuration
- * Mobile-first approach with higher mobile threshold for development
- */
-const breakpoints = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  '2xl': 1536,
-} as const;
-
-type Breakpoint = keyof typeof breakpoints;
+import { type Breakpoint, getCurrentBreakpoint, isMobile, isTablet, isDesktop } from '@/common/lib/breakpoint-utils';
 
 interface BreakpointContextType {
   currentBreakpoint: Breakpoint;
@@ -28,19 +15,7 @@ export function BreakpointProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     const updateBreakpoint = () => {
-      const width = window.innerWidth;
-      
-      if (width >= breakpoints['2xl']) {
-        setCurrentBreakpoint('2xl');
-      } else if (width >= breakpoints.xl) {
-        setCurrentBreakpoint('xl');
-      } else if (width >= breakpoints.lg) {
-        setCurrentBreakpoint('lg');
-      } else if (width >= breakpoints.md) {
-        setCurrentBreakpoint('md');
-      } else {
-        setCurrentBreakpoint('sm');
-      }
+      setCurrentBreakpoint(getCurrentBreakpoint());
     };
 
     updateBreakpoint();
@@ -51,12 +26,10 @@ export function BreakpointProvider({ children }: { children: React.ReactNode }) 
 
   const value: BreakpointContextType = {
     currentBreakpoint,
-    // 移动端：小于768px（包括手机和平板竖屏）
-    isMobile: currentBreakpoint === 'sm' || currentBreakpoint === 'md',
-    // 平板横屏：1024px以下，768px以上
-    isTablet: currentBreakpoint === 'lg',
-    // 桌面端：1280px以上
-    isDesktop: currentBreakpoint === 'xl' || currentBreakpoint === '2xl',
+    // Use the utility functions for consistency
+    isMobile: isMobile(),
+    isTablet: isTablet(),
+    isDesktop: isDesktop(),
   };
 
   return (

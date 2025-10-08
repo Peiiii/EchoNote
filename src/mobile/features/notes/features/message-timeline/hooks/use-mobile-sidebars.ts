@@ -36,8 +36,7 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
     };
 
     useEffect(() => rxEventBusService.requestOpenAIAssistant$.listen(() => {
-        const { currentChannelId } = useNotesViewStore.getState();
-        if (currentChannelId) openAIAssistant(currentChannelId);
+        openAIAssistant();
     }), [openAIAssistant]);
 
     return {
@@ -50,9 +49,7 @@ export const useMobileSidebars = (): MobileSidebarState & MobileSidebarActions =
         openChannelList: () => setIsChannelListOpen(true),
         closeChannelList: () => setIsChannelListOpen(false),
         openAIAssistant: () => {
-            if (useNotesViewStore.getState().currentChannelId) {
-                openAIAssistant(useNotesViewStore.getState().currentChannelId!);
-            }
+            openAIAssistant();
         },
         closeAIAssistant,
         openSettings: () => setIsSettingsOpen(true),

@@ -4,7 +4,6 @@ import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useLazyLoadingScrollControl } from "@/common/features/notes/hooks/use-lazy-loading-scroll-control";
 import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { Bot, ChevronUp, PenLine } from "lucide-react";
@@ -47,7 +46,6 @@ export const MessageTimeline = forwardRef<
     },
     ref
   ) => {
-    const { currentChannelId } = useNotesViewStore();
     const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
     
     // Use unified input collapse hook
@@ -184,9 +182,7 @@ export const MessageTimeline = forwardRef<
             <div className="pointer-events-auto">
               <FloatingActionButton
                 onClick={() => {
-                  if (currentChannelId) {
-                    openAIAssistant(currentChannelId);
-                  }
+                  openAIAssistant();
                 }}
                 isVisible={!isAIAssistantOpen}
                 ariaLabel="Open AI Assistant"

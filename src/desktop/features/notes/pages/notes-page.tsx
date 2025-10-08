@@ -27,6 +27,7 @@ export function NotesPage() {
     const { currentChannelId } = useNotesViewStore();
     const jumpingRef = useRef(false);
 
+
     const handleOpenSettings = () => {
         console.log('Open channel settings');
         openSettings();
@@ -37,13 +38,13 @@ export function NotesPage() {
     };
 
     useEffect(() =>
-        rxEventBusService.requestOpenAIAssistant$.listen(({ channelId }) => {
-            openAIAssistant(channelId);
+        rxEventBusService.requestOpenAIAssistant$.listen(() => {
+            openAIAssistant();
         }), [openAIAssistant]);
 
     useEffect(() =>
-        rxEventBusService.requestOpenAIConversation$.listen(({ channelId }) => {
-            openAIAssistant(channelId);
+        rxEventBusService.requestOpenAIConversation$.listen(() => {
+            openAIAssistant();
         }), [openAIAssistant]);
 
     useEffect(() =>
