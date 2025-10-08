@@ -33,12 +33,14 @@ interface RefinedPopoverProps {
   side?: "top" | "right" | "bottom" | "left";
   sideOffset?: number;
   className?: string;
+  modal?: boolean;
 }
 
 const RefinedPopoverRoot = ({
   children,
   open,
-  onOpenChange
+  onOpenChange,
+  modal
 }: RefinedPopoverProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
   
@@ -52,7 +54,7 @@ const RefinedPopoverRoot = ({
 
   return (
     <RefinedPopoverContext.Provider value={contextValue}>
-      <Popover open={isOpen} onOpenChange={handleOpenChange}>
+      <Popover open={isOpen} onOpenChange={handleOpenChange} modal={modal}>
         {children}
       </Popover>
     </RefinedPopoverContext.Provider>

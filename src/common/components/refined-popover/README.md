@@ -141,7 +141,7 @@ The action buttons area with proper alignment and spacing.
 Consistent button component for popover actions.
 
 **Props:**
-- `variant?`: "default" | "outline" | "ghost" - Button style variant (default: "default")
+- `variant?`: "default" | "outline" | "ghost" | "destructive" - Button style variant (default: "default")
 - `size?`: "sm" | "md" - Button size (default: "md")
 - `disabled?`: boolean - Whether the button is disabled
 - `onClick?`: () => void - Click handler
@@ -175,6 +175,7 @@ The component uses a consistent set of Tailwind CSS classes:
   - Base: `h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium flex items-center justify-center`
   - Default variant: `bg-primary text-primary-foreground hover:bg-primary/90`
   - Outline variant: `text-muted-foreground hover:text-foreground hover:bg-accent/30`
+  - Destructive variant: `bg-destructive text-destructive-foreground hover:bg-destructive/90`
 
 ### Customization
 

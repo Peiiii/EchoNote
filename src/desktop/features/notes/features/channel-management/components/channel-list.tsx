@@ -25,31 +25,19 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
     };
 
     const handleDeleteChannel = async (channelId: string) => {
-        const channel = channels.find(c => c.id === channelId);
-        if (!channel) return;
-
-        const confirmed = window.confirm(
-            `🗑️ Delete Channel\n\n` +
-            `"${channel.name}"\n\n` +
-            `⚠️ This action cannot be undone.\n` +
-            `The channel and all its messages will be moved to trash.\n\n` +
-            `Are you sure you want to continue?`
-        );
-
-        if (confirmed) {
-            try {
-                await deleteChannel(channelId);
-                // If the deleted channel was the current channel, switch to first available channel
-                if (currentChannelId === channelId && channels.length > 1) {
-                    const remainingChannels = channels.filter(c => c.id !== channelId);
-                    if (remainingChannels.length > 0) {
-                        setCurrentChannel(remainingChannels[0].id);
-                    }
+        try {
+            await deleteChannel(channelId);
+            // If the deleted channel was the current channel, switch to first available channel
+            if (currentChannelId === channelId && channels.length > 1) {
+                const remainingChannels = channels.filter(c => c.id !== channelId);
+                if (remainingChannels.length > 0) {
+                    console.log('🔔 [handleDeleteChannel] Switching to first available channel', remainingChannels[0].id);
+                    setCurrentChannel(remainingChannels[0].id);
                 }
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
             }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
         }
     };
 

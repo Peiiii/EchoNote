@@ -224,7 +224,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
 
   return (
     <div className={containerClass}>
-      <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
+      <RefinedPopover open={isOpen} onOpenChange={setIsOpen} modal>
         <RefinedPopover.Trigger asChild>
           {variant === 'compact' ? (
             <button
