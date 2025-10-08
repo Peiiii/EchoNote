@@ -178,7 +178,7 @@ export function CreateChannelPopover({ onAddChannel, trigger, variant = 'popover
             <RefinedPopover.Trigger asChild>
                 {trigger ?? defaultTrigger}
             </RefinedPopover.Trigger>
-            <RefinedPopover.Content align="center" side="top">
+            <RefinedPopover.Content align="center" side="bottom">
                 <RefinedPopover.Header>
                     <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
                         Create New Thought Space
