@@ -8,10 +8,11 @@ import { getFeaturesConfig } from "@/core/config/features.config";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
-import { Bot, ChevronDown, ChevronUp, MessageSquare, PanelLeft, Search, Settings, Users } from "lucide-react";
+import { Bot, ChevronDown, ChevronUp, MessageSquare, PanelLeft, Search, Settings, Users, Plus } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
+import { CreateChannelPopover } from "@/desktop/features/notes/features/channel-management/components/create-channel-popover";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -75,7 +76,7 @@ export const ChannelCoverHeader = ({
   const setLeftSidebarCollapsed = useUIPreferencesStore(
     useCallback((state) => state.setLeftSidebarCollapsed, [])
   );
-  const { updateChannel, channels } = useNotesDataStore();
+  const { updateChannel, channels, addChannel } = useNotesDataStore();
   const { setCurrentChannel } = useNotesViewStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
   const isGradient = backgroundStyle.includes('gradient');
@@ -131,6 +132,11 @@ export const ChannelCoverHeader = ({
     }
   };
 
+  const handleCreateChannel = (channel: { name: string; description: string; emoji?: string }) => {
+    // Reuse global store action; async fire-and-forget
+    void addChannel(channel);
+  };
+
   const handleRemoveBackground = async () => {
     try {
       await updateChannel(channel.id, { backgroundColor: undefined, backgroundImage: undefined });
@@ -143,15 +149,31 @@ export const ChannelCoverHeader = ({
     <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
       {/* Sidebar expand button when sidebar is collapsed */}
       {isLeftSidebarCollapsed && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleExpandSidebar}
-          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
-          title="Expand sidebar"
-        >
-          <PanelLeft className="h-4 w-4" />
-        </Button>
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExpandSidebar}
+            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
+            title="Expand sidebar"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </Button>
+          <CreateChannelPopover
+            onAddChannel={handleCreateChannel}
+            trigger={
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0"
+                title="New space"
+                aria-label="New space"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            }
+          />
+        </>
       )}
       
       {isLeftSidebarCollapsed ? (
@@ -215,7 +237,21 @@ export const ChannelCoverHeader = ({
           </div>
         </div>
 
-          <div className="flex items-center space-x-1 ml-4 flex-shrink-0">
+          <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
+          <CreateChannelPopover
+            onAddChannel={handleCreateChannel}
+            trigger={
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+                title="New space"
+                aria-label="New space"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            }
+          />
           <Button
             variant="ghost"
             size="sm"
@@ -309,7 +345,7 @@ export const ChannelCoverHeader = ({
       {isCollapsed ? (
         <>
           {collapsedContent}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"

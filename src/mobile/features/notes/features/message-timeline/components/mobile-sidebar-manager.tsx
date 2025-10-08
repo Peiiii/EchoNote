@@ -70,6 +70,7 @@ export const MobileSidebarManager = () => {
                     <SheetContent
                         side="right"
                         className="w-full max-w-md p-0 border-l border-border/60"
+                        hideClose
                     >
                         <MobileThreadSidebar
                             onSendMessage={handleSendThreadMessage}
@@ -83,6 +84,7 @@ export const MobileSidebarManager = () => {
                 <SheetContent
                     side="right"
                     className="w-full max-w-md p-0 border-l border-border/60"
+                    hideClose
                 >
                     <MobileSettingsSidebar />
                 </SheetContent>

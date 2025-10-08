@@ -4,7 +4,8 @@ import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
-import { Bot, Menu, Search, Settings } from "lucide-react";
+import { Bot, PanelLeft, Search, Settings, Plus } from "lucide-react";
+import { MobileCreateChannelPopover } from "@/mobile/features/notes/features/channel-management/components/mobile-create-channel-popover";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
@@ -27,15 +28,33 @@ export const MobileHeader = ({
     return (
         <div className="flex-shrink-0 px-4 py-2 bg-background">
             <div className="flex items-center justify-between">
-                {/* Left: Channel List Button */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={openChannelList}
-                    className="h-9 w-9 dark:text-primary"
-                >
-                    <Menu className="size-5"/>
-                </Button>
+                {/* Left: Open channel list + New space (keep spacing consistent) */}
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={openChannelList}
+                        className="h-9 w-9 dark:text-primary"
+                        title="Channels"
+                        aria-label="Channels"
+                    >
+                        <PanelLeft className="size-5"/>
+                    </Button>
+                    <MobileCreateChannelPopover
+                        onAddChannel={(channel) => { void useNotesDataStore.getState().addChannel(channel); }}
+                        trigger={
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 dark:text-primary"
+                                title="New space"
+                                aria-label="New space"
+                            >
+                                <Plus className="size-5" />
+                            </Button>
+                        }
+                    />
+                </div>
 
                 {/* Center: Current Channel Name or Dropdown */}
                 <div className="flex-1 text-center min-w-0">
@@ -53,8 +72,8 @@ export const MobileHeader = ({
                     )}
                 </div>
 
-                {/* Right: AI Assistant and Settings Buttons */}
-                <div className="flex items-center gap-1">
+                {/* Right: Follow desktop order (Search, AI, Settings) */}
+                <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
                         size="icon"

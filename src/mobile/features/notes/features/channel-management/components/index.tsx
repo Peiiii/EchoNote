@@ -3,6 +3,8 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileChannelItem } from "./mobile-channel-item";
 import { MobileCreateChannelPopover } from "./mobile-create-channel-popover";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
+import { Button } from "@/common/components/ui/button";
+import { Plus } from "lucide-react";
 import { useMemo } from "react";
 
 interface MobileChannelListProps {
@@ -69,12 +71,29 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
             <SheetContent 
                 side="left" 
                 className="w-80 p-0 border-r border-border"
+                hideClose
             >
                 <div className="flex flex-col h-full bg-background">
-                    {/* Header - Consistent with Settings */}
-                    <div className="flex items-center justify-start p-4">
+                    {/* Header - align with desktop: title + actions (right) */}
+                    <div className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-2">
                             <h3 className="font-semibold text-foreground">Spaces</h3>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <MobileCreateChannelPopover
+                                onAddChannel={handleAddChannel}
+                                trigger={
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        title="New space"
+                                        aria-label="New space"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </Button>
+                                }
+                            />
                         </div>
                     </div>
                     
@@ -91,10 +110,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
                         ))}
                     </div>
                     
-                    {/* Create Channel Button - Consistent with Settings */}
-                    <div className="p-4">
-                        <MobileCreateChannelPopover onAddChannel={handleAddChannel} />
-                    </div>
+                    {/* Footer removed: moved to header as icon trigger */}
                 </div>
             </SheetContent>
         </Sheet>

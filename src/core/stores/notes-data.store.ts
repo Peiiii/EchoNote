@@ -129,10 +129,18 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       ...channel,
       emoji: channel.emoji && channel.emoji.trim() ? channel.emoji : getRandomEmoji(),
     };
-    await withErrorHandling(
+    const newId = await withErrorHandling(
       () => firebaseNotesService.createChannel(userId, finalChannel),
       'createChannel'
     );
+    // Auto-select the newly created channel if available
+    if (typeof newId === 'string' && newId) {
+      try {
+        useNotesViewStore.getState().setCurrentChannel(newId);
+      } catch (err) {
+        console.warn('[addChannel] Failed to set current channel after creation', err);
+      }
+    }
   }),
 
   updateChannel: withUserValidation(async (userId, channelId, updates) => {
@@ -411,4 +419,3 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }
   },
 }));
-

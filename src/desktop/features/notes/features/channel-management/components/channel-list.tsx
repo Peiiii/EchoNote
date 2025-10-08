@@ -7,6 +7,7 @@ import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { CreateChannelPopover } from "./create-channel-popover";
+import { Plus } from "lucide-react";
 
 interface ChannelListProps {
     showFadeEffect?: boolean;
@@ -85,10 +86,25 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
             <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                     <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
-                        Thought Spaces
+                        Spaces
                     </h3>
                 </div>
-                <CollapsibleSidebar.ToggleButton />
+                <div className="flex items-center gap-2">
+                    <CreateChannelPopover
+                        onAddChannel={handleAddChannel}
+                        trigger={
+                            <button
+                                type="button"
+                                className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+                                aria-label="New space"
+                                title="New space"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        }
+                    />
+                    <CollapsibleSidebar.ToggleButton />
+                </div>
             </div>
 
             {/* Channel List */}
@@ -123,10 +139,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                 </div>
             )}
 
-            {/* Create Channel Button - Bottom Layout */}
-            <div data-component="channel-list-footer" className="p-3">
-                <CreateChannelPopover onAddChannel={handleAddChannel} />
-            </div>
+            {/* Footer removed: create entry moved to header */}
 
         </div>
     );

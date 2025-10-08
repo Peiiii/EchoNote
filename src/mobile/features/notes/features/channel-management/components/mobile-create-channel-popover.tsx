@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
@@ -18,9 +18,10 @@ import {
 
 interface MobileCreateChannelPopoverProps {
     onAddChannel: (channel: { name: string; description: string; emoji?: string }) => void;
+    trigger?: ReactNode; // Optional custom trigger for different placements (e.g., header icon)
 }
 
-export function MobileCreateChannelPopover({ onAddChannel }: MobileCreateChannelPopoverProps) {
+export function MobileCreateChannelPopover({ onAddChannel, trigger }: MobileCreateChannelPopoverProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -58,13 +59,15 @@ export function MobileCreateChannelPopover({ onAddChannel }: MobileCreateChannel
             }}
         >
             <DialogTrigger asChild>
-                <Button 
-                    variant="outline" 
-                    className="w-full h-10 text-muted-foreground hover:text-foreground border-dashed"
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Space
-                </Button>
+                {trigger ?? (
+                    <Button 
+                        variant="outline" 
+                        className="w-full h-10 text-muted-foreground hover:text-foreground border-dashed"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        New Space
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>

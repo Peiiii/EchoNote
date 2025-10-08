@@ -5,12 +5,15 @@ import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Plus } from "lucide-react";
 import { getRandomEmoji } from "@/common/utils/emoji";
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 interface CreateChannelPopoverProps {
     onAddChannel: (channel: { name: string; description: string; emoji?: string }) => void;
+    // Optional custom trigger; if not provided, a default wide button is rendered
+    trigger?: ReactNode;
 }
 
-export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps) => {
+export const CreateChannelPopover = ({ onAddChannel, trigger }: CreateChannelPopoverProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [newChannelName, setNewChannelName] = useState("");
     const [newChannelDescription, setNewChannelDescription] = useState("");
@@ -48,6 +51,18 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
         }
     };
 
+    const defaultTrigger = (
+        <Button 
+            variant="ghost"
+            className="group relative w-full h-11 text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all duration-200 border border-dashed border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 rounded-lg bg-transparent hover:bg-slate-50/40 dark:hover:bg-slate-800/20 hover:scale-[1.005] active:scale-[0.995]"
+        >
+            <div className="flex items-center justify-center gap-2.5">
+                <Plus className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+                <span className="text-sm font-medium">Create New Space</span>
+            </div>
+        </Button>
+    );
+
     return (
         <RefinedPopover
             open={isOpen}
@@ -62,15 +77,7 @@ export const CreateChannelPopover = ({ onAddChannel }: CreateChannelPopoverProps
             }}
         >
             <RefinedPopover.Trigger asChild>
-                <Button 
-                    variant="ghost"
-                    className="group relative w-full h-11 text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all duration-200 border border-dashed border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 rounded-lg bg-transparent hover:bg-slate-50/40 dark:hover:bg-slate-800/20 hover:scale-[1.005] active:scale-[0.995]"
-                >
-                    <div className="flex items-center justify-center gap-2.5">
-                        <Plus className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                        <span className="text-sm font-medium">Create New Space</span>
-                    </div>
-                </Button>
+                {trigger ?? defaultTrigger}
             </RefinedPopover.Trigger>
             <RefinedPopover.Content align="center" side="top">
                 <RefinedPopover.Header>

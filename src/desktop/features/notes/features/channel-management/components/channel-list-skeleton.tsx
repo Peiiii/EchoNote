@@ -12,7 +12,7 @@ export function ChannelListSkeleton({ count = 12 }: ChannelListSkeletonProps) {
       <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
-            Thought Spaces
+            Spaces
           </h3>
         </div>
         <CollapsibleSidebar.ToggleButton />
