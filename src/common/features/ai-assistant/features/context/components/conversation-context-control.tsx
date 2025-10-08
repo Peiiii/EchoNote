@@ -78,7 +78,7 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <Input
-            placeholder="Search channels..."
+            placeholder="Search spaces..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 h-7 text-sm border-0 bg-background/95 focus:bg-background focus:ring-1 focus:ring-primary/20"
@@ -94,7 +94,7 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
               {searchQuery ? '🔍' : '📁'}
             </div>
             <div className="text-xs text-muted-foreground/70">
-              {searchQuery ? 'No channels found' : 'No channels available'}
+              {searchQuery ? 'No spaces found' : 'No spaces available'}
             </div>
           </div>
         ) : (
@@ -119,7 +119,7 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{ch.name}</div>
                       {isFallback && (
-                        <div className="text-xs text-primary/80">Current channel</div>
+                        <div className="text-xs text-primary/80">Current space</div>
                       )}
                     </div>
                   </div>
@@ -149,7 +149,7 @@ function ToolChannelSelector({ activeToolChannelId, draftChannelIds, onActiveToo
     <div className="p-2.5 rounded-lg bg-muted/35 border border-muted/50 shadow-sm">
       <div className="flex items-center gap-2 mb-2">
         <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />
-        <span className="text-sm font-medium text-foreground/90">Active Tool Channel</span>
+        <span className="text-sm font-medium text-foreground/90">Active Tool Space</span>
       </div>
       <select
         value={activeToolChannelId && draftChannelIds.includes(activeToolChannelId) ? activeToolChannelId : (draftChannelIds[0] || '')}
@@ -295,7 +295,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               currentMode={draftMode}
               icon={<Sparkles className="w-4 h-4 text-muted-foreground" />}
               title="Auto"
-              description="Current channel"
+              description="Current space"
               onClick={() => {
                 setDraftMode(ConversationContextMode.AUTO);
                 setIsCustomExpanded(false);
@@ -318,7 +318,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               mode={ConversationContextMode.ALL}
               currentMode={draftMode}
               icon={<Globe className="w-4 h-4 text-muted-foreground" />}
-              title="All Channels"
+              title="All Spaces"
               description="Full access"
               onClick={() => {
                 setDraftMode(ConversationContextMode.ALL);

@@ -19,7 +19,7 @@ export function useContextDisplay({
     const ctx = contexts;
     if (!ctx) return `Auto (${getChannelName(fallbackChannelId)})`;
     if (ctx.mode === ConversationContextMode.NONE) return 'No Context';
-    if (ctx.mode === ConversationContextMode.ALL) return 'All Channels';
+    if (ctx.mode === ConversationContextMode.ALL) return 'All Spaces';
     const ids = ctx.channelIds || [];
     if (ids.length === 0) return 'No Context';
     if (ids.length === 1) return getChannelName(ids[0]);
