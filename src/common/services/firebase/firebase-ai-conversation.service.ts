@@ -12,6 +12,7 @@ import {
   increment,
   DocumentSnapshot,
   onSnapshot,
+  limit,
   limitToLast,
   startAfter,
   endBefore,
@@ -59,6 +60,38 @@ export class FirebaseAIConversationService {
     const q = this.buildConversationsQuery(userId);
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToAIConversation(doc));
+  }
+
+  /**
+   * Paginated conversation listing ordered by lastMessageAt desc.
+   * Returns items and a nextCursor (Date) for subsequent pages.
+   * If items.length < limit, nextCursor will be null (no more pages).
+   */
+  async listConversations(
+    userId: string,
+    options: { limit?: number; startAfterLastMessageAt?: Date | null } = {}
+  ): Promise<{ items: AIConversation[]; nextCursor: Date | null }> {
+    const pageSize = options.limit ?? 20;
+    let q = query(
+      collection(this.getDb(), `users/${userId}/aiConversations`),
+      orderBy('lastMessageAt', 'desc'),
+      limit(pageSize)
+    );
+    if (options.startAfterLastMessageAt) {
+      // Firestore SDK accepts JS Date for startAfter on timestamp fields
+      q = query(q, startAfter(options.startAfterLastMessageAt));
+    }
+
+    const snapshot = await getDocs(q);
+    const items = snapshot.docs.map(doc => this.docToAIConversation(doc));
+    // Derive next cursor from the last doc's lastMessageAt (as Date)
+    let nextCursor: Date | null = null;
+    if (items.length === pageSize) {
+      const last = snapshot.docs[snapshot.docs.length - 1];
+      const ts = last.data()?.lastMessageAt;
+      nextCursor = ts?.toDate?.() ?? (items[items.length - 1]?.lastMessageAt ?? null);
+    }
+    return { items, nextCursor };
   }
   
   async getConversation(userId: string, conversationId: string): Promise<AIConversation | null> {

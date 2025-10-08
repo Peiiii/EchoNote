@@ -11,7 +11,7 @@ import { useState } from "react";
 import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
 export function AIConversationList({ conversations, currentConversationId, loading, currentChannelId }: ConversationListProps) {
-  const { selectConversation, deleteConversation, updateConversation } = useConversationState();
+  const { selectConversation, deleteConversation, updateConversation, loadMoreConversations, hasMore, loadingMore } = useConversationState();
   const { userId, channels } = useNotesDataStore();
   const deletingIds = useConversationStore(s => s.deletingIds);
   const showArchived = useConversationStore(s => s.showArchived);
@@ -85,106 +85,120 @@ export function AIConversationList({ conversations, currentConversationId, loadi
         ) : filtered.length === 0 ? (
           <div className="p-4 text-center text-muted-foreground">No conversations yet</div>
         ) : (
-          filtered.map((c) => (
-            <div
-              key={c.id}
-              className={`group px-3 py-2 cursor-pointer hover:bg-accent ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
-              onClick={() => selectConversation(c.id)}
-            >
-              <div className="flex items-center gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">
-                    {editingId === c.id ? (
-                      <input
-                        value={draftTitle}
-                        onChange={e => setDraftTitle(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }
-                          if (e.key === 'Escape') { setEditingId(null); }
-                        }}
-                        onBlur={() => { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }}
-                        className="h-7 px-2 rounded-sm border bg-background text-sm w-full"
-                        autoFocus
-                        onClick={e => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span onDoubleClick={(e) => { e.stopPropagation(); setEditingId(c.id); setDraftTitle(c.title || ''); }}>
-                        {titleGeneratingMap[c.id] ? "Generating title..." : (c.title || "New Conversation")}
-                      </span>
-                    )}
-                    {c.isArchived && <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground">Archived</span>}
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
-                    <span>{c.messageCount} messages</span>
-                    <span>•</span>
-                    <span>{formatTimeForSocial(c.lastMessageAt)}</span>
-                    <span>•</span>
-                    {(() => {
-                      const { text, more } = getContextLabelParts(c);
-                      return (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border text-[10px] leading-none bg-background max-w-[14rem]">
-                          <span>Context:</span>
-                          <span className="font-medium text-foreground/80 truncate max-w-[9rem]">{text}</span>
-                          {more > 0 && (
-                            <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">+{more}</span>
-                          )}
+          <>
+            {filtered.map((c) => (
+              <div
+                key={c.id}
+                className={`group px-3 py-2 cursor-pointer hover:bg-accent ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
+                onClick={() => selectConversation(c.id)}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium truncate">
+                      {editingId === c.id ? (
+                        <input
+                          value={draftTitle}
+                          onChange={e => setDraftTitle(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }
+                            if (e.key === 'Escape') { setEditingId(null); }
+                          }}
+                          onBlur={() => { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }}
+                          className="h-7 px-2 rounded-sm border bg-background text-sm w-full"
+                          autoFocus
+                          onClick={e => e.stopPropagation()}
+                        />
+                      ) : (
+                        <span onDoubleClick={(e) => { e.stopPropagation(); setEditingId(c.id); setDraftTitle(c.title || ''); }}>
+                          {titleGeneratingMap[c.id] ? "Generating title..." : (c.title || "New Conversation")}
                         </span>
-                      );
-                    })()}
+                      )}
+                      {c.isArchived && <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground">Archived</span>}
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{c.messageCount} messages</span>
+                      <span>•</span>
+                      <span>{formatTimeForSocial(c.lastMessageAt)}</span>
+                      <span>•</span>
+                      {(() => {
+                        const { text, more } = getContextLabelParts(c);
+                        return (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border text-[10px] leading-none bg-background max-w-[14rem]">
+                            <span>Context:</span>
+                            <span className="font-medium text-foreground/80 truncate max-w-[9rem]">{text}</span>
+                            {more > 0 && (
+                              <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">+{more}</span>
+                            )}
+                          </span>
+                        );
+                      })()}
+                    </div>
                   </div>
+                  {userId && (
+                    <>
+                    <button
+                      type="button"
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
+                      onClick={(e) => { e.stopPropagation(); if (!c.isArchived) { void updateConversation(userId, c.id, { isArchived: true }); toast.success('Conversation archived'); } else { void updateConversation(userId, c.id, { isArchived: false }); toast.success('Conversation restored'); } }}
+                      aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
+                    >
+                      <Archive className="w-4 h-4" />
+                    </button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
+                          onClick={(e) => { e.stopPropagation(); }}
+                          onMouseDown={(e) => { e.stopPropagation(); }}
+                          onKeyDown={(e) => { e.stopPropagation(); }}
+                          aria-label="Delete conversation"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                        <div className="text-sm mb-2">Delete this conversation?</div>
+                        <div className="flex justify-end gap-2">
+                          <PopoverClose asChild>
+                            <button
+                              type="button"
+                              className="h-8 px-3 rounded-md text-sm border hover:bg-accent"
+                              onClick={(e) => { e.stopPropagation(); }}
+                            >
+                              Cancel
+                            </button>
+                          </PopoverClose>
+                          <PopoverClose asChild>
+                            <button
+                              type="button"
+                              className="h-8 px-3 rounded-md text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={(e) => { e.stopPropagation(); void deleteConversation(userId, c.id).then(() => toast.success('Conversation deleted')).catch(() => toast.error('Delete failed')); }}
+                            >
+                              Delete
+                            </button>
+                          </PopoverClose>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    </>
+                  )}
                 </div>
-                {userId && (
-                  <>
-                  <button
-                    type="button"
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
-                    onClick={(e) => { e.stopPropagation(); if (!c.isArchived) { void updateConversation(userId, c.id, { isArchived: true }); toast.success('Conversation archived'); } else { void updateConversation(userId, c.id, { isArchived: false }); toast.success('Conversation restored'); } }}
-                    aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
-                  >
-                    <Archive className="w-4 h-4" />
-                  </button>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
-                        onClick={(e) => { e.stopPropagation(); }}
-                        onMouseDown={(e) => { e.stopPropagation(); }}
-                        onKeyDown={(e) => { e.stopPropagation(); }}
-                        aria-label="Delete conversation"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-                      <div className="text-sm mb-2">Delete this conversation?</div>
-                      <div className="flex justify-end gap-2">
-                        <PopoverClose asChild>
-                          <button
-                            type="button"
-                            className="h-8 px-3 rounded-md text-sm border hover:bg-accent"
-                            onClick={(e) => { e.stopPropagation(); }}
-                          >
-                            Cancel
-                          </button>
-                        </PopoverClose>
-                        <PopoverClose asChild>
-                          <button
-                            type="button"
-                            className="h-8 px-3 rounded-md text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={(e) => { e.stopPropagation(); void deleteConversation(userId, c.id).then(() => toast.success('Conversation deleted')).catch(() => toast.error('Delete failed')); }}
-                          >
-                            Delete
-                          </button>
-                        </PopoverClose>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  </>
-                )}
               </div>
-            </div>
-          ))
+            ))}
+            {hasMore && userId && (
+              <div className="p-3 border-t">
+                <button
+                  type="button"
+                  className="w-full h-8 px-3 rounded-md text-sm border bg-background hover:bg-accent disabled:opacity-60"
+                  disabled={loadingMore}
+                  onClick={() => { void loadMoreConversations(userId); }}
+                >
+                  {loadingMore ? 'Loading…' : 'Load more'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

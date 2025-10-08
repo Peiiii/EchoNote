@@ -35,6 +35,7 @@ type State = {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
   selectionTick: number;
   uiView: 'list' | 'chat';
@@ -45,11 +46,15 @@ type State = {
   autoTitleEnabled: boolean;
   autoTitleDone: Record<string, boolean>;
   autoTitleMode: 'deterministic' | 'ai' | 'auto';
+  // pagination
+  nextCursor: Date | null;
+  hasMore: boolean;
 };
 
 type Actions = {
   createConversation: (userId: string, title: string, contexts?: ConversationContextConfig) => Promise<AIConversation>;
   loadConversations: (userId: string) => Promise<void>;
+  loadMoreConversations: (userId: string) => Promise<void>;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (userId: string, conversationId: string, updates: Partial<AIConversation>) => Promise<void>;
@@ -75,6 +80,7 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   conversations: [],
   currentConversationId: null,
   loading: true,
+  loadingMore: false,
   error: null,
   selectionTick: 0,
   uiView: 'chat',
@@ -86,6 +92,8 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   autoTitleDone: {},
   // autoTitleMode: 'deterministic',
   autoTitleMode: 'ai',
+  nextCursor: null,
+  hasMore: false,
 
   async createConversation(userId, title, contexts) {
     set({ error: null });
@@ -121,16 +129,37 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   async loadConversations(userId) {
-    set({ loading: true, error: null });
+    // Initial page (~20)
+    set({ loading: true, error: null, nextCursor: null, hasMore: false });
     try {
-      const list = await firebaseAIConversationService.getConversations(userId);
+      const { items, nextCursor } = await firebaseAIConversationService.listConversations(userId, { limit: 20 });
       const currentId = get().currentConversationId;
-      set({ conversations: list, loading: false });
-      if (list.length > 0 && !currentId) {
-        set({ currentConversationId: list[0].id });
+      set({ conversations: items, loading: false, nextCursor, hasMore: Boolean(nextCursor) });
+      if (items.length > 0 && !currentId) {
+        set({ currentConversationId: items[0].id });
       }
     } catch (err) {
       set({ loading: false, error: err instanceof Error ? err.message : "Failed to load conversations" });
+    }
+  },
+
+  async loadMoreConversations(userId) {
+    const { nextCursor, loadingMore, hasMore } = get();
+    if (!hasMore || loadingMore) return;
+    set({ loadingMore: true });
+    try {
+      const { items, nextCursor: next } = await firebaseAIConversationService.listConversations(userId, { limit: 20, startAfterLastMessageAt: nextCursor });
+      // Append and dedupe by id
+      const existing = get().conversations;
+      const merged = [...existing];
+      for (const c of items) {
+        if (!merged.some(x => x.id === c.id)) merged.push(c);
+      }
+      set({ conversations: merged, nextCursor: next, hasMore: Boolean(next) });
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : "Failed to load more conversations" });
+    } finally {
+      set({ loadingMore: false });
     }
   },
 
