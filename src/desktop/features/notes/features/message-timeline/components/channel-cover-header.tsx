@@ -203,7 +203,7 @@ export const ChannelCoverHeader = ({
               {channel.emoji}
             </div>
           )}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 ml-3">
             <h1 className="text-3xl font-bold text-white drop-shadow-lg truncate transition-all duration-300 ease-out min-w-0">
               {channel.name}
             </h1>
@@ -244,13 +244,13 @@ export const ChannelCoverHeader = ({
             onRemoveBackground={handleRemoveBackground}
             buttonClassName="h-8 w-8 p-0 text-white hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
           />
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
           >
             <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          </Button> */}
             <Button
               variant="ghost"
               size="sm"
