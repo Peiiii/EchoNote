@@ -191,7 +191,7 @@ export const ChannelCoverHeader = ({
             </div>
           )}
           <div className="flex items-center space-x-1.5 min-w-0 flex-1 max-w-full overflow-hidden">
-            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0 flex-1">
+            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0">
               {channel.name}
             </h1>
             <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
@@ -209,15 +209,31 @@ export const ChannelCoverHeader = ({
         <div className="flex items-center space-x-2 min-w-0 flex-1">
           {/* Sidebar expand button when sidebar is collapsed */}
           {isLeftSidebarCollapsed && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExpandSidebar}
-              className="h-8 w-8 p-0 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
-              title="Expand sidebar"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleExpandSidebar}
+                className="h-8 w-8 p-0 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
+                title="Expand sidebar"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </Button>
+              <CreateChannelPopover
+                onAddChannel={handleCreateChannel}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0"
+                    title="New space"
+                    aria-label="New space"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                }
+              />
+            </>
           )}
           
           {channel.emoji && (
@@ -238,20 +254,6 @@ export const ChannelCoverHeader = ({
         </div>
 
           <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
-          <CreateChannelPopover
-            onAddChannel={handleCreateChannel}
-            trigger={
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-                title="New space"
-                aria-label="New space"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            }
-          />
           <Button
             variant="ghost"
             size="sm"
