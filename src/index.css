@@ -137,11 +137,11 @@
 
   .timeline-scroll {
     scrollbar-width: thin;
-    scrollbar-gutter: stable;
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
   }
   
   .timeline-scroll::-webkit-scrollbar {
-    width: 3px;
+    width: 4px;
   }
   
   .timeline-scroll::-webkit-scrollbar-track {
@@ -149,20 +149,24 @@
   }
   
   .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.03);
+    background: rgba(148, 163, 184, 0.4);
     border-radius: 2px;
-    transition: background 0.3s ease;
+    transition: all 0.2s ease;
   }
   
   .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.08);
+    background: rgba(148, 163, 184, 0.6);
+  }
+  
+  .dark .timeline-scroll {
+    scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
   }
   
   .dark .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.05);
+    background: rgba(71, 85, 105, 0.5);
   }
   
   .dark .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 0.12);
+    background: rgba(71, 85, 105, 0.7);
   }
 }

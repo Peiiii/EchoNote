@@ -113,7 +113,7 @@ export const MessageTimeline = forwardRef<
             minHeight: "100%",
             maxHeight: "100%",
             scrollbarWidth: "thin",
-            msOverflowStyle: "auto",
+            scrollbarColor: "rgba(148, 163, 184, 0.4) transparent",
           }}
           onScroll={handleScroll}
         >
