@@ -15,6 +15,7 @@ import {
   CreateDefaultGeneralChannelMigration,
 } from "./migrations";
 import { MigrationLogger } from "./migrations/migration-logger";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 class MigrationStateManager {
   private getMigrationsCollectionRef = (userId: string) => {
@@ -102,8 +103,8 @@ class MigrationExecutorManager {
     new AddLastMessageTimeToChannelsMigration(),
     new AddIsDeletedToChannelsMigration(),
     // Create the default "General" channel for brand new users (runs once)
-    new CreateDefaultGeneralChannelMigration(),
-  ];
+   getFeaturesConfig().channel.autoCreateDefault.enabled && new CreateDefaultGeneralChannelMigration(),
+  ].filter(Boolean) as MigrationExecutor[];
 
   getAllMigrations(): MigrationExecutor[] {
     return this.migrations;
