@@ -11,6 +11,155 @@ import { cn } from "@/common/lib/utils";
 import { Ban, Check, ChevronDown, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
+// Internal component for context option items
+interface ContextOptionProps {
+  mode: ConversationContextMode;
+  currentMode: ConversationContextMode;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onClick: () => void;
+  showChevron?: boolean;
+  isExpanded?: boolean;
+}
+
+function ContextOption({ mode, currentMode, icon, title, description, onClick, showChevron = false, isExpanded = false }: ContextOptionProps) {
+  const isSelected = currentMode === mode;
+  
+  return (
+    <div 
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+        isSelected 
+          ? "bg-primary/10 border-primary/30" 
+          : "hover:bg-accent/50 border-border"
+      )}
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-2 flex-1">
+        {icon}
+        <span className="text-sm font-medium">{title}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">{description}</span>
+        {showChevron && (
+          <ChevronDown 
+            className={cn(
+              "w-4 h-4 text-muted-foreground transition-transform",
+              isExpanded ? "rotate-180" : ""
+            )} 
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Internal component for channel selection
+interface ChannelSelectorProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  filteredChannels: Array<{ id: string; name: string; emoji?: string }>;
+  draftChannelIds: string[];
+  toggleChannel: (id: string) => void;
+  fallbackChannelId: string;
+}
+
+function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftChannelIds, toggleChannel, fallbackChannelId }: ChannelSelectorProps) {
+  return (
+    <div className="rounded-lg border bg-muted/10 transition-all">
+      {/* Search bar */}
+      <div className="p-3 border-b">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search channels..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-9 text-sm border-0 bg-background/50 focus:bg-background"
+          />
+        </div>
+      </div>
+
+      {/* Channels list */}
+      <div className="max-h-40 overflow-y-auto">
+        {filteredChannels.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="text-muted-foreground/60 mb-1">
+              {searchQuery ? '🔍' : '📁'}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {searchQuery ? 'No channels found' : 'No channels available'}
+            </div>
+          </div>
+        ) : (
+          <div className="p-2 space-y-1">
+            {filteredChannels.map(ch => {
+              const checked = draftChannelIds.includes(ch.id);
+              const isFallback = ch.id === fallbackChannelId;
+              
+              return (
+                <div
+                  key={ch.id}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
+                    checked 
+                      ? "bg-primary/10 border border-primary/20" 
+                      : "hover:bg-accent/50 border border-transparent"
+                  )}
+                  onClick={() => toggleChannel(ch.id)}
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-base">{ch.emoji || '📝'}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{ch.name}</div>
+                      {isFallback && (
+                        <div className="text-xs text-primary">Current channel</div>
+                      )}
+                    </div>
+                  </div>
+                  {checked && (
+                    <Check className="w-4 h-4 text-primary" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Internal component for tool channel selector
+interface ToolChannelSelectorProps {
+  activeToolChannelId: string | null;
+  draftChannelIds: string[];
+  onActiveToolChannelChange: (id: string | null) => void;
+  getChannelName: (id: string) => string;
+}
+
+function ToolChannelSelector({ activeToolChannelId, draftChannelIds, onActiveToolChannelChange, getChannelName }: ToolChannelSelectorProps) {
+  return (
+    <div className="p-3 rounded-lg bg-muted/20 border">
+      <div className="flex items-center gap-2 mb-2">
+        <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+        <span className="text-sm font-medium">Active Tool Channel</span>
+      </div>
+      <select
+        value={activeToolChannelId && draftChannelIds.includes(activeToolChannelId) ? activeToolChannelId : (draftChannelIds[0] || '')}
+        onChange={e => onActiveToolChannelChange(e.target.value || null)}
+        className="w-full h-9 px-3 rounded-lg border bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
+      >
+        {draftChannelIds.length === 0 && <option value="">(none)</option>}
+        {draftChannelIds.map(id => (
+          <option key={id} value={id}>{getChannelName(id)}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 interface Props {
   conversationId: string;
   fallbackChannelId: string;
@@ -120,70 +269,50 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             </div>
           )}
           <div className="space-y-2">
-            <div 
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                draftMode === ConversationContextMode.AUTO 
-                  ? "bg-primary/10 border-primary/30" 
-                  : "hover:bg-accent/50 border-border"
-              )}
+            <ContextOption
+              mode={ConversationContextMode.AUTO}
+              currentMode={draftMode}
+              icon={<Sparkles className="w-4 h-4 text-muted-foreground" />}
+              title="Auto"
+              description="Current channel"
               onClick={() => {
                 setDraftMode(ConversationContextMode.AUTO);
                 setIsCustomExpanded(false);
               }}
-            >
-              <div className="flex items-center gap-2 flex-1">
-                <Sparkles className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Auto</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Current channel</span>
-            </div>
+            />
             
-            <div 
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                draftMode === ConversationContextMode.NONE 
-                  ? "bg-primary/10 border-primary/30" 
-                  : "hover:bg-accent/50 border-border"
-              )}
+            <ContextOption
+              mode={ConversationContextMode.NONE}
+              currentMode={draftMode}
+              icon={<Ban className="w-4 h-4 text-muted-foreground" />}
+              title="No Context"
+              description="Clean chat"
               onClick={() => {
                 setDraftMode(ConversationContextMode.NONE);
                 setIsCustomExpanded(false);
               }}
-            >
-              <div className="flex items-center gap-2 flex-1">
-                <Ban className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">No Context</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Clean chat</span>
-            </div>
+            />
             
-            <div 
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                draftMode === ConversationContextMode.ALL 
-                  ? "bg-primary/10 border-primary/30" 
-                  : "hover:bg-accent/50 border-border"
-              )}
+            <ContextOption
+              mode={ConversationContextMode.ALL}
+              currentMode={draftMode}
+              icon={<Globe className="w-4 h-4 text-muted-foreground" />}
+              title="All Channels"
+              description="Full access"
               onClick={() => {
                 setDraftMode(ConversationContextMode.ALL);
                 setIsCustomExpanded(false);
               }}
-            >
-              <div className="flex items-center gap-2 flex-1">
-                <Globe className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">All Channels</span>
-              </div>
-              <span className="text-xs text-muted-foreground">Full access</span>
-            </div>
+            />
             
-            <div 
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                draftMode === ConversationContextMode.CHANNELS 
-                  ? "bg-primary/10 border-primary/30" 
-                  : "hover:bg-accent/50 border-border"
-              )}
+            <ContextOption
+              mode={ConversationContextMode.CHANNELS}
+              currentMode={draftMode}
+              icon={<Layers className="w-4 h-4 text-muted-foreground" />}
+              title="Custom"
+              description="Select specific"
+              showChevron={true}
+              isExpanded={isCustomExpanded}
               onClick={() => {
                 if (draftMode === ConversationContextMode.CHANNELS) {
                   setIsCustomExpanded(!isCustomExpanded);
@@ -192,104 +321,27 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                   setIsCustomExpanded(true);
                 }
               }}
-            >
-              <div className="flex items-center gap-2 flex-1">
-                <Layers className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Custom</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Select specific</span>
-                <ChevronDown 
-                  className={cn(
-                    "w-4 h-4 text-muted-foreground transition-transform",
-                    isCustomExpanded ? "rotate-180" : ""
-                  )} 
-                />
-              </div>
-            </div>
+            />
 
             {/* Expandable channel selection */}
             {isCustomExpanded && (
-              <div className="rounded-lg border bg-muted/10 transition-all">
-                {/* Search bar */}
-                <div className="p-3 border-b">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search channels..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 h-9 text-sm border-0 bg-background/50 focus:bg-background"
-                    />
-                  </div>
-                </div>
-
-                {/* Channels list */}
-                <div className="max-h-40 overflow-y-auto">
-                  {filteredChannels.length === 0 ? (
-                    <div className="text-center py-6">
-                      <div className="text-muted-foreground/60 mb-1">
-                        {searchQuery ? '🔍' : '📁'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {searchQuery ? 'No channels found' : 'No channels available'}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-2 space-y-1">
-                      {filteredChannels.map(ch => {
-                        const checked = draftChannelIds.includes(ch.id);
-                        const isFallback = ch.id === fallbackChannelId;
-                        
-                        return (
-                          <div
-                            key={ch.id}
-                            className={cn(
-                              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
-                              checked 
-                                ? "bg-primary/10 border border-primary/20" 
-                                : "hover:bg-accent/50 border border-transparent"
-                            )}
-                            onClick={() => toggleChannel(ch.id)}
-                          >
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <span className="text-base">{ch.emoji || '📝'}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium truncate">{ch.name}</div>
-                                {isFallback && (
-                                  <div className="text-xs text-primary">Current channel</div>
-                                )}
-                              </div>
-                            </div>
-                            {checked && (
-                              <Check className="w-4 h-4 text-primary" />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ChannelSelector
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                filteredChannels={filteredChannels}
+                draftChannelIds={draftChannelIds}
+                toggleChannel={toggleChannel}
+                fallbackChannelId={fallbackChannelId}
+              />
             )}
 
             {draftMode === ConversationContextMode.CHANNELS && onActiveToolChannelChange && (
-              <div className="p-3 rounded-lg bg-muted/20 border">
-                <div className="flex items-center gap-2 mb-2">
-                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Active Tool Channel</span>
-                </div>
-                <select
-                  value={activeToolChannelId && draftChannelIds.includes(activeToolChannelId) ? activeToolChannelId : (draftChannelIds[0] || '')}
-                  onChange={e => onActiveToolChannelChange(e.target.value || null)}
-                  className="w-full h-9 px-3 rounded-lg border bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  {draftChannelIds.length === 0 && <option value="">(none)</option>}
-                  {draftChannelIds.map(id => (
-                    <option key={id} value={id}>{getChannelName(id)}</option>
-                  ))}
-                </select>
-              </div>
+              <ToolChannelSelector
+                activeToolChannelId={activeToolChannelId || null}
+                draftChannelIds={draftChannelIds}
+                onActiveToolChannelChange={onActiveToolChannelChange}
+                getChannelName={getChannelName}
+              />
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t">
