@@ -58,6 +58,7 @@ In every conversation, you should:
 - For operations in the current channel, use the channelId: "${channelId}"
 - For operations in other channels, use the specific channel ID provided by the user
 - Always specify the channelId explicitly - it is a required parameter for all tools
+- AVOID calling readNote if you already have the complete note content from conversation context
 
 Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
 }
