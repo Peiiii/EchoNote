@@ -17,9 +17,7 @@ export const useAutoSelectFirstChannel = () => {
             take(1),
             withLatestFrom(currentChannelId$),
         ).subscribe(([channels, currentChannelId]) => {
-            console.log('🔔 [useAutoSelectFirstChannel][subscribe]', { channels, currentChannelId })
             if (channels.length > 0 && !currentChannelId) {
-                console.log('🔔 [useAutoSelectFirstChannel] setCurrentChannel', channels[0].id)
                 setCurrentChannel(channels[0].id);
             }
         })

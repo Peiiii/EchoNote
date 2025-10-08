@@ -1,6 +1,5 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { useReadMoreStore } from '@/common/features/read-more/store/read-more.store'
-import { useDebounceFn } from 'ahooks'
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 
 interface UseChatAutoScrollOptions<T extends HTMLElement = HTMLDivElement> {
   threshold?: number // px, distance from bottom to auto sticky
@@ -15,7 +14,7 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>({
 }: UseChatAutoScrollOptions<T>) {
   const [isSticky, setIsSticky] = useState(false) // 改为 false，让滚动按钮默认显示
   const lastScrollHeight = useRef(0)
-  const activateAutoScrollSuppression = useReadMoreStore(useCallback((state) => state.activateAutoScrollSuppression, []))
+  const activateAutoScrollSuppression = useReadMoreStore((state) => state.activateAutoScrollSuppression)
   // Scroll to bottom with optional smooth animation
   const scrollToBottom = useCallback((options: { smooth?: boolean } = {}) => {
     const el = scrollContainerRef.current
@@ -53,7 +52,6 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 
-  const debouncedScrollToBottom = useDebounceFn(scrollToBottom, { wait: 0 })
 
   // In sticky mode, monitor height changes and auto scroll to bottom
   useEffect(() => {
@@ -64,14 +62,9 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>({
     const check = () => {
       if (!el) return
       if (el.scrollHeight !== lastScrollHeight.current) {
-        console.log('[useChatAutoScroll][requestAnimationFrame] el.scrollHeight !== lastScrollHeight.current,',{
-          elScrollHeight: el.scrollHeight,
-          lastScrollHeight: lastScrollHeight.current,
-        })
         const shouldSuppress = useReadMoreStore.getState().shouldSuppressAutoScrollNow()
         if (!shouldSuppress) {
-          console.log('[useChatAutoScroll][requestAnimationFrame] scrollToBottom')
-          debouncedScrollToBottom.run()
+          scrollToBottom()
         }else {
           // extend the suppression time
           activateAutoScrollSuppression()
@@ -83,17 +76,20 @@ export function useChatAutoScroll<T extends HTMLElement = HTMLDivElement>({
     frame = requestAnimationFrame(check)
     return () => {
       if (frame) cancelAnimationFrame(frame)
-      debouncedScrollToBottom.cancel()
     }
-  }, [debouncedScrollToBottom, isSticky, scrollContainerRef, activateAutoScrollSuppression])
+  }, [isSticky, scrollContainerRef, activateAutoScrollSuppression, scrollToBottom])
 
   // Bind scroll event
   useEffect(() => {
     const el = scrollContainerRef.current
     if (!el) return
-    el.addEventListener('scroll', handleScroll)
+    const onScroll = () => {
+      handleScroll()
+      // lastScrollHeight.current = el.scrollHeight
+    }
+    el.addEventListener('scroll', onScroll)
     return () => {
-      el.removeEventListener('scroll', handleScroll)
+      el.removeEventListener('scroll', onScroll)
     }
   }, [handleScroll, scrollContainerRef])
 

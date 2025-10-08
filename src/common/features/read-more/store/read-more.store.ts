@@ -54,7 +54,7 @@ interface ReadMoreStore {
   shouldSuppressAutoScrollNow: () => boolean
 }
 
-export const AUTO_SCROLL_SUPPRESSION_TIME_MS = 300
+export const AUTO_SCROLL_SUPPRESSION_TIME_MS = 600
 
 /**
  * Zustand store instance for read-more/collapse state management
