@@ -12,7 +12,7 @@ import { Bot, ChevronDown, ChevronUp, MessageSquare, PanelLeft, Search, Settings
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
-import { CreateChannelPopover } from "@/desktop/features/notes/features/channel-management/components/create-channel-popover";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;

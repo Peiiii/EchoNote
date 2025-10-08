@@ -1,7 +1,7 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileChannelItem } from "./mobile-channel-item";
-import { MobileCreateChannelPopover } from "./mobile-create-channel-popover";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { Button } from "@/common/components/ui/button";
 import { Plus } from "lucide-react";
@@ -80,7 +80,8 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
                             <h3 className="font-semibold text-foreground">Spaces</h3>
                         </div>
                         <div className="flex items-center gap-2">
-                            <MobileCreateChannelPopover
+                            <CreateChannelPopover
+                                variant="dialog"
                                 onAddChannel={handleAddChannel}
                                 trigger={
                                     <Button

@@ -5,7 +5,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 import { Bot, PanelLeft, Search, Settings, Plus } from "lucide-react";
-import { MobileCreateChannelPopover } from "@/mobile/features/notes/features/channel-management/components/mobile-create-channel-popover";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 
 interface MobileHeaderProps {
     currentChannelName?: string;
@@ -40,7 +40,8 @@ export const MobileHeader = ({
                     >
                         <PanelLeft className="size-5"/>
                     </Button>
-                    <MobileCreateChannelPopover
+                    <CreateChannelPopover
+                        variant="dialog"
                         onAddChannel={(channel) => { void useNotesDataStore.getState().addChannel(channel); }}
                         trigger={
                             <Button

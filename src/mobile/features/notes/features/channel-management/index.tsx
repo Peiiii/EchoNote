@@ -3,4 +3,3 @@
 
 export { MobileChannelList } from './components';
 export { MobileChannelItem } from './components/mobile-channel-item';
-export { MobileCreateChannelPopover } from './components/mobile-create-channel-popover';

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
-import { CreateChannelPopover } from "./create-channel-popover";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { Plus } from "lucide-react";
 
 interface ChannelListProps {
