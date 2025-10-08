@@ -5,7 +5,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useThreadSidebar } from "@/desktop/features/notes/features/thread-management/hooks/use-thread-sidebar";
 import { useMessageSender } from "@/mobile/features/notes/hooks/use-message-sender";
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const useMobileNotesState = () => {
     const { currentChannelId } = useNotesViewStore();
@@ -13,7 +13,8 @@ export const useMobileNotesState = () => {
     const { messages, hasMore, loadMore } = useChannelMessages({});
 
     // Use specialized hooks
-    const { containerRef, isSticky, scrollToBottom } = useChatScroll([currentChannelId, messages.length]);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { isSticky, scrollToBottom } = useChatScroll(containerRef,[currentChannelId, messages.length]);
     const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions(containerRef);
     const { isThreadOpen, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { sendMessage, isAddingMessage } = useMessageSender();

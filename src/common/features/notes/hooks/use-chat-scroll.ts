@@ -1,6 +1,6 @@
 import { useChatAutoScroll } from "@/common/hooks/use-chat-auto-scroll";
 import { useMemoizedFn } from "ahooks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export const checkCanScrollToBottom = (element: HTMLElement | null, threshold: number = 5) => {
     if (!element) return false;
@@ -12,22 +12,22 @@ export const checkCanScrollToBottom = (element: HTMLElement | null, threshold: n
 };
 
 
-export const useChatScroll = (deps: unknown[] = [], options: { smoothScroll?: boolean, threshold?: number } = {}) => {
-    const containerRef = useRef<HTMLDivElement>(null);
+export const useChatScroll = (containerRef: React.RefObject<HTMLDivElement | null>, deps: unknown[] = [], options: { smoothScroll?: boolean, threshold?: number } = {}) => {
 
-    const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll(containerRef, {
+    const { scrollToBottom, isSticky, setSticky } = useChatAutoScroll({
+        scrollContainerRef: containerRef,
         threshold: options.threshold ?? 30,
         deps
     });
 
-    const [canScrollToBottom, setCanScrollToBottom] = useState(false);
+    const [showScrollToBottomButton, setShowScrollToBottomButton] = useState(false);
 
     useEffect(() => {
         const container = containerRef.current;
         if (container) {
-            setCanScrollToBottom(checkCanScrollToBottom(container, options.threshold ?? 30));
+            setShowScrollToBottomButton(checkCanScrollToBottom(container, options.threshold ?? 30));
             const handleScroll = () => {
-                setCanScrollToBottom(checkCanScrollToBottom(container, options.threshold ?? 30));
+                setShowScrollToBottomButton(checkCanScrollToBottom(container, options.threshold ?? 30));
             };
             container.addEventListener('scroll', handleScroll);
             return () => {
@@ -47,6 +47,6 @@ export const useChatScroll = (deps: unknown[] = [], options: { smoothScroll?: bo
         containerRef,
         isSticky,
         scrollToBottom: handleScrollToBottom,
-        canScrollToBottom
+        showScrollToBottomButton
     };
 };

@@ -69,15 +69,10 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   }, [conv?.contexts, channelId]);
   const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
   const tools = useMemo(() => {
-    console.log("🔔 [AIConversationChat] getting tools");
     return aiAgentFactory.getChannelTools();
   }, []);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
-  console.log("🔔 [AIConversationChat] parsed tools:", { 
-    toolDefs: toolDefs.map(t => ({ name: t.name, description: t.description })),
-    toolExecutors: Object.keys(toolExecutors),
-    toolRenderers: Object.keys(toolRenderers)
-  });
+
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
@@ -168,7 +163,6 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   ], []);
 
   const { messages: _messages } = useAgentSessionManagerState(agentSessionManager)
-  console.log("🔔 [AIConversationChat] messages:", _messages);
 
   return (
     <div className="h-full flex flex-col agent-chat-fullwidth">

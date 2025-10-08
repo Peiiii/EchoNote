@@ -8,7 +8,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { Bot, ChevronUp, PenLine } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
 import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
@@ -53,7 +53,9 @@ export const MessageTimeline = forwardRef<
     // Use unified input collapse hook
     const { inputCollapsed, handleExpandInput } = useInputCollapse();
 
-    const { containerRef, scrollToBottom, canScrollToBottom } = useChatScroll(
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollToBottom, showScrollToBottomButton } = useChatScroll(
+      containerRef,
       [],
       { smoothScroll: true }
     );
@@ -195,7 +197,7 @@ export const MessageTimeline = forwardRef<
             <div className="pointer-events-auto">
               <ScrollToBottomButton
                 onClick={() => scrollToBottom({ behavior: "smooth" })}
-                isVisible={canScrollToBottom}
+                isVisible={showScrollToBottomButton}
               />
             </div>
           </div>
