@@ -1,16 +1,14 @@
 import { Input } from "@/common/components/ui/input";
-import { Label } from "@/common/components/ui/label";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useConversationContextDraft } from "../hooks/use-conversation-context-draft";
 import { useContextStatus } from "../hooks/use-context-status";
 import { useChannelFiltering } from "../hooks/use-channel-filtering";
 import { useContextDisplay } from "../hooks/use-context-display";
 import { cn } from "@/common/lib/utils";
-import { Ban, Check, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Ban, Check, ChevronDown, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 interface Props {
@@ -33,8 +31,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
     setDraftMode,
     draftChannelIds,
     toggleChannel,
-    apply,
-    isSelectedMode
+    apply
   } = useConversationContextDraft({
     conversationId,
     fallbackChannelId,
@@ -57,6 +54,8 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
     getChannelName,
     channelsLength: channels.length
   });
+
+  const [isCustomExpanded, setIsCustomExpanded] = useState(draftMode === ConversationContextMode.CHANNELS);
 
 
 
@@ -107,108 +106,183 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={6} className="p-3 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden mr-4 sm:mr-0" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
-          <div className="text-sm font-medium mb-2">Conversation Context</div>
+        <PopoverContent align="start" sideOffset={6} className="p-4 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden mr-4 sm:mr-0" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
+          <div className="flex items-center gap-2 mb-4">
+            <SlidersHorizontal className="w-4 h-4 text-primary" />
+            <div className="text-sm font-semibold">Context Settings</div>
+          </div>
           {anyLoading && (
-            <div className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span>Parsing contexts…</span>
+            <div className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 text-xs text-primary">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span>Loading context data...</span>
+              </div>
             </div>
           )}
-          <div className="space-y-3">
-            <RadioGroup
-              value={draftMode}
-              onValueChange={(v) => setDraftMode(v as typeof draftMode)}
-              className="grid gap-2"
+          <div className="space-y-2">
+            <div 
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                draftMode === ConversationContextMode.AUTO 
+                  ? "bg-primary/10 border-primary/30" 
+                  : "hover:bg-accent/50 border-border"
+              )}
+              onClick={() => {
+                setDraftMode(ConversationContextMode.AUTO);
+                setIsCustomExpanded(false);
+              }}
             >
-              <div className="flex items-center gap-2">
-                <RadioGroupItem id="ctx-auto" value="auto" />
-                <Label htmlFor="ctx-auto" className="text-sm">Auto (follow current channel)</Label>
+              <div className="flex items-center gap-2 flex-1">
+                <Sparkles className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Auto</span>
+              </div>
+              <span className="text-xs text-muted-foreground">Current channel</span>
+            </div>
+            
+            <div 
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                draftMode === ConversationContextMode.NONE 
+                  ? "bg-primary/10 border-primary/30" 
+                  : "hover:bg-accent/50 border-border"
+              )}
+              onClick={() => {
+                setDraftMode(ConversationContextMode.NONE);
+                setIsCustomExpanded(false);
+              }}
+            >
+              <div className="flex items-center gap-2 flex-1">
+                <Ban className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">No Context</span>
+              </div>
+              <span className="text-xs text-muted-foreground">Clean chat</span>
+            </div>
+            
+            <div 
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                draftMode === ConversationContextMode.ALL 
+                  ? "bg-primary/10 border-primary/30" 
+                  : "hover:bg-accent/50 border-border"
+              )}
+              onClick={() => {
+                setDraftMode(ConversationContextMode.ALL);
+                setIsCustomExpanded(false);
+              }}
+            >
+              <div className="flex items-center gap-2 flex-1">
+                <Globe className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">All Channels</span>
+              </div>
+              <span className="text-xs text-muted-foreground">Full access</span>
+            </div>
+            
+            <div 
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                draftMode === ConversationContextMode.CHANNELS 
+                  ? "bg-primary/10 border-primary/30" 
+                  : "hover:bg-accent/50 border-border"
+              )}
+              onClick={() => {
+                if (draftMode === ConversationContextMode.CHANNELS) {
+                  setIsCustomExpanded(!isCustomExpanded);
+                } else {
+                  setDraftMode(ConversationContextMode.CHANNELS);
+                  setIsCustomExpanded(true);
+                }
+              }}
+            >
+              <div className="flex items-center gap-2 flex-1">
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Custom</span>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem id="ctx-none" value="none" />
-                <Label htmlFor="ctx-none" className="text-sm">No Context</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem id="ctx-all" value="all" />
-                <Label htmlFor="ctx-all" className="text-sm">All Channels</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem id="ctx-selected" value="channels" />
-                <Label htmlFor="ctx-selected" className="text-sm">Selected Channels</Label>
-              </div>
-            </RadioGroup>
-
-            <div className={cn("border rounded-sm bg-muted/30", isSelectedMode ? "" : "opacity-40 pointer-events-none")}>
-              {/* Simple search */}
-              <div className="p-2 border-b">
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-                    <Input
-                      placeholder="Search..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-7 h-7 text-xs"
-                    />
-                  </div>
-                  {/* Selection count */}
-                  <div className="text-xs text-muted-foreground whitespace-nowrap">
-                    {draftChannelIds.length} of {filteredChannels.length}
-                  </div>
-                </div>
-              </div>
-
-              {/* Compact channels list */}
-              <div className="max-h-32 overflow-y-auto">
-                {filteredChannels.length === 0 ? (
-                  <div className="text-center py-4 text-xs text-muted-foreground">
-                    {searchQuery ? 'No channels found' : 'No channels'}
-                  </div>
-                ) : (
-                  <div className="p-1">
-                    {filteredChannels.map(ch => {
-                      const checked = draftChannelIds.includes(ch.id);
-                      const isFallback = ch.id === fallbackChannelId;
-                      
-                      return (
-                        <div
-                          key={ch.id}
-                          className={cn(
-                            "flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-accent/50 cursor-pointer",
-                            checked && "bg-primary/10"
-                          )}
-                          onClick={() => toggleChannel(ch.id)}
-                        >
-                          <span className="text-sm">{ch.emoji || '📝'}</span>
-                          <div 
-                            className="flex-1 min-w-0 truncate text-xs"
-                          >
-                            {ch.name}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {isFallback && (
-                              <span className="text-xs text-blue-600 dark:text-blue-400">•</span>
-                            )}
-                            {checked && (
-                              <Check className="w-3 h-3 text-primary" />
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <span className="text-xs text-muted-foreground">Select specific</span>
+                <ChevronDown 
+                  className={cn(
+                    "w-4 h-4 text-muted-foreground transition-transform",
+                    isCustomExpanded ? "rotate-180" : ""
+                  )} 
+                />
               </div>
             </div>
 
-            {draftMode === 'channels' && onActiveToolChannelChange && (
-              <div className="pt-2 border-t">
-                <div className="text-xs text-muted-foreground mb-1">Active Tool Channel</div>
+            {/* Expandable channel selection */}
+            {isCustomExpanded && (
+              <div className="rounded-lg border bg-muted/10 transition-all">
+                {/* Search bar */}
+                <div className="p-3 border-b">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search channels..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 h-9 text-sm border-0 bg-background/50 focus:bg-background"
+                    />
+                  </div>
+                </div>
+
+                {/* Channels list */}
+                <div className="max-h-40 overflow-y-auto">
+                  {filteredChannels.length === 0 ? (
+                    <div className="text-center py-6">
+                      <div className="text-muted-foreground/60 mb-1">
+                        {searchQuery ? '🔍' : '📁'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {searchQuery ? 'No channels found' : 'No channels available'}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-2 space-y-1">
+                      {filteredChannels.map(ch => {
+                        const checked = draftChannelIds.includes(ch.id);
+                        const isFallback = ch.id === fallbackChannelId;
+                        
+                        return (
+                          <div
+                            key={ch.id}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer",
+                              checked 
+                                ? "bg-primary/10 border border-primary/20" 
+                                : "hover:bg-accent/50 border border-transparent"
+                            )}
+                            onClick={() => toggleChannel(ch.id)}
+                          >
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <span className="text-base">{ch.emoji || '📝'}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{ch.name}</div>
+                                {isFallback && (
+                                  <div className="text-xs text-primary">Current channel</div>
+                                )}
+                              </div>
+                            </div>
+                            {checked && (
+                              <Check className="w-4 h-4 text-primary" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {draftMode === ConversationContextMode.CHANNELS && onActiveToolChannelChange && (
+              <div className="p-3 rounded-lg bg-muted/20 border">
+                <div className="flex items-center gap-2 mb-2">
+                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Active Tool Channel</span>
+                </div>
                 <select
                   value={activeToolChannelId && draftChannelIds.includes(activeToolChannelId) ? activeToolChannelId : (draftChannelIds[0] || '')}
                   onChange={e => onActiveToolChannelChange(e.target.value || null)}
-                  className="w-full h-8 px-2 rounded-sm border bg-background text-sm"
+                  className="w-full h-9 px-3 rounded-lg border bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
                   {draftChannelIds.length === 0 && <option value="">(none)</option>}
                   {draftChannelIds.map(id => (
@@ -218,12 +292,12 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               </div>
             )}
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-3 pt-4 border-t">
               <PopoverClose asChild>
-                <button type="button" className="h-8 px-3 rounded-md text-sm border hover:bg-accent">Cancel</button>
+                <button type="button" className="h-9 px-4 rounded-lg text-sm border hover:bg-accent transition-colors">Cancel</button>
               </PopoverClose>
               <PopoverClose asChild>
-                <button type="button" className="h-8 px-3 rounded-md text-sm bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void apply()}>Apply</button>
+                <button type="button" className="h-9 px-4 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium" onClick={() => void apply()}>Apply Changes</button>
               </PopoverClose>
             </div>
           </div>
