@@ -1,6 +1,7 @@
 import { EmptyState } from "@/common/features/notes/components/message-timeline/empty-state";
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
@@ -72,6 +73,10 @@ export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, Mobile
             !msg.parentId
         )
     );
+
+    if (!currentChannelId) {
+        return <MobileWelcomeGuide />;
+    }
 
     if (loading) {
         return <MessageTimelineSkeleton count={5} />;

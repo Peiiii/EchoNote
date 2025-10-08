@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, FileText, Lightbulb, Plus, Sparkles } from "lucide-react";
 
-export const WelcomeGuide = () => {
+export const DesktopWelcomeGuide = () => {
     const { addChannel } = useNotesDataStore();
 
     const handleCreateFirstChannel = async () => {

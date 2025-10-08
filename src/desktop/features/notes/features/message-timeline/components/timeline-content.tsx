@@ -1,6 +1,6 @@
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
-import { WelcomeGuide } from "@/common/features/notes/components/welcome-guide/welcome-guide";
+import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
@@ -46,7 +46,7 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     const groupedMessages = useGroupedMessages(messages);
 
     if (!currentChannelId) {
-        return <WelcomeGuide />;
+        return <DesktopWelcomeGuide />;
     }
 
     if (loading) {
