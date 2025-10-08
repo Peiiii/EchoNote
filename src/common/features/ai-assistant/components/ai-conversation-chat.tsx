@@ -3,7 +3,7 @@
 
 import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
-import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
+import { isTempConversation, useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useCollectionDiff } from "@/common/lib/use-collection-diff";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { AgentChatCore, UIMessage, useAgentSessionManager, useAgentSessionManagerState, useParseTools } from "@agent-labs/agent-chat";
@@ -36,7 +36,6 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
           </div>
         ) : (
           <AgentChatCoreWrapper
-            key={conversationId}
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
@@ -58,6 +57,8 @@ interface AgentChatCoreWrapperProps {
 }
 
 function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
+  const isTemp = isTempConversation(conversationId);
+
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   // Select tool target channel based on conversation contexts; fallback to current channel
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
@@ -81,6 +82,7 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
+  
   const [sessionMessages, setSessionMessages] = useState<UIMessage[]>(messages);
   useEffect(() => {
     const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
@@ -163,6 +165,13 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   ], []);
 
   const { messages: _messages } = useAgentSessionManagerState(agentSessionManager)
+
+  useEffect(() => {
+    if (isTemp) {
+      agentSessionManager.reset();
+      setSessionMessages([]);
+    }
+  }, [isTemp, agentSessionManager]);
 
   return (
     <div className="h-full flex flex-col agent-chat-fullwidth">

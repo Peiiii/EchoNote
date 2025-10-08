@@ -69,6 +69,8 @@ type Actions = {
   onMessagesSnapshot: (conversationId: string, messages: UIMessage[]) => void;
 };
 
+export const isTempConversation = (conversationId: string) => conversationId.startsWith('temp-');
+
 export const useConversationStore = create<State & Actions>((set, get) => ({
   conversations: [],
   currentConversationId: null,
