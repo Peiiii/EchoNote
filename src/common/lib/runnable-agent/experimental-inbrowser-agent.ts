@@ -4,7 +4,7 @@ import { catchError, filter } from "rxjs/operators";
 import { AgentConfig, OpenAIAgent } from "./agent-utils/openai-agent";
 import { decodeEventStream } from "./sse-json-decoder";
 
-const DEFAULT_CONTEXT_CHAR_LIMIT = 30000;
+const DEFAULT_CONTEXT_CHAR_LIMIT = 50000;
 
 export class ExperimentalInBrowserAgent implements IAgent {
   private openaiAgent: OpenAIAgent;
