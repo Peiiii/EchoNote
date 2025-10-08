@@ -30,6 +30,10 @@ export class ExperimentalInBrowserAgent implements IAgent {
 
     this.openaiAgent = new OpenAIAgent(this.currentConfig);
   }
+  
+  abortRun() {
+    this.openaiAgent.abort();
+  }
 
   run(input: RunAgentInput) {
     const createChunkObservable = (generator: AsyncGenerator<string>) =>

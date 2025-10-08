@@ -33,6 +33,10 @@ export interface OpenAIAgentOptions {
 export class OpenAIAgent {
   private client: OpenAI;
 
+  private currentStream: {
+    controller: AbortController;
+  } | null = null;
+
   constructor(private config: AgentConfig) {
     this.client = new OpenAI({
       apiKey: config.apiKey,
@@ -141,6 +145,7 @@ export class OpenAIAgent {
         stream: true,
         tools: tools.length > 0 ? (tools as OpenAI.Chat.ChatCompletionFunctionTool[]) : undefined,
       });
+      this.currentStream = stream;
 
       // 处理流
       const processor = new StreamProcessor(encoder);
@@ -157,6 +162,12 @@ export class OpenAIAgent {
       threadId: inputData.threadId,
     };
     yield encoder.encode(endEvent);
+  }
+
+  public abort() {
+    if (this.currentStream) {
+      this.currentStream.controller.abort();
+    }
   }
 
   private async *handleError(
