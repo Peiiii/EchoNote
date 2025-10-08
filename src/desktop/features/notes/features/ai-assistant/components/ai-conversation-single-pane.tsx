@@ -32,8 +32,6 @@ export const AIConversationSinglePane = forwardRef<SinglePaneRef, ConversationPa
           conversations={conversations}
           currentConversationId={currentConversationId}
           loading={loading}
-          currentChannelId={channelId}
-          
           withHeader={false}
         />
       </div>

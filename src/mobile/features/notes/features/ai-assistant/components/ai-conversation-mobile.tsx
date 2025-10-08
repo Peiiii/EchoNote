@@ -60,7 +60,6 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
         conversations={conversations}
         currentConversationId={currentConversationId}
         loading={loading}
-        currentChannelId={channelId}
         withHeader={false}
       />
     );
