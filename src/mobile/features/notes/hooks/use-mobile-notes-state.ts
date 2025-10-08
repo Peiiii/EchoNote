@@ -15,7 +15,7 @@ export const useMobileNotesState = () => {
     // Use specialized hooks
     const containerRef = useRef<HTMLDivElement>(null);
     const { isSticky, scrollToBottom } = useChatScroll(containerRef,[currentChannelId, messages.length]);
-    const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions(containerRef);
+    const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions();
     const { isThreadOpen, handleOpenThread, handleCloseThread, handleSendThreadMessage } = useThreadSidebar();
     const { sendMessage, isAddingMessage } = useMessageSender();
 
