@@ -97,7 +97,7 @@ export function ReadMoreBaseWrapper({
       <div
         ref={contentRef}
         className={cn(
-          "transition-all duration-300 ease-in-out",
+          "transition-all duration-100 ease-in-out",
           !isExpanded && showReadMore ? "overflow-hidden" : "",
           isExpanded && showReadMore ? "pb-12" : ""
         )}

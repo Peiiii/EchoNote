@@ -52,9 +52,9 @@ interface ReadMoreStore {
   activateAutoScrollSuppression: () => void
   /** Checks if auto-scroll should be suppressed (with time-based expiration) */
   shouldSuppressAutoScrollNow: () => boolean
-  /** Consumes suppression flag, returning true if suppression was active */
-  consumeAutoScrollSuppression: () => boolean
 }
+
+export const AUTO_SCROLL_SUPPRESSION_TIME_MS = 300
 
 /**
  * Zustand store instance for read-more/collapse state management
@@ -93,18 +93,11 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
     const state = get()
     if (!state.shouldSuppressAutoScroll) return false
     // Suppression expires after 300ms to handle multiple rapid scrollHeight changes
-    if (state.suppressionTimestamp && Date.now() - state.suppressionTimestamp > 500) {
+    if (state.suppressionTimestamp && Date.now() - state.suppressionTimestamp > AUTO_SCROLL_SUPPRESSION_TIME_MS) {
       set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null })
       return false
     }
     return true
-  },
-  consumeAutoScrollSuppression: () => {
-    const suppressed = get().shouldSuppressAutoScroll
-    if (suppressed) {
-      set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null })
-    }
-    return suppressed
   },
 }))
 
