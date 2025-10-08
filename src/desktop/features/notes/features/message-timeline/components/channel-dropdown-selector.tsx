@@ -24,11 +24,12 @@ export const ChannelDropdownSelector = ({
   className = "",
 }: ChannelDropdownSelectorProps) => {
   return (
-    <DropdownMenu>
+  <div className={className}>
+      <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto p-2 hover:bg-white/20 transition-all duration-200 hover:scale-105 ${className}`}
+          className={`h-auto p-2 hover:bg-white/20 transition-all duration-200 hover:scale-105 `}
         >
           <div className="flex items-center space-x-1.5 min-w-0">
             {currentChannel.emoji && (
@@ -93,5 +94,6 @@ export const ChannelDropdownSelector = ({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  </div>
   );
 };
