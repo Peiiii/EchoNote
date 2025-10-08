@@ -76,6 +76,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
             filter((event: unknown) => !!event && !!(event as { type?: unknown }).type),  // 业务处理可继续扩展
             // 你可以在这里继续添加更多 operator
             catchError(err => {
+              console.error("🔔 [ExperimentalInBrowserAgent][run] error:", err);
               observer.next({
                 type: EventType.RUN_ERROR,
 
@@ -94,6 +95,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
             }
           });
         } catch (error) {
+          console.error("🔔 [ExperimentalInBrowserAgent][run] error:", error);
           observer.next({
             type: EventType.RUN_ERROR,
           });
