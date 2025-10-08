@@ -1,17 +1,17 @@
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
+import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { getFeaturesConfig } from "@/core/config/features.config";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { Bot, ChevronDown, ChevronUp, MessageSquare, MoreHorizontal, PanelLeft, Settings, Users, Search } from "lucide-react";
-import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
+import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
+import { Bot, ChevronDown, ChevronUp, MessageSquare, PanelLeft, Search, Settings, Users } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
-import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
-import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
-import { getFeaturesConfig } from "@/core/config/features.config";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
