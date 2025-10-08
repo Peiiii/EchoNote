@@ -115,7 +115,7 @@ interface RefinedPopoverButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
 
 const RefinedPopoverButton = forwardRef<HTMLButtonElement, RefinedPopoverButtonProps>(
   ({ className, variant = "default", size = "md", ...props }, ref) => {
-    const baseClasses = "h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium";
+    const baseClasses = "h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium flex items-center justify-center";
     
     const variantClasses = {
       default: "bg-primary text-primary-foreground hover:bg-primary/90",

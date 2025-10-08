@@ -6,6 +6,7 @@ import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { RefinedPopover } from "@/common/components/refined-popover";
 import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
+import { Edit3 } from "lucide-react";
 
 
 interface EditChannelPopoverProps {
@@ -63,14 +64,10 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
       <RefinedPopover.Trigger asChild>
         {children}
       </RefinedPopover.Trigger>
-      <RefinedPopover.Content align="end" sideOffset={8}>
+      <RefinedPopover.Content align="center" side="bottom">
         <RefinedPopover.Header>
-          <h4 className="text-base font-medium text-slate-900 dark:text-slate-100">
-            Edit Channel
-          </h4>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Update channel information
-          </p>
+          <Edit3 className="w-4 h-4 text-primary/80" />
+          <div className="text-sm font-semibold text-foreground/90">Edit Thought Space</div>
         </RefinedPopover.Header>
         
         <RefinedPopover.Body>
@@ -147,20 +144,19 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
         </RefinedPopover.Body>
         
         <RefinedPopover.Actions>
-          <Button
+          <RefinedPopover.Button
+            type="button"
             variant="outline"
-            size="sm"
             onClick={handleCancel}
             disabled={isLoading}
-            className="h-9 px-4 rounded-md border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 text-slate-700 dark:text-slate-300"
           >
             Cancel
-          </Button>
-          <Button
-            size="sm"
+          </RefinedPopover.Button>
+          <RefinedPopover.Button
+            type="button"
+            variant="default"
             onClick={handleSave}
             disabled={!editName.trim() || isLoading}
-            className="h-9 px-4 rounded-md bg-slate-700 dark:bg-slate-600 hover:bg-slate-800 dark:hover:bg-slate-500 text-white transition-colors duration-200 disabled:opacity-50"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -170,7 +166,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             ) : (
               "Save"
             )}
-          </Button>
+          </RefinedPopover.Button>
         </RefinedPopover.Actions>
       </RefinedPopover.Content>
     </RefinedPopover>
