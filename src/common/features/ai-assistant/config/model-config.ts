@@ -20,7 +20,6 @@ export const PRESET_MODELS: ModelConfig[] = [
     apiUrl: import.meta.env.VITE_DASHSCOPE_API_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     temperature: 0.7,
     maxTokens: 4000,
-    isDefault: true,
   },
   {
     id: 'qwen3-max',
@@ -31,6 +30,7 @@ export const PRESET_MODELS: ModelConfig[] = [
     apiUrl: import.meta.env.VITE_DASHSCOPE_API_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     temperature: 0.7,
     maxTokens: 4000,
+    isDefault: true,
   },
   {
     id: 'gemini-2.5-pro',
