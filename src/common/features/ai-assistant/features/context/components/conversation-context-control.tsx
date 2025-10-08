@@ -265,9 +265,6 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
           width="w-80" 
           align="center" 
           side="bottom"
-          onInteractOutside={(e: Event) => {
-            e.preventDefault();
-          }}
         >
           <RefinedPopover.Header>
             <SlidersHorizontal className="w-4 h-4 text-primary/80" />
