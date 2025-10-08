@@ -260,7 +260,7 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={6} className="p-4 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden mr-4 sm:mr-0" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
+        <PopoverContent align="center" sideOffset={6} className="p-4 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden mr-4 sm:mr-0" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
           <div className="flex items-center gap-2.5 mb-5">
             <SlidersHorizontal className="w-4 h-4 text-primary/80" />
             <div className="text-sm font-semibold text-foreground/90">Context Settings</div>
