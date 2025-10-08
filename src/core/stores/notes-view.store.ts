@@ -21,7 +21,7 @@ export interface NotesViewState {
   setAuth: (user: User | null) => void;
 
   // View actions
-  setCurrentChannel: (channelId: string) => void;
+  setCurrentChannel: (channelId: string | null) => void;
   setIsAddingMessage: (isLoading: boolean) => void;
   setIsUpdatingMessage: (isLoading: boolean) => void;
   setIsDeletingMessage: (isLoading: boolean) => void;

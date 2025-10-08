@@ -1,4 +1,5 @@
 import { useMobileNotesState } from '@/mobile/features/notes/hooks';
+import { useAutoSelectFirstChannel } from '@/common/hooks/use-auto-select-first-channel';
 import { MobileNotesLayout } from '@/mobile/features/notes/components/mobile-notes-layout';
 import { MobileSidebarManager } from '@/mobile/features/notes/features/message-timeline';
 import { useEffect } from 'react';
@@ -8,6 +9,8 @@ import { READ_MORE_SELECTORS } from '@/common/features/read-more/core/dom-consta
 import { channelMessageService } from '@/core/services/channel-message.service';
 
 export function MobileNotesPage() {
+    // Ensure a channel is selected once channels are available (first-login-friendly)
+    useAutoSelectFirstChannel();
     const notesState = useMobileNotesState();
     useMobileJumpToMessage();
     

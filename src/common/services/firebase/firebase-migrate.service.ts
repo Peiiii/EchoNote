@@ -12,6 +12,7 @@ import {
   AddIsDeletedToMessagesMigration,
   AddLastMessageTimeToChannelsMigration,
   AddIsDeletedToChannelsMigration,
+  CreateDefaultGeneralChannelMigration,
 } from "./migrations";
 import { MigrationLogger } from "./migrations/migration-logger";
 
@@ -100,6 +101,8 @@ class MigrationExecutorManager {
     new AddIsDeletedToMessagesMigration(),
     new AddLastMessageTimeToChannelsMigration(),
     new AddIsDeletedToChannelsMigration(),
+    // Create the default "General" channel for brand new users (runs once)
+    new CreateDefaultGeneralChannelMigration(),
   ];
 
   getAllMigrations(): MigrationExecutor[] {

@@ -3,6 +3,8 @@ import { getRandomEmoji } from "@/common/utils/emoji";
 import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
 import { DocumentSnapshot } from "firebase/firestore";
+import { useNotesViewStore } from "./notes-view.store";
+import { channelMessageService } from "@/core/services/channel-message.service";
 
 export interface AIAnalysis {
   keywords: string[];
@@ -88,6 +90,7 @@ export interface NotesDataState {
   initFirebaseListeners: (userId: string) => Promise<void>;
   cleanupListeners: () => void;
   fetchInitialData: (userId: string) => Promise<void>;
+  validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
 }
 
 // Utility functions to reduce code duplication
@@ -358,6 +361,8 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
         const { isListenerEnabled } = get();
         if (!isListenerEnabled) return;
         set({ channels, channelsLoading: false });
+        
+        get().validateAndCleanupCurrentChannel(channels);
       }
     );
 
@@ -382,8 +387,28 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     set({ channelsLoading: true });
     await withErrorHandling(async () => {
       const channels = await firebaseNotesService.fetchChannels(userId);
-      set({ channels, channelsLoading: false });
+        set({ channels, channelsLoading: false });
+        
+        get().validateAndCleanupCurrentChannel(channels);
     }, 'fetchChannels');
+  },
+
+  validateAndCleanupCurrentChannel: (channels: Channel[]) => {
+    const currentChannelId = useNotesViewStore.getState().currentChannelId;
+    
+    if (!currentChannelId) return;
+    
+    const channelExists = channels.some(channel => channel.id === currentChannelId);
+    
+    if (!channelExists) {
+      
+      useNotesViewStore.getState().setCurrentChannel(null);
+      
+      const channelStateControl = channelMessageService.getChannelStateControl(currentChannelId);
+      channelStateControl.clearChannel();
+      
+      get().clearChannelMessages(currentChannelId);
+    }
   },
 }));
 

@@ -133,6 +133,17 @@ export class ChannelMessageService {
                 setMessages(prevMessages.map(m => m.id === fakeId ? { ...m, id: realId } : m));
             }
         }
+        const clearChannel = () => {
+            const currentState = getChannelState();
+            setMessages([]);
+            setLoading(false);
+            setLoadingMore(false);
+            setHasMore(false);
+            setLastVisible(null);
+            if (currentState?.subscription) {
+                currentState.subscription.unsubscribe();
+            }
+        }
         return {
             getChannelState,
             setLoading,
@@ -144,7 +155,8 @@ export class ChannelMessageService {
             setHasMore,
             setSubscription,
             removeMessage,
-            fixFakeMessage
+            fixFakeMessage,
+            clearChannel
         };
     }
 

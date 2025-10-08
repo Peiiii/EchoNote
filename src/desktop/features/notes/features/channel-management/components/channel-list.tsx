@@ -4,6 +4,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
+import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { CreateChannelPopover } from "./create-channel-popover";
 
@@ -100,15 +101,19 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                     msOverflowStyle: 'none'
                 }}
             >
-                {orderedChannels.map((channel) => (
-                    <ChannelItem
-                        key={channel.id}
-                        channel={channel}
-                        isActive={currentChannelId === channel.id}
-                        onClick={() => setCurrentChannel(channel.id)}
-                        onDelete={() => handleDeleteChannel(channel.id)}
-                    />
-                ))}
+                {orderedChannels.length === 0 ? (
+                    <ChannelListEmptyState onCreateChannel={handleAddChannel} />
+                ) : (
+                    orderedChannels.map((channel) => (
+                        <ChannelItem
+                            key={channel.id}
+                            channel={channel}
+                            isActive={currentChannelId === channel.id}
+                            onClick={() => setCurrentChannel(channel.id)}
+                            onDelete={() => handleDeleteChannel(channel.id)}
+                        />
+                    ))
+                )}
             </div>
 
             {/* Fade effect overlay container - positioned outside channel list */}

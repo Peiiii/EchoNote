@@ -1,5 +1,6 @@
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { WelcomeGuide } from "@/common/features/notes/components/welcome-guide/welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
@@ -18,6 +19,7 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     className = "",
 }, ref) => {
     const { currentChannelId } = useNotesViewStore();
+    console.log("🔔 [TimelineContent] currentChannelId", currentChannelId);
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
@@ -33,6 +35,8 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
         }
     });
 
+    console.log("🔔 [TimelineContent] messages", messages);
+
     const { handleScroll } = useLazyLoading({
         onTrigger: () => currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
         canTrigger: !!hasMore && !loading,
@@ -41,6 +45,9 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
 
     const groupedMessages = useGroupedMessages(messages);
 
+    if (!currentChannelId) {
+        return <WelcomeGuide />;
+    }
 
     if (loading) {
         return <MessageTimelineSkeleton count={5} />;
