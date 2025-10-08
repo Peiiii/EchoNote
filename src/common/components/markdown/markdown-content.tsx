@@ -1,6 +1,7 @@
 import { CodeBlock } from './code-block';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Checkbox } from '@/common/components/ui/checkbox';
 
 interface MarkdownContentProps {
     content: string;
@@ -9,7 +10,7 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ content, className = "" }: MarkdownContentProps) {
     return (
-        <div className={`prose prose-slate dark:prose-invert max-w-none ${className}`}>
+        <div className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-6 [&_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul_ul]:ml-6 [&_ol_ol]:ml-6 [&_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol_ol]:ml-6 [&_ul_ol]:ml-6 [&_ol_ul]:ml-6 ${className}`}>
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -74,6 +75,18 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                                 {children}
                             </li>
                         );
+                    },
+                    input({ type, checked, ...props }) {
+                        if (type === 'checkbox') {
+                            return (
+                                <Checkbox 
+                                    checked={checked} 
+                                    className="mr-2 mt-0.5 inline-block align-top"
+                                    disabled
+                                />
+                            );
+                        }
+                        return <input type={type} checked={checked} {...props} />;
                     },
                     ol({ children, ...props }) {
                         return (

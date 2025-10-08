@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './code-block';
+import { Checkbox } from '@/common/components/ui/checkbox';
 
 interface MobileMarkdownContentProps {
     content: string;
@@ -9,7 +10,7 @@ interface MobileMarkdownContentProps {
 
 export function MobileMarkdownContent({ content, className = "" }: MobileMarkdownContentProps) {
     return (
-        <div className={`prose prose-slate dark:prose-invert max-w-none ${className}`}>
+        <div className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-4 [&_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul_ul]:ml-4 [&_ol_ol]:ml-4 [&_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol_ol]:ml-4 [&_ul_ol]:ml-4 [&_ol_ul]:ml-4 ${className}`}>
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -79,6 +80,18 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                                 {children}
                             </ol>
                         );
+                    },
+                    input({ type, checked, ...props }) {
+                        if (type === 'checkbox') {
+                            return (
+                                <Checkbox 
+                                    checked={checked} 
+                                    className="mr-2 mt-0.5 inline-block align-top"
+                                    disabled
+                                />
+                            );
+                        }
+                        return <input type={type} checked={checked} {...props} />;
                     },
 
                     // 移动端优化的标题样式
