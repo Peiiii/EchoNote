@@ -63,7 +63,7 @@ export const MessageTimelineFeature = ({
                     </div>
                 }
                 actions={
-                    !inputCollapsed ? (
+                    currentChannel && !inputCollapsed ? (
                         <MessageInput
                             onSend={handleSendMessage}
                             replyToMessageId={chatActions.replyToMessageId ?? undefined}

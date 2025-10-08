@@ -79,15 +79,17 @@ export const MobileNotesLayout = ({
                 {/* Global quick search dialog */}
                 <QuickSearchModal />
 
-                {/* Input area */}
-                <div className="flex-shrink-0">
-                    <MobileMessageInput
-                        onSend={handleSendMessage}
-                        replyToMessageId={replyToMessageId || undefined}
-                        onCancelReply={onCancelReply}
-                        isSending={isAddingMessage}
-                    />
-                </div>
+                {/* Input area - only show when there's a current channel */}
+                {currentChannel && (
+                    <div className="flex-shrink-0">
+                        <MobileMessageInput
+                            onSend={handleSendMessage}
+                            replyToMessageId={replyToMessageId || undefined}
+                            onCancelReply={onCancelReply}
+                            isSending={isAddingMessage}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
