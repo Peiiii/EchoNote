@@ -29,14 +29,14 @@ function ContextOption({ mode, currentMode, icon, title, description, onClick, s
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200",
+        "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200",
         isSelected 
           ? "bg-primary/8 text-primary" 
           : "hover:bg-accent/30 text-foreground"
       )}
       onClick={onClick}
     >
-      <div className="flex items-center gap-2.5 flex-1">
+      <div className="flex items-center gap-2 flex-1">
         <div className={cn(
           "transition-colors",
           isSelected ? "text-primary" : "text-muted-foreground"
@@ -45,7 +45,7 @@ function ContextOption({ mode, currentMode, icon, title, description, onClick, s
         </div>
         <span className="text-sm font-medium">{title}</span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground/70">{description}</span>
         {showChevron && (
           <ChevronDown 
@@ -74,23 +74,23 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
   return (
     <div className="bg-muted/35 border border-muted/50 rounded-lg shadow-sm transition-all">
       {/* Search bar */}
-      <div className="p-3 border-b border-muted/45 bg-muted/15">
+      <div className="p-2.5 border-b border-muted/45 bg-muted/15">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <Input
             placeholder="Search channels..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-8 text-sm border-0 bg-background/95 focus:bg-background focus:ring-1 focus:ring-primary/20"
+            className="pl-9 h-7 text-sm border-0 bg-background/95 focus:bg-background focus:ring-1 focus:ring-primary/20"
           />
         </div>
       </div>
 
       {/* Channels list */}
-      <div className="max-h-40 overflow-y-auto">
+      <div className="max-h-32 overflow-y-auto">
         {filteredChannels.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-muted-foreground/50 mb-2 text-lg">
+          <div className="text-center py-6">
+            <div className="text-muted-foreground/50 mb-1.5 text-lg">
               {searchQuery ? '🔍' : '📁'}
             </div>
             <div className="text-xs text-muted-foreground/70">
@@ -98,7 +98,7 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
             </div>
           </div>
         ) : (
-          <div className="p-2 space-y-0.5">
+          <div className="p-1.5 space-y-0.5">
             {filteredChannels.map(ch => {
               const checked = draftChannelIds.includes(ch.id);
               const isFallback = ch.id === fallbackChannelId;
@@ -107,15 +107,15 @@ function ChannelSelector({ searchQuery, setSearchQuery, filteredChannels, draftC
                 <div
                   key={ch.id}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer",
+                    "flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-all duration-200 cursor-pointer",
                     checked 
                       ? "bg-primary/6 text-primary" 
                       : "hover:bg-accent/25 text-foreground"
                   )}
                   onClick={() => toggleChannel(ch.id)}
                 >
-                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                    <span className="text-base">{ch.emoji || '📝'}</span>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-sm">{ch.emoji || '📝'}</span>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{ch.name}</div>
                       {isFallback && (
@@ -146,15 +146,15 @@ interface ToolChannelSelectorProps {
 
 function ToolChannelSelector({ activeToolChannelId, draftChannelIds, onActiveToolChannelChange, getChannelName }: ToolChannelSelectorProps) {
   return (
-    <div className="p-3 rounded-lg bg-muted/35 border border-muted/50 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="p-2.5 rounded-lg bg-muted/35 border border-muted/50 shadow-sm">
+      <div className="flex items-center gap-2 mb-2">
         <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />
         <span className="text-sm font-medium text-foreground/90">Active Tool Channel</span>
       </div>
       <select
         value={activeToolChannelId && draftChannelIds.includes(activeToolChannelId) ? activeToolChannelId : (draftChannelIds[0] || '')}
         onChange={e => onActiveToolChannelChange(e.target.value || null)}
-        className="w-full h-8 px-3 rounded-lg border-0 bg-background/95 text-sm focus:bg-background focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+        className="w-full h-7 px-2.5 rounded-lg border-0 bg-background/95 text-sm focus:bg-background focus:ring-1 focus:ring-primary/20 transition-all duration-200"
       >
         {draftChannelIds.length === 0 && <option value="">(none)</option>}
         {draftChannelIds.map(id => (
@@ -282,14 +282,14 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
           
           <RefinedPopover.Body>
             {anyLoading && (
-              <div className="mb-4 p-3 rounded-lg bg-primary/6">
-                <div className="flex items-center gap-2.5 text-xs text-primary/90">
+              <div className="mb-3 p-2.5 rounded-lg bg-primary/6">
+                <div className="flex items-center gap-2 text-xs text-primary/90">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                   <span>Loading context data...</span>
                 </div>
               </div>
             )}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
             <ContextOption
               mode={ConversationContextMode.AUTO}
               currentMode={draftMode}
