@@ -150,8 +150,8 @@ You can override any styling by passing `className` props to individual componen
   
   <RefinedPopover.Content>
     <RefinedPopover.Header>
-      <h3 className="text-base font-medium">Edit Settings</h3>
-      <p className="text-sm text-slate-500">Update your preferences</p>
+      <SlidersHorizontal className="w-4 h-4 text-primary/80" />
+      <div className="text-sm font-semibold text-foreground/90">Edit Settings</div>
     </RefinedPopover.Header>
     
     <RefinedPopover.Body>

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState, ButtonHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/common/lib/utils";
 import {
   Popover,
@@ -68,7 +68,7 @@ interface RefinedPopoverHeaderProps {
 const RefinedPopoverHeader = ({ children, className = "" }: RefinedPopoverHeaderProps) => {
   return (
     <div className={cn(
-      "px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30",
+      "flex items-center gap-2.5 mb-5",
       className
     )}>
       {children}
@@ -84,7 +84,7 @@ interface RefinedPopoverContentProps {
 
 const RefinedPopoverContent = ({ children, className = "" }: RefinedPopoverContentProps) => {
   return (
-    <div className={cn("px-5 pt-5 pb-0 space-y-5", className)}>
+    <div className={cn("space-y-4", className)}>
       {children}
     </div>
   );
@@ -98,7 +98,7 @@ interface RefinedPopoverActionsProps {
 
 const RefinedPopoverActions = ({ children, className = "" }: RefinedPopoverActionsProps) => {
   return (
-    <div className={cn("px-5 pb-5 pt-2 flex items-center justify-end gap-3", className)}>
+    <div className={cn("flex justify-end gap-2.5 pt-3 mt-2", className)}>
       {children}
     </div>
   );
@@ -106,6 +106,45 @@ const RefinedPopoverActions = ({ children, className = "" }: RefinedPopoverActio
 
 // Trigger component
 const RefinedPopoverTrigger = PopoverTrigger;
+
+// Button component
+interface RefinedPopoverButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "outline" | "ghost";
+  size?: "sm" | "md";
+}
+
+const RefinedPopoverButton = forwardRef<HTMLButtonElement, RefinedPopoverButtonProps>(
+  ({ className, variant = "default", size = "md", ...props }, ref) => {
+    const baseClasses = "h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium";
+    
+    const variantClasses = {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      outline: "text-muted-foreground hover:text-foreground hover:bg-accent/30",
+      ghost: "text-muted-foreground hover:text-foreground hover:bg-accent/30"
+    };
+    
+    const sizeClasses = {
+      sm: "h-7 px-3 text-xs",
+      md: "h-8 px-4 text-sm"
+    };
+
+    return (
+      <button
+        className={cn(
+          baseClasses,
+          variantClasses[variant],
+          sizeClasses[size],
+          "disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+
+RefinedPopoverButton.displayName = "RefinedPopoverButton";
 
 // Content wrapper with styling
 interface RefinedPopoverContentWrapperProps {
@@ -120,18 +159,18 @@ interface RefinedPopoverContentWrapperProps {
 
 const RefinedPopoverContentWrapper = ({ 
   children, 
-  width = "w-88",
+  width = "w-80",
   className = "",
   align = "center",
   side = "bottom",
-  sideOffset = 8,
+  sideOffset = 6,
   onInteractOutside
 }: RefinedPopoverContentWrapperProps) => {
   return (
     <PopoverContent 
       className={cn(
         width,
-        "p-0 border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-white dark:bg-slate-900 rounded-xl overflow-hidden",
+        "p-4 border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-popover text-popover-foreground rounded-xl overflow-hidden max-w-[90vw] max-h-[70vh] mr-4 sm:mr-0",
         className
       )}
       align={align}
@@ -151,6 +190,7 @@ export const RefinedPopover = Object.assign(RefinedPopoverRoot, {
   Header: RefinedPopoverHeader,
   Body: RefinedPopoverContent,
   Actions: RefinedPopoverActions,
+  Button: RefinedPopoverButton,
 });
 
 // Export the hook for external use

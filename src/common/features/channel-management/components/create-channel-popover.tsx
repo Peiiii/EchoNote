@@ -139,14 +139,23 @@ export function CreateChannelPopover({ onAddChannel, trigger, variant = 'popover
     );
 
     const actions = (
-        <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={handleCancel}>
+        <>
+            <RefinedPopover.Button 
+                type="button" 
+                variant="outline"
+                onClick={handleCancel}
+            >
                 Cancel
-            </Button>
-            <Button type="submit" disabled={!name.trim()} onClick={handleSubmit}>
+            </RefinedPopover.Button>
+            <RefinedPopover.Button 
+                type="submit" 
+                variant="default"
+                disabled={!name.trim()}
+                onClick={handleSubmit}
+            >
                 Create Space
-            </Button>
-        </div>
+            </RefinedPopover.Button>
+        </>
     );
 
     if (variant === 'dialog') {
@@ -180,19 +189,15 @@ export function CreateChannelPopover({ onAddChannel, trigger, variant = 'popover
             </RefinedPopover.Trigger>
             <RefinedPopover.Content align="center" side="bottom">
                 <RefinedPopover.Header>
-                    <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
-                        Create New Thought Space
-                    </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        Create a dedicated space for your ideas
-                    </p>
+                    <Plus className="w-4 h-4 text-primary/80" />
+                    <div className="text-sm font-semibold text-foreground/90">Create New Thought Space</div>
                 </RefinedPopover.Header>
                 
                 <RefinedPopover.Body>
                     {formContent}
                 </RefinedPopover.Body>
                 
-                <RefinedPopover.Actions className="pt-4">
+                <RefinedPopover.Actions>
                     {actions}
                 </RefinedPopover.Actions>
             </RefinedPopover.Content>

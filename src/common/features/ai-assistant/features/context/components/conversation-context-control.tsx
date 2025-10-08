@@ -1,5 +1,6 @@
 import { Input } from "@/common/components/ui/input";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
+import { RefinedPopover } from "@/common/components/refined-popover";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useCallback, useState } from "react";
@@ -351,10 +352,10 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
 
             <div className="flex justify-end gap-2.5 pt-3 mt-2">
               <PopoverClose asChild>
-                <button type="button" className="h-8 px-4 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-all duration-200">Cancel</button>
+                <RefinedPopover.Button type="button" variant="outline">Cancel</RefinedPopover.Button>
               </PopoverClose>
               <PopoverClose asChild>
-                <button type="button" className="h-8 px-4 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 font-medium" onClick={() => void apply()}>Apply Changes</button>
+                <RefinedPopover.Button type="button" variant="default" onClick={() => void apply()}>Apply Changes</RefinedPopover.Button>
               </PopoverClose>
             </div>
           </div>
