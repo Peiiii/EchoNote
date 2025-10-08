@@ -72,7 +72,7 @@ export function AIConversationList({ conversations, currentConversationId, loadi
             {filtered.map((c) => (
               <div
                 key={c.id}
-                className={`group px-4 py-3 cursor-pointer hover:bg-accent/50 transition-colors ${currentConversationId === c.id ? "bg-accent border-r-2 border-primary" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
+                className={`group px-4 py-3 cursor-pointer hover:bg-accent/50 transition-colors ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
                 onClick={() => selectConversation(c.id)}
               >
                 <div className="flex items-start justify-between gap-3">

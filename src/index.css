@@ -169,4 +169,40 @@
   .dark .timeline-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(71, 85, 105, 0.7);
   }
+
+  /* Global scrollbar styles to prevent layout issues */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 3px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+  }
+  
+  .dark .overflow-y-auto {
+    scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+  }
+  
+  .dark .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.5);
+  }
+  
+  .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.7);
+  }
 }
