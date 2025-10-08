@@ -1,5 +1,4 @@
 import { Input } from "@/common/components/ui/input";
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 import { RefinedPopover } from "@/common/components/refined-popover";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
@@ -9,7 +8,7 @@ import { useContextStatus } from "../hooks/use-context-status";
 import { useChannelFiltering } from "../hooks/use-channel-filtering";
 import { useContextDisplay } from "../hooks/use-context-display";
 import { cn } from "@/common/lib/utils";
-import { Ban, Check, ChevronDown, Globe, Layers, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Ban, Check, ChevronDown, Globe, Layers, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { ConversationContextMode } from "@/common/types/ai-conversation";
 
 // Internal component for context option items
@@ -175,6 +174,7 @@ interface Props {
 }
 
 export function ConversationContextControl({ conversationId, fallbackChannelId, onActiveToolChannelChange, activeToolChannelId, variant = 'inline' }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
   const { channels } = useNotesDataStore();
 
@@ -224,8 +224,8 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
 
   return (
     <div className={containerClass}>
-      <Popover modal>
-        <PopoverTrigger asChild>
+      <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
+        <RefinedPopover.Trigger asChild>
           {variant === 'compact' ? (
             <button
               type="button"
@@ -260,21 +260,39 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
               <span className={"ml-1 w-1.5 h-1.5 rounded-full " + (anyLoading ? 'bg-primary animate-pulse' : 'bg-emerald-500')} />
             </button>
           )}
-        </PopoverTrigger>
-        <PopoverContent align="center" sideOffset={6} className="p-4 w-80 max-w-[90vw] max-h-[70vh] overflow-hidden mr-4 sm:mr-0" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
-          <div className="flex items-center gap-2.5 mb-5">
+        </RefinedPopover.Trigger>
+        <RefinedPopover.Content 
+          width="w-80" 
+          align="center" 
+          side="bottom"
+          onInteractOutside={(e: Event) => {
+            e.preventDefault();
+          }}
+        >
+          <RefinedPopover.Header>
             <SlidersHorizontal className="w-4 h-4 text-primary/80" />
             <div className="text-sm font-semibold text-foreground/90">Context Settings</div>
-          </div>
-          {anyLoading && (
-            <div className="mb-4 p-3 rounded-lg bg-primary/6">
-              <div className="flex items-center gap-2.5 text-xs text-primary/90">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span>Loading context data...</span>
+            <RefinedPopover.Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 ml-auto"
+              onClick={() => setIsOpen(false)}
+              title="Close"
+            >
+              <X className="h-3 w-3" />
+            </RefinedPopover.Button>
+          </RefinedPopover.Header>
+          
+          <RefinedPopover.Body>
+            {anyLoading && (
+              <div className="mb-4 p-3 rounded-lg bg-primary/6">
+                <div className="flex items-center gap-2.5 text-xs text-primary/90">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span>Loading context data...</span>
+                </div>
               </div>
-            </div>
-          )}
-          <div className="space-y-1.5">
+            )}
+            <div className="space-y-1.5">
             <ContextOption
               mode={ConversationContextMode.AUTO}
               currentMode={draftMode}
@@ -349,18 +367,30 @@ export function ConversationContextControl({ conversationId, fallbackChannelId, 
                 getChannelName={getChannelName}
               />
             )}
-
-            <div className="flex justify-end gap-2.5 pt-3 mt-2">
-              <PopoverClose asChild>
-                <RefinedPopover.Button type="button" variant="outline">Cancel</RefinedPopover.Button>
-              </PopoverClose>
-              <PopoverClose asChild>
-                <RefinedPopover.Button type="button" variant="default" onClick={() => void apply()}>Apply Changes</RefinedPopover.Button>
-              </PopoverClose>
             </div>
-          </div>
-        </PopoverContent>
-      </Popover>
+          </RefinedPopover.Body>
+          
+          <RefinedPopover.Actions>
+            <RefinedPopover.Button 
+              type="button" 
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
+              Cancel
+            </RefinedPopover.Button>
+            <RefinedPopover.Button 
+              type="button" 
+              variant="default" 
+              onClick={() => {
+                void apply();
+                setIsOpen(false);
+              }}
+            >
+              Apply Changes
+            </RefinedPopover.Button>
+          </RefinedPopover.Actions>
+        </RefinedPopover.Content>
+      </RefinedPopover>
     </div>
   );
 }
