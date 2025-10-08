@@ -14,10 +14,8 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                    // 移动端优化的代码块样式
                     code: CodeBlock,
 
-                    // 移动端优化的链接样式
                     a({ children, href, ...props }) {
                         return (
                             <a
@@ -57,7 +55,6 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                         );
                     },
 
-                    // 移动端优化的引用样式
                     blockquote({ children, ...props }) {
                         return (
                             <blockquote className="border-l-4 border-blue-400 dark:border-blue-500 pl-3 italic text-slate-600 dark:text-slate-400 bg-blue-50/30 dark:bg-blue-900/20 py-2 rounded-r-lg my-3" {...props}>
@@ -66,7 +63,6 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                         );
                     },
 
-                    // 移动端优化的列表样式
                     ul({ children, ...props }) {
                         return (
                             <ul className="list-disc list-inside space-y-1 marker:text-blue-500 dark:marker:text-blue-400 my-3" {...props}>
@@ -94,7 +90,6 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                         return <input type={type} checked={checked} {...props} />;
                     },
 
-                    // 移动端优化的标题样式
                     h1({ children, ...props }) {
                         return (
                             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 mt-3 leading-6" {...props}>
@@ -138,7 +133,6 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                         );
                     },
 
-                    // 移动端优化的段落样式
                     p({ children, ...props }) {
                         return (
                             <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words font-normal mb-3" {...props}>
@@ -147,7 +141,6 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
                         );
                     },
 
-                    // 移动端优化的分割线样式
                     hr({ ...props }) {
                         return (
                             <hr className="border-t border-slate-300 dark:border-slate-600 my-4" {...props} />
