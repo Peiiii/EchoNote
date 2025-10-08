@@ -22,6 +22,8 @@ export interface AgentConfig {
   temperature?: number;
   maxTokens?: number;
   baseURL?: string;
+  // Optional: character limit for input context trimming (handled by the experimental agent)
+  contextCharLimit?: number;
 }
 
 export interface OpenAIAgentOptions {
