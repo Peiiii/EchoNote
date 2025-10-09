@@ -15,8 +15,6 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 
 import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { sessionContextManager } from "../features/context/services/session-context-manager";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
@@ -36,6 +34,7 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
           </div>
         ) : (
           <AgentChatCoreWrapper
+            key={conversationId}
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
@@ -58,17 +57,7 @@ interface AgentChatCoreWrapperProps {
 
 function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
   const isTemp = isTempConversation(conversationId);
-
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
-  // Select tool target channel based on conversation contexts; fallback to current channel
-  const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
-  const initialToolChannel = useMemo(() => {
-    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds && conv.contexts.channelIds.length > 0) {
-      return conv.contexts.channelIds[0];
-    }
-    return channelId;
-  }, [conv?.contexts, channelId]);
-  const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
   const tools = useMemo(() => {
     return aiAgentFactory.getChannelTools();
   }, []);
@@ -82,7 +71,7 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
-  
+
   const [sessionMessages, setSessionMessages] = useState<UIMessage[]>(messages);
   useEffect(() => {
     const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
@@ -93,40 +82,6 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
     return () => sub.unsubscribe();
   }, [agentSessionManager, conversationId]);
 
-  // Trigger loading for context data for current tool channel and explicit contexts (to improve first response quality)
-  useEffect(() => {
-    // Ensure tool channel is loaded
-    const channelState = channelMessageService.dataContainer.get().messageByChannel[toolChannelId];
-    if (!channelState) {
-      channelMessageService.requestLoadInitialMessages$.next({ channelId: toolChannelId });
-    }
-    
-    // Use centralized method to ensure context channels are loaded
-    sessionContextManager.ensureContextsLoaded(conv?.contexts || null, channelId);
-  }, [toolChannelId, conv?.contexts, channelId]);
-
-  // Auto mode: when conversation has no explicit contexts, keep tool target in sync with current channel
-  useEffect(() => {
-    if (!conv || conv.contexts) return; // manual mode when contexts exists
-    if (toolChannelId !== channelId) {
-      setToolChannelId(channelId);
-    }
-  }, [conv, toolChannelId, channelId]);
-
-  // When contexts change in manual mode, ensure tool target is valid
-  useEffect(() => {
-    if (!conv?.contexts) return; // auto mode handled above
-    const mode = conv.contexts.mode;
-    if (mode === 'channels') {
-      const ids = conv.contexts.channelIds || [];
-      if (!ids.includes(toolChannelId)) {
-        setToolChannelId(ids[0] || channelId);
-      }
-    } else {
-      // 'none' or 'all' -> default to current channel for tools
-      if (toolChannelId !== channelId) setToolChannelId(channelId);
-    }
-  }, [conv?.contexts, toolChannelId, channelId]);
 
   // Use a safe hash that ignores functions/cycles inside tool parts
   const hash = (m: UIMessage) => safeHashMessage(m);

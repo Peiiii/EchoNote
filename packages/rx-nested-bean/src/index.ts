@@ -586,6 +586,18 @@ export const useBehaviorSubjectFromState = <T>(state: T) => {
   return subject;
 };
 
+export const useSubscribeObservable = <T>(observableOrGetObservable: Observable<T> | (() => Observable<T>), next: (value: T) => void) => {
+  const observable = useMemo(() => {
+    return typeof observableOrGetObservable === 'function' 
+      ? observableOrGetObservable() 
+      : observableOrGetObservable;
+  }, []);
+  useEffect(() => {
+    const sub = observable.subscribe(next);
+    return () => sub.unsubscribe();
+  }, []);
+};
+
 // export const useStateFromBehaviorSubject = <T, T2>(
 //   subject: BehaviorSubject<T>,
 //   mapper?: Parameters<typeof map<T, T2>>[0]
