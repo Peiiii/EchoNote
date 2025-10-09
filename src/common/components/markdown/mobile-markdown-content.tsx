@@ -5,6 +5,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; // KaTeX styles for math rendering
 import { CodeBlock } from "./code-block";
+import { ZoomableImage } from "./zoomable-image";
 import { Checkbox } from "@/common/components/ui/checkbox";
 
 interface MobileMarkdownContentProps {
@@ -192,6 +193,9 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
             return (
               <hr className="border-t border-slate-300 dark:border-slate-600 my-4" {...props} />
             );
+          },
+          img({ src, alt }) {
+            return <ZoomableImage src={src} alt={alt?.toString()} className="my-2" />;
           },
         }}
       >

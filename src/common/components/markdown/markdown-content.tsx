@@ -6,6 +6,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; // KaTeX styles for math rendering
 import { Checkbox } from "@/common/components/ui/checkbox";
+import { ZoomableImage } from "./zoomable-image";
 
 interface MarkdownContentProps {
   content: string;
@@ -209,6 +210,9 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
                 {children}
               </em>
             );
+          },
+          img({ src, alt }) {
+            return <ZoomableImage src={src} alt={alt?.toString()} className="my-2" />;
           },
         }}
       >
