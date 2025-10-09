@@ -291,9 +291,17 @@ export function ConversationContextControl({
             <button
               type="button"
               title={tooltip || label}
-              className="relative inline-flex items-center gap-2 text-xs px-2 py-1 rounded-sm border hover:bg-accent"
+              className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
             >
-              <span className="text-muted-foreground">Context</span>
+              {(() => {
+                const ctx = conv?.contexts;
+                if (!ctx || ctx.mode === ConversationContextMode.AUTO) return <Sparkles className="w-4 h-4 text-muted-foreground/70" />; // Auto
+                if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4 text-muted-foreground/70" />;
+                if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4 text-muted-foreground/70" />;
+                if (ctx.mode === ConversationContextMode.CHANNELS)
+                  return <Layers className="w-4 h-4 text-muted-foreground/70" />;
+                return <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />;
+              })()}
               <span className="font-medium text-foreground/90 truncate max-w-[10rem]">{label}</span>
               {otherCount > 0 && (
                 <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">
@@ -302,10 +310,11 @@ export function ConversationContextControl({
               )}
               <span
                 className={
-                  "ml-1 w-1.5 h-1.5 rounded-full " +
+                  "w-1.5 h-1.5 rounded-full " +
                   (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
                 }
               />
+              <ChevronDown className="w-4 h-4 text-muted-foreground/60" />
             </button>
           )}
         </RefinedPopover.Trigger>
