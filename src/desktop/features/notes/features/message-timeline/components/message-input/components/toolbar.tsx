@@ -92,7 +92,7 @@ export function Toolbar() {
   }
 
   return (
-    <div className="px-4 py-1 flex items-center justify-between">
+    <div className="px-3 py-1 flex items-center justify-between">
       <div className="flex items-center gap-1">
         {leftButtons.map((button, index) => (
           <ToolbarButton

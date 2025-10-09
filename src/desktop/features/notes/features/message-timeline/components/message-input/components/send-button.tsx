@@ -3,7 +3,7 @@ import { SendButtonProps } from "../types";
 
 export function SendButton({ onSend, disabled, message }: SendButtonProps) {
   return (
-    <div className="absolute bottom-2 right-2">
+    <div className="absolute bottom-2 right-3">
       <button
         onClick={onSend}
         disabled={disabled}

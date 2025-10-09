@@ -1,5 +1,9 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+// Math support: parse $...$ / $$...$$ and render via KaTeX
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css"; // KaTeX styles for math rendering
 import { CodeBlock } from "./code-block";
 import { Checkbox } from "@/common/components/ui/checkbox";
 
@@ -14,7 +18,9 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
       className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-4 [&_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul_ul]:ml-4 [&_ol_ol]:ml-4 [&_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol_ol]:ml-4 [&_ul_ol]:ml-4 [&_ol_ul]:ml-4 ${className}`}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        // Enable GFM and math. Order matters: math first so GFM doesn't eat underscores, etc.
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex]}
         components={{
           code: CodeBlock,
 
