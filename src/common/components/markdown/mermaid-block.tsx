@@ -1,4 +1,4 @@
-import { Check, Copy, Download, Maximize2 } from "lucide-react";
+import { Check, Copy, Download, Maximize2, Code2, Image as ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
@@ -22,6 +22,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const id = useMemo(() => `mermaid-${Math.random().toString(36).slice(2)}`, []);
   const [open, setOpen] = useState(false);
+  const [showSource, setShowSource] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -86,57 +87,102 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
   if (error) {
     return (
       <div className="group relative my-4">
-        <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 border-b border-gray-600 dark:border-gray-600 rounded-t px-3 py-2">
-          <span className="text-xs text-red-400">Mermaid render failed</span>
-          <button
-            onClick={handleCopy}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-gray-700 hover:bg-gray-600 rounded transition-all duration-150"
-            title={copied ? "Copied!" : "Copy source"}
-          >
-            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-          </button>
+        <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-3 py-2">
+          <span className="text-xs text-red-400 tracking-wide">mermaid</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSource(s => !s)}
+              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              title={showSource ? "View diagram" : "View source"}
+            >
+              {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
+            </button>
+            <button
+              onClick={handleCopy}
+              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              title={copied ? "Copied!" : "Copy source"}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </button>
+          </div>
         </div>
-        <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
-          <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200 whitespace-pre">{code}</code>
-        </pre>
+        {showSource ? (
+          <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+            <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200 whitespace-pre">{code}</code>
+          </pre>
+        ) : (
+          <div className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+            <code className="text-sm text-red-400">Failed to render mermaid diagram</code>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="group relative my-4" ref={containerRef}>
-      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 border-b border-gray-600 dark:border-gray-600 rounded-t px-3 py-2">
-        <span className="text-xs font-medium text-gray-300">mermaid</span>
+      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-3 py-2">
+        <span className="text-xs font-medium text-gray-300 uppercase tracking-wide">MERMAID</span>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setOpen(true)}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-gray-700 hover:bg-gray-600 rounded transition-all duration-150"
-            title="View larger"
+            onClick={() => setShowSource(s => !s)}
+            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+            title={showSource ? "View diagram" : "View source"}
           >
-            <Maximize2 className="w-3 h-3" />
+            {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
           </button>
+          {!showSource && (
+            <button
+              onClick={() => setOpen(true)}
+              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              title="View larger"
+            >
+              <Maximize2 className="w-3 h-3" />
+            </button>
+          )}
           <button
-            onClick={handleDownloadSvg}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-gray-700 hover:bg-gray-600 rounded transition-all duration-150"
-            title="Download SVG"
+            onClick={showSource ? () => {
+              // download .mmd
+              try {
+                const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'diagram.mmd';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+              } catch (err) {
+                console.warn('Download mmd failed:', err);
+              }
+            } : handleDownloadSvg}
+            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+            title={showSource ? "Download .mmd" : "Download SVG"}
           >
             <Download className="w-3 h-3" />
           </button>
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-gray-700 hover:bg-gray-600 rounded transition-all duration-150"
+            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
             title={copied ? "Copied!" : "Copy source"}
           >
             {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           </button>
         </div>
       </div>
-      <div
-        className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600 cursor-zoom-in"
-        onDoubleClick={() => setOpen(true)}
-        // SVG markup from mermaid
-        dangerouslySetInnerHTML={{ __html: svg || "" }}
-      />
+      {showSource ? (
+        <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+          <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200 whitespace-pre">{code}</code>
+        </pre>
+      ) : (
+        <div
+          className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600 cursor-zoom-in"
+          onDoubleClick={() => setOpen(true)}
+          // SVG markup from mermaid
+          dangerouslySetInnerHTML={{ __html: svg || "" }}
+        />
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-[95vw]">

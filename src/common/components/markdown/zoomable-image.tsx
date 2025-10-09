@@ -18,6 +18,7 @@ interface ZoomableImageProps {
 
 export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
   const [open, setOpen] = useState(false);
+  const [errored, setErrored] = useState(false);
 
   const filename = (() => {
     if (!src) return "image";
@@ -61,18 +62,22 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
         <img
           src={src}
           alt={alt}
-          className={`cursor-zoom-in ${className ?? ""}`}
+          className={`${errored ? "cursor-default" : "cursor-zoom-in"} ${className ?? ""}`}
           loading="lazy"
-          onClick={() => setOpen(true)}
+          onLoad={() => setErrored(false)}
+          onError={() => setErrored(true)}
+          onClick={() => !errored && setOpen(true)}
         />
-        <button
-          type="button"
-          className="absolute top-1 right-1 hidden group-hover:flex items-center justify-center w-6 h-6 rounded bg-black/50 text-white"
-          title="View larger"
-          onClick={() => setOpen(true)}
-        >
-          <Maximize2 className="w-3 h-3" />
-        </button>
+        {!errored && (
+          <button
+            type="button"
+            className="absolute top-1 right-1 hidden group-hover:flex items-center justify-center w-6 h-6 rounded bg-black/50 text-white"
+            title="View larger"
+            onClick={() => setOpen(true)}
+          >
+            <Maximize2 className="w-3 h-3" />
+          </button>
+        )}
       </span>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -84,9 +89,11 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
             <img src={src} alt={alt} className="mx-auto max-w-[90vw] max-h-[78vh] object-contain" />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleDownload} size="sm">
-              <Download className="w-4 h-4 mr-2" /> Download
-            </Button>
+            {!errored && (
+              <Button variant="outline" onClick={handleDownload} size="sm">
+                <Download className="w-4 h-4 mr-2" /> Download
+              </Button>
+            )}
             <DialogClose asChild>
               <Button size="sm">Close</Button>
             </DialogClose>
@@ -96,4 +103,3 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
     </>
   );
 }
-

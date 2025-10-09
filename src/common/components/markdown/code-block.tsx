@@ -113,7 +113,7 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
 
   return (
     <div className="group relative my-4">
-      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-1.5 py-1">
+      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-2 py-1">
         <div className="flex items-center space-x-2">
           {language && (
             <span className="text-xs font-medium text-gray-400 dark:text-gray-500 tracking-wide">
@@ -123,7 +123,7 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
         </div>
         <button
           onClick={copyToClipboard}
-          className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-600 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+          className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
           title={copied ? "Copied!" : "Copy code"}
         >
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
