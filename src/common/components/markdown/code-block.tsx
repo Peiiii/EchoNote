@@ -1,5 +1,7 @@
 import { Copy, Check } from "lucide-react";
 import { Children, useMemo, useState } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { MermaidBlock } from "./mermaid-block";
 
 interface CodeBlockProps {
@@ -61,14 +63,31 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
         </button>
       </div>
-
-      <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
-        <code
-          className={`${className} text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200`}
+      {language ? (
+        <SyntaxHighlighter
+          style={vscDarkPlus}
+          language={language}
+          PreTag="div"
+          className="rounded-b overflow-auto w-full max-w-full min-w-0 border border-gray-600 dark:border-gray-600"
+          wrapLongLines
+          customStyle={{
+            whiteSpace: "pre",
+            overflowX: "auto",
+            overflowY: "auto",
+            background: "#0a0a0a",
+            margin: 0,
+            padding: "0.75rem",
+          }}
         >
-          {children}
-        </code>
-      </pre>
+          {raw}
+        </SyntaxHighlighter>
+      ) : (
+        <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+          <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200">
+            {raw}
+          </code>
+        </pre>
+      )}
     </div>
   );
 }
