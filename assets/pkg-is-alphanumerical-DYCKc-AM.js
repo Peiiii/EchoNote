@@ -1,0 +1,1 @@
+import{r as n}from"./pkg-is-alphabetical-BQ1fjZEF.js";import{r as m}from"./pkg-is-decimal-Bg2oiju0.js";var r,e;function t(){if(e)return r;e=1;var i=n(),l=m();r=u;function u(a){return i(a)||l(a)}return r}export{t as r};
