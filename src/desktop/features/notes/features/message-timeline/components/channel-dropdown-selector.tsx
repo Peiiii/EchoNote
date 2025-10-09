@@ -1,5 +1,4 @@
 import { Badge } from "@/common/components/ui/badge";
-import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,25 +26,20 @@ export const ChannelDropdownSelector = ({
     <div className={className}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className={`h-auto p-2 hover:bg-white/20 transition-all duration-200 hover:scale-105 `}
-          >
+          <div className="flex items-center space-x-1.5 min-w-0">
+            {currentChannel.emoji && (
+              <div className="text-lg flex-shrink-0">{currentChannel.emoji}</div>
+            )}
             <div className="flex items-center space-x-1.5 min-w-0">
-              {currentChannel.emoji && (
-                <div className="text-lg flex-shrink-0">{currentChannel.emoji}</div>
-              )}
-              <div className="flex items-center space-x-1.5 min-w-0 flex-1">
-                <h1 className="text-lg font-semibold text-muted-foreground truncate">
-                  {currentChannel.name}
-                </h1>
-                <Badge variant="secondary" className="text-xs flex-shrink-0 text-muted-foreground">
-                  {currentChannel.messageCount}
-                </Badge>
-              </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <h1 className="text-lg font-semibold text-muted-foreground truncate">
+                {currentChannel.name}
+              </h1>
+              <Badge variant="secondary" className="text-xs flex-shrink-0 text-muted-foreground">
+                {currentChannel.messageCount}
+              </Badge>
             </div>
-          </Button>
+            <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-72 max-h-80 overflow-y-auto" align="start" sideOffset={8}>
@@ -53,11 +47,10 @@ export const ChannelDropdownSelector = ({
             <DropdownMenuItem
               key={channel.id}
               onClick={() => onChannelSelect(channel.id)}
-              className={`flex items-center space-x-3 p-3 cursor-pointer transition-all duration-200 ${
-                channel.id === currentChannel.id
+              className={`flex items-center space-x-3 p-3 cursor-pointer transition-all duration-200 ${channel.id === currentChannel.id
                   ? "bg-accent text-accent-foreground"
                   : "hover:bg-accent/50"
-              }`}
+                }`}
             >
               <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
                 {channel.emoji ? (
