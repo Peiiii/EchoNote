@@ -86,20 +86,20 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
 
   if (error) {
     return (
-      <div className="group relative my-4">
-        <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-3 py-2">
-          <span className="text-xs text-red-400 tracking-wide">mermaid</span>
+      <div className="group/code relative my-4">
+        <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">MERMAID</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSource(s => !s)}
-              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
               title={showSource ? "View diagram" : "View source"}
             >
               {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
             </button>
             <button
               onClick={handleCopy}
-              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
               title={copied ? "Copied!" : "Copy source"}
             >
               {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -107,11 +107,11 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
           </div>
         </div>
         {showSource ? (
-          <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
-            <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200 whitespace-pre">{code}</code>
+          <pre className="bg-slate-50 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700 border-t-0">
+            <code className="text-sm leading-relaxed font-mono text-slate-800 dark:text-gray-200 whitespace-pre">{code}</code>
           </pre>
         ) : (
-          <div className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
+          <div className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700">
             <code className="text-sm text-red-400">Failed to render mermaid diagram</code>
           </div>
         )}
@@ -120,13 +120,13 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
   }
 
   return (
-    <div className="group relative my-4" ref={containerRef}>
-      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-3 py-2">
-        <span className="text-xs font-medium text-gray-300 uppercase tracking-wide">MERMAID</span>
+      <div className="group/code relative my-4" ref={containerRef}>
+      <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">MERMAID</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSource(s => !s)}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+            className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
             title={showSource ? "View diagram" : "View source"}
           >
             {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
@@ -134,7 +134,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
           {!showSource && (
             <button
               onClick={() => setOpen(true)}
-              className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
               title="View larger"
             >
               <Maximize2 className="w-3 h-3" />
@@ -157,14 +157,14 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
                 console.warn('Download mmd failed:', err);
               }
             } : handleDownloadSvg}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+            className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
             title={showSource ? "Download .mmd" : "Download SVG"}
           >
             <Download className="w-3 h-3" />
           </button>
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+            className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
             title={copied ? "Copied!" : "Copy source"}
           >
             {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -172,12 +172,12 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
         </div>
       </div>
       {showSource ? (
-        <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
-          <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200 whitespace-pre">{code}</code>
+        <pre className="bg-slate-50 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700">
+          <code className="text-sm leading-relaxed font-mono text-slate-800 dark:text-gray-200 whitespace-pre">{code}</code>
         </pre>
       ) : (
         <div
-          className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600 cursor-zoom-in"
+          className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700 border-t-0 cursor-zoom-in"
           onDoubleClick={() => setOpen(true)}
           // SVG markup from mermaid
           dangerouslySetInnerHTML={{ __html: svg || "" }}

@@ -1,7 +1,7 @@
 import { Copy, Check } from "lucide-react";
-import { Children, useMemo, useState } from "react";
+import { Children, useEffect, useMemo, useState } from "react";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { vscDarkPlus, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { MermaidBlock } from "./mermaid-block";
 
 interface CodeBlockProps {
@@ -71,6 +71,9 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
   const language = match ? match[1] : "";
   const isInline = !className || !match;
   const [hlVersion, setHlVersion] = useState(0);
+  const [isDark, setIsDark] = useState<boolean>(() =>
+    typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false
+  );
   const raw = useMemo(() => {
     // Join all child text nodes into a single string and trim a single trailing newline
     return Children.toArray(children)
@@ -87,6 +90,16 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
       setHlVersion(v => v + 1);
     })();
   }, [language]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.documentElement;
+    const update = () => setIsDark(el.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   const copyToClipboard = async () => {
     try {
@@ -112,18 +125,18 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
   }
 
   return (
-    <div className="group relative my-4">
-      <div className="flex items-center justify-between bg-gray-800 dark:bg-gray-900 rounded-t px-2 py-1">
+    <div className="group/code relative my-4">
+      <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
         <div className="flex items-center space-x-2">
           {language && (
-            <span className="text-xs font-medium text-gray-400 dark:text-gray-500 tracking-wide">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">
               {language}
             </span>
           )}
         </div>
         <button
           onClick={copyToClipboard}
-          className="flex items-center justify-center w-6 h-6 text-xs text-gray-400 hover:text-gray-200 bg-transparent hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover:opacity-100"
+          className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
           title={copied ? "Copied!" : "Copy code"}
         >
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -132,16 +145,16 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
       {language && loadedLangs.has(language.toLowerCase()) ? (
         <SyntaxHighlighter
           key={hlVersion}
-          style={vscDarkPlus}
+          style={isDark ? vscDarkPlus : oneLight}
           language={language}
           PreTag="div"
-          className="rounded-b overflow-auto w-full max-w-full min-w-0"
+          className="rounded-b overflow-auto w-full max-w-full min-w-0 border border-slate-200 dark:border-gray-700 border-t-0"
           wrapLongLines
           customStyle={{
             whiteSpace: "pre",
             overflowX: "auto",
             overflowY: "auto",
-            background: "#0a0a0a",
+            background: isDark ? "#0b0b0b" : "#f8fafc",
             margin: 0,
             padding: "0.75rem",
           }}
@@ -149,8 +162,8 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
           {raw}
         </SyntaxHighlighter>
       ) : (
-        <pre className="bg-gray-900 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-gray-600 dark:border-gray-600">
-          <code className="text-sm leading-relaxed font-mono text-gray-100 dark:text-gray-200">
+        <pre className="bg-slate-50 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700 border-t-0">
+          <code className="text-sm leading-relaxed font-mono text-slate-800 dark:text-gray-200">
             {raw}
           </code>
         </pre>
