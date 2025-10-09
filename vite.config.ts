@@ -141,4 +141,81 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1200, // keep an eye on bundle size while avoiding noisy warnings
+    rollupOptions: {
+      output: {
+        // Split large deps into dedicated chunks to avoid one huge index chunk
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          // In pnpm, paths look like: node_modules/.pnpm/pkg@ver/node_modules/pkg/...
+          // Use the last occurrence of node_modules to get the real package
+          const nm = "node_modules/";
+          const idx = id.lastIndexOf(nm);
+          if (idx === -1) return undefined;
+          const sub = id.slice(idx + nm.length);
+          const segs = sub.split("/");
+          const pkg = segs[0].startsWith("@") ? `${segs[0]}/${segs[1]}` : segs[0];
+
+          // Framework core
+          if (pkg === "react" || pkg === "react-dom") return "react-vendor";
+          if (pkg === "react-router-dom") return "router";
+
+          // Agent chat (can be heavy)
+          if (pkg === "@agent-labs/agent-chat") return "agent-chat";
+
+          // Editor / ProseMirror family
+          if (
+            pkg === "zenmark-editor" ||
+            pkg === "@benrbray/prosemirror-math" ||
+            pkg.startsWith("prosemirror-")
+          ) {
+            return "editor";
+          }
+
+          // Markdown + math rendering
+          if (
+            pkg === "react-markdown" ||
+            pkg === "remark-gfm" ||
+            pkg === "remark-math" ||
+            pkg === "rehype-katex" ||
+            pkg === "katex"
+          ) {
+            return "markdown";
+          }
+
+          // Data + utils
+          if (pkg === "firebase") return "firebase";
+          if (pkg === "rxjs") return "rxjs";
+          if (pkg === "lodash-es") return "lodash";
+
+          // AI SDK
+          if (pkg === "ai" || pkg === "@ai-sdk/openai" || pkg === "openai") return "ai-sdk";
+
+          // UI libs
+          if (pkg.startsWith("@radix-ui/")) return "radix";
+          if (pkg === "lucide-react") return "icons";
+          if (
+            pkg === "class-variance-authority" ||
+            pkg === "clsx" ||
+            pkg === "tailwind-merge"
+          ) {
+            return "ui-utils";
+          }
+
+          // Fallback: split by package to avoid one mega vendor chunk
+          const safe = pkg
+            .replace(/^@/, "at-")
+            .replaceAll("/", "-")
+            .replaceAll(".", "-")
+            .replaceAll("_", "-");
+          return `pkg-${safe}`;
+        },
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
+    },
+  },
 });
