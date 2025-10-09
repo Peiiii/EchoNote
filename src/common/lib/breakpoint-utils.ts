@@ -8,7 +8,7 @@ export const breakpoints = {
   md: 768,
   lg: 1024,
   xl: 1280,
-  '2xl': 1536,
+  "2xl": 1536,
 } as const;
 
 export type Breakpoint = keyof typeof breakpoints;
@@ -18,20 +18,20 @@ export type Breakpoint = keyof typeof breakpoints;
  * This replicates the exact logic from BreakpointProvider
  */
 export const getCurrentBreakpoint = (): Breakpoint => {
-  if (typeof window === 'undefined') return 'sm';
-  
+  if (typeof window === "undefined") return "sm";
+
   const width = window.innerWidth;
-  
-  if (width >= breakpoints['2xl']) {
-    return '2xl';
+
+  if (width >= breakpoints["2xl"]) {
+    return "2xl";
   } else if (width >= breakpoints.xl) {
-    return 'xl';
+    return "xl";
   } else if (width >= breakpoints.lg) {
-    return 'lg';
+    return "lg";
   } else if (width >= breakpoints.md) {
-    return 'md';
+    return "md";
   } else {
-    return 'sm';
+    return "sm";
   }
 };
 
@@ -41,7 +41,7 @@ export const getCurrentBreakpoint = (): Breakpoint => {
  */
 export const isMobile = (): boolean => {
   const currentBreakpoint = getCurrentBreakpoint();
-  return currentBreakpoint === 'sm' || currentBreakpoint === 'md';
+  return currentBreakpoint === "sm" || currentBreakpoint === "md";
 };
 
 /**
@@ -50,7 +50,7 @@ export const isMobile = (): boolean => {
  */
 export const isTablet = (): boolean => {
   const currentBreakpoint = getCurrentBreakpoint();
-  return currentBreakpoint === 'lg';
+  return currentBreakpoint === "lg";
 };
 
 /**
@@ -59,5 +59,5 @@ export const isTablet = (): boolean => {
  */
 export const isDesktop = (): boolean => {
   const currentBreakpoint = getCurrentBreakpoint();
-  return currentBreakpoint === 'xl' || currentBreakpoint === '2xl';
+  return currentBreakpoint === "xl" || currentBreakpoint === "2xl";
 };

@@ -1,5 +1,5 @@
-import { useModalContext } from './context';
-import type { ModalOptions } from './types';
+import { useModalContext } from "./context";
+import type { ModalOptions } from "./types";
 
 export function useModal() {
   const context = useModalContext();
@@ -8,7 +8,7 @@ export function useModal() {
     context.show(options);
   };
 
-  const confirmModal = (options: Omit<ModalOptions, 'content'>) => {
+  const confirmModal = (options: Omit<ModalOptions, "content">) => {
     context.confirm(options);
   };
 
@@ -21,4 +21,4 @@ export function useModal() {
     confirm: confirmModal,
     close: closeModal,
   };
-} 
+}

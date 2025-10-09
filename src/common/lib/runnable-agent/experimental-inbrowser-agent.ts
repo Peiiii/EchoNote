@@ -1,4 +1,12 @@
-import { AgentEvent, EventType, IAgent, RunAgentInput, UIMessage, type TextUIPart, type ToolInvocationUIPart } from "@agent-labs/agent-chat";
+import {
+  AgentEvent,
+  EventType,
+  IAgent,
+  RunAgentInput,
+  UIMessage,
+  type TextUIPart,
+  type ToolInvocationUIPart,
+} from "@agent-labs/agent-chat";
 import { Observable } from "rxjs";
 import { catchError, filter } from "rxjs/operators";
 import { AgentConfig, OpenAIAgent } from "./agent-utils/openai-agent";
@@ -14,21 +22,19 @@ export class ExperimentalInBrowserAgent implements IAgent {
 
   constructor(config?: Partial<AgentConfig>) {
     this.currentConfig = {
-      apiKey:
-        config?.apiKey || import.meta.env.VITE_OPENAI_API_KEY || "",
-      model:
-        config?.model || import.meta.env.VITE_OPENAI_MODEL || "gpt-3.5-turbo",
+      apiKey: config?.apiKey || import.meta.env.VITE_OPENAI_API_KEY || "",
+      model: config?.model || import.meta.env.VITE_OPENAI_MODEL || "gpt-3.5-turbo",
       temperature: config?.temperature || 0.7,
       maxTokens: config?.maxTokens || 1000,
       baseURL:
-        config?.baseURL ||
-        import.meta.env.VITE_OPENAI_API_URL ||
-        "https://api.openai.com/v1",
+        config?.baseURL || import.meta.env.VITE_OPENAI_API_URL || "https://api.openai.com/v1",
     };
 
     // Resolve context char limit from, in order: explicit config, env (VITE_CONTEXT_CHAR_LIMIT or CONTEXT_CHAR_LIMIT), default 30000.
-    const parsedLimit = Number(import.meta.env.VITE_CONTEXT_CHAR_LIMIT) || DEFAULT_CONTEXT_CHAR_LIMIT;
-    this.contextCharLimit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : DEFAULT_CONTEXT_CHAR_LIMIT;
+    const parsedLimit =
+      Number(import.meta.env.VITE_CONTEXT_CHAR_LIMIT) || DEFAULT_CONTEXT_CHAR_LIMIT;
+    this.contextCharLimit =
+      Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : DEFAULT_CONTEXT_CHAR_LIMIT;
 
     if (!this.currentConfig.apiKey) {
       throw new Error(
@@ -38,7 +44,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
 
     this.openaiAgent = new OpenAIAgent(this.currentConfig);
   }
-  
+
   abortRun() {
     this.openaiAgent.abort();
   }
@@ -71,29 +77,30 @@ export class ExperimentalInBrowserAgent implements IAgent {
           const acceptHeader = "application/json";
           const generator = this.openaiAgent.run(trimmedInput, acceptHeader);
 
-          createChunkObservable(generator).pipe(
-            decodeEventStream(), // event解码步骤
-            filter((event: unknown) => !!event && !!(event as { type?: unknown }).type),  // 业务处理可继续扩展
-            // 你可以在这里继续添加更多 operator
-            catchError(err => {
-              console.error("🔔 [ExperimentalInBrowserAgent][run] error:", err);
-              observer.next({
-                type: EventType.RUN_ERROR,
-
-              });
-              observer.error(err);
-              return [];
-            })
-          ).subscribe({
-            next: (event: unknown) => {
-              console.log("event", event);
-              observer.next(event as AgentEvent);
-            },
-            error: err => observer.error(err),
-            complete: () => {
-              observer.complete();
-            }
-          });
+          createChunkObservable(generator)
+            .pipe(
+              decodeEventStream(), // event解码步骤
+              filter((event: unknown) => !!event && !!(event as { type?: unknown }).type), // 业务处理可继续扩展
+              // 你可以在这里继续添加更多 operator
+              catchError(err => {
+                console.error("🔔 [ExperimentalInBrowserAgent][run] error:", err);
+                observer.next({
+                  type: EventType.RUN_ERROR,
+                });
+                observer.error(err);
+                return [];
+              })
+            )
+            .subscribe({
+              next: (event: unknown) => {
+                console.log("event", event);
+                observer.next(event as AgentEvent);
+              },
+              error: err => observer.error(err),
+              complete: () => {
+                observer.complete();
+              },
+            });
         } catch (error) {
           console.error("🔔 [ExperimentalInBrowserAgent][run] error:", error);
           observer.next({
@@ -152,10 +159,9 @@ export class ExperimentalInBrowserAgent implements IAgent {
       // Helper: count characters for any part (text, tool-invocation, etc.)
       const isTextPart = (p: UIMessage["parts"][number]): p is TextUIPart =>
         (p as TextUIPart).type === "text" && typeof (p as TextUIPart).text === "string";
-      const isToolInvocationPart = (
-        p: UIMessage["parts"][number]
-      ): p is ToolInvocationUIPart =>
-        (p as ToolInvocationUIPart).type === "tool-invocation" && !!(p as ToolInvocationUIPart).toolInvocation;
+      const isToolInvocationPart = (p: UIMessage["parts"][number]): p is ToolInvocationUIPart =>
+        (p as ToolInvocationUIPart).type === "tool-invocation" &&
+        !!(p as ToolInvocationUIPart).toolInvocation;
       const countPart = (p: UIMessage["parts"][number]): number => {
         if (isTextPart(p)) return p.text.length;
         if (isToolInvocationPart(p)) {
@@ -165,10 +171,14 @@ export class ExperimentalInBrowserAgent implements IAgent {
           if (typeof inv.args === "string") len += inv.args.length;
           if (inv.toolCallId) len += inv.toolCallId.length;
           if (inv.result !== undefined) {
-            len += typeof inv.result === "string" ? inv.result.length : JSON.stringify(inv.result).length;
+            len +=
+              typeof inv.result === "string"
+                ? inv.result.length
+                : JSON.stringify(inv.result).length;
           }
           if (inv.error !== undefined) {
-            len += typeof inv.error === "string" ? inv.error.length : JSON.stringify(inv.error).length;
+            len +=
+              typeof inv.error === "string" ? inv.error.length : JSON.stringify(inv.error).length;
           }
           return len;
         }
@@ -178,10 +188,11 @@ export class ExperimentalInBrowserAgent implements IAgent {
           return 0;
         }
       };
-      const countMessage = (m: UIMessage): number => (m.parts || []).reduce((acc, part) => acc + countPart(part), 0);
+      const countMessage = (m: UIMessage): number =>
+        (m.parts || []).reduce((acc, part) => acc + countPart(part), 0);
 
       // History messages eligible for trimming: user/assistant (limit applies ONLY to these)
-      const historyMessages = messages.filter((m) => m.role === "user" || m.role === "assistant");
+      const historyMessages = messages.filter(m => m.role === "user" || m.role === "assistant");
       const historyChars = historyMessages.reduce((acc, m) => acc + countMessage(m), 0);
       // System messages and context are NOT counted towards the limit.
       if (historyChars <= limit) {
@@ -198,7 +209,7 @@ export class ExperimentalInBrowserAgent implements IAgent {
         currentHistoryChars -= countMessage(removed);
       }
 
-      const trimmedMessages = messages.filter((m) => !toRemove.has(m.id));
+      const trimmedMessages = messages.filter(m => !toRemove.has(m.id));
       // After trimming, history-only chars should be within limit. No warning needed since system/context are excluded.
 
       return {

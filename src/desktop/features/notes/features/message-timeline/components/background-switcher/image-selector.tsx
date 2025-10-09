@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/common/components/ui/button';
-import { Input } from '@/common/components/ui/input';
-import { BackgroundOption, generateRandomImages } from './background-options';
-import { Plus, RefreshCw, Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { BackgroundOption, generateRandomImages } from "./background-options";
+import { Plus, RefreshCw, Loader2 } from "lucide-react";
 
 interface ImageSelectorProps {
   currentBackground?: string;
@@ -10,7 +10,7 @@ interface ImageSelectorProps {
 }
 
 export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSelectorProps) => {
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
   const [currentImages, setCurrentImages] = useState<BackgroundOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,13 +37,13 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
 
     const customImageOption: BackgroundOption = {
       id: `custom-${Date.now()}`,
-      name: 'Custom Image',
-      type: 'image',
+      name: "Custom Image",
+      type: "image",
       value: imageUrl.trim(),
-      preview: imageUrl.trim()
+      preview: imageUrl.trim(),
     };
     onBackgroundSelect(customImageOption);
-    setImageUrl('');
+    setImageUrl("");
   };
 
   const isValidImageUrl = (url: string) => {
@@ -80,46 +80,44 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          {isLoading ? (
-            Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="aspect-square rounded-lg border-2 border-border bg-muted animate-pulse"
-              />
-            ))
-          ) : (
-            currentImages.map((option) => (
-              <button
-                key={option.id}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onBackgroundSelect(option);
-                }}
-                className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer overflow-hidden ${
-                  isCurrentBackground(option)
-                    ? 'border-primary'
-                    : 'border-border hover:border-primary/50'
-                }`}
-                title={option.name}
-              >
-                <img
-                  src={option.preview}
-                  alt={option.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="aspect-square rounded-lg border-2 border-border bg-muted animate-pulse"
                 />
-                {isCurrentBackground(option) && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
-                    <div className="w-2 h-2 bg-white rounded-full" />
-                  </div>
-                )}
-              </button>
-            ))
-          )}
+              ))
+            : currentImages.map(option => (
+                <button
+                  key={option.id}
+                  onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onBackgroundSelect(option);
+                  }}
+                  className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer overflow-hidden ${
+                    isCurrentBackground(option)
+                      ? "border-primary"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  title={option.name}
+                >
+                  <img
+                    src={option.preview}
+                    alt={option.name}
+                    className="w-full h-full object-cover"
+                    onError={e => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                    }}
+                  />
+                  {isCurrentBackground(option) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                      <div className="w-2 h-2 bg-white rounded-full" />
+                    </div>
+                  )}
+                </button>
+              ))}
         </div>
       </div>
 
@@ -130,7 +128,7 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
             type="url"
             placeholder="Enter image URL (jpg, png, gif, webp, svg)"
             value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
+            onChange={e => setImageUrl(e.target.value)}
             className="text-xs"
           />
           <Button
@@ -144,9 +142,7 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
             Add Image
           </Button>
           {imageUrl && !isValidImageUrl(imageUrl) && (
-            <p className="text-xs text-destructive">
-              Please enter a valid image URL
-            </p>
+            <p className="text-xs text-destructive">Please enter a valid image URL</p>
           )}
         </div>
       </div>

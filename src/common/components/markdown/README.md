@@ -5,12 +5,15 @@ A collection of reusable Markdown components with world-class design and mobile 
 ## Components
 
 ### MarkdownContent
+
 The main desktop-optimized Markdown renderer with enhanced styling and components.
 
 ### MobileMarkdownContent
+
 Mobile-optimized version with touch-friendly spacing and responsive design.
 
 ### CodeBlock
+
 Standalone code block component with copy functionality and syntax highlighting support.
 
 ## Features
@@ -39,22 +42,19 @@ import { MarkdownContent, MobileMarkdownContent } from '@/common/components/mark
 ### With Custom Styling
 
 ```tsx
-<MarkdownContent 
-    content={markdownText} 
-    className="custom-prose-class" 
-/>
+<MarkdownContent content={markdownText} className="custom-prose-class" />
 ```
 
 ### Standalone CodeBlock
 
 ```tsx
-import { CodeBlock } from '@/common/components/markdown';
+import { CodeBlock } from "@/common/components/markdown";
 
 <CodeBlock className="language-javascript">
-{`function hello() {
+  {`function hello() {
     console.log('Hello World!');
 }`}
-</CodeBlock>
+</CodeBlock>;
 ```
 
 ## File Structure
@@ -79,18 +79,21 @@ src/common/components/markdown/
 ## Integration
 
 ### Desktop Components
+
 ```tsx
-import { MarkdownContent } from '@/common/components/markdown';
+import { MarkdownContent } from "@/common/components/markdown";
 ```
 
 ### Mobile Components
+
 ```tsx
-import { MobileMarkdownContent } from '@/common/components/markdown';
+import { MobileMarkdownContent } from "@/common/components/markdown";
 ```
 
 ### Direct Usage
+
 ```tsx
-import { CodeBlock } from '@/common/components/markdown';
+import { CodeBlock } from "@/common/components/markdown";
 ```
 
 ## Customization

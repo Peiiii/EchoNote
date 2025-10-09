@@ -1,5 +1,11 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { type Breakpoint, getCurrentBreakpoint, isMobile, isTablet, isDesktop } from '@/common/lib/breakpoint-utils';
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  type Breakpoint,
+  getCurrentBreakpoint,
+  isMobile,
+  isTablet,
+  isDesktop,
+} from "@/common/lib/breakpoint-utils";
 
 interface BreakpointContextType {
   currentBreakpoint: Breakpoint;
@@ -11,7 +17,7 @@ interface BreakpointContextType {
 const BreakpointContext = createContext<BreakpointContextType | undefined>(undefined);
 
 export function BreakpointProvider({ children }: { children: React.ReactNode }) {
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<Breakpoint>('sm');
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<Breakpoint>("sm");
 
   useEffect(() => {
     const updateBreakpoint = () => {
@@ -19,9 +25,9 @@ export function BreakpointProvider({ children }: { children: React.ReactNode }) 
     };
 
     updateBreakpoint();
-    window.addEventListener('resize', updateBreakpoint);
-    
-    return () => window.removeEventListener('resize', updateBreakpoint);
+    window.addEventListener("resize", updateBreakpoint);
+
+    return () => window.removeEventListener("resize", updateBreakpoint);
   }, []);
 
   const value: BreakpointContextType = {
@@ -32,17 +38,13 @@ export function BreakpointProvider({ children }: { children: React.ReactNode }) 
     isDesktop: isDesktop(),
   };
 
-  return (
-    <BreakpointContext.Provider value={value}>
-      {children}
-    </BreakpointContext.Provider>
-  );
+  return <BreakpointContext.Provider value={value}>{children}</BreakpointContext.Provider>;
 }
 
 export function useBreakpoint() {
   const context = useContext(BreakpointContext);
   if (context === undefined) {
-    throw new Error('useBreakpoint must be used within a BreakpointProvider');
+    throw new Error("useBreakpoint must be used within a BreakpointProvider");
   }
   return context;
 }

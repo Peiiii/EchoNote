@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface ActivityItem {
   id: string;
@@ -18,11 +18,11 @@ export interface ActivityItem {
   iconColor?: string;
 }
 
-const DEFAULT_ACTIVE_ID = 'chat';
+const DEFAULT_ACTIVE_ID = "chat";
 
 export enum ActivityBarGroup {
-  MAIN = 'main',
-  FOOTER = 'footer',
+  MAIN = "main",
+  FOOTER = "footer",
 }
 
 export interface ActivityBarState {
@@ -38,47 +38,45 @@ export interface ActivityBarState {
   reset: () => void;
 }
 
-
 export const useActivityBarStore = create<ActivityBarState>()(
   persist(
-    (set) => ({
+    set => ({
       items: [],
       activeId: undefined,
       expanded: false,
 
       addItem: (item: ActivityItem) => {
-        set((state) => ({
+        set(state => ({
           items: [...state.items, item],
         }));
         return () => {
-          set((state) => ({
-            items: state.items.filter((it) => it.id !== item.id),
+          set(state => ({
+            items: state.items.filter(it => it.id !== item.id),
           }));
-        }
+        };
       },
 
       removeItem: (id: string) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
+        set(state => ({
+          items: state.items.filter(item => item.id !== id),
           // If the deleted item is currently active, activate the first available item
-          activeId: state.activeId === id
-            ? state.items.find(item => item.id !== id)?.id || DEFAULT_ACTIVE_ID
-            : state.activeId,
+          activeId:
+            state.activeId === id
+              ? state.items.find(item => item.id !== id)?.id || DEFAULT_ACTIVE_ID
+              : state.activeId,
         }));
       },
 
       updateItem: (id: string, updates: Partial<ActivityItem>) => {
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id ? { ...item, ...updates } : item
-          ),
+        set(state => ({
+          items: state.items.map(item => (item.id === id ? { ...item, ...updates } : item)),
         }));
       },
 
       setActiveId: (id: string) => {
-        set((state) => {
+        set(state => {
           // Update both activeId and items in a single set operation
-          const updatedItems = state.items.map((item) => ({
+          const updatedItems = state.items.map(item => ({
             ...item,
             isActive: item.id === id,
           }));
@@ -90,7 +88,7 @@ export const useActivityBarStore = create<ActivityBarState>()(
       },
 
       toggleExpanded: () => {
-        set((state) => ({ expanded: !state.expanded }));
+        set(state => ({ expanded: !state.expanded }));
       },
 
       setExpanded: (expanded: boolean) => {
@@ -106,9 +104,8 @@ export const useActivityBarStore = create<ActivityBarState>()(
       },
     }),
     {
-      name: 'activity-bar-store',
-      partialize: (state) => ({ expanded: state.expanded }), // Only persist expanded
+      name: "activity-bar-store",
+      partialize: state => ({ expanded: state.expanded }), // Only persist expanded
     }
   )
 );
-

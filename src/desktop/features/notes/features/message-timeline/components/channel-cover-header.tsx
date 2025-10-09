@@ -8,7 +8,17 @@ import { getFeaturesConfig } from "@/core/config/features.config";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
-import { Bot, ChevronDown, ChevronUp, MessageSquare, PanelLeft, Search, Settings, Users, Plus } from "lucide-react";
+import {
+  Bot,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  PanelLeft,
+  Search,
+  Settings,
+  Users,
+  Plus,
+} from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
@@ -33,7 +43,7 @@ const getPicsumBackground = (hash: number) => {
   const imageId = (hash % 100) + 1;
   return {
     background: `url(https://picsum.photos/800/400?random=${imageId})`,
-    isImage: true
+    isImage: true,
   };
 };
 
@@ -54,51 +64,47 @@ export const ChannelCoverHeader = ({
   channel,
   onOpenSettings,
   className = "",
-  defaultCollapsed = false
+  defaultCollapsed = false,
 }: ChannelCoverHeaderProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const notifyLayoutChange = useReadMoreStore(
-    useCallback((state) => state.notifyLayoutChange, [])
-  );
+  const notifyLayoutChange = useReadMoreStore(useCallback(state => state.notifyLayoutChange, []));
   const setTimelineCoverCollapsed = useUIPreferencesStore(
-    useCallback((state) => state.setTimelineCoverCollapsed, [])
+    useCallback(state => state.setTimelineCoverCollapsed, [])
   );
   const isCollapsed = useUIPreferencesStore(
-    useCallback(
-      (state) => state.timelineCoverCollapsed ?? defaultCollapsed,
-      [defaultCollapsed]
-    )
+    useCallback(state => state.timelineCoverCollapsed ?? defaultCollapsed, [defaultCollapsed])
   );
   const isLeftSidebarCollapsed = useUIPreferencesStore(
-    useCallback((state) => state.isLeftSidebarCollapsed, [])
+    useCallback(state => state.isLeftSidebarCollapsed, [])
   );
   const setLeftSidebarCollapsed = useUIPreferencesStore(
-    useCallback((state) => state.setLeftSidebarCollapsed, [])
+    useCallback(state => state.setLeftSidebarCollapsed, [])
   );
   const { updateChannel, channels, addChannel } = useNotesDataStore();
   const { setCurrentChannel } = useNotesViewStore();
-  const { background: backgroundStyle, isImage: hasBackgroundImage } = getChannelBackground(channel);
-  const isGradient = backgroundStyle.includes('gradient');
+  const { background: backgroundStyle, isImage: hasBackgroundImage } =
+    getChannelBackground(channel);
+  const isGradient = backgroundStyle.includes("gradient");
 
   const getBackgroundStyle = (): React.CSSProperties => {
     if (hasBackgroundImage) {
       return {
         backgroundImage: backgroundStyle,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       };
     }
 
     if (isGradient) {
       return {
-        background: backgroundStyle
+        background: backgroundStyle,
       };
     }
 
     return {
-      backgroundColor: backgroundStyle
+      backgroundColor: backgroundStyle,
     };
   };
 
@@ -120,15 +126,21 @@ export const ChannelCoverHeader = ({
     setLeftSidebarCollapsed(false);
   };
 
-  const handleBackgroundChange = async ({ type, value }: { type: 'color' | 'image'; value: string }) => {
+  const handleBackgroundChange = async ({
+    type,
+    value,
+  }: {
+    type: "color" | "image";
+    value: string;
+  }) => {
     try {
-      if (type === 'color') {
+      if (type === "color") {
         await updateChannel(channel.id, { backgroundColor: value, backgroundImage: undefined });
-      } else if (type === 'image') {
+      } else if (type === "image") {
         await updateChannel(channel.id, { backgroundImage: value, backgroundColor: undefined });
       }
     } catch (error) {
-      console.error('Failed to update channel background:', error);
+      console.error("Failed to update channel background:", error);
     }
   };
 
@@ -141,7 +153,7 @@ export const ChannelCoverHeader = ({
     try {
       await updateChannel(channel.id, { backgroundColor: undefined, backgroundImage: undefined });
     } catch (error) {
-      console.error('Failed to remove channel background:', error);
+      console.error("Failed to remove channel background:", error);
     }
   };
 
@@ -175,7 +187,7 @@ export const ChannelCoverHeader = ({
           />
         </>
       )}
-      
+
       {isLeftSidebarCollapsed ? (
         <ChannelDropdownSelector
           currentChannel={channel}
@@ -194,7 +206,10 @@ export const ChannelCoverHeader = ({
             <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0">
               {channel.name}
             </h1>
-            <Badge variant="secondary" className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground">
+            <Badge
+              variant="secondary"
+              className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground"
+            >
               {channel.messageCount}
             </Badge>
           </div>
@@ -235,7 +250,7 @@ export const ChannelCoverHeader = ({
               />
             </>
           )}
-          
+
           {channel.emoji && (
             <div className="text-4xl drop-shadow-lg flex-shrink-0 transition-all duration-300 ease-out">
               {channel.emoji}
@@ -253,7 +268,7 @@ export const ChannelCoverHeader = ({
           </div>
         </div>
 
-          <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
+        <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -275,8 +290,8 @@ export const ChannelCoverHeader = ({
           )}
           <BackgroundSwitcher
             currentBackground={{
-              type: channel.backgroundColor ? 'color' : 'image',
-              value: channel.backgroundColor || channel.backgroundImage
+              type: channel.backgroundColor ? "color" : "image",
+              value: channel.backgroundColor || channel.backgroundImage,
             }}
             onBackgroundChange={handleBackgroundChange}
             onRemoveBackground={handleRemoveBackground}
@@ -289,27 +304,33 @@ export const ChannelCoverHeader = ({
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button> */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-              onClick={handleToggle}
-            >
-              <ChevronUp className="h-4 w-4 transition-transform duration-200" />
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+            onClick={handleToggle}
+          >
+            <ChevronUp className="h-4 w-4 transition-transform duration-200" />
+          </Button>
         </div>
       </div>
 
       <div className="relative z-10 flex items-center justify-between mt-4">
         <div className="flex items-center space-x-3">
-          <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out">
+          <Badge
+            variant="secondary"
+            className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out"
+          >
             <MessageSquare className="h-3 w-3 mr-1.5" />
             <span className="font-medium">{channel.messageCount}</span>
             <span className="ml-1 text-xs opacity-90">messages</span>
           </Badge>
 
           {channel.lastMessageTime && (
-            <Badge variant="secondary" className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out">
+            <Badge
+              variant="secondary"
+              className="bg-white/25 text-white border-white/40 backdrop-blur-sm transition-all duration-300 ease-out"
+            >
               <Users className="h-3 w-3 mr-1.5" />
               <span className="text-xs">
                 {new Date(channel.lastMessageTime).toLocaleDateString()}
@@ -323,7 +344,9 @@ export const ChannelCoverHeader = ({
             variant="secondary"
             size="sm"
             className="bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm transition-all duration-200 hover:scale-105"
-            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
+            onClick={() =>
+              rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })
+            }
           >
             <Bot className="h-4 w-4 mr-2" />
             <span className="font-medium">AI Assistant</span>
@@ -361,14 +384,16 @@ export const ChannelCoverHeader = ({
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
+              onClick={() =>
+                rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })
+              }
             >
               <Bot className="h-4 w-4" />
             </Button>
             <BackgroundSwitcher
               currentBackground={{
-                type: channel.backgroundColor ? 'color' : 'image',
-                value: channel.backgroundColor || channel.backgroundImage
+                type: channel.backgroundColor ? "color" : "image",
+                value: channel.backgroundColor || channel.backgroundImage,
               }}
               onBackgroundChange={handleBackgroundChange}
               onRemoveBackground={handleRemoveBackground}

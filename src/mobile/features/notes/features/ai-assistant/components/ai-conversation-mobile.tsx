@@ -27,19 +27,12 @@ interface Props {
 
 export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
   function AIConversationMobile(
-    {
-      conversations,
-      currentConversationId,
-      loading,
-      onCreate,
-      channelId,
-      onClose,
-    },
+    { conversations, currentConversationId, loading, onCreate, channelId, onClose },
     ref
   ) {
-    const view = useConversationStore((s) => s.uiView);
-    const showList = useConversationStore((s) => s.showList);
-    const showChat = useConversationStore((s) => s.showChat);
+    const view = useConversationStore(s => s.uiView);
+    const showList = useConversationStore(s => s.showList);
+    const showChat = useConversationStore(s => s.showChat);
     const hasConversations = conversations.length > 0;
     useImperativeHandle(
       ref,
@@ -93,11 +86,14 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       ? conversations.find(c => c.id === currentConversationId)
       : undefined;
     const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
-    const headerTitle = view === "list"
-      ? "Conversations"
-      : activeConversation
-        ? (titleGeneratingMap[activeConversation.id] ? "Generating title..." : (activeConversation.title || "AI Chat"))
-        : "AI Chat";
+    const headerTitle =
+      view === "list"
+        ? "Conversations"
+        : activeConversation
+          ? titleGeneratingMap[activeConversation.id]
+            ? "Generating title..."
+            : activeConversation.title || "AI Chat"
+          : "AI Chat";
 
     return (
       <div className="relative flex-1 flex flex-col">
@@ -126,10 +122,12 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
-            <h3 className="font-semibold text-foreground truncate text-sm leading-6">{headerTitle}</h3>
+            <h3 className="font-semibold text-foreground truncate text-sm leading-6">
+              {headerTitle}
+            </h3>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            {view === 'chat' && currentConversationId && (
+            {view === "chat" && currentConversationId && (
               <ConversationContextControl
                 conversationId={currentConversationId}
                 fallbackChannelId={channelId}
@@ -141,7 +139,10 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
               size="icon"
               aria-label="New conversation"
               className="h-8 w-8"
-              onClick={() => { onCreate(); showChat(); }}
+              onClick={() => {
+                onCreate();
+                showChat();
+              }}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -156,7 +157,13 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 <span className="sr-only">Close</span>
                 {/* Using the same icon size as default sheet close */}
                 <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden>
-                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                  <path
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 6l12 12M18 6L6 18"
+                  />
                 </svg>
               </Button>
             )}
@@ -165,20 +172,10 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
 
         {/* Content Area */}
         <div className="relative flex-1">
-          <div
-            className={
-              "absolute inset-0 flex flex-col " +
-              (view === "list" ? "" : "hidden")
-            }
-          >
+          <div className={"absolute inset-0 flex flex-col " + (view === "list" ? "" : "hidden")}>
             {renderListView()}
           </div>
-          <div
-            className={
-              "absolute inset-0 flex flex-col " +
-              (view === "chat" ? "" : "hidden")
-            }
-          >
+          <div className={"absolute inset-0 flex flex-col " + (view === "chat" ? "" : "hidden")}>
             {renderChatView()}
           </div>
         </div>

@@ -1,12 +1,12 @@
-import { Alert, AlertDescription } from '@/common/components/ui/alert';
-import { ToolInvocation, ToolInvocationStatus, ToolResult } from '@agent-labs/agent-chat';
-import React from 'react';
-import { ToolPanel } from './tool-panel';
-import { ConfirmFooter } from './confirm-footer';
-import { useConfirmAction } from '../utils/use-confirm-action';
-import { getParsedArgs } from '../utils/invocation-utils';
+import { Alert, AlertDescription } from "@/common/components/ui/alert";
+import { ToolInvocation, ToolInvocationStatus, ToolResult } from "@agent-labs/agent-chat";
+import React from "react";
+import { ToolPanel } from "./tool-panel";
+import { ConfirmFooter } from "./confirm-footer";
+import { useConfirmAction } from "../utils/use-confirm-action";
+import { getParsedArgs } from "../utils/invocation-utils";
 
-type Variant = 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
+type Variant = "default" | "outline" | "secondary" | "destructive" | "ghost" | "link";
 
 export interface InteractiveToolPanelProps<Args, Result> {
   invocation: ToolInvocation<Args, Result>;
@@ -34,7 +34,7 @@ export function InteractiveToolPanel<Args, Result>(props: InteractiveToolPanelPr
     onResult,
     icon,
     title,
-    loadingText = 'Loading...',
+    loadingText = "Loading...",
     callStatusText,
     preview,
     confirm,
@@ -133,10 +133,10 @@ export function InteractiveToolPanel<Args, Result>(props: InteractiveToolPanelPr
       <ToolPanel
         icon={icon}
         title={title}
-        status={'success'}
+        status={"success"}
         statusText={resultStatusText(result)}
         contentScrollable={contentScrollable}
-        headerCardClassName={'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950'}
+        headerCardClassName={"border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950"}
         contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
       >
         {resultContent(args, result)}
@@ -149,10 +149,10 @@ export function InteractiveToolPanel<Args, Result>(props: InteractiveToolPanelPr
       <ToolPanel
         icon={icon}
         title={title}
-        status={'ready'}
-        statusText={cancelStatusText || 'Cancelled'}
+        status={"ready"}
+        statusText={cancelStatusText || "Cancelled"}
         contentScrollable={contentScrollable}
-        headerCardClassName={'border-gray-200 dark:border-gray-800'}
+        headerCardClassName={"border-gray-200 dark:border-gray-800"}
         contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
       >
         {preview(args)}

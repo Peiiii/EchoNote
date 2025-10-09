@@ -1,21 +1,23 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/common/components/ui/button';
-import { RefinedPopover } from '@/common/components/refined-popover';
-import { Palette, Palette as ColorIcon, Image as ImageIcon, X } from 'lucide-react';
-import { BackgroundSwitcherProps } from './types';
-import { ColorSelector } from './color-selector';
-import { ImageSelector } from './image-selector';
-import { BackgroundOption } from './background-options';
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/common/components/ui/button";
+import { RefinedPopover } from "@/common/components/refined-popover";
+import { Palette, Palette as ColorIcon, Image as ImageIcon, X } from "lucide-react";
+import { BackgroundSwitcherProps } from "./types";
+import { ColorSelector } from "./color-selector";
+import { ImageSelector } from "./image-selector";
+import { BackgroundOption } from "./background-options";
 
 export function BackgroundSwitcher({
   currentBackground,
   onBackgroundChange,
   onRemoveBackground,
-  buttonClassName = "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+  buttonClassName = "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105",
 }: BackgroundSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'colors' | 'images'>('colors');
-  const [originalBackground, setOriginalBackground] = useState<{ type: 'color' | 'image'; value?: string } | undefined>(currentBackground);
+  const [activeTab, setActiveTab] = useState<"colors" | "images">("colors");
+  const [originalBackground, setOriginalBackground] = useState<
+    { type: "color" | "image"; value?: string } | undefined
+  >(currentBackground);
   const isOpenRef = useRef(false);
 
   useEffect(() => {
@@ -30,34 +32,26 @@ export function BackgroundSwitcher({
   };
 
   const handleBackgroundSelect = (option: BackgroundOption) => {
-    if (option.type === 'gradient' || option.type === 'color') {
-      onBackgroundChange({ type: 'color', value: option.value });
-    } else if (option.type === 'image') {
-      onBackgroundChange({ type: 'image', value: option.value });
+    if (option.type === "gradient" || option.type === "color") {
+      onBackgroundChange({ type: "color", value: option.value });
+    } else if (option.type === "image") {
+      onBackgroundChange({ type: "image", value: option.value });
     }
   };
 
   const handleResetBackground = () => {
     if (originalBackground) {
-      console.log('🎨 [BackgroundSwitcher] Resetting background to:', { originalBackground });
-      onBackgroundChange({ type: originalBackground.type, value: originalBackground.value || '' });
+      console.log("🎨 [BackgroundSwitcher] Resetting background to:", { originalBackground });
+      onBackgroundChange({ type: originalBackground.type, value: originalBackground.value || "" });
     } else {
       onRemoveBackground();
     }
   };
 
   return (
-    <RefinedPopover
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-    >
+    <RefinedPopover open={isOpen} onOpenChange={handleOpenChange}>
       <RefinedPopover.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={buttonClassName}
-          title="Change background"
-        >
+        <Button variant="ghost" size="sm" className={buttonClassName} title="Change background">
           <Palette className="h-4 w-4" />
         </Button>
       </RefinedPopover.Trigger>
@@ -82,24 +76,23 @@ export function BackgroundSwitcher({
             <X className="h-3 w-3" />
           </RefinedPopover.Button>
         </RefinedPopover.Header>
-        
-        <RefinedPopover.Body>
 
+        <RefinedPopover.Body>
           <div className="flex space-x-1 mb-4">
             <RefinedPopover.Button
-              variant={activeTab === 'colors' ? 'default' : 'outline'}
+              variant={activeTab === "colors" ? "default" : "outline"}
               size="sm"
               className="flex-1"
-              onClick={() => setActiveTab('colors')}
+              onClick={() => setActiveTab("colors")}
             >
               <ColorIcon className="h-4 w-4 mr-2" />
               Colors
             </RefinedPopover.Button>
             <RefinedPopover.Button
-              variant={activeTab === 'images' ? 'default' : 'outline'}
+              variant={activeTab === "images" ? "default" : "outline"}
               size="sm"
               className="flex-1"
-              onClick={() => setActiveTab('images')}
+              onClick={() => setActiveTab("images")}
             >
               <ImageIcon className="h-4 w-4 mr-2" />
               Images
@@ -107,7 +100,7 @@ export function BackgroundSwitcher({
           </div>
 
           <div className="max-h-64 overflow-y-auto">
-            {activeTab === 'colors' ? (
+            {activeTab === "colors" ? (
               <ColorSelector
                 currentBackground={currentBackground?.value}
                 onBackgroundSelect={handleBackgroundSelect}

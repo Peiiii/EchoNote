@@ -1,6 +1,6 @@
-import { Button } from '@/common/components/ui/button';
-import { useAuthStore } from '@/core/stores/auth.store';
-import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
+import { Button } from "@/common/components/ui/button";
+import { useAuthStore } from "@/core/stores/auth.store";
+import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 
 export const LoginButton = () => {
   const { currentUser, signInWithGoogle, signOut } = useAuthStore();
@@ -26,16 +26,8 @@ export const LoginButton = () => {
   }
 
   if (!isGoogleAuthSupported) {
-    return (
-      <Button disabled>
-        Sign in (Email only)
-      </Button>
-    );
+    return <Button disabled>Sign in (Email only)</Button>;
   }
 
-  return (
-    <Button onClick={handleLogin}>
-      Sign in with Google
-    </Button>
-  );
+  return <Button onClick={handleLogin}>Sign in with Google</Button>;
 };

@@ -28,20 +28,19 @@ export const MobileThoughtRecord = ({
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
 
   // Edit state management
-  const editingMessageId = useEditStateStore((s) => s.editingMessageId);
-  const globalEditMode = useEditStateStore((s) => s.editMode);
-  const globalIsSaving = useEditStateStore((s) => s.isSaving);
-  const startEdit = useEditStateStore((s) => s.startEditing);
-  const save = useEditStateStore((s) => s.save);
-  const cancel = useEditStateStore((s) => s.cancel);
-  const switchToExpandedMode = useEditStateStore((s) => s.switchToExpandedMode);
-  const switchToInlineMode = useEditStateStore((s) => s.switchToInlineMode);
+  const editingMessageId = useEditStateStore(s => s.editingMessageId);
+  const globalEditMode = useEditStateStore(s => s.editMode);
+  const globalIsSaving = useEditStateStore(s => s.isSaving);
+  const startEdit = useEditStateStore(s => s.startEditing);
+  const save = useEditStateStore(s => s.save);
+  const cancel = useEditStateStore(s => s.cancel);
+  const switchToExpandedMode = useEditStateStore(s => s.switchToExpandedMode);
+  const switchToInlineMode = useEditStateStore(s => s.switchToInlineMode);
 
   const isEditing = editingMessageId === message.id;
-  const isExpandedEditing = isEditing && globalEditMode === 'expanded';
+  const isExpandedEditing = isEditing && globalEditMode === "expanded";
   const isSaving = isEditing ? globalIsSaving : false;
-  const editMode = isEditing ? globalEditMode : 'inline';
-
+  const editMode = isEditing ? globalEditMode : "inline";
 
   // 重置自动生成标志
   useEffect(() => {
@@ -50,12 +49,10 @@ export const MobileThoughtRecord = ({
     }
   }, [shouldAutoGenerate]);
 
-
   // If message is deleted, don't show it
   if (message.isDeleted) {
     return null;
   }
-
 
   // Action handlers
   const handleEdit = () => {
@@ -64,9 +61,7 @@ export const MobileThoughtRecord = ({
 
   const handleDelete = async () => {
     const messagePreview =
-      message.content.length > 100
-        ? `${message.content.substring(0, 100)}...`
-        : message.content;
+      message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
     const confirmed = window.confirm(
       `🗑️ Delete Thought\n\n` +
@@ -83,11 +78,8 @@ export const MobileThoughtRecord = ({
           channelId: message.channelId,
         });
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        alert(
-          `❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`
-        );
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
       }
     }
   };
@@ -104,7 +96,6 @@ export const MobileThoughtRecord = ({
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
   };
-
 
   const handleReply = () => {
     onReply?.();
@@ -177,17 +168,14 @@ export const MobileThoughtRecord = ({
         {/* Footer - Floor bottom thread indicator */}
         {!isEditing && threadCount > 0 && (
           <div className="flex justify-end mt-4 pt-2">
-            <MobileThreadIndicator
-              threadCount={threadCount}
-              messageId={message.id}
-            />
+            <MobileThreadIndicator threadCount={threadCount} messageId={message.id} />
           </div>
         )}
 
         {/* Expanded Editor Modal */}
         <Dialog
           open={isExpandedEditing}
-          onOpenChange={(open) => {
+          onOpenChange={open => {
             if (!open) {
               switchToInlineMode();
             }
@@ -196,7 +184,7 @@ export const MobileThoughtRecord = ({
           <DialogContent
             showCloseButton={false}
             className="h-[90vh] w-[95vw] max-w-none p-0 border-0 bg-background"
-            onInteractOutside={(e) => {
+            onInteractOutside={e => {
               e.preventDefault();
             }}
           >

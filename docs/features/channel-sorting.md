@@ -17,6 +17,7 @@ The channel list now automatically sorts channels by their latest message time, 
 ### Database Schema Changes
 
 The `Channel` interface now includes:
+
 ```typescript
 interface Channel {
   id: string;
@@ -67,6 +68,7 @@ When a user first loads the application after this update:
 ## Future Enhancements
 
 Potential improvements could include:
+
 - User preference for sorting (by name, creation time, etc.)
 - Channel pinning functionality
 - Advanced filtering options

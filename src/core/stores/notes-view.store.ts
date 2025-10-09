@@ -28,10 +28,7 @@ export interface NotesViewState {
   // Data actions
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
-  updateMessage: (
-    messageId: string,
-    updates: Partial<Message>
-  ) => Promise<void>;
+  updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
 }
 
 export const useNotesViewStore = create<NotesViewState>()(
@@ -46,25 +43,25 @@ export const useNotesViewStore = create<NotesViewState>()(
       authIsReady: false,
 
       // Auth actions
-      setAuth: (user) => {
+      setAuth: user => {
         set({ currentUser: user, authIsReady: true });
       },
 
       // View actions
-      setCurrentChannel: (channelId) => {
+      setCurrentChannel: channelId => {
         set({ currentChannelId: channelId });
       },
-      setIsAddingMessage: (isLoading) => {
+      setIsAddingMessage: isLoading => {
         set({ isAddingMessage: isLoading });
       },
-      setIsUpdatingMessage: (isLoading) => {
+      setIsUpdatingMessage: isLoading => {
         set({ isUpdatingMessage: isLoading });
       },
-      setIsDeletingMessage: (isLoading) => {
+      setIsDeletingMessage: isLoading => {
         set({ isDeletingMessage: isLoading });
       },
       // Data actions
-      addMessage: async (message) => {
+      addMessage: async message => {
         // 设置加载状态
         get().setIsAddingMessage(true);
         try {
@@ -74,7 +71,7 @@ export const useNotesViewStore = create<NotesViewState>()(
           get().setIsAddingMessage(false);
         }
       },
-      deleteMessage: async (messageId) => {
+      deleteMessage: async messageId => {
         // 设置加载状态
         get().setIsDeletingMessage(true);
         try {

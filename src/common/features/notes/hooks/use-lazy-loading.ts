@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
 interface UseLazyLoadingProps {
   onTrigger: () => void;
@@ -15,17 +15,21 @@ export const useLazyLoading = ({
   onTrigger,
   canTrigger,
   threshold = 0.2,
-  getState
+  getState,
 }: UseLazyLoadingProps) => {
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    if (!canTrigger || !getState().hasMore || getState().loading || getState().loadingMore) return;
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (!canTrigger || !getState().hasMore || getState().loading || getState().loadingMore)
+        return;
 
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    const scrollPercentage = scrollTop / (scrollHeight - clientHeight);
-    if (scrollPercentage < threshold) {
-      onTrigger();
-    }
-  }, [canTrigger, getState, threshold, onTrigger]);
+      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+      const scrollPercentage = scrollTop / (scrollHeight - clientHeight);
+      if (scrollPercentage < threshold) {
+        onTrigger();
+      }
+    },
+    [canTrigger, getState, threshold, onTrigger]
+  );
 
   return { handleScroll };
 };

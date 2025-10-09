@@ -1,7 +1,15 @@
-import { BehaviorSubject, Observable, combineLatest, firstValueFrom, map, debounceTime, distinctUntilChanged } from 'rxjs';
-import type { Note, NoteFilters, NoteSearchMatch } from '../search.types';
-import { localDataManager } from './local-data-manager.service';
-import { InMemorySearchIndex } from './search-index.service';
+import {
+  BehaviorSubject,
+  Observable,
+  combineLatest,
+  firstValueFrom,
+  map,
+  debounceTime,
+  distinctUntilChanged,
+} from "rxjs";
+import type { Note, NoteFilters, NoteSearchMatch } from "../search.types";
+import { localDataManager } from "./local-data-manager.service";
+import { InMemorySearchIndex } from "./search-index.service";
 
 // Simple configuration constants
 const SEARCH_CONFIG = {
@@ -27,10 +35,13 @@ const SEARCH_CONFIG = {
 
 export class NoteSearchService {
   private searchIndex: InMemorySearchIndex;
-  private searchQuery$ = new BehaviorSubject<string>('');
+  private searchQuery$ = new BehaviorSubject<string>("");
   private searchFilters$ = new BehaviorSubject<NoteFilters>({});
-  private indexStats$ = new BehaviorSubject<{ totalDocs: number; indexedChannelIds: string[] }>({ totalDocs: 0, indexedChannelIds: [] });
-  private indexedDataHash = '';
+  private indexStats$ = new BehaviorSubject<{ totalDocs: number; indexedChannelIds: string[] }>({
+    totalDocs: 0,
+    indexedChannelIds: [],
+  });
+  private indexedDataHash = "";
   private isIndexing = false;
 
   constructor() {
@@ -46,20 +57,17 @@ export class NoteSearchService {
 
     return combineLatest([
       localDataManager.getNotes(this.searchFilters$.value),
-      this.searchQuery$.pipe(
-        debounceTime(SEARCH_CONFIG.ui.debounceMs),
-        distinctUntilChanged()
-      )
+      this.searchQuery$.pipe(debounceTime(SEARCH_CONFIG.ui.debounceMs), distinctUntilChanged()),
     ]).pipe(
       map(([notes, searchQuery]) => {
         if (!searchQuery || searchQuery.trim().length < SEARCH_CONFIG.ui.minQueryLength) {
           return [];
         }
-        
+
         this.updateIndexIfNeeded(notes);
         return this.searchIndex.search(searchQuery, {
           channelIds: this.searchFilters$.value.channelIds,
-          limit: SEARCH_CONFIG.limits.maxResults
+          limit: SEARCH_CONFIG.limits.maxResults,
         });
       })
     );
@@ -75,11 +83,11 @@ export class NoteSearchService {
 
   async preIndexData(): Promise<void> {
     if (this.isIndexing) return;
-    
+
     this.isIndexing = true;
     try {
       const notes = await firstValueFrom(localDataManager.getNotes());
-      
+
       if (notes) {
         this.searchIndex.indexNotes(notes);
         this.indexedDataHash = this.calculateDataHash(notes);
@@ -92,11 +100,11 @@ export class NoteSearchService {
 
   async preIndexChannel(channelId: string): Promise<void> {
     if (this.isIndexing) return;
-    
+
     this.isIndexing = true;
     try {
       const notes = await firstValueFrom(localDataManager.getNotes({ channelIds: [channelId] }));
-      
+
       if (notes) {
         this.searchIndex.upsertNotes(notes);
         const allNotes = await firstValueFrom(localDataManager.getNotes());
@@ -123,8 +131,8 @@ export class NoteSearchService {
     localDataManager.getNotes().subscribe(notes => {
       this.updateIndexIfNeeded(notes);
       const stats = this.getIndexStats();
-      if (typeof window !== 'undefined') {
-        console.debug('[NoteSearchService] notes updated, index stats', stats);
+      if (typeof window !== "undefined") {
+        console.debug("[NoteSearchService] notes updated, index stats", stats);
       }
     });
   }
@@ -146,27 +154,29 @@ export class NoteSearchService {
   }
 
   private calculateDataHash(notes: unknown[]): string {
-    const dataString = JSON.stringify(notes.map((note: unknown) => {
-      const n = note as {
-        id: string;
-        content: string;
-        tags: string[];
-        aiAnalysis?: { summary?: string; keywords?: string[] };
-        timestamp: Date;
-      };
-      return {
-        id: n.id,
-        content: n.content,
-        tags: n.tags,
-        aiAnalysis: n.aiAnalysis,
-        timestamp: n.timestamp
-      };
-    }));
-    
+    const dataString = JSON.stringify(
+      notes.map((note: unknown) => {
+        const n = note as {
+          id: string;
+          content: string;
+          tags: string[];
+          aiAnalysis?: { summary?: string; keywords?: string[] };
+          timestamp: Date;
+        };
+        return {
+          id: n.id,
+          content: n.content,
+          tags: n.tags,
+          aiAnalysis: n.aiAnalysis,
+          timestamp: n.timestamp,
+        };
+      })
+    );
+
     let hash = 0;
     for (let i = 0; i < dataString.length; i++) {
       const char = dataString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return hash.toString();
@@ -175,4 +185,9 @@ export class NoteSearchService {
 
 export const noteSearchService = new NoteSearchService();
 
-export type { NoteSearchMatch, NoteSearchQuery, SearchBootstrapOptions, NoteFilters } from '../search.types';
+export type {
+  NoteSearchMatch,
+  NoteSearchQuery,
+  SearchBootstrapOptions,
+  NoteFilters,
+} from "../search.types";

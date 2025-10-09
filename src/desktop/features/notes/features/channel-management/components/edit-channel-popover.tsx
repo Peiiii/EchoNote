@@ -8,7 +8,6 @@ import { RefinedPopover } from "@/common/components/refined-popover";
 import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Edit3 } from "lucide-react";
 
-
 interface EditChannelPopoverProps {
   channel: Channel;
   children: React.ReactNode;
@@ -24,13 +23,13 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
 
   const handleSave = async () => {
     if (!editName.trim()) return;
-    
+
     setIsLoading(true);
     try {
       await updateChannel(channel.id, {
         name: editName.trim(),
         description: editDescription.trim(),
-        emoji: editEmoji.trim() || undefined
+        emoji: editEmoji.trim() || undefined,
       });
       setIsOpen(false);
     } catch (error) {
@@ -52,24 +51,22 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isLoading) {
+    if (e.key === "Enter" && !isLoading) {
       handleSave();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       handleCancel();
     }
   };
 
   return (
     <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
-      <RefinedPopover.Trigger asChild>
-        {children}
-      </RefinedPopover.Trigger>
+      <RefinedPopover.Trigger asChild>{children}</RefinedPopover.Trigger>
       <RefinedPopover.Content align="center" side="bottom">
         <RefinedPopover.Header>
           <Edit3 className="w-4 h-4 text-primary/80" />
           <div className="text-sm font-semibold text-foreground/90">Edit Thought Space</div>
         </RefinedPopover.Header>
-        
+
         <RefinedPopover.Body>
           <div className="space-y-4">
             {/* Emoji selection */}
@@ -78,10 +75,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
                 Emoji
               </Label>
               <div className="flex items-center gap-2">
-                <EmojiPickerComponent
-                  value={editEmoji}
-                  onSelect={setEditEmoji}
-                >
+                <EmojiPickerComponent value={editEmoji} onSelect={setEditEmoji}>
                   <Button
                     variant="outline"
                     size="sm"
@@ -105,8 +99,8 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
 
             {/* Name input */}
             <div className="space-y-2">
-              <Label 
-                htmlFor="channel-name" 
+              <Label
+                htmlFor="channel-name"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 Channel Name
@@ -114,18 +108,18 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
               <Input
                 id="channel-name"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                onChange={e => setEditName(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Enter channel name"
                 disabled={isLoading}
                 className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
               />
             </div>
-            
+
             {/* Description input */}
             <div className="space-y-2">
-              <Label 
-                htmlFor="channel-description" 
+              <Label
+                htmlFor="channel-description"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 Description
@@ -133,7 +127,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
               <Input
                 id="channel-description"
                 value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
+                onChange={e => setEditDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Enter channel description"
                 disabled={isLoading}
@@ -142,7 +136,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             </div>
           </div>
         </RefinedPopover.Body>
-        
+
         <RefinedPopover.Actions>
           <RefinedPopover.Button
             type="button"

@@ -1,4 +1,4 @@
-import { firebaseConfig } from '@/common/config/firebase.config';
+import { firebaseConfig } from "@/common/config/firebase.config";
 
 export const useGoogleAuthSupport = () => {
   return {

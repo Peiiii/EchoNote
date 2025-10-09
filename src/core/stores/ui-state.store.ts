@@ -5,29 +5,29 @@ import { isMobile } from "@/common/lib/breakpoint-utils";
 export interface UIState {
   // AI Assistant state
   isAIAssistantOpen: boolean;
-  
+
   // Thread sidebar state
   isThreadOpen: boolean;
   currentThreadId: string | null;
-  
+
   // Settings sidebar state
   isSettingsOpen: boolean;
-  
+
   // Mobile specific states
   isChannelListOpen: boolean;
-  
+
   // Actions for AI Assistant
   openAIAssistant: () => void;
   closeAIAssistant: () => void;
-  
+
   // Actions for Thread
   openThread: (messageId: string) => void;
   closeThread: () => void;
-  
+
   // Actions for Settings
   openSettings: () => void;
   closeSettings: () => void;
-  
+
   // Actions for Mobile
   openChannelList: () => void;
   closeChannelList: () => void;
@@ -35,7 +35,7 @@ export interface UIState {
 
 export const useUIStateStore = create<UIState>()(
   persist(
-    (set) => ({
+    set => ({
       // Initial state - open on desktop, closed on mobile
       isAIAssistantOpen: !isMobile(),
       isThreadOpen: false,
@@ -93,9 +93,9 @@ export const useUIStateStore = create<UIState>()(
       },
     }),
     {
-      name: 'echonote-ui-state',
+      name: "echonote-ui-state",
       // Only persist the AI assistant open/close state to satisfy the requirement
-      partialize: (state) => ({ isAIAssistantOpen: state.isAIAssistantOpen }),
+      partialize: state => ({ isAIAssistantOpen: state.isAIAssistantOpen }),
     }
   )
 );

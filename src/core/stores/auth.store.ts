@@ -1,34 +1,42 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { User } from 'firebase/auth';
-import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
-import { firebaseConfig } from '@/common/config/firebase.config';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { User } from "firebase/auth";
+import { firebaseAuthService } from "@/common/services/firebase/firebase-auth.service";
+import { firebaseConfig } from "@/common/config/firebase.config";
 
 export interface AuthState {
   currentUser: User | null;
   authIsReady: boolean;
-  
+
   // 三个核心状态
-  isInitializing: boolean;    // 首次初始化（无缓存）
-  isRefreshing: boolean;      // 有缓存，正在刷新
-  isAuthenticating: boolean;  // 正在登录/登出
-  
+  isInitializing: boolean; // 首次初始化（无缓存）
+  isRefreshing: boolean; // 有缓存，正在刷新
+  isAuthenticating: boolean; // 正在登录/登出
+
   // 公共方法
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<{ user: User; verificationSent: boolean }>;
-  sendSignUpLink: (email: string, password: string, displayName?: string) => Promise<{ verificationSent: boolean }>;
+  signUpWithEmail: (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => Promise<{ user: User; verificationSent: boolean }>;
+  sendSignUpLink: (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => Promise<{ verificationSent: boolean }>;
   sendPasswordReset: (email: string) => Promise<void>;
   sendEmailVerification: () => Promise<void>;
   signOut: () => Promise<void>;
-  
+
   // 内部状态管理
   setAuth: (user: User | null) => void;
   setAuthReady: (ready: boolean) => void;
   setInitializing: (initializing: boolean) => void;
   setRefreshing: (refreshing: boolean) => void;
   setAuthenticating: (authenticating: boolean) => void;
-  
+
   // 初始化认证监听器
   initAuthListener: () => Promise<() => void>;
 }
@@ -45,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
 
       signInWithGoogle: async () => {
         if (!firebaseConfig.supportGoogleAuth()) {
-          throw new Error('Google authentication is not supported in this region');
+          throw new Error("Google authentication is not supported in this region");
         }
         set({ isAuthenticating: true });
         try {
@@ -84,7 +92,6 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-
       sendPasswordReset: async (email: string) => {
         set({ isAuthenticating: true });
         try {
@@ -99,7 +106,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = get().currentUser;
           if (!user) {
-            throw new Error('No user logged in');
+            throw new Error("No user logged in");
           }
           await firebaseAuthService.sendEmailVerification(user);
         } finally {
@@ -141,7 +148,7 @@ export const useAuthStore = create<AuthState>()(
       initAuthListener: async () => {
         // 检查是否有缓存数据
         const hasCachedUser = get().currentUser !== null;
-        
+
         if (hasCachedUser) {
           // 有缓存数据，设置为刷新状态
           set({ isRefreshing: true, authIsReady: false });
@@ -150,10 +157,10 @@ export const useAuthStore = create<AuthState>()(
           set({ isInitializing: true, authIsReady: false });
         }
 
-        const unsubscribe = await firebaseAuthService.onAuthStateChanged((user) => {
+        const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
           // 更新用户状态
           get().setAuth(user);
-          
+
           // 根据之前的状态设置相应的加载状态
           if (hasCachedUser) {
             // 有缓存数据，刷新完成
@@ -169,10 +176,10 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "echonote-auth-storage",
-      partialize: (state) => ({ 
-        currentUser: state.currentUser, 
-        authIsReady: state.authIsReady 
-      })
+      partialize: state => ({
+        currentUser: state.currentUser,
+        authIsReady: state.authIsReady,
+      }),
     }
   )
 );

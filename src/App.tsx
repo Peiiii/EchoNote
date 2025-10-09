@@ -14,12 +14,11 @@ import { useEffect } from "react";
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user, isInitializing } = useFirebaseAuth();
-  console.log('[App] ', {
+  console.log("[App] ", {
     user,
     isInitializing,
   });
-  const setNotesViewAuth = useNotesViewStore((state) => state.setAuth);
-
+  const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
 
   useEffect(() => {
     setNotesViewAuth(user);
@@ -45,7 +44,7 @@ export const App = () => {
 
   return (
     <>
-      {currentBreakpoint === 'sm' ? <MobileApp /> : <DesktopApp />}
+      {currentBreakpoint === "sm" ? <MobileApp /> : <DesktopApp />}
       <Toaster />
       <PWAStatusIndicator />
       <PWAInstallPrompt />
@@ -53,4 +52,3 @@ export const App = () => {
     </>
   );
 };
-

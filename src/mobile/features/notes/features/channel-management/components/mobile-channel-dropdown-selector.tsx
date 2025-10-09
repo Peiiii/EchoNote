@@ -30,9 +30,7 @@ export const MobileChannelDropdownSelector = ({
         >
           <div className="flex items-center space-x-1.5 min-w-0 max-w-full">
             {currentChannel.emoji && (
-              <div className="text-base flex-shrink-0">
-                {currentChannel.emoji}
-              </div>
+              <div className="text-base flex-shrink-0">{currentChannel.emoji}</div>
             )}
             <div className="flex items-center min-w-0 flex-1">
               <h1 className="text-base font-medium text-foreground/90 truncate">
@@ -43,20 +41,16 @@ export const MobileChannelDropdownSelector = ({
           </div>
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent 
-        className="w-64 max-h-72 overflow-y-auto"
-        align="center"
-        sideOffset={6}
-      >
-        {channels.map((channel) => (
+
+      <DropdownMenuContent className="w-64 max-h-72 overflow-y-auto" align="center" sideOffset={6}>
+        {channels.map(channel => (
           <DropdownMenuItem
             key={channel.id}
             onClick={() => onChannelSelect(channel.id)}
             className={`flex items-center space-x-2 px-3 py-2 cursor-pointer transition-all duration-200 touch-manipulation min-h-[40px] ${
-              channel.id === currentChannel.id 
-                ? 'bg-accent text-accent-foreground' 
-                : 'hover:bg-accent/50 active:bg-accent/70'
+              channel.id === currentChannel.id
+                ? "bg-accent text-accent-foreground"
+                : "hover:bg-accent/50 active:bg-accent/70"
             }`}
           >
             <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0">
@@ -67,9 +61,7 @@ export const MobileChannelDropdownSelector = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-medium truncate text-sm">
-                {channel.name}
-              </div>
+              <div className="font-medium truncate text-sm">{channel.name}</div>
               {channel.description && (
                 <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                   {channel.description}

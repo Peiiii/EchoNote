@@ -1,13 +1,5 @@
 import { Message } from "@/core/stores/notes-data.store";
-import { 
-  Bookmark, 
-  Copy, 
-  Edit2, 
-  Eye, 
-  Lightbulb, 
-  MessageCircle, 
-  Trash2 
-} from "lucide-react";
+import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, Trash2 } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 import { getFeaturesConfig } from "@/core/config/features.config";
 
@@ -32,9 +24,8 @@ export function MobileMoreActionsMenu({
   onReply,
   onGenerateSparks,
   onViewDetails,
-  onBookmark
+  onBookmark,
 }: MobileMoreActionsMenuProps) {
-
   const handleCopy = () => {
     if (onCopy) {
       onCopy();
@@ -49,67 +40,87 @@ export function MobileMoreActionsMenu({
       id: "primary",
       showSeparator: false,
       items: [
-        ...(onEdit && getFeaturesConfig().channel.thoughtRecord.edit.enabled ? [{
-          id: "edit",
-          icon: <Edit2 className="w-4 h-4" />,
-          title: "Edit",
-          onClick: onEdit,
-          variant: "default" as const,
-          disabled: isEditing
-        }] : []),
+        ...(onEdit && getFeaturesConfig().channel.thoughtRecord.edit.enabled
+          ? [
+              {
+                id: "edit",
+                icon: <Edit2 className="w-4 h-4" />,
+                title: "Edit",
+                onClick: onEdit,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
         {
           id: "copy",
           icon: <Copy className="w-4 h-4" />,
           title: "Copy",
           onClick: handleCopy,
           variant: "default" as const,
-          disabled: isEditing
+          disabled: isEditing,
         },
-        ...(onReply && getFeaturesConfig().channel.thoughtRecord.reply.enabled ? [{
-          id: "reply",
-          icon: <MessageCircle className="w-4 h-4" />,
-          title: "Reply",
-          onClick: onReply,
-          variant: "default" as const,
-          disabled: isEditing
-        }] : [])
-      ]
+        ...(onReply && getFeaturesConfig().channel.thoughtRecord.reply.enabled
+          ? [
+              {
+                id: "reply",
+                icon: <MessageCircle className="w-4 h-4" />,
+                title: "Reply",
+                onClick: onReply,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
+      ],
     },
     {
       id: "ai",
       showSeparator: true,
       items: [
-        ...(onGenerateSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled ? [{
-          id: "generate-sparks",
-          icon: <Lightbulb className="w-4 h-4" />,
-          title: "Generate Sparks",
-          onClick: onGenerateSparks,
-          variant: "default" as const,
-          disabled: isEditing
-        }] : [])
-      ]
+        ...(onGenerateSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled
+          ? [
+              {
+                id: "generate-sparks",
+                icon: <Lightbulb className="w-4 h-4" />,
+                title: "Generate Sparks",
+                onClick: onGenerateSparks,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
+      ],
     },
     {
       id: "secondary",
       showSeparator: true,
       items: [
-        ...(onViewDetails && getFeaturesConfig().channel.thoughtRecord.viewDetails.enabled ? [{
-          id: "view-details",
-          icon: <Eye className="w-4 h-4" />,
-          title: "View Details",
-          onClick: onViewDetails,
-          variant: "default" as const,
-          disabled: isEditing
-        }] : []),
-        ...(onBookmark && getFeaturesConfig().channel.thoughtRecord.bookmark.enabled ? [{
-          id: "bookmark",
-          icon: <Bookmark className="w-4 h-4" />,
-          title: "Bookmark",
-          onClick: onBookmark,
-          variant: "default" as const,
-          disabled: isEditing
-        }] : [])
-      ]
+        ...(onViewDetails && getFeaturesConfig().channel.thoughtRecord.viewDetails.enabled
+          ? [
+              {
+                id: "view-details",
+                icon: <Eye className="w-4 h-4" />,
+                title: "View Details",
+                onClick: onViewDetails,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
+        ...(onBookmark && getFeaturesConfig().channel.thoughtRecord.bookmark.enabled
+          ? [
+              {
+                id: "bookmark",
+                icon: <Bookmark className="w-4 h-4" />,
+                title: "Bookmark",
+                onClick: onBookmark,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
+      ],
     },
     {
       id: "danger",
@@ -121,14 +132,14 @@ export function MobileMoreActionsMenu({
           title: "Delete",
           onClick: onDelete,
           variant: "destructive" as const,
-          disabled: isEditing
-        }
-      ]
-    }
+          disabled: isEditing,
+        },
+      ],
+    },
   ];
 
   return (
-    <ConfigurableActionMenu 
+    <ConfigurableActionMenu
       groups={menuGroups}
       width="md"
       alwaysVisible={true}

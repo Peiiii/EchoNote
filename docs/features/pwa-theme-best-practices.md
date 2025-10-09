@@ -24,15 +24,15 @@ StillRoot uses a static theme color that matches the activity bar's primary colo
 ```json
 // public/manifest.json
 {
-  "theme_color": "#d6d3d1",  // Light mode activity bar color
+  "theme_color": "#d6d3d1", // Light mode activity bar color
   "background_color": "#ffffff"
 }
 ```
 
 ```html
 <!-- index.html -->
-<meta name="theme-color" content="#d6d3d1">
-<meta name="msapplication-TileColor" content="#d6d3d1">
+<meta name="theme-color" content="#d6d3d1" />
+<meta name="msapplication-TileColor" content="#d6d3d1" />
 ```
 
 ```xml

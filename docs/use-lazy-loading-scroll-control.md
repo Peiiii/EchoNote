@@ -34,11 +34,12 @@ const MyComponent = () => {
 
 ```typescript
 {
-  containerRef: React.RefObject<HTMLDivElement | null>
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 ```
 
 **Returns:**
+
 - `recordScrollPosition: () => void` - Record current scroll position
 - `restoreScrollPosition: () => void` - Restore scroll position after content change
 

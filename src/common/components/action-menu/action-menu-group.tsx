@@ -1,5 +1,9 @@
 import { ReactNode } from "react";
-import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@/common/components/ui/dropdown-menu";
+import {
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/common/components/ui/dropdown-menu";
 import { cn } from "@/common/lib/utils";
 
 export interface ActionMenuGroupProps {
@@ -15,26 +19,26 @@ export function ActionMenuGroup({
   children,
   variant = "default",
   showSeparator = true,
-  className
+  className,
 }: ActionMenuGroupProps) {
   const variantStyles = {
     default: "text-slate-500 dark:text-slate-400",
     warning: "text-amber-500 dark:text-amber-400",
-    danger: "text-red-500 dark:text-red-400"
+    danger: "text-red-500 dark:text-red-400",
   };
 
   return (
     <>
-      {showSeparator && (
-        <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-slate-700" />
-      )}
-      
+      {showSeparator && <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-slate-700" />}
+
       <DropdownMenuGroup className={cn("space-y-0.5", className)}>
         {title && (
-          <DropdownMenuLabel className={cn(
-            "px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400",
-            variantStyles[variant]
-          )}>
+          <DropdownMenuLabel
+            className={cn(
+              "px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400",
+              variantStyles[variant]
+            )}
+          >
             {title}
           </DropdownMenuLabel>
         )}

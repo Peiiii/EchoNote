@@ -9,7 +9,7 @@ export interface NoteSearchMatch {
   channelId: string;
   score: number;
   snippet?: string;
-  matchedFields: Array<'content' | 'tags' | 'keywords' | 'summary'>;
+  matchedFields: Array<"content" | "tags" | "keywords" | "summary">;
   timestamp: Date;
 }
 

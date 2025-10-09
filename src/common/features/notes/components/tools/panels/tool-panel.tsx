@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import { ToolContainer } from './tool-container';
+import React, { useMemo, useState } from "react";
+import { ToolContainer } from "./tool-container";
 
-export type ToolStatus = 'loading' | 'ready' | 'success' | 'error';
+export type ToolStatus = "loading" | "ready" | "success" | "error";
 
 export interface ToolPanelProps {
   icon: React.ReactNode;
@@ -29,7 +29,7 @@ export function ToolPanel({
   status,
   statusText,
   children,
-  maxHeight = '400px',
+  maxHeight = "400px",
   defaultExpanded,
   expandable,
   forceExpanded,
@@ -42,18 +42,23 @@ export function ToolPanel({
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded ?? false);
   const isExpanded = forceExpanded ? true : expanded;
 
-  const header = useMemo(() => ({
-    icon,
-    title,
-    status,
-    statusText,
-    hasDetails: canToggle,
-    isExpanded,
-    onToggleExpanded: canToggle ? () => setExpanded(v => !v) : undefined,
-  }), [icon, title, status, statusText, canToggle, isExpanded]);
+  const header = useMemo(
+    () => ({
+      icon,
+      title,
+      status,
+      statusText,
+      hasDetails: canToggle,
+      isExpanded,
+      onToggleExpanded: canToggle ? () => setExpanded(v => !v) : undefined,
+    }),
+    [icon, title, status, statusText, canToggle, isExpanded]
+  );
 
   // Show content when toggle is available or when explicitly forced expanded
-  const content = hasContent ? { children, maxHeight, isExpanded, scrollable: contentScrollable !== false } : undefined;
+  const content = hasContent
+    ? { children, maxHeight, isExpanded, scrollable: contentScrollable !== false }
+    : undefined;
 
   return (
     <div className="w-full" data-echo-tool>

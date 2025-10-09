@@ -18,9 +18,9 @@ export function MobileInlineEditor({
   onExpand,
   isSaving,
 }: MobileInlineEditorProps) {
-  const editContent = useEditStateStore((s) => s.editContent);
-  const originalContent = useEditStateStore((s) => s.originalContent);
-  const updateContent = useEditStateStore((s) => s.updateContent);
+  const editContent = useEditStateStore(s => s.editContent);
+  const originalContent = useEditStateStore(s => s.originalContent);
+  const updateContent = useEditStateStore(s => s.updateContent);
   const hasChanges = editContent !== originalContent;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -39,9 +39,7 @@ export function MobileInlineEditor({
 
   const handleCancel = () => {
     if (hasChanges) {
-      if (
-        confirm("You have unsaved changes. Are you sure you want to cancel?")
-      ) {
+      if (confirm("You have unsaved changes. Are you sure you want to cancel?")) {
         onCancel();
       }
     } else {

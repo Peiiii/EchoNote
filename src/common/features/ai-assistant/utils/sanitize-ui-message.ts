@@ -1,21 +1,19 @@
-import type { UIMessage } from '@agent-labs/agent-chat'
+import type { UIMessage } from "@agent-labs/agent-chat";
 
 // Deep-sanitize arbitrary values so they are Firestore-safe (no functions/undefined/cycles)
 function sanitizeValue(value: unknown, seen = new WeakSet<object>()): unknown {
   if (value === null) return null;
   const t = typeof value;
-  if (t === 'string' || t === 'number' || t === 'boolean') return value;
-  if (t === 'bigint') return Number(value);
-  if (t === 'symbol' || t === 'function' || t === 'undefined') return undefined;
+  if (t === "string" || t === "number" || t === "boolean") return value;
+  if (t === "bigint") return Number(value);
+  if (t === "symbol" || t === "function" || t === "undefined") return undefined;
 
   if (Array.isArray(value)) {
-    const arr = value
-      .map(v => sanitizeValue(v, seen))
-      .filter(v => v !== undefined);
+    const arr = value.map(v => sanitizeValue(v, seen)).filter(v => v !== undefined);
     return arr;
   }
 
-  if (t === 'object') {
+  if (t === "object") {
     const obj = value as Record<string, unknown>;
     if (seen.has(obj)) return undefined; // drop cyclic refs
     seen.add(obj);
@@ -38,7 +36,7 @@ export function sanitizeUIMessageForPersistence(message: UIMessage) {
     role: message.role,
     // parts may contain tool invocation structures; sanitize to primitives only
     parts: sanitizeValue(message.parts),
-  } as { id: string; role: UIMessage['role']; parts: unknown };
+  } as { id: string; role: UIMessage["role"]; parts: unknown };
 }
 
 // Produce a stable hash string for change detection without throwing on complex parts
@@ -54,4 +52,3 @@ export function safeHashMessage(message: UIMessage): string {
     return `${message.role}:${message.id}`;
   }
 }
-

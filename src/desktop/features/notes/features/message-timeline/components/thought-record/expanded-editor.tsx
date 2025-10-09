@@ -19,13 +19,13 @@ export function ExpandedEditor({
   onSave,
   onCancel,
   onCollapse,
-  isSaving
+  isSaving,
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Select only the updater to avoid subscribing to edit content changes here
-  const updateContent = useEditStateStore((s) => s.updateContent);
-  
+  const updateContent = useEditStateStore(s => s.updateContent);
+
   useEditor({ textareaRef, updateContent, content });
 
   // Auto-focus when component mounts
@@ -104,26 +104,24 @@ export function ExpandedEditor({
         <div className="w-1/2 min-h-0 border-r border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Editor
-              </h3>
+              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
               <div className="text-xs text-slate-500 dark:text-slate-500">
                 {localContent.length} characters
               </div>
             </div>
           </div>
-          
+
           <div className="flex-1 min-h-0 p-6 overflow-y-auto">
             <textarea
               ref={textareaRef}
               value={localContent}
-              onChange={(e) => handleContentChange(e.target.value)}
+              onChange={e => handleContentChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write your thought in Markdown..."
               className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
               disabled={isSaving}
               style={{
-                caretColor: '#3b82f6'
+                caretColor: "#3b82f6",
               }}
             />
           </div>
@@ -133,15 +131,11 @@ export function ExpandedEditor({
         <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Preview
-              </h3>
-              <div className="text-xs text-slate-500 dark:text-slate-500">
-                Live Preview
-              </div>
+              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Preview</h3>
+              <div className="text-xs text-slate-500 dark:text-slate-500">Live Preview</div>
             </div>
           </div>
-          
+
           <div className="flex-1 min-h-0 p-6 overflow-y-auto">
             <div className="prose prose-slate dark:prose-invert max-w-none">
               {localContent.trim() ? (

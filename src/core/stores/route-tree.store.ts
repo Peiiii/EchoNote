@@ -1,10 +1,10 @@
-import type { RouteNode } from '@/common/types/route';
-import { create } from 'zustand';
+import type { RouteNode } from "@/common/types/route";
+import { create } from "zustand";
 
 export interface RouteTreeState {
   routes: RouteNode[];
   addRoute: (route: RouteNode, parentId?: string) => () => void;
-  addRoutes: (routes: RouteNode[], parentId?: string) =>()=> void;
+  addRoutes: (routes: RouteNode[], parentId?: string) => () => void;
   removeRoute: (id: string) => void;
   updateRoute: (id: string, updates: Partial<RouteNode>) => void;
   getRoutes: () => RouteNode[];
@@ -45,13 +45,15 @@ function removeRouteFromTree(tree: RouteNode[], id: string): RouteNode[] {
   return tree
     .filter(node => node.id !== id)
     .map(node =>
-      node.children
-        ? { ...node, children: removeRouteFromTree(node.children, id) }
-        : node
+      node.children ? { ...node, children: removeRouteFromTree(node.children, id) } : node
     );
 }
 
-function updateRouteInTree(tree: RouteNode[], id: string, updates: Partial<RouteNode>): RouteNode[] {
+function updateRouteInTree(
+  tree: RouteNode[],
+  id: string,
+  updates: Partial<RouteNode>
+): RouteNode[] {
   return tree.map(node => {
     if (node.id === id) {
       return { ...node, ...updates };
@@ -80,8 +82,10 @@ export const useRouteTreeStore = create<RouteTreeState>()((set, get) => ({
     }));
     return () => {
       set((state: RouteTreeState) => ({
-        routes: routes.reduce((currentRoutes, route) => 
-          removeRouteFromTree(currentRoutes, route.id), state.routes),
+        routes: routes.reduce(
+          (currentRoutes, route) => removeRouteFromTree(currentRoutes, route.id),
+          state.routes
+        ),
       }));
     };
   },
@@ -97,4 +101,4 @@ export const useRouteTreeStore = create<RouteTreeState>()((set, get) => ({
   },
   getRoutes: () => get().routes,
   reset: () => set({ routes: [] }),
-})); 
+}));

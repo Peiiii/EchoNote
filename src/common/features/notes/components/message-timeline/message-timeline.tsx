@@ -15,10 +15,7 @@ import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
 interface MessageTimelineProps {
-  renderThoughtRecord?: (
-    message: Message,
-    threadCount: number
-  ) => React.ReactNode;
+  renderThoughtRecord?: (message: Message, threadCount: number) => React.ReactNode;
   className?: string;
   groupedMessages: Record<string, Message[]>;
   messages: Message[];
@@ -31,10 +28,7 @@ export interface MessageTimelineRef {
   scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => void;
 }
 
-export const MessageTimeline = forwardRef<
-  MessageTimelineRef,
-  MessageTimelineProps
->(
+export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelineProps>(
   (
     {
       renderThoughtRecord,
@@ -47,23 +41,25 @@ export const MessageTimeline = forwardRef<
     ref
   ) => {
     const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
-    
+
     // Use unified input collapse hook
     const { inputCollapsed, handleExpandInput } = useInputCollapse();
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollToBottom, showScrollToBottomButton } = useChatScroll(
+    const { scrollToBottom, showScrollToBottomButton } = useChatScroll(containerRef, [], {
+      smoothScroll: true,
+    });
+    const { recordScrollPosition, restoreScrollPosition } = useLazyLoadingScrollControl({
       containerRef,
-      [],
-      { smoothScroll: true }
-    );
-    const { recordScrollPosition, restoreScrollPosition } =
-      useLazyLoadingScrollControl({ containerRef });
+    });
 
-    const { showFloatingCollapse, handleScroll: handleCollapseScroll, collapseCurrent } = useGlobalCollapse(containerRef);
+    const {
+      showFloatingCollapse,
+      handleScroll: handleCollapseScroll,
+      collapseCurrent,
+    } = useGlobalCollapse(containerRef);
 
     const messageDataAttr = READ_MORE_DATA_ATTRS.messageId;
-
 
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
@@ -91,7 +87,7 @@ export const MessageTimeline = forwardRef<
     useEffect(() => {
       scrollToBottom({ behavior: "instant" });
     }, [scrollToBottom]);
-    
+
     // Build a cache of thread counts once per messages change to avoid O(n^2) work on render
     const threadCounts = useMemo(() => {
       const map = new Map<string, number>();
@@ -102,7 +98,7 @@ export const MessageTimeline = forwardRef<
       return map;
     }, [messages]);
 
-  return (
+    return (
       <>
         <div
           data-component="message-timeline"
@@ -125,11 +121,7 @@ export const MessageTimeline = forwardRef<
             // Use cached thread counts to derive per-message thread size quickly
 
             return (
-              <div
-                key={date}
-                className="w-full"
-                style={{ height: "auto", minHeight: "auto" }}
-              >
+              <div key={date} className="w-full" style={{ height: "auto", minHeight: "auto" }}>
                 <DateDivider date={date} />
 
                 {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
@@ -171,10 +163,7 @@ export const MessageTimeline = forwardRef<
           <div className="flex flex-col items-end gap-2">
             {inputCollapsed && (
               <div className="pointer-events-auto">
-                <FloatingActionButton
-                  onClick={handleExpandInput}
-                  ariaLabel="Show composer"
-                >
+                <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
                   <PenLine className="h-4 w-4" />
                 </FloatingActionButton>
               </div>
@@ -199,8 +188,10 @@ export const MessageTimeline = forwardRef<
           </div>
         </div>
         <div
-          className={`pointer-events-none absolute left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showFloatingCollapse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
-          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + var(--collapse-float-offset, 8px))' }}
+          className={`pointer-events-none absolute left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showFloatingCollapse ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"}`}
+          style={{
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + var(--collapse-float-offset, 8px))",
+          }}
         >
           {showFloatingCollapse && (
             <div className="pointer-events-auto">

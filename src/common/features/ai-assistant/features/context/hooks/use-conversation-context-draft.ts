@@ -16,7 +16,7 @@ export function useConversationContextDraft({
   conversationId,
   fallbackChannelId,
   onActiveToolChannelChange,
-  activeToolChannelId
+  activeToolChannelId,
 }: UseConversationContextDraftProps) {
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
   const updateConversation = useConversationStore(s => s.updateConversation);
@@ -27,7 +27,7 @@ export function useConversationContextDraft({
   );
   const [draftChannelIds, setDraftChannelIds] = useState<string[]>(
     conv?.contexts?.mode === ConversationContextMode.CHANNELS
-      ? (conv?.contexts?.channelIds || [fallbackChannelId])
+      ? conv?.contexts?.channelIds || [fallbackChannelId]
       : [fallbackChannelId]
   );
 
@@ -36,22 +36,22 @@ export function useConversationContextDraft({
     setDraftMode(conv?.contexts ? conv.contexts.mode : ConversationContextMode.AUTO);
     setDraftChannelIds(
       conv?.contexts?.mode === ConversationContextMode.CHANNELS
-        ? (conv?.contexts?.channelIds || [fallbackChannelId])
+        ? conv?.contexts?.channelIds || [fallbackChannelId]
         : [fallbackChannelId]
     );
   }, [conversationId, conv?.contexts, fallbackChannelId]);
 
   const toggleChannel = useCallback((id: string) => {
-    setDraftChannelIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
+    setDraftChannelIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   }, []);
 
   const apply = useCallback(async () => {
     if (!userId || !conv) return;
 
     if (draftMode === ConversationContextMode.AUTO) {
-      await updateConversation(userId, conv.id, { contexts: { mode: ConversationContextMode.AUTO } });
+      await updateConversation(userId, conv.id, {
+        contexts: { mode: ConversationContextMode.AUTO },
+      });
       return;
     }
 
@@ -65,9 +65,8 @@ export function useConversationContextDraft({
       next = { mode: ConversationContextMode.CHANNELS, channelIds: ids };
 
       if (onActiveToolChannelChange) {
-        const ensure = (activeToolChannelId && ids.includes(activeToolChannelId))
-          ? activeToolChannelId
-          : ids[0];
+        const ensure =
+          activeToolChannelId && ids.includes(activeToolChannelId) ? activeToolChannelId : ids[0];
         onActiveToolChannelChange(ensure);
       }
     }
@@ -76,7 +75,16 @@ export function useConversationContextDraft({
 
     // Trigger loading for contexts after apply using centralized method
     sessionContextManager.ensureContextsLoaded(next, fallbackChannelId);
-  }, [userId, conv, draftMode, draftChannelIds, fallbackChannelId, onActiveToolChannelChange, activeToolChannelId, updateConversation]);
+  }, [
+    userId,
+    conv,
+    draftMode,
+    draftChannelIds,
+    fallbackChannelId,
+    onActiveToolChannelChange,
+    activeToolChannelId,
+    updateConversation,
+  ]);
 
   return {
     draftMode,
@@ -84,6 +92,6 @@ export function useConversationContextDraft({
     draftChannelIds,
     toggleChannel,
     apply,
-    isSelectedMode: draftMode === ConversationContextMode.CHANNELS
+    isSelectedMode: draftMode === ConversationContextMode.CHANNELS,
   };
 }

@@ -1,6 +1,12 @@
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import { Auth, browserLocalPersistence, connectAuthEmulator, getAuth, initializeAuth } from 'firebase/auth';
-import { Firestore, initializeFirestore } from 'firebase/firestore';
+import { FirebaseApp, initializeApp } from "firebase/app";
+import {
+  Auth,
+  browserLocalPersistence,
+  connectAuthEmulator,
+  getAuth,
+  initializeAuth,
+} from "firebase/auth";
+import { Firestore, initializeFirestore } from "firebase/firestore";
 
 interface FirebaseConfigOptions {
   apiKey: string;
@@ -12,9 +18,8 @@ interface FirebaseConfigOptions {
   measurementId?: string;
 }
 
-const PROXY_URL_AUTH = 'https://firebase-auth-api.agentverse.cc';
-const PROXY_HOST_API = 'firebase-api.agentverse.cc';
-
+const PROXY_URL_AUTH = "https://firebase-auth-api.agentverse.cc";
+const PROXY_HOST_API = "firebase-api.agentverse.cc";
 
 const config: FirebaseConfigOptions = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -35,21 +40,18 @@ const db = initializeFirestore(app, {
 });
 
 const tryLoadRegionFromLocalStorage = (defaultRegion: string): string => {
-  const region = localStorage.getItem('region');
+  const region = localStorage.getItem("region");
   if (region) {
     return region;
   }
   return defaultRegion;
-}
-
+};
 
 const saveRegionToLocalStorage = (region: string): void => {
-  localStorage.setItem('region', region);
-}
-
+  localStorage.setItem("region", region);
+};
 
 const CN_REGION = "CN";
-
 
 export class FirebaseConfig {
   private static instance: FirebaseConfig | null = null;
@@ -58,7 +60,7 @@ export class FirebaseConfig {
   private db: Firestore = db;
   private region: string = tryLoadRegionFromLocalStorage(CN_REGION);
   private constructor() {
-    console.log('[FirebaseConfig] constructor, region', this.region);
+    console.log("[FirebaseConfig] constructor, region", this.region);
     this.getAuth();
     this.validateRegionAndMaybeReloadPage();
   }
@@ -70,13 +72,12 @@ export class FirebaseConfig {
     return FirebaseConfig.instance;
   }
 
-
   getApp(): FirebaseApp {
     return this.app;
   }
 
   /**
-   * 
+   *
    * @returns true if the region is CN
    * not support google auth in this region
    */
@@ -89,42 +90,38 @@ export class FirebaseConfig {
   }
 
   private async fetchRegion(): Promise<string> {
-    let country = '';
+    let country = "";
     try {
       const response = await fetch(`${PROXY_URL_AUTH}/api/location`);
       if (response.ok) {
-        country = (await response.json()).country || 'XX';
+        country = (await response.json()).country || "XX";
       }
     } catch (e) {
-      console.error('Failed to fetch user country, using restricted auth.', e);
+      console.error("Failed to fetch user country, using restricted auth.", e);
     }
     return country;
   }
 
-
   private async validateRegionAndMaybeReloadPage(): Promise<void> {
     const region = await this.fetchRegion();
     saveRegionToLocalStorage(region);
-    if(region !== this.region) {
+    if (region !== this.region) {
       window.location.reload();
     }
   }
 
-
-   getAuth(): Auth {
+  getAuth(): Auth {
     if (!this.auth) {
       if (this.isInCNRegion()) {
         this.auth = initializeAuth(this.getApp(), {
-          persistence: browserLocalPersistence
+          persistence: browserLocalPersistence,
         });
         connectAuthEmulator(this.auth, PROXY_URL_AUTH, {
-          disableWarnings: true
+          disableWarnings: true,
         });
       } else {
         this.auth = getAuth(this.getApp());
       }
-
-     
     }
     return this.auth;
   }

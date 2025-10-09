@@ -3,12 +3,14 @@
 This document explains the cross‑platform (mobile + desktop) Read‑More/Collapse behaviors, how the moving/float transition works, and how to integrate or tune it.
 
 ## UX Goals
+
 - Long content is initially collapsed to a max height, with a subtle gradient + a centered pill button: “Read more”.
 - After expansion, a centered pill “Collapse” appears. It normally scrolls with the note.
 - When the inline Collapse pill would be covered near the bottom edge, it seamlessly switches to a floating pill near the bottom of the viewport. Scrolling back restores the inline pill.
 - Floating and inline pills share the same low‑key design and do not distract from content.
 
 ## Files & Responsibilities
+
 - `common/features/read-more/core/read-more.bus.ts`
   - `statusChanged$`: `{ messageId, long, expanded, collapseInlineVisible? }`
   - `requestCollapse$`: `{ messageId }`
@@ -30,6 +32,7 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
   - `desktop/thought-record/read-more-wrapper.tsx`: thin wrapper around `ReadMoreBaseWrapper`; defaults maxHeight 300.
 
 ## Visual Design
+
 - Inline pills (Read more / Collapse)
   - `text-xs px-2.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground border-0 shadow-none`
 - Floating Collapse pill
@@ -39,6 +42,7 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
   - Container has `pointer-events-none`; button is wrapped in `pointer-events-auto`.
 
 ## Switching Logic (Inline ↔ Floating)
+
 - Inline Collapse carries `data-collapse-inline-for="<messageId>"`.
 - Controller computes per frame (rAF):
   - `dist = containerRect.bottom - inlineBtnRect.bottom`
@@ -46,10 +50,12 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
 - `showCollapse = long && expanded && inlineOverlap === true`.
 
 ## Scroll Rules On Collapse
+
 - Rule 1: If top edge is visible → just collapse.
 - Rule 2: If top edge is not visible → collapse and align the element’s top to the container’s top.
 
 ## How To Integrate (New Container)
+
 1. Render notes wrapped with `data-message-id="<id>"`.
 2. Use `useGlobalCollapse(containerRef)` and wire:
    - `onScroll` → `handleScroll()` (after your own recordScrollPosition)
@@ -60,16 +66,19 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
    - Optional IO signal is supported, but geometry switching is the source of truth.
 
 ## Tuning
+
 - Collapsed height: Mobile wrapper `maxHeight` (default 600), Desktop wrapper `maxHeight` (default 300).
 - Floating switch offset: CSS var `--collapse-float-offset` on the scroll container root (default 8px).
 - Animation: Timeline uses `transition-all duration-150` for fade/translate.
 
 ## Edge Cases & Hardening
+
 - Bottom unclickable strip: Avoid by using `pointer-events-none` on overlays; wrap interactive elements with `pointer-events-auto`.
 - Hidden DOM eating clicks: Only render floating pill when `showCollapse`.
 - Safe area: Floating bottom uses `env(safe-area-inset-bottom)`.
 
 ## QA Checklist
+
 - Short note: No Read more; no Collapse.
 - Long note collapsed: gradient + centered Read more pill.
 - Expand → inline Collapse visible; scrolling down switches to floating when reaching bottom threshold; scrolling up restores inline.
@@ -80,6 +89,7 @@ This document explains the cross‑platform (mobile + desktop) Read‑More/Colla
 - Desktop behavior matches mobile.
 
 ## Known Extensibility
+
 - Translate labels: change pill text (e.g., "收起"/"展开").
 - Unify thresholds by product config; expose via theme tokens or CSS vars.
 - Programmatic collapse: fire `requestCollapse$({ messageId })`.

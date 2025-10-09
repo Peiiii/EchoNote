@@ -9,12 +9,12 @@ interface FloatingActionButtonProps {
   className?: string;
 }
 
-export const FloatingActionButton = ({ 
-  onClick, 
-  children, 
-  ariaLabel, 
+export const FloatingActionButton = ({
+  onClick,
+  children,
+  ariaLabel,
   isVisible = true,
-  className 
+  className,
 }: FloatingActionButtonProps) => {
   if (!isVisible) return null;
 
@@ -22,10 +22,7 @@ export const FloatingActionButton = ({
     <Button
       size="sm"
       variant="secondary"
-      className={cn(
-        "h-8 w-8 rounded-full p-0 shadow-lg",
-        className
-      )}
+      className={cn("h-8 w-8 rounded-full p-0 shadow-lg", className)}
       onClick={onClick}
       aria-label={ariaLabel}
     >

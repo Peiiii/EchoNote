@@ -12,7 +12,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <Button
-      variant="ghost" 
+      variant="ghost"
       size="icon"
       onClick={toggleDarkMode}
       className={cn("hover:bg-muted/80", className)}
@@ -25,4 +25,4 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       )}
     </Button>
   );
-} 
+}

@@ -2,49 +2,49 @@
 export const GITHUB_CONFIG = {
   // OAuth application configuration
   oauth: {
-    clientId: import.meta.env.VITE_GITHUB_CLIENT_ID || '',
-    clientSecret: import.meta.env.VITE_GITHUB_CLIENT_SECRET || '',
-    redirectUri: import.meta.env.VITE_GITHUB_REDIRECT_URI || 'http://localhost:3000',
-    scopes: ['repo', 'user', 'workflow'], // Required permission scopes
+    clientId: import.meta.env.VITE_GITHUB_CLIENT_ID || "",
+    clientSecret: import.meta.env.VITE_GITHUB_CLIENT_SECRET || "",
+    redirectUri: import.meta.env.VITE_GITHUB_REDIRECT_URI || "http://localhost:3000",
+    scopes: ["repo", "user", "workflow"], // Required permission scopes
   },
-  
+
   // Default storage configuration
   storage: {
-    defaultBranch: 'main',
-    basePath: 'data', // Base path for data storage
+    defaultBranch: "main",
+    basePath: "data", // Base path for data storage
   },
-  
+
   // API configuration
   api: {
-    baseUrl: 'https://api.github.com',
+    baseUrl: "https://api.github.com",
     timeout: 30000, // 30 seconds timeout
   },
-  
+
   // Feature flags
   features: {
     autoSync: true, // Auto synchronization
     conflictResolution: true, // Conflict resolution
     backupEnabled: true, // Backup functionality
-  }
+  },
 };
 
 // 验证配置是否完整
 export function validateGitHubConfig(): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   if (!GITHUB_CONFIG.oauth.clientId) {
-    errors.push('GitHub Client ID not configured');
+    errors.push("GitHub Client ID not configured");
   }
-  
+
   if (!GITHUB_CONFIG.oauth.redirectUri) {
-    errors.push('GitHub Redirect URI not configured');
+    errors.push("GitHub Redirect URI not configured");
   }
-  
+
   // Note: Storage configuration is now user-configurable, not required in initial config
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -84,7 +84,7 @@ export function checkDevelopmentConfig(): void {
   if (import.meta.env.DEV) {
     const config = validateGitHubConfig();
     if (!config.isValid) {
-      console.warn('⚠️ GitHub configuration incomplete, some features may not work:');
+      console.warn("⚠️ GitHub configuration incomplete, some features may not work:");
       config.errors.forEach(error => console.warn(`  - ${error}`));
       console.log(getGitHubConfigInstructions());
     }

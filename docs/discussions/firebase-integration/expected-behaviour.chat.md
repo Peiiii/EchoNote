@@ -54,7 +54,7 @@ d. 应用可能会自动选中第一个频道，并触发该频道的第一页�
 
 用户看到： 在输入框输入文字后按回车，这条新消息立即、瞬间出现在消息列表的顶部。输入框被清空。消息旁边可能会有一个小小的“发送中”图标（可选）。
 
-幕后发生 (乐观更新)： addMessage action 被调用。它首先在 Zustand store 中创建一个临时的、带 temp_... ID 的消息并更新 state。UI 因为 state 改变而立即重绘。然后，它才在后台调用 firebaseService.createMessage 将数据发送到 Firestore。
+幕后发生 (乐观更新)： addMessage action 被调用。它首先在 Zustand store 中创建一个临时的、带 temp\_... ID 的消息并更新 state。UI 因为 state 改变而立即重绘。然后，它才在后台调用 firebaseService.createMessage 将数据发送到 Firestore。
 
 无限滚动加载旧消息：
 

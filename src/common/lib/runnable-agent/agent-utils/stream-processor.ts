@@ -3,11 +3,7 @@ import OpenAI from "openai";
 import { v4 as uuidv4 } from "uuid";
 import { EventEncoder } from "./encoder";
 import { TextMessageHandler } from "./handlers/text-message.handler";
-import {
-  StreamProcessor as IStreamProcessor,
-  StreamContext,
-  StreamHandler,
-} from "./types";
+import { StreamProcessor as IStreamProcessor, StreamContext, StreamHandler } from "./types";
 
 export class StreamProcessor implements IStreamProcessor {
   private handlers: Map<string, StreamHandler> = new Map();
@@ -26,9 +22,9 @@ export class StreamProcessor implements IStreamProcessor {
         last_response: this.context.fullResponse,
         last_tool_call: this.context.isToolCallStarted
           ? {
-            name: this.context.toolCallName,
-            arguments: this.context.toolCallArgs,
-          }
+              name: this.context.toolCallName,
+              arguments: this.context.toolCallArgs,
+            }
           : null,
         usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
       }),

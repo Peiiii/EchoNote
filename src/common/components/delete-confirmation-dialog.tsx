@@ -25,22 +25,22 @@ export function DeleteConfirmationDialog({
   title,
   description,
   itemName,
-  onConfirm
+  onConfirm,
 }: DeleteConfirmationDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const handleConfirm = async () => {
     setIsDeleting(true);
     try {
       await onConfirm();
       onOpenChange(false);
     } catch (error) {
-      console.error('Delete failed:', error);
+      console.error("Delete failed:", error);
     } finally {
       setIsDeleting(false);
     }
   };
-  
+
   const handleCancel = () => {
     onOpenChange(false);
   };
@@ -61,7 +61,7 @@ export function DeleteConfirmationDialog({
             </div>
           </div>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="p-3 rounded-lg bg-muted/50 border border-muted">
             <div className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export function DeleteConfirmationDialog({
               <span className="text-sm font-medium text-foreground">{itemName}</span>
             </div>
           </div>
-          
+
           <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
@@ -80,22 +80,12 @@ export function DeleteConfirmationDialog({
             </div>
           </div>
         </div>
-        
+
         <DialogFooter className="gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isDeleting}
-          >
+          <Button type="button" variant="outline" onClick={handleCancel} disabled={isDeleting}>
             Cancel
           </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isDeleting}
-          >
+          <Button type="button" variant="destructive" onClick={handleConfirm} disabled={isDeleting}>
             {isDeleting ? (
               <div className="flex items-center gap-2">
                 <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
 
 interface GitHubConfigErrorSectionProps {
   configErrors: string[];

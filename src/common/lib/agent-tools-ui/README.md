@@ -33,6 +33,7 @@ src/common/lib/agent-tools-ui/
 ## 组件分类
 
 ### 纯UI组件 (display/)
+
 - **ContentCard**: 通用内容卡片，支持多种变体
 - **ErrorMessage**: 智能错误信息展示
 - **EmptyState**: 空状态展示
@@ -40,9 +41,11 @@ src/common/lib/agent-tools-ui/
 - **MetadataRow**: 元数据展示行
 
 ### 布局组件 (layout/)
+
 - **ComparisonLayout**: 内容对比布局
 
 ### Agent工具面板 (panels/)
+
 - **DisplayToolPanel**: 展示类工具面板
 - **InteractiveToolPanel**: 交互类工具面板
 - **ToolPanel**: 基础工具面板
@@ -52,30 +55,32 @@ src/common/lib/agent-tools-ui/
 ## 使用示例
 
 ### 基础展示组件
+
 ```tsx
 import { ContentCard, ErrorMessage, EmptyState } from '@/common/lib/agent-tools-ui';
 
 // 内容卡片
-<ContentCard 
-  content="Hello World" 
-  variant="success" 
-  maxHeight="200px" 
+<ContentCard
+  content="Hello World"
+  variant="success"
+  maxHeight="200px"
 />
 
 // 错误信息
-<ErrorMessage 
-  error={error} 
-  variant="alert" 
+<ErrorMessage
+  error={error}
+  variant="alert"
 />
 
 // 空状态
-<EmptyState 
-  icon={FileText} 
-  message="No data found" 
+<EmptyState
+  icon={FileText}
+  message="No data found"
 />
 ```
 
 ### Agent工具面板
+
 ```tsx
 import { DisplayToolPanel, InteractiveToolPanel } from '@/common/lib/agent-tools-ui';
 
@@ -134,6 +139,7 @@ import { DisplayToolPanel, InteractiveToolPanel } from '@/common/lib/agent-tools
 4. **文档完善**: 清晰的使用文档和示例
 
 拆分为独立库时，只需要：
+
 1. 创建独立的 `package.json`
 2. 配置构建工具
 3. 发布到 npm

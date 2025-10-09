@@ -7,16 +7,19 @@
 ## 核心特性
 
 ### 🎯 空间感知
+
 - 自动获取指定空间的所有记录
 - 理解记录内容和标签
 - 提供空间摘要和统计信息
 
 ### 💬 智能对话
+
 - 基于空间上下文进行对话
 - 无需重复解释背景信息
 - 支持自然语言查询
 
 ### 🔍 内容分析
+
 - 自动总结空间内容
 - 分析进度和状态
 - 提供建议和改进方向
@@ -26,32 +29,23 @@
 ### 基础用法
 
 ```tsx
-import { SpaceAwareChat } from '@/common/features/space-aware-chat';
+import { SpaceAwareChat } from "@/common/features/space-aware-chat";
 
 function MyComponent() {
-  return (
-    <SpaceAwareChat 
-      spaceId="work"
-      placeholder="询问关于工作空间的问题..."
-    />
-  );
+  return <SpaceAwareChat spaceId="work" placeholder="询问关于工作空间的问题..." />;
 }
 ```
 
 ### 高级用法
 
 ```tsx
-import { useSpaceRecords, useSpaceAIChat } from '@/common/features/space-aware-chat';
+import { useSpaceRecords, useSpaceAIChat } from "@/common/features/space-aware-chat";
 
 function CustomChat() {
-  const spaceContext = useSpaceRecords('work');
-  const { messages, sendMessage, isLoading } = useSpaceAIChat('work', spaceContext);
-  
-  return (
-    <div>
-      {/* 自定义UI */}
-    </div>
-  );
+  const spaceContext = useSpaceRecords("work");
+  const { messages, sendMessage, isLoading } = useSpaceAIChat("work", spaceContext);
+
+  return <div>{/* 自定义UI */}</div>;
 }
 ```
 
@@ -81,29 +75,30 @@ space-aware-chat/
 ## 扩展点
 
 ### 1. 真实AI集成
+
 替换 `use-space-ai-chat.ts` 中的模拟AI逻辑：
 
 ```tsx
 // 替换模拟AI调用
 const aiResponse = await openaiClient.chat({
   messages: [
-    { role: 'system', content: `基于以下空间记录进行对话：\n${context}` },
-    { role: 'user', content: userMessage }
-  ]
+    { role: "system", content: `基于以下空间记录进行对话：\n${context}` },
+    { role: "user", content: userMessage },
+  ],
 });
 ```
 
 ### 2. 数据源集成
+
 替换 `use-space-records.ts` 中的模拟数据：
 
 ```tsx
 // 从真实store获取数据
-const records = useMessageStore(state => 
-  state.messages.filter(msg => msg.spaceId === spaceId)
-);
+const records = useMessageStore(state => state.messages.filter(msg => msg.spaceId === spaceId));
 ```
 
 ### 3. 自定义UI
+
 可以只使用hooks，自定义UI组件：
 
 ```tsx
@@ -111,23 +106,28 @@ const { messages, sendMessage } = useSpaceAIChat(spaceId, spaceContext);
 
 // 自定义消息列表
 <div className="custom-messages">
-  {messages.map(msg => <CustomMessage key={msg.id} message={msg} />)}
-</div>
+  {messages.map(msg => (
+    <CustomMessage key={msg.id} message={msg} />
+  ))}
+</div>;
 ```
 
 ## 设计原则
 
 ### 简单直接
+
 - 最小化抽象层次
 - 清晰的组件职责
 - 直观的API设计
 
 ### 可扩展性
+
 - 模块化组件设计
 - 灵活的hook系统
 - 支持自定义UI
 
 ### 类型安全
+
 - 完整的TypeScript类型定义
 - 运行时类型检查
 - 开发时智能提示
@@ -135,16 +135,19 @@ const { messages, sendMessage } = useSpaceAIChat(spaceId, spaceContext);
 ## 使用场景
 
 ### 工作空间
+
 - 项目进度查询
 - 任务状态分析
 - 工作总结和建议
 
 ### 学习空间
+
 - 知识体系构建
 - 学习进度跟踪
 - 复习建议和计划
 
 ### 个人空间
+
 - 生活习惯分析
 - 目标管理
 - 生活建议

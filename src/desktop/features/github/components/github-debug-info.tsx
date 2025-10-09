@@ -1,8 +1,8 @@
-import { Badge } from '@/common/components/ui/badge';
-import { Button } from '@/common/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { useGitHubConfigStore, GitHubUserInfo } from '@/core/stores/github-config.store';
-import { useCallback, useEffect, useState } from 'react';
+import { Badge } from "@/common/components/ui/badge";
+import { Button } from "@/common/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { useGitHubConfigStore, GitHubUserInfo } from "@/core/stores/github-config.store";
+import { useCallback, useEffect, useState } from "react";
 
 interface DebugInfo {
   authInfo: unknown;
@@ -19,29 +19,24 @@ interface DebugInfo {
 export function GitHubDebugInfo() {
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   // Get store state
-  const { 
-    authInfo, 
-    userInfo, 
-    isAuthenticated, 
-    storageConfig,
-    clearAuthInfo 
-  } = useGitHubConfigStore();
+  const { authInfo, userInfo, isAuthenticated, storageConfig, clearAuthInfo } =
+    useGitHubConfigStore();
 
   const updateDebugInfo = useCallback(() => {
     try {
       const accessToken = authInfo?.accessToken;
-      
+
       setDebugInfo({
         authInfo,
         isAuthenticated,
         hasAccessToken: !!accessToken,
         accessTokenLength: accessToken ? accessToken.length : 0,
-        accessTokenPreview: accessToken ? `${accessToken.substring(0, 10)}...` : 'None',
+        accessTokenPreview: accessToken ? `${accessToken.substring(0, 10)}...` : "None",
         userInfo,
         storageConfig,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       setDebugInfo({
@@ -49,11 +44,11 @@ export function GitHubDebugInfo() {
         isAuthenticated: false,
         hasAccessToken: false,
         accessTokenLength: 0,
-        accessTokenPreview: 'None',
+        accessTokenPreview: "None",
         userInfo: null,
         storageConfig: null,
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }, [authInfo, userInfo, isAuthenticated, storageConfig]);
@@ -67,7 +62,7 @@ export function GitHubDebugInfo() {
       clearAuthInfo();
       updateDebugInfo();
     } catch (error) {
-      console.error('Failed to clear auth:', error);
+      console.error("Failed to clear auth:", error);
     }
   };
 
@@ -88,7 +83,7 @@ export function GitHubDebugInfo() {
               Clear Auth
             </Button>
             <Button size="sm" variant="outline" onClick={() => setIsExpanded(!isExpanded)}>
-              {isExpanded ? 'Collapse' : 'Expand'}
+              {isExpanded ? "Collapse" : "Expand"}
             </Button>
           </div>
         </CardTitle>
@@ -98,13 +93,19 @@ export function GitHubDebugInfo() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="font-medium">Authentication Status:</span>
-              <Badge variant={debugInfo.isAuthenticated ? "secondary" : "destructive"} className="ml-2">
+              <Badge
+                variant={debugInfo.isAuthenticated ? "secondary" : "destructive"}
+                className="ml-2"
+              >
                 {debugInfo.isAuthenticated ? "✅ Authenticated" : "❌ Not Authenticated"}
               </Badge>
             </div>
             <div>
               <span className="font-medium">Access Token:</span>
-              <Badge variant={debugInfo.hasAccessToken ? "secondary" : "destructive"} className="ml-2">
+              <Badge
+                variant={debugInfo.hasAccessToken ? "secondary" : "destructive"}
+                className="ml-2"
+              >
                 {debugInfo.hasAccessToken ? "✅ Present" : "❌ Missing"}
               </Badge>
             </div>
@@ -122,13 +123,11 @@ export function GitHubDebugInfo() {
             <div>
               <span className="font-medium">User Info:</span>
               <div className="ml-2 text-sm">
-                <p>Login: {debugInfo.userInfo?.login || 'N/A'}</p>
-                <p>ID: {debugInfo.userInfo?.id || 'N/A'}</p>
-                <p>Name: {debugInfo.userInfo?.name || 'N/A'}</p>
-                <p>Email: {debugInfo.userInfo?.email || 'N/A'}</p>
-                {debugInfo.userInfo?.avatar_url && (
-                  <p>Avatar: Available</p>
-                )}
+                <p>Login: {debugInfo.userInfo?.login || "N/A"}</p>
+                <p>ID: {debugInfo.userInfo?.id || "N/A"}</p>
+                <p>Name: {debugInfo.userInfo?.name || "N/A"}</p>
+                <p>Email: {debugInfo.userInfo?.email || "N/A"}</p>
+                {debugInfo.userInfo?.avatar_url && <p>Avatar: Available</p>}
               </div>
             </div>
           )}
@@ -156,9 +155,7 @@ export function GitHubDebugInfo() {
             </div>
           )}
 
-          <div className="text-xs text-gray-500">
-            Last updated: {debugInfo.timestamp}
-          </div>
+          <div className="text-xs text-gray-500">Last updated: {debugInfo.timestamp}</div>
         </div>
       </CardContent>
     </Card>

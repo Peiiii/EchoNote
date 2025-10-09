@@ -4,7 +4,7 @@ import React, { useContext, useMemo } from "react";
 export const defineController = <
   TResult,
   TParams extends any[],
-  TIsHook extends true | false = false
+  TIsHook extends true | false = false,
 >(
   maybeHookCreate: (...params: TParams) => TResult,
   {
@@ -16,19 +16,11 @@ export const defineController = <
   } = {}
 ) => {
   const Context = React.createContext<TResult | undefined>(undefined);
-  const Provider = ({
-    children,
-    value,
-  }: {
-    children: React.ReactNode;
-    value: TResult;
-  }) => {
+  const Provider = ({ children, value }: { children: React.ReactNode; value: TResult }) => {
     return (
       <Context.Provider value={value}>
         {extraContext ? (
-          <extraContext.Provider value={value}>
-            {children}
-          </extraContext.Provider>
+          <extraContext.Provider value={value}>{children}</extraContext.Provider>
         ) : (
           children
         )}

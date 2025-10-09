@@ -6,44 +6,41 @@ import { useMessageInput } from "./hooks/use-message-input";
 import { MessageInputProps } from "./types";
 
 export function MessageInput({ onSend, replyToMessageId, onCancelReply }: MessageInputProps) {
-    const {
-        message,
-        textareaRef,
-        replyToMessage,
-        isAddingMessage,
-        handleSend,
-        handleKeyDown,
-        handleMessageChange,
-        placeholder
-    } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
+  const {
+    message,
+    textareaRef,
+    replyToMessage,
+    isAddingMessage,
+    handleSend,
+    handleKeyDown,
+    handleMessageChange,
+    placeholder,
+  } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
 
-    return (
-        <div className="bg-white dark:bg-background border-t border-slate-200/50 dark:border-slate-700/50">
-            {replyToMessage && (
-                <ReplyIndicator 
-                    replyToMessage={replyToMessage} 
-                    onCancelReply={onCancelReply} 
-                />
-            )}
+  return (
+    <div className="bg-white dark:bg-background border-t border-slate-200/50 dark:border-slate-700/50">
+      {replyToMessage && (
+        <ReplyIndicator replyToMessage={replyToMessage} onCancelReply={onCancelReply} />
+      )}
 
-            <Toolbar />
+      <Toolbar />
 
-            <div className="relative">
-                <InputArea
-                    message={message}
-                    onMessageChange={handleMessageChange}
-                    onKeyDown={handleKeyDown}
-                    placeholder={placeholder}
-                    disabled={isAddingMessage}
-                    textareaRef={textareaRef}
-                />
-                
-                <SendButton
-                    onSend={handleSend}
-                    disabled={!message.trim() || isAddingMessage}
-                    message={message}
-                />
-            </div>
-        </div>
-    );
+      <div className="relative">
+        <InputArea
+          message={message}
+          onMessageChange={handleMessageChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={isAddingMessage}
+          textareaRef={textareaRef}
+        />
+
+        <SendButton
+          onSend={handleSend}
+          disabled={!message.trim() || isAddingMessage}
+          message={message}
+        />
+      </div>
+    </div>
+  );
 }

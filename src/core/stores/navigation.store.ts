@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface NavigationState {
   targetPath: string | null;
@@ -7,9 +7,9 @@ interface NavigationState {
   setCurrentPath: (path: string) => void;
 }
 
-export const navigationStore = create<NavigationState>((set) => ({
+export const navigationStore = create<NavigationState>(set => ({
   targetPath: null,
-  currentPath: '/',
-  navigate: (path) => set({ targetPath: path }),
-  setCurrentPath: (path) => set({ currentPath: path }),
-})); 
+  currentPath: "/",
+  navigate: path => set({ targetPath: path }),
+  setCurrentPath: path => set({ currentPath: path }),
+}));

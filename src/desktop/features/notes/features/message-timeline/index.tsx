@@ -14,67 +14,61 @@ import { QuickSearchModal } from "@/common/features/note-search/components/quick
 import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 
 interface MessageTimelineFeatureProps {
-    className?: string;
+  className?: string;
 }
 
-export const MessageTimelineFeature = ({
-    className = ""
-}: MessageTimelineFeatureProps) => {
-    // Use unified timeline state management
-    const { chatActions } = useTimelineState();
+export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatureProps) => {
+  // Use unified timeline state management
+  const { chatActions } = useTimelineState();
 
-    // Get current channel for cover header
-    const currentChannel = useCurrentChannel();
+  // Get current channel for cover header
+  const currentChannel = useCurrentChannel();
 
-    const timelineContentRef = useRef<MessageTimelineRef>(null);
-    
-    // Get input collapsed state for conditional rendering
-    const { inputCollapsed } = useInputCollapse();
+  const timelineContentRef = useRef<MessageTimelineRef>(null);
 
-    // Render thought record function
-    const renderThoughtRecord = useCallback((message: Message, threadCount: number) => (
-        <ThoughtRecord message={message} threadCount={threadCount} />
-    ), []);
+  // Get input collapsed state for conditional rendering
+  const { inputCollapsed } = useInputCollapse();
 
-    // Create wrapper function for onSend to match MessageInput interface
-    const handleSendMessage = () => {
-        timelineContentRef.current?.scrollToBottom({ behavior: 'instant' });
-        chatActions.handleSend();
-    };
+  // Render thought record function
+  const renderThoughtRecord = useCallback(
+    (message: Message, threadCount: number) => (
+      <ThoughtRecord message={message} threadCount={threadCount} />
+    ),
+    []
+  );
 
+  // Create wrapper function for onSend to match MessageInput interface
+  const handleSendMessage = () => {
+    timelineContentRef.current?.scrollToBottom({ behavior: "instant" });
+    chatActions.handleSend();
+  };
 
-
-
-
-    return (
-        <div className={`relative w-full h-full ${className}`}>
-            {/* Timeline layout with content and actions */}
-            <TimelineLayout
-                channel={currentChannel || undefined}
-                onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
-                content={
-                    <div className="flex flex-1 flex-col min-h-0 relative">
-                        <TimelineContent
-                            ref={timelineContentRef}
-                            renderThoughtRecord={renderThoughtRecord}
-                        />
-                        <QuickSearchModal />
-                        <QuickSearchHotkey />
-                    </div>
-                }
-                actions={
-                    currentChannel && !inputCollapsed ? (
-                        <MessageInput
-                            onSend={handleSendMessage}
-                            replyToMessageId={chatActions.replyToMessageId ?? undefined}
-                            onCancelReply={chatActions.handleCancelReply}
-                        />
-                    ) : null
-                }
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      {/* Timeline layout with content and actions */}
+      <TimelineLayout
+        channel={currentChannel || undefined}
+        onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
+        content={
+          <div className="flex flex-1 flex-col min-h-0 relative">
+            <TimelineContent ref={timelineContentRef} renderThoughtRecord={renderThoughtRecord} />
+            <QuickSearchModal />
+            <QuickSearchHotkey />
+          </div>
+        }
+        actions={
+          currentChannel && !inputCollapsed ? (
+            <MessageInput
+              onSend={handleSendMessage}
+              replyToMessageId={chatActions.replyToMessageId ?? undefined}
+              onCancelReply={chatActions.handleCancelReply}
             />
+          ) : null
+        }
+      />
 
-            {/* Expanded editor overlay (isolated from parent re-renders) */}
-            <ExpandedEditorOverlayContainer />
-        </div>
-    );
+      {/* Expanded editor overlay (isolated from parent re-renders) */}
+      <ExpandedEditorOverlayContainer />
+    </div>
+  );
 };

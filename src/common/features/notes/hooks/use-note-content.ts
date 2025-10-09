@@ -1,8 +1,8 @@
-import React from 'react';
-import { channelMessageService } from '@/core/services/channel-message.service';
+import React from "react";
+import { channelMessageService } from "@/core/services/channel-message.service";
 
 export function useNoteContent(noteId: string, channelId: string) {
-  const [content, setContent] = React.useState<string>('');
+  const [content, setContent] = React.useState<string>("");
 
   React.useEffect(() => {
     if (!noteId || !channelId) return;
@@ -11,10 +11,9 @@ export function useNoteContent(noteId: string, channelId: string) {
       const note = channelState?.messages.find(msg => msg.id === noteId);
       if (note) setContent(note.content);
     } catch (err) {
-      console.error('Failed to fetch note content:', err);
+      console.error("Failed to fetch note content:", err);
     }
   }, [noteId, channelId]);
 
   return content;
 }
-

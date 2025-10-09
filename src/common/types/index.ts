@@ -11,8 +11,8 @@ export interface User {
 }
 
 export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
-  language: 'zh-CN' | 'en-US';
+  theme: "light" | "dark" | "system";
+  language: "zh-CN" | "en-US";
   notifications: boolean;
   autoSave: boolean;
 }
@@ -22,7 +22,7 @@ export interface Channel {
   id: string;
   name: string;
   description?: string;
-  type: 'personal' | 'group' | 'system';
+  type: "personal" | "group" | "system";
   createdAt: string;
   updatedAt: string;
 }
@@ -31,7 +31,7 @@ export interface Channel {
 export interface Message {
   id: string;
   content: string;
-  type: 'text' | 'image' | 'file' | 'voice' | 'code';
+  type: "text" | "image" | "file" | "voice" | "code";
   senderId: string;
   channelId: string;
   replyTo?: string; // ID of the message being replied to
@@ -65,7 +65,7 @@ export interface AIAssistant {
 export interface UIState {
   currentChannelId: string | null;
   sidebarOpen: boolean;
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   loading: boolean;
   error: string | null;
   modal: {
@@ -97,7 +97,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {
@@ -119,7 +119,7 @@ export interface AppEvent {
 
 // Storage types
 export interface StorageConfig {
-  type: 'local' | 'session' | 'indexeddb';
+  type: "local" | "session" | "indexeddb";
   key: string;
   defaultValue?: unknown;
-} 
+}

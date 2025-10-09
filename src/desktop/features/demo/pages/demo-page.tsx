@@ -1,51 +1,46 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { Button } from '@/common/components/ui/button';
-import { Badge } from '@/common/components/ui/badge';
-import { 
-  Bot, 
-  Clock, 
-  Brain,
-  Sparkles
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Button } from "@/common/components/ui/button";
+import { Badge } from "@/common/components/ui/badge";
+import { Bot, Clock, Brain, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const DemoPage: React.FC = () => {
   const navigate = useNavigate();
 
   const demoFeatures = [
     {
-      id: 'space-chat',
-      title: '空间感知AI聊天',
-      description: 'AI助手能够感知指定空间的所有记录，并基于上下文进行智能对话',
+      id: "space-chat",
+      title: "空间感知AI聊天",
+      description: "AI助手能够感知指定空间的所有记录，并基于上下文进行智能对话",
       icon: Brain,
-      color: 'bg-blue-500',
-      path: '/demo/space-chat'
+      color: "bg-blue-500",
+      path: "/demo/space-chat",
     },
     {
-      id: 'ai-object',
-      title: 'AI对象生成',
-      description: '使用AI生成各种类型的对象和数据',
+      id: "ai-object",
+      title: "AI对象生成",
+      description: "使用AI生成各种类型的对象和数据",
       icon: Bot,
-      color: 'bg-green-500',
-      path: '/demo/ai-object'
+      color: "bg-green-500",
+      path: "/demo/ai-object",
     },
     {
-      id: 'ai-quick-test',
-      title: 'AI快速测试',
-      description: '快速测试AI功能和响应',
+      id: "ai-quick-test",
+      title: "AI快速测试",
+      description: "快速测试AI功能和响应",
       icon: Sparkles,
-      color: 'bg-purple-500',
-      path: '/demo/ai-quick-test'
+      color: "bg-purple-500",
+      path: "/demo/ai-quick-test",
     },
     {
-      id: 'time-format',
-      title: '时间格式化',
-      description: '测试时间格式化和显示功能',
+      id: "time-format",
+      title: "时间格式化",
+      description: "测试时间格式化和显示功能",
       icon: Clock,
-      color: 'bg-orange-500',
-      path: '/demo/time-format'
-    }
+      color: "bg-orange-500",
+      path: "/demo/time-format",
+    },
   ];
 
   return (
@@ -58,7 +53,7 @@ export const DemoPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {demoFeatures.map((feature) => {
+        {demoFeatures.map(feature => {
           const Icon = feature.icon;
           return (
             <Card key={feature.id} className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -76,13 +71,8 @@ export const DemoPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  {feature.description}
-                </p>
-                <Button 
-                  onClick={() => navigate(feature.path)}
-                  className="w-full"
-                >
+                <p className="text-muted-foreground mb-4">{feature.description}</p>
+                <Button onClick={() => navigate(feature.path)} className="w-full">
                   开始体验
                 </Button>
               </CardContent>
@@ -100,4 +90,4 @@ export const DemoPage: React.FC = () => {
       </div>
     </div>
   );
-}; 
+};

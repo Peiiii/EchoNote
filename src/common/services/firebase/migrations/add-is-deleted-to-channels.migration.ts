@@ -17,10 +17,10 @@ export class AddIsDeletedToChannelsMigration implements MigrationExecutor {
     const channelsCollectionRef = collection(db, `users/${userId}/channels`);
     const channelsSnapshot = await getDocs(channelsCollectionRef);
     let migratedCount = 0;
-    
+
     for (const channelDoc of channelsSnapshot.docs) {
       const channelData = channelDoc.data();
-      
+
       // If the channel does not have the isDeleted field, add isDeleted: false
       if (channelData.isDeleted === undefined) {
         const channelRef = doc(channelsCollectionRef, channelDoc.id);
@@ -30,7 +30,7 @@ export class AddIsDeletedToChannelsMigration implements MigrationExecutor {
         migratedCount++;
       }
     }
-    
+
     // Only log if there were actual changes
     if (migratedCount > 0) {
       console.log(`   📊 Updated ${migratedCount} channels with isDeleted field`);

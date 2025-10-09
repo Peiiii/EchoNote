@@ -1,27 +1,43 @@
-
-
-
 import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
-import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
-import { isTempConversation, useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useCollectionDiff } from "@/common/lib/use-collection-diff";
+import {
+  isTempConversation,
+  useConversationStore,
+} from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AgentChatCore, UIMessage, useAgentSessionManager, useAgentSessionManagerState, useParseTools } from "@agent-labs/agent-chat";
+import {
+  AgentChatCore,
+  UIMessage,
+  useAgentSessionManager,
+  useAgentSessionManagerState,
+  useParseTools,
+} from "@agent-labs/agent-chat";
+import { useMemoizedFn } from "ahooks";
+import { isEqual } from "lodash-es";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { debounceTime } from "rxjs";
+import { useEffect, useMemo, useRef } from "react";
+import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
-
-import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { userId: _userId } = useNotesDataStore();
-  const { messages, createMessage, updateMessage, loading } = useConversationMessages(conversationId);
+  const { messages, createMessage, updateMessage, loading } =
+    useConversationMessages(conversationId);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
-  const isBrandNewConversation = !!conv && (conv.messageCount === 0);
+  const isBrandNewConversation = !!conv && conv.messageCount === 0;
   const showLoading = loading && !isBrandNewConversation;
+
+  // const resetKey = useValueFromObservable(() => conversationId$.pipe(distinctUntilChanged((a, b) => isTempConversation(a) ? true : a === b)), conversationId);
+  const lastConversationIdRef = useRef(conversationId);
+  const resetKey = useMemo(() => {
+    const lastConversationId = lastConversationIdRef.current;
+    if (lastConversationId === conversationId) return;
+    lastConversationIdRef.current = conversationId;
+    if (isTempConversation(lastConversationId)) return lastConversationId;
+    return conversationId;
+  }, [conversationId])
+
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
@@ -34,7 +50,7 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
           </div>
         ) : (
           <AgentChatCoreWrapper
-            key={conversationId}
+            key={resetKey}
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
@@ -55,8 +71,13 @@ interface AgentChatCoreWrapperProps {
   updateMessage: (message: UIMessage) => Promise<void>;
 }
 
-function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
-  const isTemp = isTempConversation(conversationId);
+function AgentChatCoreWrapper({
+  conversationId,
+  channelId,
+  messages,
+  createMessage,
+  updateMessage,
+}: AgentChatCoreWrapperProps) {
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => {
     return aiAgentFactory.getChannelTools();
@@ -66,67 +87,61 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
-    // Dynamic contexts: use conversation-bound contexts when available; fallback to current channel
     getContexts: () => aiAgentFactory.getSessionContexts(conversationId, channelId),
     initialMessages: messages,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
 
-  const [sessionMessages, setSessionMessages] = useState<UIMessage[]>(messages);
+  const memoizedCreateMessage = useMemoizedFn(createMessage);
+  const memoizedUpdateMessage = useMemoizedFn(updateMessage);
+
   useEffect(() => {
-    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
-      setSessionMessages(arr);
-      // Feed messages to store for auto-title evaluation (no AI call here; store handles policy)
+    const sub = agentSessionManager.addMessagesEvent$.subscribe(({ messages }) => {
+      messages.forEach(async m => {
+        memoizedCreateMessage(m);
+      });
+    });
+    return () => sub.unsubscribe();
+  }, [agentSessionManager.addMessagesEvent$, memoizedCreateMessage]);
+
+  useEffect(() => {
+    const sub = agentSessionManager.updateMessageEvent$
+      .pipe(
+        map(({ message }) => message),
+        groupBy(message => message.id),
+        mergeMap(group =>
+          group.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => isEqual(prev, curr))
+          )
+        )
+      )
+      .subscribe(message => {
+        memoizedUpdateMessage(message);
+      });
+
+    return () => sub.unsubscribe();
+  }, [agentSessionManager.updateMessageEvent$, memoizedUpdateMessage]);
+
+  useEffect(() => {
+    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe(arr => {
       useConversationStore.getState().onMessagesSnapshot(conversationId, arr);
     });
     return () => sub.unsubscribe();
   }, [agentSessionManager, conversationId]);
 
+  const inputExtensions = useMemo(
+    () => [
+      createModelSelectorExtension({
+        onModelChange: (modelId: string) => {
+          console.log("Model changed to:", modelId);
+        },
+      }),
+    ],
+    []
+  );
 
-  // Use a safe hash that ignores functions/cycles inside tool parts
-  const hash = (m: UIMessage) => safeHashMessage(m);
-  useCollectionDiff<UIMessage>({
-    items: sessionMessages,
-    getId: (m) => (m.id ? m.id : null),
-    hash,
-    onAdd: async (m) => {
-      console.log("[AgentChatCoreWrapper] onAdd", m);
-      await createMessage(m);
-    },
-    onUpdate: async (m) => {
-      console.log("[AgentChatCoreWrapper] onUpdate", m);
-      await updateMessage(m);
-    },
-    resetKey: conversationId,
-    debounceMs: 1000,
-  });
-
-  const { conversations } = useConversationState();
-  const autoTitleDoneMap = useConversationStore(s => s.autoTitleDone);
-  useEffect(() => {
-    if (autoTitleDoneMap && autoTitleDoneMap[conversationId]) return;
-    const conv = conversations.find(c => c.id === conversationId);
-    if (!conv) return;
-    // Ensure store sees initial static messages too
-    useConversationStore.getState().onMessagesSnapshot(conversationId, sessionMessages);
-  }, [conversations, sessionMessages, conversationId, autoTitleDoneMap]);
-
-  const inputExtensions = useMemo(() => [
-    createModelSelectorExtension({
-      onModelChange: (modelId: string) => {
-        console.log('Model changed to:', modelId);
-      }
-    })
-  ], []);
-
-  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager)
-
-  useEffect(() => {
-    if (isTemp) {
-      agentSessionManager.reset();
-      setSessionMessages([]);
-    }
-  }, [isTemp, agentSessionManager]);
+  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);
 
   return (
     <div className="h-full flex flex-col agent-chat-fullwidth">
@@ -141,15 +156,19 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
           promptsProps={{
             items: getChannelPrompts(channelId),
             onItemClick: ({ prompt }) => {
-              agentSessionManager.handleAddMessages([{
-                id: crypto.randomUUID(),
-                role: "user",
-                parts: [{
-                  type: "text",
-                  text: prompt,
-                }],
-              }]);
-            }
+              agentSessionManager.handleAddMessages([
+                {
+                  id: crypto.randomUUID(),
+                  role: "user",
+                  parts: [
+                    {
+                      type: "text",
+                      text: prompt,
+                    },
+                  ],
+                },
+              ]);
+            },
           }}
           inputExtensions={inputExtensions}
         />
@@ -183,6 +202,6 @@ function getChannelPrompts(_channelId: string) {
     {
       id: "prompt-6",
       prompt: "Suggestions for next week",
-    }
+    },
   ];
 }

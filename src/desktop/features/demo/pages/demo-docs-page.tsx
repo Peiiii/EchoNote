@@ -6,9 +6,7 @@ export function DemoDocsPage() {
       <div className="space-y-6">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Demo Documentation</h1>
-          <p className="text-muted-foreground">
-            Documentation page for demo extension
-          </p>
+          <p className="text-muted-foreground">Documentation page for demo extension</p>
         </div>
         <div className="p-4 border rounded">
           <p>Here you can find usage documentation and API references for the Demo extension</p>
@@ -16,4 +14,4 @@ export function DemoDocsPage() {
       </div>
     </PageContainer>
   );
-} 
+}

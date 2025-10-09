@@ -36,23 +36,23 @@ function generateTooltip(
   channelStates: Record<string, { loading?: boolean }>,
   getChannelName: (id: string) => string
 ): string {
-  if (channelIds.length === 0) return '';
-  
+  if (channelIds.length === 0) return "";
+
   const parts = channelIds.map(id => {
     const channelState = channelStates[id];
     const name = getChannelName(id);
-    const status = channelState?.loading ? 'loading' : 'ready';
+    const status = channelState?.loading ? "loading" : "ready";
     return `${name}(${status})`;
   });
-  
-  return parts.join(', ');
+
+  return parts.join(", ");
 }
 
 export function useContextStatus({
   conversationId,
   fallbackChannelId,
   contexts,
-  getChannelName
+  getChannelName,
 }: UseContextStatusProps) {
   const channelStates = channelMessageService.dataContainer.use();
   const { channels } = useNotesDataStore();
@@ -65,19 +65,19 @@ export function useContextStatus({
   const { anyLoading, tooltip } = useMemo(() => {
     const mode: ConversationContextMode = contexts ? contexts.mode : ConversationContextMode.AUTO;
     const channelIds = getChannelIds(mode, contexts, fallbackChannelId, channels);
-    
-    const loadingStates = channelIds.map(id => 
-      channelStates.messageByChannel[id]?.loading || false
+
+    const loadingStates = channelIds.map(
+      id => channelStates.messageByChannel[id]?.loading || false
     );
-    
+
     const anyLoading = loadingStates.some(loading => loading);
     const tooltip = generateTooltip(channelIds, channelStates.messageByChannel, getChannelName);
-    
+
     return { anyLoading, tooltip };
   }, [contexts, fallbackChannelId, channels, channelStates, getChannelName]);
 
   return {
     anyLoading,
-    tooltip
+    tooltip,
   };
 }

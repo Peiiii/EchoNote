@@ -1,22 +1,29 @@
-import { Tool } from '@agent-labs/agent-chat';
-import { GrepToolRenderer, GrepToolArgs, GrepToolResult, GrepMatchItem } from '@/common/features/agent-tools/renderers/grep-tool-renderer';
-import { localDataManager } from '@/common/features/note-search/services/local-data-manager.service';
-import type { Note, NoteFilters } from '@/common/features/note-search/search.types';
-import { firstValueFrom } from 'rxjs';
-import React from 'react';
+import { Tool } from "@agent-labs/agent-chat";
+import {
+  GrepToolRenderer,
+  GrepToolArgs,
+  GrepToolResult,
+  GrepMatchItem,
+} from "@/common/features/agent-tools/renderers/grep-tool-renderer";
+import { localDataManager } from "@/common/features/note-search/services/local-data-manager.service";
+import type { Note, NoteFilters } from "@/common/features/note-search/search.types";
+import { firstValueFrom } from "rxjs";
+import React from "react";
 // import { firebaseAuthService } from '@/common/services/firebase/firebase-auth.service';
 // import { firebaseNotesService } from '@/common/services/firebase/firebase-notes.service';
-import { useConversationStore } from '@/common/features/ai-assistant/stores/conversation.store';
-import { useNotesViewStore } from '@/core/stores/notes-view.store';
+import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 // Escape regex special characters for fixed string searches
 function escapeRegExp(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function buildMatcher(args: GrepToolArgs): { test: (text: string) => { matched: boolean; matchText?: string; index?: number } } {
-  const pattern = args.pattern ?? '';
-  const flags = args.ignoreCase ? 'i' : '';
+function buildMatcher(args: GrepToolArgs): {
+  test: (text: string) => { matched: boolean; matchText?: string; index?: number };
+} {
+  const pattern = args.pattern ?? "";
+  const flags = args.ignoreCase ? "i" : "";
 
   if (!pattern) {
     return { test: () => ({ matched: false }) };
@@ -68,32 +75,33 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
 
   // Build filters for initial note subset, respecting current context
   const filters: NoteFilters = {};
-  let scopeSource: 'args' | 'contexts:channels' | 'contexts:all' | 'currentChannel' | 'global' = 'global';
+  let scopeSource: "args" | "contexts:channels" | "contexts:all" | "currentChannel" | "global" =
+    "global";
 
   // Derive effective channels: args > conversation contexts > currentChannel > all
   let effectiveInclude: string[] | null = null; // null => all
   if (args.includeChannels && args.includeChannels.length > 0) {
     effectiveInclude = args.includeChannels;
-    scopeSource = 'args';
+    scopeSource = "args";
   } else {
     const convState = useConversationStore.getState();
     const convId = convState.currentConversationId;
     const conv = convState.conversations.find(c => c.id === convId);
     const mode = conv?.contexts?.mode;
-    if (mode === 'channels' && conv?.contexts?.channelIds && conv.contexts.channelIds.length > 0) {
+    if (mode === "channels" && conv?.contexts?.channelIds && conv.contexts.channelIds.length > 0) {
       effectiveInclude = conv.contexts.channelIds;
-      scopeSource = 'contexts:channels';
-    } else if (mode === 'all') {
+      scopeSource = "contexts:channels";
+    } else if (mode === "all") {
       effectiveInclude = null; // search all
-      scopeSource = 'contexts:all';
+      scopeSource = "contexts:all";
     } else {
       const { currentChannelId } = useNotesViewStore.getState();
       if (currentChannelId) {
         effectiveInclude = [currentChannelId];
-        scopeSource = 'currentChannel';
+        scopeSource = "currentChannel";
       } else {
         effectiveInclude = null;
-        scopeSource = 'global';
+        scopeSource = "global";
       }
     }
   }
@@ -115,7 +123,11 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
 
   let allNotes: Note[] = await firstValueFrom(localDataManager.getNotes(filters));
   // If index is empty (or target channels have no notes), try a quick refresh
-  if (allNotes.length === 0 || (args.includeChannels && args.includeChannels.every(cid => !allNotes.some(n => n.channelId === cid)))) {
+  if (
+    allNotes.length === 0 ||
+    (args.includeChannels &&
+      args.includeChannels.every(cid => !allNotes.some(n => n.channelId === cid)))
+  ) {
     try {
       if (args.includeChannels && args.includeChannels.length > 0) {
         for (const cid of args.includeChannels) {
@@ -146,11 +158,11 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
     if (scanned >= maxNotes) break;
     scanned++;
 
-    const content = note.content || '';
+    const content = note.content || "";
     if (!content) continue;
 
     const lines = content.split(/\r?\n/);
-    const contexts: GrepMatchItem['contexts'] = [];
+    const contexts: GrepMatchItem["contexts"] = [];
     let noteHasMatch = false;
 
     for (let i = 0; i < lines.length; i++) {
@@ -164,7 +176,8 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
         const before: string[] = [];
         const after: string[] = [];
         for (let b = Math.max(0, i - lineBefore); b < i; b++) before.push(lines[b]);
-        for (let a = i + 1; a <= Math.min(lines.length - 1, i + lineAfter); a++) after.push(lines[a]);
+        for (let a = i + 1; a <= Math.min(lines.length - 1, i + lineAfter); a++)
+          after.push(lines[a]);
 
         const matchText = args.onlyMatching && res.matchText ? res.matchText : line;
         contexts.push({ before, match: matchText, after, line: i + 1, offset: res.index });
@@ -180,7 +193,7 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
         matches.push({
           noteId: note.id,
           channelId: note.channelId,
-          timestamp: note.timestamp?.toLocaleString?.() || '',
+          timestamp: note.timestamp?.toLocaleString?.() || "",
           contexts,
         });
       }
@@ -204,7 +217,7 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
   if (args.countOnly) {
     // only summary
   } else if (args.listOnly) {
-    result.noteIds = matches.map((m) => m.noteId);
+    result.noteIds = matches.map(m => m.noteId);
   } else {
     result.matches = matches;
   }
@@ -214,45 +227,48 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
 
 export function createGrepTool(): Tool<GrepToolArgs, GrepToolResult> {
   return {
-    name: 'grepNotes',
+    name: "grepNotes",
     description:
-      'Search notes with grep-like semantics. Supports regex, case-insensitive, word boundary, context lines, and filtering by channel/tags/date.',
+      "Search notes with grep-like semantics. Supports regex, case-insensitive, word boundary, context lines, and filtering by channel/tags/date.",
     parameters: {
-      type: 'object',
+      type: "object",
       properties: {
-        pattern: { type: 'string', description: 'Search pattern (string or regex source when isRegex=true)' },
-        isRegex: { type: 'boolean' },
-        ignoreCase: { type: 'boolean' },
-        word: { type: 'boolean' },
-        fixedStrings: { type: 'boolean' },
-        before: { type: 'number' },
-        after: { type: 'number' },
-        context: { type: 'number' },
-        countOnly: { type: 'boolean' },
-        listOnly: { type: 'boolean' },
-        onlyMatching: { type: 'boolean' },
-        includeChannels: { type: 'array', items: { type: 'string' } },
-        excludeChannels: { type: 'array', items: { type: 'string' } },
-        tags: { type: 'array', items: { type: 'string' } },
-        sender: { type: 'string', enum: ['user', 'ai'] },
+        pattern: {
+          type: "string",
+          description: "Search pattern (string or regex source when isRegex=true)",
+        },
+        isRegex: { type: "boolean" },
+        ignoreCase: { type: "boolean" },
+        word: { type: "boolean" },
+        fixedStrings: { type: "boolean" },
+        before: { type: "number" },
+        after: { type: "number" },
+        context: { type: "number" },
+        countOnly: { type: "boolean" },
+        listOnly: { type: "boolean" },
+        onlyMatching: { type: "boolean" },
+        includeChannels: { type: "array", items: { type: "string" } },
+        excludeChannels: { type: "array", items: { type: "string" } },
+        tags: { type: "array", items: { type: "string" } },
+        sender: { type: "string", enum: ["user", "ai"] },
         dateRange: {
-          type: 'object',
+          type: "object",
           properties: {
-            start: { type: 'number' },
-            end: { type: 'number' },
+            start: { type: "number" },
+            end: { type: "number" },
           },
         },
-        maxMatches: { type: 'number' },
-        maxNotes: { type: 'number' },
-        snippetSize: { type: 'number' },
-        timeoutMs: { type: 'number' },
+        maxMatches: { type: "number" },
+        maxNotes: { type: "number" },
+        snippetSize: { type: "number" },
+        timeoutMs: { type: "number" },
       },
-      required: ['pattern'],
+      required: ["pattern"],
     },
-    execute: async (toolCallArgs) => {
+    execute: async toolCallArgs => {
       const result = await grepExecute(toolCallArgs as GrepToolArgs);
       return result;
     },
-    render: (invocation) => React.createElement(GrepToolRenderer, { invocation }),
+    render: invocation => React.createElement(GrepToolRenderer, { invocation }),
   };
 }

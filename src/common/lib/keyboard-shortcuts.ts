@@ -6,7 +6,7 @@
  * Check if the current platform is Mac
  */
 export const isMac = () => {
-  return navigator.platform.toUpperCase().includes('MAC');
+  return navigator.platform.toUpperCase().includes("MAC");
 };
 
 /**
@@ -23,7 +23,7 @@ export const isModifierKeyPressed = (event: KeyboardEvent | React.KeyboardEvent)
  * @returns The display symbol for the modifier key
  */
 export const getModifierKeySymbol = (): string => {
-  return isMac() ? '⌘' : 'Ctrl';
+  return isMac() ? "⌘" : "Ctrl";
 };
 
 /**
@@ -39,8 +39,8 @@ export const getShortcutText = (key: string): string => {
  * Common keyboard shortcuts
  */
 export const SHORTCUTS = {
-  SEND: getShortcutText('Enter'),
-  SAVE: getShortcutText('Enter'),
-  CANCEL: 'Esc',
-  SEARCH: getShortcutText('K'),
+  SEND: getShortcutText("Enter"),
+  SAVE: getShortcutText("Enter"),
+  CANCEL: "Esc",
+  SEARCH: getShortcutText("K"),
 } as const;

@@ -26,7 +26,7 @@ export function InlineEditor({
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Select only the updater to avoid subscribing to edit content changes here
-  const updateContent = useEditStateStore((s) => s.updateContent);
+  const updateContent = useEditStateStore(s => s.updateContent);
 
   useEditor({ textareaRef, updateContent, content });
 
@@ -82,7 +82,7 @@ export function InlineEditor({
         <textarea
           ref={textareaRef}
           value={localContent}
-          onChange={(e) => handleContentChange(e.target.value)}
+          onChange={e => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Edit your thought..."
           className="w-full min-h-[120px] max-h-[300px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"

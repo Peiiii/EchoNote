@@ -3,14 +3,30 @@ import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { Trash2, Archive, Filter, MessageSquare } from "lucide-react";
 import { useConversationState } from "../hooks/use-conversation-state";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/common/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from "@/common/components/ui/popover";
 import { useConversationStore } from "../stores/conversation.store";
 import { toast } from "sonner";
 
 import { useState } from "react";
 
-export function AIConversationList({ conversations, currentConversationId, loading }: ConversationListProps) {
-  const { selectConversation, deleteConversation, updateConversation, loadMoreConversations, hasMore, loadingMore } = useConversationState();
+export function AIConversationList({
+  conversations,
+  currentConversationId,
+  loading,
+}: ConversationListProps) {
+  const {
+    selectConversation,
+    deleteConversation,
+    updateConversation,
+    loadMoreConversations,
+    hasMore,
+    loadingMore,
+  } = useConversationState();
   const { userId } = useNotesDataStore();
   const deletingIds = useConversationStore(s => s.deletingIds);
   const showArchived = useConversationStore(s => s.showArchived);
@@ -25,7 +41,7 @@ export function AIConversationList({ conversations, currentConversationId, loadi
     if (!showArchived && c.isArchived) return false;
     if (!query) return true;
     const q = query.toLowerCase();
-    return (c.title || '').toLowerCase().includes(q);
+    return (c.title || "").toLowerCase().includes(q);
   });
 
   return (
@@ -49,14 +65,25 @@ export function AIConversationList({ conversations, currentConversationId, loadi
               <Filter className="w-4 h-4" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+          <PopoverContent
+            align="end"
+            sideOffset={6}
+            className="p-2 w-56"
+            onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => setShowArchived(!showArchived)}
               className="w-full h-8 px-3 rounded-md border bg-background text-sm flex items-center justify-between hover:bg-accent transition-colors"
             >
               <span>Show archived</span>
-              <span className={"inline-block w-4 h-4 rounded-sm border " + (showArchived ? 'bg-primary border-primary' : 'bg-background')}></span>
+              <span
+                className={
+                  "inline-block w-4 h-4 rounded-sm border " +
+                  (showArchived ? "bg-primary border-primary" : "bg-background")
+                }
+              ></span>
             </button>
           </PopoverContent>
         </Popover>
@@ -69,10 +96,10 @@ export function AIConversationList({ conversations, currentConversationId, loadi
           <div className="p-4 text-center text-muted-foreground">No conversations yet</div>
         ) : (
           <>
-            {filtered.map((c) => (
+            {filtered.map(c => (
               <div
                 key={c.id}
-                className={`group px-4 py-3 cursor-pointer hover:bg-accent/50 transition-colors ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
+                className={`group px-4 py-3 cursor-pointer hover:bg-accent/50 transition-colors ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? "opacity-50 pointer-events-none" : ""}`}
                 onClick={() => selectConversation(c.id)}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -85,17 +112,39 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                               value={draftTitle}
                               onChange={e => setDraftTitle(e.target.value)}
                               onKeyDown={e => {
-                                if (e.key === 'Enter') { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }
-                                if (e.key === 'Escape') { setEditingId(null); }
+                                if (e.key === "Enter") {
+                                  const t = draftTitle.trim();
+                                  if (t && userId) {
+                                    void updateConversation(userId, c.id, { title: t });
+                                  }
+                                  setEditingId(null);
+                                }
+                                if (e.key === "Escape") {
+                                  setEditingId(null);
+                                }
                               }}
-                              onBlur={() => { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }}
+                              onBlur={() => {
+                                const t = draftTitle.trim();
+                                if (t && userId) {
+                                  void updateConversation(userId, c.id, { title: t });
+                                }
+                                setEditingId(null);
+                              }}
                               className="h-7 px-2 rounded-sm border bg-background text-sm w-full"
                               autoFocus
                               onClick={e => e.stopPropagation()}
                             />
                           ) : (
-                            <span onDoubleClick={(e) => { e.stopPropagation(); setEditingId(c.id); setDraftTitle(c.title || ''); }}>
-                              {titleGeneratingMap[c.id] ? "Generating title..." : (c.title || "New Conversation")}
+                            <span
+                              onDoubleClick={e => {
+                                e.stopPropagation();
+                                setEditingId(c.id);
+                                setDraftTitle(c.title || "");
+                              }}
+                            >
+                              {titleGeneratingMap[c.id]
+                                ? "Generating title..."
+                                : c.title || "New Conversation"}
                             </span>
                           )}
                         </span>
@@ -104,7 +153,11 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                           <span className="text-xs text-muted-foreground/70">{c.messageCount}</span>
                         </div>
                       </div>
-                      {c.isArchived && <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Archived</span>}
+                      {c.isArchived && (
+                        <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          Archived
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {formatTimeForSocial(c.lastMessageAt)}
@@ -115,7 +168,16 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                       <button
                         type="button"
                         className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent/50 transition-colors"
-                        onClick={(e) => { e.stopPropagation(); if (!c.isArchived) { void updateConversation(userId, c.id, { isArchived: true }); toast.success('Conversation archived'); } else { void updateConversation(userId, c.id, { isArchived: false }); toast.success('Conversation restored'); } }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          if (!c.isArchived) {
+                            void updateConversation(userId, c.id, { isArchived: true });
+                            toast.success("Conversation archived");
+                          } else {
+                            void updateConversation(userId, c.id, { isArchived: false });
+                            toast.success("Conversation restored");
+                          }
+                        }}
                         aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
                       >
                         <Archive className="w-4 h-4" />
@@ -125,22 +187,36 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                           <button
                             type="button"
                             className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent/50 transition-colors"
-                            onClick={(e) => { e.stopPropagation(); }}
-                            onMouseDown={(e) => { e.stopPropagation(); }}
-                            onKeyDown={(e) => { e.stopPropagation(); }}
+                            onClick={e => {
+                              e.stopPropagation();
+                            }}
+                            onMouseDown={e => {
+                              e.stopPropagation();
+                            }}
+                            onKeyDown={e => {
+                              e.stopPropagation();
+                            }}
                             aria-label="Delete conversation"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                        <PopoverContent
+                          align="end"
+                          sideOffset={6}
+                          className="p-2 w-56"
+                          onClick={e => e.stopPropagation()}
+                          onMouseDown={e => e.stopPropagation()}
+                        >
                           <div className="text-sm mb-2">Delete this conversation?</div>
                           <div className="flex justify-end gap-2">
                             <PopoverClose asChild>
                               <button
                                 type="button"
                                 className="h-8 px-3 rounded-md text-sm border hover:bg-accent"
-                                onClick={(e) => { e.stopPropagation(); }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                }}
                               >
                                 Cancel
                               </button>
@@ -149,7 +225,12 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                               <button
                                 type="button"
                                 className="h-8 px-3 rounded-md text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={(e) => { e.stopPropagation(); void deleteConversation(userId, c.id).then(() => toast.success('Conversation deleted')).catch(() => toast.error('Delete failed')); }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  void deleteConversation(userId, c.id)
+                                    .then(() => toast.success("Conversation deleted"))
+                                    .catch(() => toast.error("Delete failed"));
+                                }}
                               >
                                 Delete
                               </button>
@@ -168,9 +249,11 @@ export function AIConversationList({ conversations, currentConversationId, loadi
                   type="button"
                   className="w-full h-9 px-4 rounded-lg text-sm border bg-background hover:bg-accent disabled:opacity-60 transition-colors"
                   disabled={loadingMore}
-                  onClick={() => { void loadMoreConversations(userId); }}
+                  onClick={() => {
+                    void loadMoreConversations(userId);
+                  }}
                 >
-                  {loadingMore ? 'Loading…' : 'Load more'}
+                  {loadingMore ? "Loading…" : "Load more"}
                 </button>
               </div>
             )}

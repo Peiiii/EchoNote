@@ -32,13 +32,16 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const confirm = useCallback((options: Omit<ModalOptions, 'content'>) => {
-    show({
-      ...options,
-      okText: options.okText ?? 'Confirm',
-      cancelText: options.cancelText ?? 'Cancel',
-    });
-  }, [show]);
+  const confirm = useCallback(
+    (options: Omit<ModalOptions, "content">) => {
+      show({
+        ...options,
+        okText: options.okText ?? "Confirm",
+        cancelText: options.cancelText ?? "Cancel",
+      });
+    },
+    [show]
+  );
 
   const handleOk = async () => {
     try {
@@ -48,7 +51,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
         return { ...prev, isOpen: false };
       });
     } catch (error) {
-      console.error('Modal onOk error:', error);
+      console.error("Modal onOk error:", error);
     }
   };
 
@@ -79,15 +82,13 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
           {state.options.showFooter !== false && (
             <DialogFooter>
               <Button variant="outline" onClick={handleCancel}>
-                {state.options.cancelText ?? 'Cancel'}
+                {state.options.cancelText ?? "Cancel"}
               </Button>
-              <Button onClick={handleOk}>
-                {state.options.okText ?? 'Confirm'}
-              </Button>
+              <Button onClick={handleOk}>{state.options.okText ?? "Confirm"}</Button>
             </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
     </ModalContext.Provider>
   );
-} 
+}

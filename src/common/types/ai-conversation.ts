@@ -1,9 +1,9 @@
 // Conversation context config for dynamic binding to channels
 export enum ConversationContextMode {
-  NONE = 'none',
-  CHANNELS = 'channels', 
-  ALL = 'all',
-  AUTO = 'auto'
+  NONE = "none",
+  CHANNELS = "channels",
+  ALL = "all",
+  AUTO = "auto",
 }
 
 export interface ConversationContextConfig {
@@ -26,12 +26,12 @@ export interface AIConversation {
   contexts?: ConversationContextConfig | null;
 }
 
-export type UIMessage = import('@agent-labs/agent-chat').UIMessage;
+export type UIMessage = import("@agent-labs/agent-chat").UIMessage;
 
 export interface MessageListOptions {
   limit?: number;
   offset?: number;
-  orderBy?: 'asc' | 'desc';
+  orderBy?: "asc" | "desc";
   startAfter?: string;
   endBefore?: string;
 }

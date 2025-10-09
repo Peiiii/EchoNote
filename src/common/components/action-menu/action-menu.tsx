@@ -27,13 +27,13 @@ export function ActionMenu({
   align = "end",
   sideOffset = 4,
   width = "md",
-  alwaysVisible = false
+  alwaysVisible = false,
 }: ActionMenuProps) {
   const widthClasses = {
     sm: "w-44",
-    md: "w-52", 
+    md: "w-52",
     lg: "w-60",
-    xl: "w-72"
+    xl: "w-72",
   };
 
   const defaultTrigger = (
@@ -56,10 +56,8 @@ export function ActionMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {trigger || defaultTrigger}
-      </DropdownMenuTrigger>
-      
+      <DropdownMenuTrigger asChild>{trigger || defaultTrigger}</DropdownMenuTrigger>
+
       <DropdownMenuContent
         align={align}
         className={cn(

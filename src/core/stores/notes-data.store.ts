@@ -68,12 +68,18 @@ export interface NotesDataState {
   // Actions
   setChannelsLoading: (loading: boolean) => void;
   addChannel: (channel: Omit<Channel, "id" | "createdAt" | "messageCount">) => Promise<void>;
-  updateChannel: (channelId: string, updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>) => Promise<void>;
+  updateChannel: (
+    channelId: string,
+    updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
+  ) => Promise<void>;
   deleteChannel: (channelId: string) => Promise<void>;
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
   deleteMessage: (messageId: string, hardDelete?: boolean) => Promise<void>;
   updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
-  addThreadMessage: (parentMessageId: string, message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">) => Promise<void>;
+  addThreadMessage: (
+    parentMessageId: string,
+    message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">
+  ) => Promise<void>;
   restoreMessage: (messageId: string) => Promise<void>;
   permanentDeleteMessage: (messageId: string) => Promise<void>;
 
@@ -82,9 +88,9 @@ export interface NotesDataState {
   addChannelMessage: (channelId: string, message: Message) => void;
   setChannelLoading: (channelId: string, loading: boolean) => void;
   setChannelHasMore: (channelId: string, hasMore: boolean) => void;
-          setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
-        clearChannelMessages: (channelId: string) => void;
-        removeChannelMessage: (channelId: string, messageId: string) => void;
+  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
+  clearChannelMessages: (channelId: string) => void;
+  removeChannelMessage: (channelId: string, messageId: string) => void;
 
   // Firebase integration
   initFirebaseListeners: (userId: string) => Promise<void>;
@@ -94,14 +100,18 @@ export interface NotesDataState {
 }
 
 // Utility functions to reduce code duplication
-const withUserValidation = <T extends unknown[]>(fn: (userId: string, ...args: T) => Promise<void>) => 
+const withUserValidation =
+  <T extends unknown[]>(fn: (userId: string, ...args: T) => Promise<void>) =>
   async (...args: T): Promise<void> => {
     const { userId } = useNotesDataStore.getState();
     if (!userId) return;
     await fn(userId, ...args);
   };
 
-const withErrorHandling = async <T>(operation: () => Promise<T>, operationName: string): Promise<T | void> => {
+const withErrorHandling = async <T>(
+  operation: () => Promise<T>,
+  operationName: string
+): Promise<T | void> => {
   try {
     return await operation();
   } catch (error) {
@@ -131,29 +141,29 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     };
     const newId = await withErrorHandling(
       () => firebaseNotesService.createChannel(userId, finalChannel),
-      'createChannel'
+      "createChannel"
     );
     // Auto-select the newly created channel if available
-    if (typeof newId === 'string' && newId) {
+    if (typeof newId === "string" && newId) {
       try {
         useNotesViewStore.getState().setCurrentChannel(newId);
       } catch (err) {
-        console.warn('[addChannel] Failed to set current channel after creation', err);
+        console.warn("[addChannel] Failed to set current channel after creation", err);
       }
     }
   }),
 
   updateChannel: withUserValidation(async (userId, channelId, updates) => {
     const { channels } = get();
-    const updatedChannels = channels.map((channel) =>
+    const updatedChannels = channels.map(channel =>
       channel.id === channelId ? { ...channel, ...updates } : channel
     );
-    
+
     set({ channels: updatedChannels });
-    
+
     await withErrorHandling(
       () => firebaseNotesService.updateChannel(userId, channelId, updates),
-      'updateChannel'
+      "updateChannel"
     );
   }),
 
@@ -161,49 +171,49 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     // 调用 Firebase 服务删除 channel
     await withErrorHandling(
       () => firebaseNotesService.deleteChannel(userId, channelId),
-      'deleteChannel'
+      "deleteChannel"
     );
-    
+
     // 更新本地 store 状态
     const { channels, messagesByChannel } = get();
-    
+
     // 从 channels 数组中移除被删除的 channel
     const updatedChannels = channels.filter(channel => channel.id !== channelId);
     set({ channels: updatedChannels });
-    
+
     // 从 messagesByChannel 中移除被删除 channel 的消息
     const { [channelId]: removedChannel, ...remainingChannels } = messagesByChannel;
     set({ messagesByChannel: remainingChannels });
-    
-    console.log('🔔 [deleteChannel] 成功删除 channel 并更新本地状态', { 
-      channelId, 
+
+    console.log("🔔 [deleteChannel] 成功删除 channel 并更新本地状态", {
+      channelId,
       remainingChannelsCount: Object.keys(remainingChannels).length,
-      removedChannelMessageCount: removedChannel?.messages?.length || 0
+      removedChannelMessageCount: removedChannel?.messages?.length || 0,
     });
   }),
 
   addMessage: withUserValidation(async (userId, message) => {
     await withErrorHandling(
       () => firebaseNotesService.createMessage(userId, message),
-      'createMessage'
+      "createMessage"
     );
   }),
 
   deleteMessage: withUserValidation(async (userId, messageId, hardDelete = false) => {
-    const operation = hardDelete 
+    const operation = hardDelete
       ? () => firebaseNotesService.deleteMessage(userId, messageId)
       : () => firebaseNotesService.softDeleteMessage(userId, messageId);
-    
-    await withErrorHandling(operation, hardDelete ? 'deleteMessage' : 'softDeleteMessage');
-    
+
+    await withErrorHandling(operation, hardDelete ? "deleteMessage" : "softDeleteMessage");
+
     // 更新本地store状态 - 修复逻辑：遍历所有channel找到包含该消息的channel
     const { messagesByChannel } = get();
-    console.log('🔔 [deleteMessage] 开始查找消息', { messageId, messagesByChannel });
-    
+    console.log("🔔 [deleteMessage] 开始查找消息", { messageId, messagesByChannel });
+
     for (const [channelId, channelState] of Object.entries(messagesByChannel)) {
       const messageExists = channelState.messages.some(msg => msg.id === messageId);
       if (messageExists) {
-        console.log('🔔 [deleteMessage] 找到消息，准备删除', { channelId, messageId });
+        console.log("🔔 [deleteMessage] 找到消息，准备删除", { channelId, messageId });
         get().removeChannelMessage(channelId, messageId);
         break; // 找到后立即退出循环
       }
@@ -213,32 +223,33 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   updateMessage: withUserValidation(async (userId, messageId, updates) => {
     await withErrorHandling(
       () => firebaseNotesService.updateMessage(userId, messageId, updates),
-      'updateMessage'
+      "updateMessage"
     );
   }),
 
   addThreadMessage: withUserValidation(async (userId, parentMessageId, message) => {
     await withErrorHandling(
-      () => firebaseNotesService.createMessage(userId, {
-        ...message,
-        parentId: parentMessageId,
-        threadId: parentMessageId,
-      }),
-      'createThreadMessage'
+      () =>
+        firebaseNotesService.createMessage(userId, {
+          ...message,
+          parentId: parentMessageId,
+          threadId: parentMessageId,
+        }),
+      "createThreadMessage"
     );
   }),
 
   restoreMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
       () => firebaseNotesService.restoreMessage(userId, messageId),
-      'restoreMessage'
+      "restoreMessage"
     );
   }),
 
   permanentDeleteMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
       () => firebaseNotesService.deleteMessage(userId, messageId),
-      'permanentDeleteMessage'
+      "permanentDeleteMessage"
     );
   }),
 
@@ -250,9 +261,9 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
         [channelId]: {
           ...state.messagesByChannel[channelId],
           messages,
-          loading: false
-        }
-      }
+          loading: false,
+        },
+      },
     }));
   },
 
@@ -264,20 +275,23 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       // ✅ 新增：检查消息是否已存在，防止重复添加
       const messageExists = currentChannel.messages.some(msg => msg.id === message.id);
       if (messageExists) {
-        console.log('🔔 [addChannelMessage] 消息已存在，跳过添加', { messageId: message.id, channelId });
+        console.log("🔔 [addChannelMessage] 消息已存在，跳过添加", {
+          messageId: message.id,
+          channelId,
+        });
         return state; // 消息已存在，不重复添加
       }
 
-      console.log('🔔 [addChannelMessage] 添加新消息', { messageId: message.id, channelId });
+      console.log("🔔 [addChannelMessage] 添加新消息", { messageId: message.id, channelId });
 
       return {
         messagesByChannel: {
           ...state.messagesByChannel,
           [channelId]: {
             ...currentChannel,
-            messages: [...currentChannel.messages, message]
-          }
-        }
+            messages: [...currentChannel.messages, message],
+          },
+        },
       };
     });
   },
@@ -288,9 +302,9 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
         ...state.messagesByChannel,
         [channelId]: {
           ...state.messagesByChannel[channelId],
-          loading
-        }
-      }
+          loading,
+        },
+      },
     }));
   },
 
@@ -300,9 +314,9 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
         ...state.messagesByChannel,
         [channelId]: {
           ...state.messagesByChannel[channelId],
-          hasMore
-        }
-      }
+          hasMore,
+        },
+      },
     }));
   },
 
@@ -312,9 +326,9 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
         ...state.messagesByChannel,
         [channelId]: {
           ...state.messagesByChannel[channelId],
-          lastVisible
-        }
-      }
+          lastVisible,
+        },
+      },
     }));
   },
 
@@ -333,22 +347,22 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       if (!currentChannel) return state;
 
       const updatedMessages = currentChannel.messages.filter(msg => msg.id !== messageId);
-      
-      console.log('🔔 [removeChannelMessage]', { 
-        channelId, 
-        messageId, 
-        beforeCount: currentChannel.messages.length, 
-        afterCount: updatedMessages.length 
+
+      console.log("🔔 [removeChannelMessage]", {
+        channelId,
+        messageId,
+        beforeCount: currentChannel.messages.length,
+        afterCount: updatedMessages.length,
       });
-      
+
       return {
         messagesByChannel: {
           ...state.messagesByChannel,
           [channelId]: {
             ...currentChannel,
-            messages: updatedMessages
-          }
-        }
+            messages: updatedMessages,
+          },
+        },
       };
     });
   },
@@ -361,60 +375,56 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
     await withErrorHandling(async () => {
       await firebaseMigrateService.runAllMigrations(userId);
-    }, 'runMigrations');
+    }, "runMigrations");
 
-    const unsubscribeChannels = firebaseNotesService.subscribeToChannels(
-      userId,
-      (channels) => {
-        const { isListenerEnabled } = get();
-        if (!isListenerEnabled) return;
-        set({ channels, channelsLoading: false });
-        
-        get().validateAndCleanupCurrentChannel(channels);
-      }
-    );
+    const unsubscribeChannels = firebaseNotesService.subscribeToChannels(userId, channels => {
+      const { isListenerEnabled } = get();
+      if (!isListenerEnabled) return;
+      set({ channels, channelsLoading: false });
+
+      get().validateAndCleanupCurrentChannel(channels);
+    });
 
     set({ unsubscribeChannels });
   },
 
-          cleanupListeners: () => {
-          const { unsubscribeChannels } = get();
-          if (unsubscribeChannels) {
-            unsubscribeChannels();
-          }
-          set({
-            unsubscribeChannels: null,
-            channels: [],
-            channelsLoading: true, // Keep loading state when not authenticated
-            userId: null,
-            messagesByChannel: {}, // Clear channel messages when cleaning up
-          });
-        },
+  cleanupListeners: () => {
+    const { unsubscribeChannels } = get();
+    if (unsubscribeChannels) {
+      unsubscribeChannels();
+    }
+    set({
+      unsubscribeChannels: null,
+      channels: [],
+      channelsLoading: true, // Keep loading state when not authenticated
+      userId: null,
+      messagesByChannel: {}, // Clear channel messages when cleaning up
+    });
+  },
 
   fetchInitialData: async (userId: string) => {
     set({ channelsLoading: true });
     await withErrorHandling(async () => {
       const channels = await firebaseNotesService.fetchChannels(userId);
-        set({ channels, channelsLoading: false });
-        
-        get().validateAndCleanupCurrentChannel(channels);
-    }, 'fetchChannels');
+      set({ channels, channelsLoading: false });
+
+      get().validateAndCleanupCurrentChannel(channels);
+    }, "fetchChannels");
   },
 
   validateAndCleanupCurrentChannel: (channels: Channel[]) => {
     const currentChannelId = useNotesViewStore.getState().currentChannelId;
-    
+
     if (!currentChannelId) return;
-    
+
     const channelExists = channels.some(channel => channel.id === currentChannelId);
-    
+
     if (!channelExists) {
-      
       useNotesViewStore.getState().setCurrentChannel(null);
-      
+
       const channelStateControl = channelMessageService.getChannelStateControl(currentChannelId);
       channelStateControl.clearChannel();
-      
+
       get().clearChannelMessages(currentChannelId);
     }
   },

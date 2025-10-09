@@ -1,10 +1,13 @@
-import { ReactNode, createContext, useContext, useState, ButtonHTMLAttributes, forwardRef } from "react";
-import { cn } from "@/common/lib/utils";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/common/components/ui/popover";
+  ReactNode,
+  createContext,
+  useContext,
+  useState,
+  ButtonHTMLAttributes,
+  forwardRef,
+} from "react";
+import { cn } from "@/common/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 
 // Context for internal communication
 interface RefinedPopoverContextType {
@@ -36,20 +39,15 @@ interface RefinedPopoverProps {
   modal?: boolean;
 }
 
-const RefinedPopoverRoot = ({
-  children,
-  open,
-  onOpenChange,
-  modal
-}: RefinedPopoverProps) => {
+const RefinedPopoverRoot = ({ children, open, onOpenChange, modal }: RefinedPopoverProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
-  
+
   const isOpen = open !== undefined ? open : internalOpen;
   const handleOpenChange = onOpenChange || setInternalOpen;
 
   const contextValue: RefinedPopoverContextType = {
     isOpen,
-    onOpenChange: handleOpenChange
+    onOpenChange: handleOpenChange,
   };
 
   return (
@@ -68,14 +66,7 @@ interface RefinedPopoverHeaderProps {
 }
 
 const RefinedPopoverHeader = ({ children, className = "" }: RefinedPopoverHeaderProps) => {
-  return (
-    <div className={cn(
-      "flex items-center gap-2.5 mb-5",
-      className
-    )}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex items-center gap-2.5 mb-5", className)}>{children}</div>;
 };
 
 // Content component
@@ -85,11 +76,7 @@ interface RefinedPopoverContentProps {
 }
 
 const RefinedPopoverContent = ({ children, className = "" }: RefinedPopoverContentProps) => {
-  return (
-    <div className={cn("space-y-4", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("space-y-4", className)}>{children}</div>;
 };
 
 // Actions component
@@ -99,11 +86,7 @@ interface RefinedPopoverActionsProps {
 }
 
 const RefinedPopoverActions = ({ children, className = "" }: RefinedPopoverActionsProps) => {
-  return (
-    <div className={cn("flex justify-end gap-2.5 pt-3 mt-2", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex justify-end gap-2.5 pt-3 mt-2", className)}>{children}</div>;
 };
 
 // Trigger component
@@ -117,17 +100,18 @@ interface RefinedPopoverButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
 
 const RefinedPopoverButton = forwardRef<HTMLButtonElement, RefinedPopoverButtonProps>(
   ({ className, variant = "default", size = "md", ...props }, ref) => {
-    const baseClasses = "h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium flex items-center justify-center";
-    
+    const baseClasses =
+      "h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium flex items-center justify-center";
+
     const variantClasses = {
       default: "bg-primary text-primary-foreground hover:bg-primary/90",
       outline: "text-muted-foreground hover:text-foreground hover:bg-accent/30",
-      ghost: "text-muted-foreground hover:text-foreground hover:bg-accent/30"
+      ghost: "text-muted-foreground hover:text-foreground hover:bg-accent/30",
     };
-    
+
     const sizeClasses = {
       sm: "h-7 px-3 text-xs",
-      md: "h-8 px-4 text-sm"
+      md: "h-8 px-4 text-sm",
     };
 
     return (
@@ -159,17 +143,17 @@ interface RefinedPopoverContentWrapperProps {
   onInteractOutside?: (e: Event) => void;
 }
 
-const RefinedPopoverContentWrapper = ({ 
-  children, 
+const RefinedPopoverContentWrapper = ({
+  children,
   width = "w-80",
   className = "",
   align = "center",
   side = "bottom",
   sideOffset = 6,
-  onInteractOutside
+  onInteractOutside,
 }: RefinedPopoverContentWrapperProps) => {
   return (
-    <PopoverContent 
+    <PopoverContent
       className={cn(
         width,
         "p-4 border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-popover text-popover-foreground rounded-xl overflow-hidden max-w-[90vw] max-h-[70vh] mr-4 sm:mr-0",

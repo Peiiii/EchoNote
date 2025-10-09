@@ -12,10 +12,12 @@ Input Extensions 是 `@agent-labs/agent-chat` 库的核心扩展系统，允许�
 
 ```typescript
 interface ChatInputExtension {
-  id: string                                    // 唯一标识符
-  placement?: ChatInputExtensionPlacement       // 扩展位置
-  render: (ctx: ChatInputExtensionContext) => React.ReactNode  // 渲染函数
-  beforeSend?: (draft: ComposerDraft) => Promise<ComposerDraft | { abort: true }> | ComposerDraft | { abort: true }  // 发送前处理
+  id: string; // 唯一标识符
+  placement?: ChatInputExtensionPlacement; // 扩展位置
+  render: (ctx: ChatInputExtensionContext) => React.ReactNode; // 渲染函数
+  beforeSend?: (
+    draft: ComposerDraft
+  ) => Promise<ComposerDraft | { abort: true }> | ComposerDraft | { abort: true }; // 发送前处理
 }
 ```
 
@@ -25,16 +27,16 @@ interface ChatInputExtension {
 
 ```typescript
 type ChatInputExtensionPlacement =
-  | 'inside-left'      // 输入框内部左侧（适合简单图标）
-  | 'inside-right'     // 输入框内部右侧（靠近发送按钮）
-  | 'top-left'         // 头部工具栏左侧（适合工具按钮）
-  | 'top-right'        // 头部工具栏右侧
-  | 'bottom-left'      // 底部工具栏左侧（适合模型选择）
-  | 'bottom-right'     // 底部工具栏右侧（适合计数器、成本显示）
-  | 'below'            // 输入框下方（已废弃，映射到bottom-left）
-  | 'above'            // 输入框上方（已废弃）
-  | 'toolbar-left'     // 工具栏左侧（已废弃，映射到top-left）
-  | 'toolbar-right'    // 工具栏右侧（已废弃，映射到top-right）
+  | "inside-left" // 输入框内部左侧（适合简单图标）
+  | "inside-right" // 输入框内部右侧（靠近发送按钮）
+  | "top-left" // 头部工具栏左侧（适合工具按钮）
+  | "top-right" // 头部工具栏右侧
+  | "bottom-left" // 底部工具栏左侧（适合模型选择）
+  | "bottom-right" // 底部工具栏右侧（适合计数器、成本显示）
+  | "below" // 输入框下方（已废弃，映射到bottom-left）
+  | "above" // 输入框上方（已废弃）
+  | "toolbar-left" // 工具栏左侧（已废弃，映射到top-left）
+  | "toolbar-right"; // 工具栏右侧（已废弃，映射到top-right）
 ```
 
 ### 扩展上下文 (Context)
@@ -43,10 +45,10 @@ type ChatInputExtensionPlacement =
 
 ```typescript
 interface ChatInputExtensionContext {
-  draft: ComposerDraft                    // 当前输入草稿
-  setDraft: (next: ComposerDraft | ((d: ComposerDraft) => ComposerDraft)) => void  // 更新草稿
-  isAgentResponding: boolean             // 是否正在响应
-  requestAbort?: () => void              // 请求中止函数
+  draft: ComposerDraft; // 当前输入草稿
+  setDraft: (next: ComposerDraft | ((d: ComposerDraft) => ComposerDraft)) => void; // 更新草稿
+  isAgentResponding: boolean; // 是否正在响应
+  requestAbort?: () => void; // 请求中止函数
 }
 ```
 
@@ -56,8 +58,8 @@ interface ChatInputExtensionContext {
 
 ```typescript
 interface ComposerDraft {
-  text: string                           // 输入文本
-  meta?: Record<string, unknown>         // 元数据（如模型ID、文件等）
+  text: string; // 输入文本
+  meta?: Record<string, unknown>; // 元数据（如模型ID、文件等）
 }
 ```
 
@@ -120,16 +122,17 @@ export const createMyExtension = (props: MyExtensionProps): ChatInputExtension =
 ### 语音输入扩展
 
 ```typescript
-import { createVoiceInputExtension } from './extensions'
+import { createVoiceInputExtension } from "./extensions";
 
 const voiceExtension = createVoiceInputExtension({
-  onVoiceResult: (text) => {
-    console.log('语音识别结果:', text)
-  }
-})
+  onVoiceResult: text => {
+    console.log("语音识别结果:", text);
+  },
+});
 ```
 
 **功能特性：**
+
 - 支持浏览器原生语音录制
 - 自动处理权限请求
 - 可自定义回调函数
@@ -138,18 +141,19 @@ const voiceExtension = createVoiceInputExtension({
 ### 文件上传扩展
 
 ```typescript
-import { createFileUploadExtension } from './extensions'
+import { createFileUploadExtension } from "./extensions";
 
 const fileExtension = createFileUploadExtension({
-  maxFileSize: 10 * 1024 * 1024,  // 10MB
-  acceptedFileTypes: ['image/*', '.pdf', '.txt'],
-  onFileUpload: (files) => {
-    console.log('上传文件:', files)
-  }
-})
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  acceptedFileTypes: ["image/*", ".pdf", ".txt"],
+  onFileUpload: files => {
+    console.log("上传文件:", files);
+  },
+});
 ```
 
 **功能特性：**
+
 - 支持拖拽上传
 - 文件类型和大小限制
 - 多文件选择
@@ -158,16 +162,17 @@ const fileExtension = createFileUploadExtension({
 ### 表情选择扩展
 
 ```typescript
-import { createEmojiExtension } from './extensions'
+import { createEmojiExtension } from "./extensions";
 
 const emojiExtension = createEmojiExtension({
-  onEmojiSelect: (emoji) => {
-    console.log('选择表情:', emoji)
-  }
-})
+  onEmojiSelect: emoji => {
+    console.log("选择表情:", emoji);
+  },
+});
 ```
 
 **功能特性：**
+
 - 内置常用表情
 - 点击插入到输入框
 - 可自定义表情列表
@@ -273,13 +278,13 @@ const robustExtension: ChatInputExtension = {
 
 ```typescript
 interface MyExtensionProps {
-  onAction: (value: string) => void
-  className?: string
+  onAction: (value: string) => void;
+  className?: string;
 }
 
 export const createMyExtension = (props: MyExtensionProps): ChatInputExtension => {
   // 实现
-}
+};
 ```
 
 ## 常见问题
@@ -312,25 +317,25 @@ A: 在扩展组件中使用 `className` 属性，或者使用内联样式。
 
 ### ChatInputExtension
 
-| 属性 | 类型 | 必需 | 描述 |
-|------|------|------|------|
-| `id` | `string` | ✅ | 扩展唯一标识符 |
-| `placement` | `ChatInputExtensionPlacement` | ❌ | 扩展位置，默认为 `bottom-left` |
-| `render` | `(ctx: ChatInputExtensionContext) => React.ReactNode` | ✅ | 渲染函数 |
-| `beforeSend` | `(draft: ComposerDraft) => Promise<ComposerDraft \| { abort: true }> \| ComposerDraft \| { abort: true }` | ❌ | 发送前处理函数 |
+| 属性         | 类型                                                                                                      | 必需 | 描述                           |
+| ------------ | --------------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| `id`         | `string`                                                                                                  | ✅   | 扩展唯一标识符                 |
+| `placement`  | `ChatInputExtensionPlacement`                                                                             | ❌   | 扩展位置，默认为 `bottom-left` |
+| `render`     | `(ctx: ChatInputExtensionContext) => React.ReactNode`                                                     | ✅   | 渲染函数                       |
+| `beforeSend` | `(draft: ComposerDraft) => Promise<ComposerDraft \| { abort: true }> \| ComposerDraft \| { abort: true }` | ❌   | 发送前处理函数                 |
 
 ### ChatInputExtensionContext
 
-| 属性 | 类型 | 描述 |
-|------|------|------|
-| `draft` | `ComposerDraft` | 当前输入草稿 |
-| `setDraft` | `(next: ComposerDraft \| ((d: ComposerDraft) => ComposerDraft)) => void` | 更新草稿函数 |
-| `isAgentResponding` | `boolean` | 是否正在响应 |
-| `requestAbort` | `() => void` | 请求中止函数（可选） |
+| 属性                | 类型                                                                     | 描述                 |
+| ------------------- | ------------------------------------------------------------------------ | -------------------- |
+| `draft`             | `ComposerDraft`                                                          | 当前输入草稿         |
+| `setDraft`          | `(next: ComposerDraft \| ((d: ComposerDraft) => ComposerDraft)) => void` | 更新草稿函数         |
+| `isAgentResponding` | `boolean`                                                                | 是否正在响应         |
+| `requestAbort`      | `() => void`                                                             | 请求中止函数（可选） |
 
 ### ComposerDraft
 
-| 属性 | 类型 | 描述 |
-|------|------|------|
-| `text` | `string` | 输入文本 |
+| 属性   | 类型                      | 描述           |
+| ------ | ------------------------- | -------------- |
+| `text` | `string`                  | 输入文本       |
 | `meta` | `Record<string, unknown>` | 元数据（可选） |

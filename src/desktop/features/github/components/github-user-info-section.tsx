@@ -1,6 +1,6 @@
-import { Badge } from '@/common/components/ui/badge';
-import { Button } from '@/common/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Badge } from "@/common/components/ui/badge";
+import { Button } from "@/common/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
 
 interface GitHubUserInfo {
   login: string;
@@ -35,9 +35,7 @@ export function GitHubUserInfoSection({ userInfo, onLogout }: GitHubUserInfoSect
             <div>
               <p className="font-medium">{userInfo?.name || userInfo?.login}</p>
               <p className="text-sm text-gray-600">@{userInfo?.login}</p>
-              {userInfo?.email && (
-                <p className="text-xs text-gray-500">{userInfo.email}</p>
-              )}
+              {userInfo?.email && <p className="text-xs text-gray-500">{userInfo.email}</p>}
             </div>
           </div>
           <Button variant="outline" onClick={onLogout}>

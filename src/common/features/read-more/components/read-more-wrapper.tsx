@@ -1,10 +1,7 @@
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  selectShowFloatingCollapse,
-  useReadMoreStore,
-} from "../store/read-more.store";
+import { selectShowFloatingCollapse, useReadMoreStore } from "../store/read-more.store";
 import { READ_MORE_DATA_ATTRS } from "../core/dom-constants";
 
 interface ReadMoreBaseWrapperProps {
@@ -28,28 +25,18 @@ export function ReadMoreBaseWrapper({
   readMoreLabel = "Read more",
   collapseLabel = "Collapse",
 }: ReadMoreBaseWrapperProps) {
-  const setStatus = useReadMoreStore(
-    useCallback((state) => state.setStatus, [])
-  );
-  const pendingCollapseId = useReadMoreStore(
-    (state) => state.pendingCollapseId
-  );
-  const acknowledgeCollapse = useReadMoreStore(
-    useCallback((state) => state.acknowledgeCollapse, [])
-  );
+  const setStatus = useReadMoreStore(useCallback(state => state.setStatus, []));
+  const pendingCollapseId = useReadMoreStore(state => state.pendingCollapseId);
+  const acknowledgeCollapse = useReadMoreStore(useCallback(state => state.acknowledgeCollapse, []));
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const showFloatingCollapse = useReadMoreStore(selectShowFloatingCollapse);
-  const activeMessageId = useReadMoreStore(
-    useCallback((state) => state.activeMessageId, [])
-  );
-  const notifyLayoutChange = useReadMoreStore(
-    useCallback((state) => state.notifyLayoutChange, [])
-  );
+  const activeMessageId = useReadMoreStore(useCallback(state => state.activeMessageId, []));
+  const notifyLayoutChange = useReadMoreStore(useCallback(state => state.notifyLayoutChange, []));
   const activateAutoScrollSuppression = useReadMoreStore(
-    useCallback((state) => state.activateAutoScrollSuppression, [])
+    useCallback(state => state.activateAutoScrollSuppression, [])
   );
   const previousExpandedRef = useRef(false);
 
@@ -85,9 +72,8 @@ export function ReadMoreBaseWrapper({
     previousExpandedRef.current = isExpanded;
   }, [isExpanded, activateAutoScrollSuppression]);
 
-  const handleToggle = () => setIsExpanded((prev) => !prev);
-  const inlineHidden =
-    showFloatingCollapse && activeMessageId === messageId && isExpanded;
+  const handleToggle = () => setIsExpanded(prev => !prev);
+  const inlineHidden = showFloatingCollapse && activeMessageId === messageId && isExpanded;
   const collapseInlineData = {
     [READ_MORE_DATA_ATTRS.collapseInlineFor]: messageId,
   } as const;

@@ -9,24 +9,29 @@ export class RawMessageSummarizer implements MessageSummarizer {
    * @returns Array of context items grouped by channel
    */
   summarizeMessages(messages: Message[], _maxTokens?: number): ContextItem[] {
-    const userMessages = messages.filter(msg => msg.sender === 'user');
+    const userMessages = messages.filter(msg => msg.sender === "user");
 
     if (userMessages.length === 0) {
-      return [{
-        description: 'No user content available',
-        value: JSON.stringify({ message: 'No user thoughts or notes found in this context.' })
-      }];
+      return [
+        {
+          description: "No user content available",
+          value: JSON.stringify({ message: "No user thoughts or notes found in this context." }),
+        },
+      ];
     }
 
     // Group messages by channel
-    const messagesByChannel = userMessages.reduce((acc, message) => {
-      const channelId = message.channelId;
-      if (!acc[channelId]) {
-        acc[channelId] = [];
-      }
-      acc[channelId].push(message);
-      return acc;
-    }, {} as Record<string, Message[]>);
+    const messagesByChannel = userMessages.reduce(
+      (acc, message) => {
+        const channelId = message.channelId;
+        if (!acc[channelId]) {
+          acc[channelId] = [];
+        }
+        acc[channelId].push(message);
+        return acc;
+      },
+      {} as Record<string, Message[]>
+    );
 
     const contextItems: ContextItem[] = [];
 
@@ -34,7 +39,9 @@ export class RawMessageSummarizer implements MessageSummarizer {
     Object.entries(messagesByChannel).forEach(([channelId, channelMessages]) => {
       const channelInfo = useNotesDataStore.getState().channels.find(c => c.id === channelId);
       // Sort messages by timestamp (newest first) within each channel
-      const sortedMessages = channelMessages.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      const sortedMessages = channelMessages.sort(
+        (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+      );
 
       contextItems.push({
         description: `Channel ${channelId} - All messages (${sortedMessages.length} messages)`,
@@ -48,9 +55,9 @@ export class RawMessageSummarizer implements MessageSummarizer {
             timestamp: msg.timestamp.toISOString(),
             sender: msg.sender,
             channelId: msg.channelId,
-            tags: msg.tags
-          }))
-        })
+            tags: msg.tags,
+          })),
+        }),
       });
     });
 

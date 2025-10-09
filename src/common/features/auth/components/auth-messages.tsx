@@ -15,7 +15,7 @@ export const AuthMessages = ({
   email,
   onResendVerification,
   onBackToSignIn,
-  isAuthenticating
+  isAuthenticating,
 }: AuthMessagesProps) => {
   return (
     <>
@@ -35,7 +35,8 @@ export const AuthMessages = ({
         <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-lg p-3">
           <div className="font-medium mb-1">Check your email</div>
           <div className="text-xs">
-            We've sent a verification link to <strong>{email}</strong>. Click the link to complete registration.
+            We've sent a verification link to <strong>{email}</strong>. Click the link to complete
+            registration.
           </div>
           <div className="mt-2 flex gap-2">
             <button

@@ -22,7 +22,8 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "rx-nested-bean": ["./packages/rx-nested-bean/src"]
     }
   },
   "include": ["src"]

@@ -1,13 +1,13 @@
-import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
-import { useAuthStore } from '@/core/stores/auth.store';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { MessageSquare } from 'lucide-react';
-import { AuthMessages } from './auth-messages';
-import { EmailPasswordForm } from './email-password-form';
-import { LoginFooter } from './login-footer';
-import { LoginIllustration } from './login-illustration';
-import { SocialLogin } from './social-login';
+import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
+import { useAuthStore } from "@/core/stores/auth.store";
+import { useState } from "react";
+import { toast } from "sonner";
+import { MessageSquare } from "lucide-react";
+import { AuthMessages } from "./auth-messages";
+import { EmailPasswordForm } from "./email-password-form";
+import { LoginFooter } from "./login-footer";
+import { LoginIllustration } from "./login-illustration";
+import { SocialLogin } from "./social-login";
 
 export const LoginPage = () => {
   const {
@@ -16,248 +16,248 @@ export const LoginPage = () => {
     sendSignUpLink,
     sendPasswordReset,
     sendEmailVerification,
-    isAuthenticating
+    isAuthenticating,
   } = useAuthStore();
 
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState('');
-  const [statusMessage, setStatusMessage] = useState('');
+  const [error, setError] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [isEmailVerificationSent, setIsEmailVerificationSent] = useState(false);
   const [pendingUser, setPendingUser] = useState<{ email: string } | null>(null);
 
   const handleGoogleLogin = async () => {
     try {
-      setError('');
+      setError("");
       await signInWithGoogle();
     } catch (error: unknown) {
-      console.error('Google login failed:', error);
+      console.error("Google login failed:", error);
       const firebaseError = error as { code?: string; message?: string };
 
       // 处理Google登录的Firebase错误
       switch (firebaseError.code) {
-        case 'auth/popup-closed-by-user':
-          setError('Sign-in was cancelled. Please try again.');
+        case "auth/popup-closed-by-user":
+          setError("Sign-in was cancelled. Please try again.");
           break;
-        case 'auth/popup-blocked':
-          setError('Popup was blocked. Please allow popups and try again.');
+        case "auth/popup-blocked":
+          setError("Popup was blocked. Please allow popups and try again.");
           break;
-        case 'auth/network-request-failed':
-          setError('Network error. Please check your connection and try again.');
+        case "auth/network-request-failed":
+          setError("Network error. Please check your connection and try again.");
           break;
-        case 'auth/too-many-requests':
-          setError('Too many failed attempts. Please try again later.');
+        case "auth/too-many-requests":
+          setError("Too many failed attempts. Please try again later.");
           break;
         default:
-          setError('Google sign-in failed. Please try again.');
+          setError("Google sign-in failed. Please try again.");
       }
     }
   };
 
-
   const handleEmailSubmit = async () => {
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
 
     // 注册时的额外验证
     if (isSignUp) {
       if (!confirmPassword) {
-        setError('Please confirm your password');
+        setError("Please confirm your password");
         return;
       }
       if (password !== confirmPassword) {
-        setError('Passwords do not match');
+        setError("Passwords do not match");
         return;
       }
       if (password.length < 6) {
-        setError('Password must be at least 6 characters long');
+        setError("Password must be at least 6 characters long");
         return;
       }
     }
 
     try {
-      setError('');
-      setStatusMessage('');
+      setError("");
+      setStatusMessage("");
 
       if (isSignUp) {
         toast.loading("Creating your account...", {
           id: "creating-account",
-          duration: 1000
+          duration: 1000,
         });
 
         const result = await sendSignUpLink(email, password);
         if (result.verificationSent) {
           setPendingUser({ email });
           setIsEmailVerificationSent(true);
-          setError('');
-          setStatusMessage('');
+          setError("");
+          setStatusMessage("");
 
           toast.success("Account created! Please check your email to verify your account.", {
             id: "creating-account",
-            duration: 3000
+            duration: 3000,
           });
         }
       } else {
         toast.loading("Signing you in...", {
           id: "signing-in",
-          duration: 1000
+          duration: 1000,
         });
 
         await signInWithEmail(email, password);
 
         toast.success("Login successful! Welcome back!", {
           id: "signing-in",
-          duration: 1500
+          duration: 1500,
         });
       }
     } catch (error: unknown) {
-      console.error('Email auth failed:', error);
-      setStatusMessage('');
+      console.error("Email auth failed:", error);
+      setStatusMessage("");
 
       // 处理常见的Firebase错误，转换为用户友好的错误信息
       const firebaseError = error as { code?: string; message?: string };
-      let errorMessage = '';
+      let errorMessage = "";
 
       switch (firebaseError.code) {
-        case 'auth/user-not-found':
-          errorMessage = 'No account found with this email address';
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email address";
           break;
-        case 'auth/wrong-password':
-          errorMessage = 'Incorrect password';
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password";
           break;
-        case 'auth/invalid-credential':
-          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        case "auth/invalid-credential":
+          errorMessage = "Invalid email or password. Please check your credentials and try again.";
           break;
-        case 'auth/email-already-in-use':
-          errorMessage = 'An account with this email already exists';
+        case "auth/email-already-in-use":
+          errorMessage = "An account with this email already exists";
           break;
-        case 'auth/weak-password':
-          errorMessage = 'Password should be at least 6 characters';
+        case "auth/weak-password":
+          errorMessage = "Password should be at least 6 characters";
           break;
-        case 'auth/invalid-email':
-          errorMessage = 'Invalid email address';
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address";
           break;
-        case 'auth/user-disabled':
-          errorMessage = 'This account has been disabled. Please contact support.';
+        case "auth/user-disabled":
+          errorMessage = "This account has been disabled. Please contact support.";
           break;
-        case 'auth/too-many-requests':
-          errorMessage = 'Too many failed attempts. Please try again later.';
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later.";
           break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your connection and try again.';
+        case "auth/network-request-failed":
+          errorMessage = "Network error. Please check your connection and try again.";
           break;
-        case 'auth/operation-not-allowed':
-          errorMessage = 'This sign-in method is not enabled. Please try a different method.';
+        case "auth/operation-not-allowed":
+          errorMessage = "This sign-in method is not enabled. Please try a different method.";
           break;
         default:
-          if (firebaseError.message === 'EMAIL_NOT_VERIFIED') {
-            errorMessage = 'Please verify your email address before signing in. Check your inbox for a verification link.';
-          } else if (firebaseError.message === 'EMAIL_NOT_VERIFIED_RESENT') {
-            errorMessage = 'Please verify your email address before signing in. We\'ve sent a new verification link to your inbox.';
-          } else if (firebaseError.message === 'EMAIL_ALREADY_VERIFIED') {
-            errorMessage = 'This email is already verified. Please sign in instead.';
-          } else if (firebaseError.message === 'ACCOUNT_EXISTS_WRONG_PASSWORD') {
-            errorMessage = 'An account with this email already exists, but the password is incorrect. Please check your password or try signing in.';
+          if (firebaseError.message === "EMAIL_NOT_VERIFIED") {
+            errorMessage =
+              "Please verify your email address before signing in. Check your inbox for a verification link.";
+          } else if (firebaseError.message === "EMAIL_NOT_VERIFIED_RESENT") {
+            errorMessage =
+              "Please verify your email address before signing in. We've sent a new verification link to your inbox.";
+          } else if (firebaseError.message === "EMAIL_ALREADY_VERIFIED") {
+            errorMessage = "This email is already verified. Please sign in instead.";
+          } else if (firebaseError.message === "ACCOUNT_EXISTS_WRONG_PASSWORD") {
+            errorMessage =
+              "An account with this email already exists, but the password is incorrect. Please check your password or try signing in.";
           } else {
-            errorMessage = 'Authentication failed. Please check your credentials and try again.';
+            errorMessage = "Authentication failed. Please check your credentials and try again.";
           }
       }
 
       setError(errorMessage);
       toast.error(errorMessage, {
         id: isSignUp ? "creating-account" : "signing-in",
-        duration: 4000
+        duration: 4000,
       });
     }
   };
 
   const handlePasswordReset = async () => {
     if (!email) {
-      setError('Please enter your email address first');
+      setError("Please enter your email address first");
       return;
     }
 
     try {
-      setError('');
+      setError("");
       await sendPasswordReset(email);
       setIsPasswordReset(true);
     } catch (error: unknown) {
-      console.error('Password reset failed:', error);
+      console.error("Password reset failed:", error);
       const firebaseError = error as { code?: string; message?: string };
 
       // 处理密码重置的Firebase错误
       switch (firebaseError.code) {
-        case 'auth/user-not-found':
-          setError('No account found with this email address');
+        case "auth/user-not-found":
+          setError("No account found with this email address");
           break;
-        case 'auth/invalid-email':
-          setError('Invalid email address');
+        case "auth/invalid-email":
+          setError("Invalid email address");
           break;
-        case 'auth/too-many-requests':
-          setError('Too many reset attempts. Please try again later.');
+        case "auth/too-many-requests":
+          setError("Too many reset attempts. Please try again later.");
           break;
-        case 'auth/network-request-failed':
-          setError('Network error. Please check your connection and try again.');
+        case "auth/network-request-failed":
+          setError("Network error. Please check your connection and try again.");
           break;
         default:
-          setError('Failed to send password reset email. Please try again.');
+          setError("Failed to send password reset email. Please try again.");
       }
     }
   };
 
   const handleResendVerification = async () => {
     if (!pendingUser) {
-      setError('No pending user found');
+      setError("No pending user found");
       return;
     }
 
     try {
-      setError('');
+      setError("");
       await sendEmailVerification();
       setIsEmailVerificationSent(true);
     } catch (error: unknown) {
-      console.error('Resend verification failed:', error);
+      console.error("Resend verification failed:", error);
       const firebaseError = error as { code?: string; message?: string };
 
       switch (firebaseError.code) {
-        case 'auth/too-many-requests':
-          setError('Too many verification attempts. Please try again later.');
+        case "auth/too-many-requests":
+          setError("Too many verification attempts. Please try again later.");
           break;
-        case 'auth/network-request-failed':
-          setError('Network error. Please check your connection and try again.');
+        case "auth/network-request-failed":
+          setError("Network error. Please check your connection and try again.");
           break;
         default:
-          setError('Failed to resend verification email. Please try again.');
+          setError("Failed to resend verification email. Please try again.");
       }
     }
   };
 
   const handleToggleSignUp = () => {
     setIsSignUp(!isSignUp);
-    setError('');
+    setError("");
     setIsPasswordReset(false);
     setIsEmailVerificationSent(false);
     setPendingUser(null);
-    setConfirmPassword('');
+    setConfirmPassword("");
   };
 
   const handleBackToSignIn = () => {
     setIsEmailVerificationSent(false);
     setPendingUser(null);
     setIsSignUp(false);
-    setError('');
-    setPassword('');
-    setConfirmPassword('');
+    setError("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const { isGoogleAuthSupported } = useGoogleAuthSupport();
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 flex">
@@ -280,19 +280,24 @@ export const LoginPage = () => {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 relative backdrop-blur-sm">
-            {
-              isGoogleAuthSupported && <>
-                <SocialLogin onGoogleLogin={handleGoogleLogin} isAuthenticating={isAuthenticating} />
+            {isGoogleAuthSupported && (
+              <>
+                <SocialLogin
+                  onGoogleLogin={handleGoogleLogin}
+                  isAuthenticating={isAuthenticating}
+                />
                 <div className="relative mb-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-slate-200 dark:border-slate-600" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">or</span>
+                    <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      or
+                    </span>
                   </div>
                 </div>
               </>
-            }
+            )}
             <EmailPasswordForm
               email={email}
               password={password}

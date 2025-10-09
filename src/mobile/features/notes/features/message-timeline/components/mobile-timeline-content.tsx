@@ -1,6 +1,9 @@
 import { EmptyState } from "@/common/features/notes/components/message-timeline/empty-state";
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
-import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import {
+  MessageTimeline,
+  MessageTimelineRef,
+} from "@/common/features/notes/components/message-timeline/message-timeline";
 import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
@@ -12,91 +15,94 @@ import { MobileThoughtRecord } from "@/mobile/features/notes/features/message-ti
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
 export interface MobileTimelineContentRef {
-    scrollToBottom: (options?: { behavior?: 'smooth' | 'instant' }) => void;
+  scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => void;
 }
 
 interface MobileTimelineContentProps {
-    onReply: (messageId: string) => void;
-    className?: string;
+  onReply: (messageId: string) => void;
+  className?: string;
 }
 
-export const MobileTimelineContent = forwardRef<MobileTimelineContentRef, MobileTimelineContentProps>(({
-    onReply,
-    className = ""
-}, ref) => {
-    const { currentChannelId } = useNotesViewStore();
-    const messageTimelineRef = useRef<MessageTimelineRef>(null);
+export const MobileTimelineContent = forwardRef<
+  MobileTimelineContentRef,
+  MobileTimelineContentProps
+>(({ onReply, className = "" }, ref) => {
+  const { currentChannelId } = useNotesViewStore();
+  const messageTimelineRef = useRef<MessageTimelineRef>(null);
 
-    const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
+  const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
-    const {
-        messages = [],
-        loading,
-        hasMore,
-        loadMore,
-        getChannelState,
-    } = useChannelMessages({
-        onHistoryMessagesChange: (messages) => {
-            onHistoryMessagesLoadedEvent$.emit(messages);
-        }
-    });
+  const {
+    messages = [],
+    loading,
+    hasMore,
+    loadMore,
+    getChannelState,
+  } = useChannelMessages({
+    onHistoryMessagesChange: messages => {
+      onHistoryMessagesLoadedEvent$.emit(messages);
+    },
+  });
 
-    const { handleScroll } = useLazyLoading({
-        onTrigger: () => {
-            if (currentChannelId) {
-                loadMore({ channelId: currentChannelId, messagesLimit: 20 });
-            }
-        },
-        canTrigger: !!hasMore && !loading,
-        getState: getChannelState,
-    });
+  const { handleScroll } = useLazyLoading({
+    onTrigger: () => {
+      if (currentChannelId) {
+        loadMore({ channelId: currentChannelId, messagesLimit: 20 });
+      }
+    },
+    canTrigger: !!hasMore && !loading,
+    getState: getChannelState,
+  });
 
-    const groupedMessages = useGroupedMessages(messages);
+  const groupedMessages = useGroupedMessages(messages);
 
-    useImperativeHandle(ref, () => ({
-        scrollToBottom: (options?: { behavior?: 'smooth' | 'instant' }) => {
-            messageTimelineRef.current?.scrollToBottom(options);
-        }
-    }), [messageTimelineRef]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => {
+        messageTimelineRef.current?.scrollToBottom(options);
+      },
+    }),
+    [messageTimelineRef]
+  );
 
-    const renderThoughtRecord = (message: Message, threadCount: number) => (
-        <MobileThoughtRecord
-            message={message}
-            onReply={() => onReply(message.id)}
-            threadCount={threadCount}
-        />
-    );
+  const renderThoughtRecord = (message: Message, threadCount: number) => (
+    <MobileThoughtRecord
+      message={message}
+      onReply={() => onReply(message.id)}
+      threadCount={threadCount}
+    />
+  );
 
-    const hasMessages = Object.values(groupedMessages).some(dayMessages =>
-        (dayMessages as Message[]).some((msg: Message) =>
-            msg.sender === "user" &&
-            !msg.parentId
-        )
-    );
+  const hasMessages = Object.values(groupedMessages).some(dayMessages =>
+    (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
+  );
 
-    if (!currentChannelId) {
-        return <MobileWelcomeGuide />;
-    }
+  if (!currentChannelId) {
+    return <MobileWelcomeGuide />;
+  }
 
-    if (loading) {
-        return <MessageTimelineSkeleton count={5} />;
-    }
+  if (loading) {
+    return <MessageTimelineSkeleton count={5} />;
+  }
 
-    if (!hasMessages) {
-        return <EmptyState />;
-    }
+  if (!hasMessages) {
+    return <EmptyState />;
+  }
 
-    return (
-        <div className={`flex-1 min-h-0 relative overflow-hidden bg-white dark:bg-slate-950 ${className}`}>
-            <MessageTimeline
-                ref={messageTimelineRef}
-                className="h-full"
-                renderThoughtRecord={renderThoughtRecord}
-                groupedMessages={groupedMessages}
-                messages={messages}
-                onScroll={handleScroll}
-                onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
-            />
-        </div>
-    );
+  return (
+    <div
+      className={`flex-1 min-h-0 relative overflow-hidden bg-white dark:bg-slate-950 ${className}`}
+    >
+      <MessageTimeline
+        ref={messageTimelineRef}
+        className="h-full"
+        renderThoughtRecord={renderThoughtRecord}
+        groupedMessages={groupedMessages}
+        messages={messages}
+        onScroll={handleScroll}
+        onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
+      />
+    </div>
+  );
 });

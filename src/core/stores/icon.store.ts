@@ -120,7 +120,7 @@ export const useIconStore = create<IconState>()((set, get) => ({
   icons: defaultIcons,
 
   addIcon: (id: string, icon: LucideIcon) => {
-    set((state) => ({
+    set(state => ({
       icons: {
         ...state.icons,
         [id]: icon,
@@ -132,7 +132,7 @@ export const useIconStore = create<IconState>()((set, get) => ({
   },
 
   addIcons: (icons: Record<string, LucideIcon>) => {
-    set((state) => {
+    set(state => {
       return {
         icons: {
           ...state.icons,
@@ -141,14 +141,14 @@ export const useIconStore = create<IconState>()((set, get) => ({
       };
     });
     return () => {
-      Object.keys(icons).forEach((key) => {
+      Object.keys(icons).forEach(key => {
         get().removeIcon(key);
       });
     };
   },
 
   removeIcon: (id: string) => {
-    set((state) => {
+    set(state => {
       const newIcons = { ...state.icons };
       delete newIcons[id];
       return {
@@ -168,4 +168,4 @@ export const useIconStore = create<IconState>()((set, get) => ({
   },
 }));
 
-export const useIcon = (id: string) => useIconStore((state) => state.icons[id]);
+export const useIcon = (id: string) => useIconStore(state => state.icons[id]);

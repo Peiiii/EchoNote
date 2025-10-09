@@ -7,72 +7,74 @@ import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts
 import { MessageInputProps } from "../types";
 
 export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
-    const [message, setMessage] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { sendMessage } = channelMessageService;
-    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
-    const { currentChannelId, isAddingMessage } = useNotesViewStore();
+  const [message, setMessage] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { sendMessage } = channelMessageService;
+  const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
+  const { currentChannelId, isAddingMessage } = useNotesViewStore();
 
-    const { messages: channelMessages = [] } = useChannelMessages({});
+  const { messages: channelMessages = [] } = useChannelMessages({});
 
-    const replyToMessage = useMemo(() =>
-        replyToMessageId && channelMessages.length > 0
-            ? channelMessages.find(msg => msg.id === replyToMessageId)
-            : null
-        , [replyToMessageId, channelMessages]);
+  const replyToMessage = useMemo(
+    () =>
+      replyToMessageId && channelMessages.length > 0
+        ? channelMessages.find(msg => msg.id === replyToMessageId)
+        : null,
+    [replyToMessageId, channelMessages]
+  );
 
-    const handleSend = async () => {
-        if (!message.trim() || !currentChannelId) return;
+  const handleSend = async () => {
+    if (!message.trim() || !currentChannelId) return;
 
-        if (replyToMessageId) {
-            addThreadMessage(replyToMessageId, {
-                content: message.trim(),
-                sender: "user" as const,
-                channelId: currentChannelId,
-            });
-        } else {
-            sendMessage({
-                content: message.trim(),
-                sender: "user" as const,
-                channelId: currentChannelId,
-            });
-        }
+    if (replyToMessageId) {
+      addThreadMessage(replyToMessageId, {
+        content: message.trim(),
+        sender: "user" as const,
+        channelId: currentChannelId,
+      });
+    } else {
+      sendMessage({
+        content: message.trim(),
+        sender: "user" as const,
+        channelId: currentChannelId,
+      });
+    }
 
-        onSend();
-        setMessage("");
-    };
+    onSend();
+    setMessage("");
+  };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && isModifierKeyPressed(e)) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && isModifierKeyPressed(e)) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-    const handleMessageChange = (newMessage: string) => {
-        setMessage(newMessage);
-    };
+  const handleMessageChange = (newMessage: string) => {
+    setMessage(newMessage);
+  };
 
-    useEffect(() => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-        }
-    }, [message]);
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [message]);
 
-    const placeholder = replyToMessage 
-        ? `Reply to this message... (${SHORTCUTS.SEND} to send, Enter for new line)`
-        : `Record your thoughts... (${SHORTCUTS.SEND} to send, Enter for new line)`;
+  const placeholder = replyToMessage
+    ? `Reply to this message... (${SHORTCUTS.SEND} to send, Enter for new line)`
+    : `Record your thoughts... (${SHORTCUTS.SEND} to send, Enter for new line)`;
 
-    return {
-        message,
-        textareaRef,
-        replyToMessage,
-        isAddingMessage,
-        handleSend,
-        handleKeyDown,
-        handleMessageChange,
-        placeholder,
-        currentChannelId
-    };
+  return {
+    message,
+    textareaRef,
+    replyToMessage,
+    isAddingMessage,
+    handleSend,
+    handleKeyDown,
+    handleMessageChange,
+    placeholder,
+    currentChannelId,
+  };
 }

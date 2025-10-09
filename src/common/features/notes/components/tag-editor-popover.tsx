@@ -17,7 +17,7 @@ export function TagEditorPopover({
   onTagsChange,
   trigger,
   maxTags = 10,
-  placeholder = "Add a tag..."
+  placeholder = "Add a tag...",
 }: TagEditorPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -33,20 +33,20 @@ export function TagEditorPopover({
 
   const addTag = (tagName: string) => {
     const trimmedTag = tagName.trim().toLowerCase();
-    
+
     if (!trimmedTag) return;
-    
+
     // Check if tag already exists
     if (tags.includes(trimmedTag)) {
       setInputValue("");
       return;
     }
-    
+
     // Check max tags limit
     if (tags.length >= maxTags) {
       return;
     }
-    
+
     onTagsChange([...tags, trimmedTag]);
     setInputValue("");
   };
@@ -80,7 +80,7 @@ export function TagEditorPopover({
     if (editingTag && inputValue.trim()) {
       const newTag = inputValue.trim().toLowerCase();
       if (newTag !== editingTag && !tags.includes(newTag)) {
-        onTagsChange(tags.map(tag => tag === editingTag ? newTag : tag));
+        onTagsChange(tags.map(tag => (tag === editingTag ? newTag : tag)));
       }
       setEditingTag(null);
       setInputValue("");
@@ -120,37 +120,26 @@ export function TagEditorPopover({
           </Button>
         )}
       </PopoverTrigger>
-      <PopoverContent 
-        className="w-80 p-0" 
-        align="start"
-        side="bottom"
-      >
+      <PopoverContent className="w-80 p-0" align="start" side="bottom">
         <div className="p-3 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2 mb-3">
             <TagIcon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">
-              Edit Tags
-            </h3>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">Edit Tags</h3>
           </div>
-          
+
           {/* Input area */}
           <div className="flex gap-2">
             <Input
               ref={inputRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={e => setInputValue(e.target.value)}
               onKeyPress={editingTag ? handleKeyPressEdit : handleKeyPress}
               placeholder={editingTag ? `Edit "${editingTag}"` : placeholder}
               className="flex-1"
             />
             {editingTag ? (
               <div className="flex gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCancelEdit}
-                  className="px-2"
-                >
+                <Button size="sm" variant="outline" onClick={handleCancelEdit} className="px-2">
                   <X className="h-3 w-3" />
                 </Button>
                 <Button
@@ -187,7 +176,7 @@ export function TagEditorPopover({
                 {tags.length} of {maxTags} tags
               </div>
               <div className="flex flex-wrap gap-1">
-                {tags.map((tag) => (
+                {tags.map(tag => (
                   <div
                     key={tag}
                     className="group flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-md px-2 py-1 text-sm"

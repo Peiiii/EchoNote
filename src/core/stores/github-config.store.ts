@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface GitHubStorageConfig {
   owner: string;
@@ -32,12 +32,12 @@ interface GitHubConfigState {
   authInfo: GitHubAuthInfo | null;
   userInfo: GitHubUserInfo | null;
   isAuthenticated: boolean;
-  
+
   // Storage config methods
   setStorageConfig: (config: Partial<GitHubStorageConfig>) => void;
   resetStorageConfig: () => void;
   isStorageConfigured: () => boolean;
-  
+
   // Auth methods
   setAuthInfo: (authInfo: GitHubAuthInfo) => void;
   clearAuthInfo: () => void;
@@ -47,10 +47,10 @@ interface GitHubConfigState {
 }
 
 const defaultStorageConfig: GitHubStorageConfig = {
-  owner: '',
-  repo: 'echonote-data',
-  branch: 'main',
-  basePath: 'data'
+  owner: "",
+  repo: "echonote-data",
+  branch: "main",
+  basePath: "data",
 };
 
 export const useGitHubConfigStore = create<GitHubConfigState>()(
@@ -60,58 +60,58 @@ export const useGitHubConfigStore = create<GitHubConfigState>()(
       authInfo: null,
       userInfo: null,
       isAuthenticated: false,
-      
+
       setStorageConfig: (config: Partial<GitHubStorageConfig>) => {
-        set((state) => ({
-          storageConfig: { ...state.storageConfig, ...config }
+        set(state => ({
+          storageConfig: { ...state.storageConfig, ...config },
         }));
       },
-      
+
       resetStorageConfig: () => {
         set({ storageConfig: defaultStorageConfig });
       },
-      
+
       isStorageConfigured: () => {
         const { storageConfig } = get();
-        return storageConfig.owner.trim() !== '' && storageConfig.repo.trim() !== '';
+        return storageConfig.owner.trim() !== "" && storageConfig.repo.trim() !== "";
       },
-      
+
       setAuthInfo: (authInfo: GitHubAuthInfo) => {
-        set({ 
+        set({
           authInfo,
           userInfo: authInfo.user,
-          isAuthenticated: true 
+          isAuthenticated: true,
         });
       },
-      
+
       clearAuthInfo: () => {
-        set({ 
+        set({
           authInfo: null,
           userInfo: null,
-          isAuthenticated: false 
+          isAuthenticated: false,
         });
       },
-      
+
       setUserInfo: (userInfo: GitHubUserInfo) => {
         set({ userInfo });
       },
-      
+
       clearUserInfo: () => {
         set({ userInfo: null });
       },
-      
+
       setAuthenticated: (authenticated: boolean) => {
         set({ isAuthenticated: authenticated });
-      }
+      },
     }),
     {
-      name: 'github-config-storage',
-      partialize: (state) => ({ 
+      name: "github-config-storage",
+      partialize: state => ({
         storageConfig: state.storageConfig,
         authInfo: state.authInfo,
         userInfo: state.userInfo,
-        isAuthenticated: state.isAuthenticated
-      })
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

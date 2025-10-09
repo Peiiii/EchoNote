@@ -7,21 +7,25 @@
 ## 核心设计原则
 
 ### 1. 模块化设计
+
 - **功能隔离**：每个功能模块独立开发、测试和部署
 - **依赖解耦**：模块间通过标准接口通信，避免直接依赖
 - **可插拔**：支持运行时动态加载和卸载功能模块
 
 ### 2. 状态管理
+
 - **集中式状态**：使用 Zustand 进行全局状态管理
 - **状态隔离**：每个模块可以管理自己的局部状态
 - **状态同步**：通过事件机制实现状态间的同步
 
 ### 3. 路由系统
+
 - **动态路由**：支持运行时注册和注销路由
 - **路由映射**：活动栏与路由系统的双向映射
 - **嵌套路由**：支持复杂的路由嵌套结构
 
 ### 4. 生命周期管理
+
 - **激活/停用**：完整的模块生命周期管理
 - **资源清理**：自动处理模块卸载时的资源清理
 - **依赖管理**：处理模块间的依赖关系
@@ -40,6 +44,7 @@ export const extensionManager = new ExtensionManager();
 ```
 
 **主要职责：**
+
 - 注册和注销扩展
 - 激活和停用扩展
 - 管理扩展依赖关系
@@ -52,56 +57,56 @@ export const extensionManager = new ExtensionManager();
 ```typescript
 // src/core/hooks/use-extensions.ts
 export const useExtensions = (extensions: ExtensionDefinition<unknown>[]) => {
-    const [initialized, setInitialized] = useState(false);
-    const processedExtensionsRef = useRef<Set<string>>(new Set());
+  const [initialized, setInitialized] = useState(false);
+  const processedExtensionsRef = useRef<Set<string>>(new Set());
 
-    // 注册扩展
-    useEffect(() => {
-        extensions.forEach((extension) => {
-            const extensionId = extension.manifest.id;
-            if (!extensionManager.getExtension(extensionId)) {
-                extensionManager.registerExtension(extension);
-            }
-        });
-    }, [extensions]);
+  // 注册扩展
+  useEffect(() => {
+    extensions.forEach(extension => {
+      const extensionId = extension.manifest.id;
+      if (!extensionManager.getExtension(extensionId)) {
+        extensionManager.registerExtension(extension);
+      }
+    });
+  }, [extensions]);
 
-    // 激活扩展
-    useEffect(() => {
-        const currentExtensionIds = new Set(extensions.map(ext => ext.manifest.id));
-        const processedIds = processedExtensionsRef.current;
+  // 激活扩展
+  useEffect(() => {
+    const currentExtensionIds = new Set(extensions.map(ext => ext.manifest.id));
+    const processedIds = processedExtensionsRef.current;
 
-        // 激活新的扩展
-        extensions.forEach((extension) => {
-            const extensionId = extension.manifest.id;
-            if (!processedIds.has(extensionId)) {
-                extensionManager.activateExtension(extensionId);
-                processedIds.add(extensionId);
-            }
-        });
+    // 激活新的扩展
+    extensions.forEach(extension => {
+      const extensionId = extension.manifest.id;
+      if (!processedIds.has(extensionId)) {
+        extensionManager.activateExtension(extensionId);
+        processedIds.add(extensionId);
+      }
+    });
 
-        // 停用不再需要的扩展
-        const idsToDeactivate = Array.from(processedIds).filter(id => !currentExtensionIds.has(id));
-        idsToDeactivate.forEach(extensionId => {
-            extensionManager.deactivateExtension(extensionId);
-            processedIds.delete(extensionId);
-        });
+    // 停用不再需要的扩展
+    const idsToDeactivate = Array.from(processedIds).filter(id => !currentExtensionIds.has(id));
+    idsToDeactivate.forEach(extensionId => {
+      extensionManager.deactivateExtension(extensionId);
+      processedIds.delete(extensionId);
+    });
 
-        setInitialized(true);
-    }, [extensions]);
+    setInitialized(true);
+  }, [extensions]);
 
-    // 清理函数
-    useEffect(() => {
-        return () => {
-            const processedIds = processedExtensionsRef.current;
-            const idsToCleanup = Array.from(processedIds);
-            idsToCleanup.forEach(extensionId => {
-                extensionManager.deactivateExtension(extensionId);
-            });
-            processedIds.clear();
-        };
-    }, []);
+  // 清理函数
+  useEffect(() => {
+    return () => {
+      const processedIds = processedExtensionsRef.current;
+      const idsToCleanup = Array.from(processedIds);
+      idsToCleanup.forEach(extensionId => {
+        extensionManager.deactivateExtension(extensionId);
+      });
+      processedIds.clear();
+    };
+  }, []);
 
-    return { initialized };
+  return { initialized };
 };
 ```
 
@@ -129,7 +134,7 @@ export interface ActivityBarState {
   items: ActivityItem[];
   activeId?: string;
   expanded: boolean;
-  addItem: (item: ActivityItem) => ()=>void;
+  addItem: (item: ActivityItem) => () => void;
   removeItem: (id: string) => void;
   updateItem: (id: string, updates: Partial<ActivityItem>) => void;
   setActiveId: (id: string) => void;
@@ -148,7 +153,7 @@ export interface ActivityBarState {
 export interface RouteTreeState {
   routes: RouteNode[];
   addRoute: (route: RouteNode, parentId?: string) => () => void;
-  addRoutes: (routes: RouteNode[], parentId?: string) =>()=> void;
+  addRoutes: (routes: RouteNode[], parentId?: string) => () => void;
   removeRoute: (id: string) => void;
   updateRoute: (id: string, updates: Partial<RouteNode>) => void;
   getRoutes: () => RouteNode[];
@@ -436,9 +441,7 @@ export function DesktopAppInner() {
 
 ```typescript
 // src/core/hooks/use-setup-app.ts
-export const useSetupApp = (options: {
-  extensions: ExtensionDefinition[]
-}) => {
+export const useSetupApp = (options: { extensions: ExtensionDefinition[] }) => {
   useConnectNavigationStore();
   const { initialized } = useExtensions(options.extensions);
   return { initialized };
@@ -486,6 +489,7 @@ Extension 文件应该包含：
 ### 1. Extension 设计原则
 
 #### 单一职责
+
 每个 Extension 应该只负责一个明确的功能领域。
 
 ```typescript
@@ -494,7 +498,7 @@ export const chatExtension = defineExtension({
   manifest: { id: "chat", name: "Chat" },
   activate: ({ subscriptions }) => {
     // 只处理聊天相关功能
-  }
+  },
 });
 
 // ❌ 避免：职责混乱
@@ -502,11 +506,12 @@ export const megaExtension = defineExtension({
   manifest: { id: "mega", name: "Mega Extension" },
   activate: ({ subscriptions }) => {
     // 处理聊天、文件、设置等多种功能
-  }
+  },
 });
 ```
 
 #### 资源管理
+
 使用 `Disposable` 确保资源正确清理。
 
 ```typescript
@@ -518,13 +523,14 @@ activate: ({ subscriptions }) => {
     label: "My Extension",
     icon: "icon",
   });
-  
+
   // 添加到订阅列表，自动清理
   subscriptions.push(Disposable.from(cleanup));
-}
+};
 ```
 
 #### 错误处理
+
 在 Extension 激活过程中处理可能的错误。
 
 ```typescript
@@ -533,39 +539,41 @@ activate: ({ subscriptions }) => {
     // 注册资源
     subscriptions.push(Disposable.from(/* ... */));
   } catch (error) {
-    console.error('Failed to activate extension:', error);
+    console.error("Failed to activate extension:", error);
     // 可以选择重新抛出或记录错误
   }
-}
+};
 ```
 
 ### 2. 状态管理最佳实践
 
 #### 状态隔离
+
 每个 Extension 应该管理自己的状态，避免全局状态污染。
 
 ```typescript
 // ✅ 好的做法：状态隔离
-const useMyExtensionStore = create<MyExtensionState>((set) => ({
+const useMyExtensionStore = create<MyExtensionState>(set => ({
   // 只管理本扩展的状态
 }));
 
 // ❌ 避免：全局状态污染
-const useGlobalStore = create<GlobalState>((set) => ({
+const useGlobalStore = create<GlobalState>(set => ({
   // 管理所有扩展的状态
 }));
 ```
 
 #### 状态同步
+
 使用事件机制实现状态间的同步。
 
 ```typescript
 // 监听其他扩展的状态变化
 useEffect(() => {
-  const unsubscribe = otherExtensionStore.subscribe((state) => {
+  const unsubscribe = otherExtensionStore.subscribe(state => {
     // 响应状态变化
   });
-  
+
   return unsubscribe;
 }, []);
 ```
@@ -573,6 +581,7 @@ useEffect(() => {
 ### 3. 路由管理最佳实践
 
 #### 路由命名
+
 使用一致的命名规范。
 
 ```typescript
@@ -592,6 +601,7 @@ const routes = [
 ```
 
 #### 路由嵌套
+
 合理使用路由嵌套结构。
 
 ```typescript
@@ -616,8 +626,6 @@ const routes = [
   },
 ];
 ```
-
-
 
 ## 扩展开发指南
 
@@ -731,14 +739,10 @@ export function DesktopAppInner() {
       myExtension,
     ],
   });
-  
+
   // ...
 }
 ```
-
-
-
-
 
 ## 总结
 
@@ -756,4 +760,4 @@ export function DesktopAppInner() {
 - [@cardos/extension 文档](https://github.com/cardos/extension)
 - [Zustand 状态管理](https://github.com/pmndrs/zustand)
 - [React Router 路由管理](https://reactrouter.com/)
-- [AgentVerse 项目](https://github.com/agentverse/agentverse) 
+- [AgentVerse 项目](https://github.com/agentverse/agentverse)

@@ -1,8 +1,8 @@
-import { validateGitHubConfig } from '@/common/config/github.config';
-import { getGitHubAuthService } from '@/common/services/github-auth.service';
-import { githubStorageService } from '@/common/services/github-storage.service';
-import { useGitHubConfigStore } from '@/core/stores/github-config.store';
-import { useEffect, useState } from 'react';
+import { validateGitHubConfig } from "@/common/config/github.config";
+import { getGitHubAuthService } from "@/common/services/github-auth.service";
+import { githubStorageService } from "@/common/services/github-storage.service";
+import { useGitHubConfigStore } from "@/core/stores/github-config.store";
+import { useEffect, useState } from "react";
 
 interface GitHubUserInfo {
   login: string;
@@ -16,10 +16,10 @@ export function useGitHubIntegrationPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState<GitHubUserInfo | null>(null);
   const [storageService, setStorageService] = useState<unknown>(null);
-  const [noteContent, setNoteContent] = useState('');
-  const [noteTitle, setNoteTitle] = useState('');
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
-  const [lastSync, setLastSync] = useState<string>('');
+  const [noteContent, setNoteContent] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
+  const [lastSync, setLastSync] = useState<string>("");
   const [configErrors, setConfigErrors] = useState<string[]>([]);
 
   // Use store for storage configuration
@@ -54,15 +54,14 @@ export function useGitHubIntegrationPage() {
   const initializeStorageService = async () => {
     try {
       if (!storageConfig.owner.trim()) {
-        throw new Error('Please configure storage settings first');
+        throw new Error("Please configure storage settings first");
       }
 
       const storage = githubStorageService;
       await storage.initialize();
       setStorageService(storage);
-
     } catch (error) {
-      console.error('Failed to initialize storage service:', error);
+      console.error("Failed to initialize storage service:", error);
     }
   };
 
@@ -72,10 +71,10 @@ export function useGitHubIntegrationPage() {
     }
 
     try {
-      setSyncStatus('syncing');
+      setSyncStatus("syncing");
 
       const timestamp = new Date().toISOString();
-      const fileName = `${noteTitle.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}.md`;
+      const fileName = `${noteTitle.replace(/[^a-zA-Z0-9]/g, "-")}-${Date.now()}.md`;
 
       const markdownContent = `# ${noteTitle}
 
@@ -87,26 +86,33 @@ ${noteContent}
 *This note was automatically synchronized to GitHub by StillRoot*
 `;
 
-      await (storageService as { storeMarkdown: (path: string, content: string, options: { message?: string }) => Promise<void> }).storeMarkdown(`notes/${fileName}`, markdownContent, {
-        message: `Add note: ${noteTitle}`
+      await (
+        storageService as {
+          storeMarkdown: (
+            path: string,
+            content: string,
+            options: { message?: string }
+          ) => Promise<void>;
+        }
+      ).storeMarkdown(`notes/${fileName}`, markdownContent, {
+        message: `Add note: ${noteTitle}`,
       });
 
-      setSyncStatus('success');
+      setSyncStatus("success");
       setLastSync(new Date().toLocaleString());
 
       // Clear inputs
-      setNoteTitle('');
-      setNoteContent('');
+      setNoteTitle("");
+      setNoteContent("");
 
       // Reset status after 3 seconds
-      setTimeout(() => setSyncStatus('idle'), 3000);
-
+      setTimeout(() => setSyncStatus("idle"), 3000);
     } catch (error) {
-      setSyncStatus('error');
-      console.error('Failed to sync note:', error);
+      setSyncStatus("error");
+      console.error("Failed to sync note:", error);
 
       // Reset status after 5 seconds
-      setTimeout(() => setSyncStatus('idle'), 5000);
+      setTimeout(() => setSyncStatus("idle"), 5000);
     }
   };
 
@@ -118,7 +124,7 @@ ${noteContent}
       setUserInfo(null);
       setStorageService(null);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -133,12 +139,12 @@ ${noteContent}
     configErrors,
     storageConfig,
     isStorageConfigured: isStorageConfigured(),
-      
+
     // Actions
     setNoteContent,
     setNoteTitle,
     setStorageConfig,
     handleSyncNote,
-    handleLogout
+    handleLogout,
   };
 }

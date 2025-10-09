@@ -17,21 +17,21 @@ import { DocumentSnapshot } from "firebase/firestore";
 import { firebaseService } from '../services/firebaseService';
 
 // --- 你的核心类型定义 (保持不变) ---
-export interface AIAnalysis { /* ... */ }
-export interface Message { /* ... */ }
-export interface Channel { /* ... */ }
+export interface AIAnalysis { /_ ... _/ }
+export interface Message { /_ ... _/ }
+export interface Channel { /_ ... _/ }
 
 // --- 重新设计的 State 接口 ---
 // 注意：Action 函数现在直接是接口的一部分
 export interface ChatDataState {
-    // Auth State
-    currentUser: User | null;
-    authIsReady: boolean;
-    
+// Auth State
+currentUser: User | null;
+authIsReady: boolean;
+
     // Channels State
     channels: { [id: string]: Channel };
     channelOrder: string[];
-    
+
     // Messages State
     messagesByChannel: {
         [channelId: string]: {
@@ -41,40 +41,41 @@ export interface ChatDataState {
             allLoaded: boolean;
         };
     };
-    
+
     // UI/Loading State
     currentChannelId: string | null;
     isLoading: {
         channels: boolean;
         messages: boolean;
     };
-    
+
     // --- Actions (平铺) ---
     setAuth: (user: User | null) => void;
     subscribeToChannels: () => () => void;
     addChannel: (channelData: Omit<Channel, "id" | "createdAt" | "messageCount">) => Promise<void>;
-    
+
     setCurrentChannel: (channelId: string) => void;
     fetchInitialMessages: (channelId: string) => Promise<void>;
     fetchMoreMessages: () => Promise<void>;
-    
+
     addMessage: (messageData: Omit<Message, "id" | "timestamp">) => Promise<void>;
     updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
     deleteMessage: (messageId: string) => Promise<void>;
+
 }
 
 // 私有变量，用于在 store 外部存储 unsubscribe 函数，避免在 state 中存储非序列化数据
 let channelUnsubscribe: (() => void) | null = null;
 
 export const useChatDataStore = create<ChatDataState>((set, get) => ({
-    // --- 初始 State ---
-    currentUser: null,
-    authIsReady: false,
-    channels: {},
-    channelOrder: [],
-    messagesByChannel: {},
-    currentChannelId: null,
-    isLoading: { channels: false, messages: false },
+// --- 初始 State ---
+currentUser: null,
+authIsReady: false,
+channels: {},
+channelOrder: [],
+messagesByChannel: {},
+currentChannelId: null,
+isLoading: { channels: false, messages: false },
 
     // --- Actions 实现 (平铺) ---
     setAuth: (user) => {
@@ -96,15 +97,15 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
         if (!userId) return () => {};
 
         channelUnsubscribe?.(); // 先清理旧的订阅
-        
+
         set(state => ({ isLoading: { ...state.isLoading, channels: true } }));
-        
+
         channelUnsubscribe = firebaseService.subscribeToChannels(userId, (channels) => {
             const channelsMap = channels.reduce((acc, ch) => ({ ...acc, [ch.id]: ch }), {});
             const channelOrder = channels.map(ch => ch.id);
-            set({ 
-                channels: channelsMap, 
-                channelOrder, 
+            set({
+                channels: channelsMap,
+                channelOrder,
                 isLoading: { ...get().isLoading, channels: false }
             });
         });
@@ -130,9 +131,9 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
         if (!userId) return;
 
         set(state => ({ isLoading: { ...state.isLoading, messages: true } }));
-        
+
         const { messages, lastVisible, allLoaded } = await firebaseService.fetchInitialMessages(userId, channelId, 30);
-        
+
         const messagesMap = messages.reduce((acc, msg) => ({ ...acc, [msg.id]: msg }), {});
         const messageOrder = messages.map(msg => msg.id);
 
@@ -148,10 +149,10 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
     fetchMoreMessages: async () => {
         const { currentUser, currentChannelId, messagesByChannel, isLoading } = get();
         if (!currentUser || !currentChannelId || isLoading.messages) return;
-        
+
         const channelState = messagesByChannel[currentChannelId];
         if (!channelState || channelState.allLoaded || !channelState.lastVisible) return;
-        
+
         set(state => ({ isLoading: { ...state.isLoading, messages: true } }));
 
         const { messages, lastVisible, allLoaded } = await firebaseService.fetchMoreMessages(currentUser.uid, currentChannelId, 30, channelState.lastVisible);
@@ -177,7 +178,7 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
     addMessage: async (messageData) => {
         const userId = get().currentUser?.uid;
         if (!userId) throw new Error("User not authenticated.");
-        
+
         const channelId = messageData.channelId;
         const optimisticMessage: Message = { ...messageData, id: `temp_${Date.now()}`, timestamp: new Date() };
 
@@ -224,7 +225,7 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
         if (!currentChannelId) return;
         const originalMessage = messagesByChannel[currentChannelId]?.messages[messageId];
         if (!originalMessage) return;
-        
+
         const updatedMessage = { ...originalMessage, ...updates };
         set(state => {
              const messages = state.messagesByChannel[currentChannelId].messages;
@@ -267,6 +268,7 @@ export const useChatDataStore = create<ChatDataState>((set, get) => ({
             // 回滚逻辑可以根据需要实现
         }
     },
+
 }));
 关键改动和说明
 
@@ -294,8 +296,8 @@ IGNORE_WHEN_COPYING_END
 import { shallow } from 'zustand/shallow';
 
 const { addMessage, deleteMessage } = useChatDataStore(
-    (state) => ({ addMessage: state.addMessage, deleteMessage: state.deleteMessage }),
-    shallow
+(state) => ({ addMessage: state.addMessage, deleteMessage: state.deleteMessage }),
+shallow
 );
 
 这份代码保留了你熟悉的 store 结构，同时注入了连接到真实后端的全部能力，包括状态隔离、分页、实时订阅和乐观更新。这是一个非常实用的、生产就绪的最终方案。

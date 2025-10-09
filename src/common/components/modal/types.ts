@@ -18,6 +18,6 @@ export interface ModalState {
 
 export interface ModalContextValue {
   show: (options: ModalOptions) => void;
-  confirm: (options: Omit<ModalOptions, 'content'>) => void;
+  confirm: (options: Omit<ModalOptions, "content">) => void;
   close: () => void;
-} 
+}

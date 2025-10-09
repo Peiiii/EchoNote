@@ -2,37 +2,40 @@ import type { Message } from "@/core/stores/notes-data.store";
 import type { ContextItem, MessageSummarizer } from "../types/message-summarizer.types";
 
 export class TieredMessageSummarizer implements MessageSummarizer {
-  
   private readonly TIER_LIMITS = {
     latest: 10000,
     recent: 2000,
     historical: 300,
     archive: 30,
   } as const;
-  
+
   private readonly MAX_LENGTH = 35000;
 
   summarizeMessages(messages: Message[], maxLength?: number): ContextItem[] {
     const _lengthLimit = maxLength || this.MAX_LENGTH;
-    const userMessages = messages.filter(msg => msg.sender === 'user');
-    
+    const userMessages = messages.filter(msg => msg.sender === "user");
+
     if (userMessages.length === 0) {
-      return [{
-        description: 'User Notes Context',
-        value: JSON.stringify({ empty: true, message: 'No user notes available' })
-      }];
+      return [
+        {
+          description: "User Notes Context",
+          value: JSON.stringify({ empty: true, message: "No user notes available" }),
+        },
+      ];
     }
 
     // Group messages by tiers
     const tieredMessages = this.groupMessagesByTier(userMessages);
-    
+
     // Build JSON context
     const jsonContext = this.buildContextJSON(tieredMessages, _lengthLimit);
-    
-    return [{
-      description: 'User Notes Context (Structured)',
-      value: JSON.stringify(jsonContext)
-    }];
+
+    return [
+      {
+        description: "User Notes Context (Structured)",
+        value: JSON.stringify(jsonContext),
+      },
+    ];
   }
 
   private groupMessagesByTier(messages: Message[]): Array<{
@@ -43,29 +46,29 @@ export class TieredMessageSummarizer implements MessageSummarizer {
   }> {
     const groups = [
       {
-        name: '1',
-        description: 'Most recent note (full content)',
+        name: "1",
+        description: "Most recent note (full content)",
         items: [] as Message[],
-        charLimit: this.TIER_LIMITS.latest
+        charLimit: this.TIER_LIMITS.latest,
       },
       {
-        name: '2-5',
-        description: 'Recent notes (detailed)',
+        name: "2-5",
+        description: "Recent notes (detailed)",
         items: [] as Message[],
-        charLimit: this.TIER_LIMITS.recent
+        charLimit: this.TIER_LIMITS.recent,
       },
       {
-        name: '6-30',
-        description: 'Historical notes (summarized)',
+        name: "6-30",
+        description: "Historical notes (summarized)",
         items: [] as Message[],
-        charLimit: this.TIER_LIMITS.historical
+        charLimit: this.TIER_LIMITS.historical,
       },
       {
-        name: '31+',
-        description: 'Archive notes (brief)',
+        name: "31+",
+        description: "Archive notes (brief)",
         items: [] as Message[],
-        charLimit: this.TIER_LIMITS.archive
-      }
+        charLimit: this.TIER_LIMITS.archive,
+      },
     ];
 
     messages.forEach((message, index) => {
@@ -85,24 +88,27 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     return 3; // '31+'
   }
 
-  private buildContextJSON(messageGroups: Array<{
-    name: string;
-    description: string;
-    items: Message[];
-    charLimit: number;
-  }>, lengthLimit: number): Record<string, unknown> {
+  private buildContextJSON(
+    messageGroups: Array<{
+      name: string;
+      description: string;
+      items: Message[];
+      charLimit: number;
+    }>,
+    lengthLimit: number
+  ): Record<string, unknown> {
     const allMessages = messageGroups.flatMap(group => group.items);
     if (allMessages.length === 0) {
-      return { 
-        empty: true, 
-        message: 'No user notes available',
-        sampling_rules: this.getSamplingRulesDescription()
+      return {
+        empty: true,
+        message: "No user notes available",
+        sampling_rules: this.getSamplingRulesDescription(),
       };
     }
 
     const context: Record<string, unknown> = {
       sampling_rules: this.getSamplingRulesDescription(),
-      groups: []
+      groups: [],
     };
     let totalLength = 0;
     let processedCount = 0;
@@ -113,7 +119,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
 
       const groupData = this.buildGroupJSON(group);
       const groupLength = this.getTextLength(JSON.stringify(groupData));
-      
+
       if (totalLength + groupLength <= lengthLimit) {
         (context.groups as Record<string, unknown>[]).push(groupData);
         totalLength += groupLength;
@@ -127,7 +133,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     if (remainingCount > 0) {
       context.additional_notes = {
         count: remainingCount,
-        message: 'Use search tools to access more content'
+        message: "Use search tools to access more content",
       };
     }
 
@@ -143,16 +149,16 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     const groupData: Record<string, unknown> = {
       name: group.name,
       description: group.description,
-      items: []
+      items: [],
     };
 
-    group.items.forEach((message) => {
+    group.items.forEach(message => {
       const processedContent = this.processMessageContent(message, group.charLimit);
       const itemData: Record<string, unknown> = {
         id: message.id,
         timestamp: message.timestamp.toISOString(),
         channel_id: message.channelId,
-        content: processedContent.content
+        content: processedContent.content,
       };
 
       if (processedContent.truncated) {
@@ -167,7 +173,10 @@ export class TieredMessageSummarizer implements MessageSummarizer {
     return groupData;
   }
 
-  private processMessageContent(message: Message, charLimit: number): { content: string; truncated?: boolean; originalLength?: number; truncatedLength?: number } {
+  private processMessageContent(
+    message: Message,
+    charLimit: number
+  ): { content: string; truncated?: boolean; originalLength?: number; truncatedLength?: number } {
     if (message.content.length <= charLimit) {
       return { content: message.content };
     }
@@ -177,7 +186,7 @@ export class TieredMessageSummarizer implements MessageSummarizer {
       content: truncatedContent,
       truncated: true,
       originalLength: message.content.length,
-      truncatedLength: truncatedContent.length
+      truncatedLength: truncatedContent.length,
     };
   }
 
@@ -252,24 +261,24 @@ Groups are processed in priority order (1 → 2-5 → 6-30 → 31+) until token 
    */
   debugSummarizeMessages(sampleMessages?: Message[]): void {
     const messages = sampleMessages || this.generateSampleMessages();
-    
-    console.group('🔍 Message Summarizer Debug');
-    console.log('📝 Input Messages:', messages);
-    
+
+    console.group("🔍 Message Summarizer Debug");
+    console.log("📝 Input Messages:", messages);
+
     const result = this.summarizeMessages(messages);
-    console.log('📊 Summary Result:', result);
-    
+    console.log("📊 Summary Result:", result);
+
     if (result[0]?.value) {
       try {
         const parsed = JSON.parse(result[0].value);
-        console.log('📋 Parsed JSON:', parsed);
-        console.log('📏 Length:', this.getTextLength(result[0].value));
-        console.log('📐 Character Count:', result[0].value.length);
+        console.log("📋 Parsed JSON:", parsed);
+        console.log("📏 Length:", this.getTextLength(result[0].value));
+        console.log("📐 Character Count:", result[0].value.length);
       } catch (e) {
-        console.error('❌ Failed to parse JSON:', e);
+        console.error("❌ Failed to parse JSON:", e);
       }
     }
-    
+
     console.groupEnd();
   }
 
@@ -277,33 +286,37 @@ Groups are processed in priority order (1 → 2-5 → 6-30 → 31+) until token 
     const now = new Date();
     return [
       {
-        id: '1',
-        content: 'This is the latest note with full content that should be preserved completely. It contains important information about the current project status and next steps.',
+        id: "1",
+        content:
+          "This is the latest note with full content that should be preserved completely. It contains important information about the current project status and next steps.",
         timestamp: new Date(now.getTime() - 1000 * 60 * 5), // 5 minutes ago
-        sender: 'user',
-        channelId: 'channel1'
+        sender: "user",
+        channelId: "channel1",
       },
       {
-        id: '2',
-        content: 'This is a recent note that should be included with good detail. It discusses the implementation approach and technical considerations.',
+        id: "2",
+        content:
+          "This is a recent note that should be included with good detail. It discusses the implementation approach and technical considerations.",
         timestamp: new Date(now.getTime() - 1000 * 60 * 30), // 30 minutes ago
-        sender: 'user',
-        channelId: 'channel1'
+        sender: "user",
+        channelId: "channel1",
       },
       {
-        id: '3',
-        content: 'This is a historical note that should be summarized. It contains older information that is less critical but still relevant for context.',
+        id: "3",
+        content:
+          "This is a historical note that should be summarized. It contains older information that is less critical but still relevant for context.",
         timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 2), // 2 hours ago
-        sender: 'user',
-        channelId: 'channel2'
+        sender: "user",
+        channelId: "channel2",
       },
       {
-        id: '4',
-        content: 'This is an archive note that should be brief. Very old information that provides minimal context.',
+        id: "4",
+        content:
+          "This is an archive note that should be brief. Very old information that provides minimal context.",
         timestamp: new Date(now.getTime() - 1000 * 60 * 60 * 24), // 1 day ago
-        sender: 'user',
-        channelId: 'channel1'
-      }
+        sender: "user",
+        channelId: "channel1",
+      },
     ];
   }
 }

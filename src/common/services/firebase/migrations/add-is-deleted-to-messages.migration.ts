@@ -17,10 +17,10 @@ export class AddIsDeletedToMessagesMigration implements MigrationExecutor {
     const messagesCollectionRef = collection(db, `users/${userId}/messages`);
     const messagesSnapshot = await getDocs(messagesCollectionRef);
     let migratedCount = 0;
-    
+
     for (const messageDoc of messagesSnapshot.docs) {
       const messageData = messageDoc.data();
-      
+
       // If the message does not have the isDeleted field, add isDeleted: false
       if (messageData.isDeleted === undefined) {
         const messageRef = doc(messagesCollectionRef, messageDoc.id);
@@ -30,7 +30,7 @@ export class AddIsDeletedToMessagesMigration implements MigrationExecutor {
         migratedCount++;
       }
     }
-    
+
     // Only log if there were actual changes
     if (migratedCount > 0) {
       console.log(`   📊 Updated ${migratedCount} messages with isDeleted field`);

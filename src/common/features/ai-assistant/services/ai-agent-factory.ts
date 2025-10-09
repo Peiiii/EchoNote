@@ -1,7 +1,10 @@
 import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 import { IAgent } from "@agent-labs/agent-chat";
 import { channelToolsManager } from "./channel-tools-manager";
-import { channelContextManager, sessionContextManager } from "@/common/features/ai-assistant/features/context";
+import {
+  channelContextManager,
+  sessionContextManager,
+} from "@/common/features/ai-assistant/features/context";
 import { ModelConfig, getDefaultModel } from "../config/model-config";
 import { useModelSelectionStore } from "../stores/model-selection.store";
 
@@ -38,7 +41,7 @@ export class AIAgentFactory {
     if (!this.agent) {
       this.agent = new ExperimentalInBrowserAgent();
     }
-    
+
     this.agent.setConfig({
       apiKey: modelConfig.apiKey,
       model: modelConfig.model,
@@ -58,7 +61,7 @@ export class AIAgentFactory {
       temperature: modelConfig.temperature,
       maxTokens: modelConfig.maxTokens,
       baseURL: modelConfig.apiUrl,
-    })
+    });
   }
 
   /**
@@ -72,7 +75,7 @@ export class AIAgentFactory {
       temperature: config.temperature ?? defaultModel.temperature,
       maxTokens: config.maxTokens ?? defaultModel.maxTokens,
       baseURL: config.baseURL || defaultModel.apiUrl,
-    })
+    });
   }
 
   /**
@@ -81,7 +84,10 @@ export class AIAgentFactory {
   getChannelTools() {
     console.log("🔔 [AIAgentFactory][getChannelTools] requesting tools");
     const tools = channelToolsManager.getChannelTools();
-    console.log("🔔 [AIAgentFactory][getChannelTools] returning tools:", tools.map(t => ({ name: t.name, description: t.description })));
+    console.log(
+      "🔔 [AIAgentFactory][getChannelTools] returning tools:",
+      tools.map(t => ({ name: t.name, description: t.description }))
+    );
     return tools;
   }
 

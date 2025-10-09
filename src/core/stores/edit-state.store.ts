@@ -10,10 +10,10 @@ export interface EditState {
   originalContent: string;
   isDirty: boolean;
   isSaving: boolean;
-  
+
   // Edit mode: inline vs expanded
-  editMode: 'inline' | 'expanded';
-  
+  editMode: "inline" | "expanded";
+
   // Editing actions
   startEditing: (messageId: string, content: string) => void;
   updateContent: (content: string) => void;
@@ -31,7 +31,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   originalContent: "",
   isDirty: false,
   isSaving: false,
-  editMode: 'inline',
+  editMode: "inline",
 
   // Start editing a message
   startEditing: (messageId: string, content: string) => {
@@ -41,7 +41,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       originalContent: content,
       isDirty: false,
       isSaving: false,
-      editMode: 'inline', // Default to inline mode
+      editMode: "inline", // Default to inline mode
     });
   },
 
@@ -56,12 +56,12 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
 
   // Switch to expanded editing mode
   switchToExpandedMode: () => {
-    set({ editMode: 'expanded' });
+    set({ editMode: "expanded" });
   },
 
   // Switch back to inline editing mode
   switchToInlineMode: () => {
-    set({ editMode: 'inline' });
+    set({ editMode: "inline" });
   },
 
   // Save the edited message
@@ -74,21 +74,21 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
     try {
       const { userId } = useNotesDataStore.getState();
       if (!userId) {
-        throw new Error('User not authenticated');
+        throw new Error("User not authenticated");
       }
 
       const { currentChannelId } = useNotesViewStore.getState();
       if (!currentChannelId) {
-        throw new Error('No current channel selected');
+        throw new Error("No current channel selected");
       }
 
       await channelMessageService.updateMessage({
         messageId: editingMessageId,
         channelId: currentChannelId,
         updates: { content: editContent.trim() },
-        userId
+        userId,
       });
-      
+
       get().reset();
     } catch (error) {
       console.error("Failed to save message:", error);
@@ -110,7 +110,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       originalContent: "",
       isDirty: false,
       isSaving: false,
-      editMode: 'inline',
+      editMode: "inline",
     });
   },
 }));

@@ -1,6 +1,5 @@
 import { AgentEvent } from "@agent-labs/agent-chat";
 
-
 export class EventEncoder {
   constructor() {}
 

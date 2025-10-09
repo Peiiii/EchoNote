@@ -19,11 +19,11 @@ interface EditorToolbarProps {
   rightActions?: EditorToolbarAction[];
 }
 
-export const EditorToolbar = ({ 
-  actions, 
+export const EditorToolbar = ({
+  actions,
   className,
   leftActions,
-  rightActions 
+  rightActions,
 }: EditorToolbarProps) => {
   const renderAction = (action: EditorToolbarAction, index: number) => (
     <Button
@@ -32,10 +32,7 @@ export const EditorToolbar = ({
       size={action.size || "sm"}
       onClick={action.onClick}
       disabled={action.disabled}
-      className={cn(
-        "h-8 px-3 text-xs",
-        action.className
-      )}
+      className={cn("h-8 px-3 text-xs", action.className)}
     >
       {action.icon}
       {action.label}
@@ -45,21 +42,15 @@ export const EditorToolbar = ({
   return (
     <div className={cn("flex items-center justify-between", className)}>
       {/* Left actions */}
-      <div className="flex items-center gap-2">
-        {leftActions?.map(renderAction)}
-      </div>
+      <div className="flex items-center gap-2">{leftActions?.map(renderAction)}</div>
 
       {/* Center actions */}
       {actions && actions.length > 0 && (
-        <div className="flex items-center gap-2">
-          {actions.map(renderAction)}
-        </div>
+        <div className="flex items-center gap-2">{actions.map(renderAction)}</div>
       )}
 
       {/* Right actions */}
-      <div className="flex items-center gap-2">
-        {rightActions?.map(renderAction)}
-      </div>
+      <div className="flex items-center gap-2">{rightActions?.map(renderAction)}</div>
     </div>
   );
 };

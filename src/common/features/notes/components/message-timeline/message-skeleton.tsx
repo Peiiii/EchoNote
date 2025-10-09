@@ -1,4 +1,4 @@
-import { Skeleton } from '@/common/components/ui/skeleton';
+import { Skeleton } from "@/common/components/ui/skeleton";
 
 export const MessageSkeleton = () => {
   return (
@@ -12,14 +12,14 @@ export const MessageSkeleton = () => {
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-3 w-16" />
           </div>
-          
+
           {/* 消息内容骨架 */}
           <div className="space-y-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
           </div>
-          
+
           {/* 操作按钮骨架 */}
           <div className="flex items-center space-x-2 pt-2">
             <Skeleton className="h-6 w-16" />

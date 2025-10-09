@@ -1,8 +1,10 @@
 import { useRef, useCallback } from "react";
 
-
-export const useLazyLoadingScrollControl = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null>; }) => {
-
+export const useLazyLoadingScrollControl = ({
+  containerRef,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}) => {
   const scrollPositionRef = useRef<{
     scrollTop: number;
     scrollHeight: number;
@@ -16,7 +18,7 @@ export const useLazyLoadingScrollControl = ({ containerRef }: { containerRef: Re
     scrollPositionRef.current = {
       scrollTop: container.scrollTop,
       scrollHeight: container.scrollHeight,
-      clientHeight: container.clientHeight
+      clientHeight: container.clientHeight,
     };
   }, [containerRef]);
 
@@ -39,7 +41,7 @@ export const useLazyLoadingScrollControl = ({ containerRef }: { containerRef: Re
       // 调整滚动位置，保持用户关注的相对位置
       if (addedHeight > 0) {
         // container.scrollTop = scrollTop + addedHeight;
-        container.scrollTo({ top: scrollTop + addedHeight, behavior: 'instant' });
+        container.scrollTo({ top: scrollTop + addedHeight, behavior: "instant" });
       }
 
       // 清除记录的位置
@@ -49,7 +51,6 @@ export const useLazyLoadingScrollControl = ({ containerRef }: { containerRef: Re
 
   return {
     recordScrollPosition,
-    restoreScrollPosition
+    restoreScrollPosition,
   };
-
 };

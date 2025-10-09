@@ -1,12 +1,15 @@
-import { EventType, TextDeltaEvent, TextEndEvent, TextStartEvent } from '@agent-labs/agent-chat';
-import OpenAI from 'openai';
-import { EventEncoder } from '../encoder';
-import { StreamContext, StreamHandler } from '../types';
+import { EventType, TextDeltaEvent, TextEndEvent, TextStartEvent } from "@agent-labs/agent-chat";
+import OpenAI from "openai";
+import { EventEncoder } from "../encoder";
+import { StreamContext, StreamHandler } from "../types";
 
 export class TextMessageHandler implements StreamHandler {
   constructor(private encoder: EventEncoder) {}
 
-  async *handle(chunk: OpenAI.Chat.Completions.ChatCompletionChunk, context: StreamContext): AsyncGenerator<string, void, unknown> {
+  async *handle(
+    chunk: OpenAI.Chat.Completions.ChatCompletionChunk,
+    context: StreamContext
+  ): AsyncGenerator<string, void, unknown> {
     if (!context.isMessageStarted) {
       const event: TextStartEvent = {
         type: EventType.TEXT_START,
@@ -37,4 +40,4 @@ export class TextMessageHandler implements StreamHandler {
       yield this.encoder.encode(event);
     }
   }
-} 
+}

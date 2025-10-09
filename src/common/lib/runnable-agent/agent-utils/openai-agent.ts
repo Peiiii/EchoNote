@@ -8,7 +8,7 @@ import {
   UIMessage,
   type Context,
   type RunAgentInput,
-  type ToolCall
+  type ToolCall,
 } from "@agent-labs/agent-chat";
 import OpenAI from "openai";
 import { EventEncoder } from "./encoder";
@@ -48,7 +48,7 @@ export class OpenAIAgent {
   }
 
   private convertToolsToOpenAIFormat(tools: Tool[]) {
-    return tools.map((tool) => ({
+    return tools.map(tool => ({
       type: "function" as const,
       function: {
         name: tool.name,
@@ -62,7 +62,7 @@ export class OpenAIAgent {
     uiMessages: UIMessage[]
   ): OpenAI.Chat.ChatCompletionMessageParam[] {
     const messages = convertUIMessagesToMessages(uiMessages);
-    return messages.map((message) => {
+    return messages.map(message => {
       if (message.role === "tool" && "toolCallId" in message) {
         return {
           role: message.role,
@@ -70,11 +70,7 @@ export class OpenAIAgent {
           tool_call_id: message.toolCallId,
         };
       }
-      if (
-        message.role === "developer" ||
-        message.role === "system" ||
-        message.role === "user"
-      ) {
+      if (message.role === "developer" || message.role === "system" || message.role === "user") {
         return {
           role: message.role,
           content: message.content,
@@ -88,13 +84,13 @@ export class OpenAIAgent {
         tool_calls:
           "toolCalls" in message
             ? message.toolCalls?.map((toolCall: ToolCall) => ({
-              id: toolCall.id,
-              type: "function" as const,
-              function: {
-                name: toolCall.function.name,
-                arguments: toolCall.function.arguments,
-              },
-            }))
+                id: toolCall.id,
+                type: "function" as const,
+                function: {
+                  name: toolCall.function.name,
+                  arguments: toolCall.function.arguments,
+                },
+              }))
             : undefined,
       };
     });
@@ -106,9 +102,7 @@ export class OpenAIAgent {
   ) {
     const contextMessage = {
       role: "system" as const,
-      content: context
-        .map((ctx) => `${ctx.description}: ${ctx.value}`)
-        .join("\n"),
+      content: context.map(ctx => `${ctx.description}: ${ctx.value}`).join("\n"),
     };
     return [contextMessage, ...messages];
   }
@@ -135,10 +129,13 @@ export class OpenAIAgent {
       if (inputData.context) {
         messages = this.addContextToMessages(messages, inputData.context);
       }
-      console.log("🔔 [OpenAIAgent][run] messages:", messages,"inputData.messages:", inputData.messages);
-      const tools = inputData.tools
-        ? this.convertToolsToOpenAIFormat(inputData.tools)
-        : [];
+      console.log(
+        "🔔 [OpenAIAgent][run] messages:",
+        messages,
+        "inputData.messages:",
+        inputData.messages
+      );
+      const tools = inputData.tools ? this.convertToolsToOpenAIFormat(inputData.tools) : [];
 
       // 创建流
       const stream = await this.client.chat.completions.create({

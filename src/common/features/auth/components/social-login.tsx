@@ -1,5 +1,5 @@
-import { Button } from '@/common/components/ui/button';
-import { useGoogleAuthSupport } from '@/common/hooks/use-google-auth-support';
+import { Button } from "@/common/components/ui/button";
+import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 
 interface SocialLoginProps {
   onGoogleLogin: () => void;

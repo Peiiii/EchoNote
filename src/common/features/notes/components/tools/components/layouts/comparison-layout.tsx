@@ -1,5 +1,5 @@
-import { ContentCard } from '../content-display/content-card';
-import { cn } from '@/common/lib/utils';
+import { ContentCard } from "../content-display/content-card";
+import { cn } from "@/common/lib/utils";
 
 export interface ComparisonItem {
   content: string;
@@ -21,15 +21,15 @@ export function ComparisonLayout({
   className,
 }: ComparisonLayoutProps) {
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn("space-y-3", className)}>
       {showLabels && (
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {original.label || 'Original'}
+            {original.label || "Original"}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">→</span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {updated.label || 'Updated'}
+            {updated.label || "Updated"}
           </span>
         </div>
       )}
@@ -39,14 +39,14 @@ export function ComparisonLayout({
           variant="default"
           maxHeight="max-h-48"
           showScrollbar={true}
-          placeholder={original.placeholder || 'Loading original content...'}
+          placeholder={original.placeholder || "Loading original content..."}
         />
         <ContentCard
           content={updated.content}
           variant="success"
           maxHeight="max-h-48"
           showScrollbar={true}
-          placeholder={updated.placeholder || 'Loading updated content...'}
+          placeholder={updated.placeholder || "Loading updated content..."}
         />
       </div>
     </div>

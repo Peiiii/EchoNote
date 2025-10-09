@@ -1,4 +1,4 @@
-import { BackgroundOption, gradientOptions, colorOptions } from './background-options';
+import { BackgroundOption, gradientOptions, colorOptions } from "./background-options";
 
 interface ColorSelectorProps {
   currentBackground?: string;
@@ -15,18 +15,18 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
       <div>
         <h4 className="text-xs font-medium text-muted-foreground mb-2">Gradients</h4>
         <div className="grid grid-cols-3 gap-2">
-          {gradientOptions.map((option) => (
+          {gradientOptions.map(option => (
             <button
               key={option.id}
-              onClick={(e) => {
+              onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 onBackgroundSelect(option);
               }}
               className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer ${
                 isCurrentBackground(option)
-                  ? 'border-primary'
-                  : 'border-border hover:border-primary/50'
+                  ? "border-primary"
+                  : "border-border hover:border-primary/50"
               }`}
               style={{ background: option.preview }}
               title={option.name}
@@ -44,18 +44,18 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
       <div>
         <h4 className="text-xs font-medium text-muted-foreground mb-2">Solid Colors</h4>
         <div className="grid grid-cols-3 gap-2">
-          {colorOptions.map((option) => (
+          {colorOptions.map(option => (
             <button
               key={option.id}
-              onClick={(e) => {
+              onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 onBackgroundSelect(option);
               }}
               className={`relative aspect-square rounded-lg border-2 transition-all duration-200 hover:scale-105 cursor-pointer ${
                 isCurrentBackground(option)
-                  ? 'border-primary'
-                  : 'border-border hover:border-primary/50'
+                  ? "border-primary"
+                  : "border-border hover:border-primary/50"
               }`}
               style={{ background: option.preview }}
               title={option.name}

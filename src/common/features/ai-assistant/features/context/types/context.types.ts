@@ -1,6 +1,6 @@
 // Context Feature Types
 
-export type ContextMode = 'none' | 'channels' | 'all' | 'auto';
+export type ContextMode = "none" | "channels" | "all" | "auto";
 
 export interface ConversationContexts {
   mode: ContextMode;
@@ -8,7 +8,7 @@ export interface ConversationContexts {
 }
 
 export interface ContextStatus {
-  status: 'idle' | 'loading' | 'ready';
+  status: "idle" | "loading" | "ready";
   readyCount: number;
   totalCount: number;
 }

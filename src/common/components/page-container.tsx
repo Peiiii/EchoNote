@@ -29,7 +29,7 @@ export interface PageContainerProps {
 const maxWidthClasses = {
   none: "",
   sm: "max-w-sm",
-  md: "max-w-md", 
+  md: "max-w-md",
   lg: "max-w-lg",
   xl: "max-w-xl",
   "2xl": "max-w-2xl",
@@ -44,7 +44,7 @@ const paddingClasses = {
   none: "",
   sm: "p-2",
   default: "p-6",
-  lg: "p-8", 
+  lg: "p-8",
   xl: "p-12",
 };
 
@@ -63,18 +63,13 @@ export function PageContainer({
     className
   );
 
-  const contentClasses = cn(
-    "w-full h-full",
-    paddingClasses[padding]
-  );
+  const contentClasses = cn("w-full h-full", paddingClasses[padding]);
 
   if (scrollable) {
     return (
       <div className={containerClasses}>
         <ScrollArea className="w-full h-full">
-          <div className={contentClasses}>
-            {children}
-          </div>
+          <div className={contentClasses}>{children}</div>
         </ScrollArea>
       </div>
     );
@@ -82,9 +77,7 @@ export function PageContainer({
 
   return (
     <div className={containerClasses}>
-      <div className={contentClasses}>
-        {children}
-      </div>
+      <div className={contentClasses}>{children}</div>
     </div>
   );
-} 
+}

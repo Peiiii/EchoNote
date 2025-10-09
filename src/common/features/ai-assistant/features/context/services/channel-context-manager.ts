@@ -6,7 +6,11 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 /**
  * Generate system instructions for AI Assistant
  */
-export function generateSystemInstructions(channelName: string, messageCount: number, channelId: string): string {
+export function generateSystemInstructions(
+  channelName: string,
+  messageCount: number,
+  channelId: string
+): string {
   return `You are StillRoot AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
 
 You are currently assisting in the channel: ${channelName}
@@ -63,7 +67,6 @@ In every conversation, you should:
 Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
 }
 
-
 export class ChannelContextManager {
   private summarizer: MessageSummarizer = new HybridMessageSummarizer();
 
@@ -81,19 +84,21 @@ export class ChannelContextManager {
 
     if (!channel) {
       // still loading; return minimal payload
-      return [{
-        description: 'Channel Context',
-        value: JSON.stringify({
-          info: 'Channel meta loading...',
-          channelId,
-          timestamp: new Date().toISOString()
-        })
-      }];
+      return [
+        {
+          description: "Channel Context",
+          value: JSON.stringify({
+            info: "Channel meta loading...",
+            channelId,
+            timestamp: new Date().toISOString(),
+          }),
+        },
+      ];
     }
 
     // Filter to only user messages for context and sort by timestamp (newest first)
     const userMessages = messages
-      .filter(msg => msg.sender === 'user')
+      .filter(msg => msg.sender === "user")
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     // Use message summarizer to process messages
@@ -101,12 +106,12 @@ export class ChannelContextManager {
 
     return [
       {
-        description: 'System Instructions',
+        description: "System Instructions",
         value: JSON.stringify({
-          instructions: generateSystemInstructions(channel.name, userMessages.length, channelId)
-        })
+          instructions: generateSystemInstructions(channel.name, userMessages.length, channelId),
+        }),
       },
-      ...contextItems
+      ...contextItems,
     ];
   }
 }

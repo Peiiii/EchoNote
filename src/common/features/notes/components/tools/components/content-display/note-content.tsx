@@ -1,5 +1,5 @@
-import { ContentCard } from './content-card';
-import { MetadataRow, MetadataItem } from './metadata-row';
+import { ContentCard } from "./content-card";
+import { MetadataRow, MetadataItem } from "./metadata-row";
 
 export interface NoteContentProps {
   content: string;
@@ -9,7 +9,7 @@ export interface NoteContentProps {
     timestamp?: string;
     contentLength?: number;
   };
-  variant?: 'preview' | 'detail' | 'comparison' | 'error';
+  variant?: "preview" | "detail" | "comparison" | "error";
   maxHeight?: string;
   className?: string;
   placeholder?: string;
@@ -19,39 +19,39 @@ export function NoteContent({
   content,
   showMetadata = false,
   metadata,
-  variant = 'preview',
+  variant = "preview",
   maxHeight,
   className,
   placeholder,
 }: NoteContentProps) {
   const metadataItems: MetadataItem[] = [];
-  
+
   if (showMetadata && metadata) {
     if (metadata.noteId) {
       metadataItems.push({
-        label: 'ID',
+        label: "ID",
         value: metadata.noteId,
-        variant: 'mono',
+        variant: "mono",
       });
     }
     if (metadata.timestamp) {
       metadataItems.push({
-        label: 'Time',
+        label: "Time",
         value: metadata.timestamp,
-        variant: 'default',
+        variant: "default",
       });
     }
     if (metadata.contentLength) {
       metadataItems.push({
-        label: 'Length',
+        label: "Length",
         value: `${metadata.contentLength} chars`,
-        variant: 'default',
+        variant: "default",
       });
     }
   }
 
-  const cardVariant = variant === 'detail' ? 'success' : variant === 'error' ? 'error' : 'default';
-  const cardMaxHeight = variant === 'comparison' ? 'max-h-48' : maxHeight;
+  const cardVariant = variant === "detail" ? "success" : variant === "error" ? "error" : "default";
+  const cardMaxHeight = variant === "comparison" ? "max-h-48" : maxHeight;
 
   return (
     <div className={className}>
@@ -62,7 +62,7 @@ export function NoteContent({
         content={content}
         variant={cardVariant}
         maxHeight={cardMaxHeight}
-        showScrollbar={variant === 'comparison'}
+        showScrollbar={variant === "comparison"}
         placeholder={placeholder}
       />
     </div>

@@ -24,13 +24,11 @@ export interface ConfigurableActionMenuContentProps {
   groups: ActionMenuGroupConfig[];
 }
 
-export function ConfigurableActionMenuContent({
-  groups
-}: ConfigurableActionMenuContentProps) {
+export function ConfigurableActionMenuContent({ groups }: ConfigurableActionMenuContentProps) {
   const visibleGroups = groups
     .map(group => ({
       ...group,
-      items: group.items.filter(item => !item.hidden)
+      items: group.items.filter(item => !item.hidden),
     }))
     .filter(group => group.items.length > 0);
 
@@ -43,7 +41,7 @@ export function ConfigurableActionMenuContent({
           variant={group.variant}
           showSeparator={groupIndex > 0 || group.showSeparator === true}
         >
-          {group.items.map((item) => (
+          {group.items.map(item => (
             <ActionMenuItem
               key={item.id}
               icon={item.icon}

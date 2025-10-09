@@ -1,60 +1,60 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 /**
  * Status information for a single message's read-more state
  */
 type StatusEntry = {
   /** Whether the message content is long enough to require collapse functionality */
-  long: boolean
+  long: boolean;
   /** Whether the message is currently expanded (showing full content) */
-  expanded: boolean
+  expanded: boolean;
   /** Visible height threshold at which collapsing stops being useful */
-  collapseThreshold: number
-}
+  collapseThreshold: number;
+};
 
 /**
  * Global store for managing read-more/collapse state across all messages
  */
 interface ReadMoreStore {
   /** Map of message IDs to their individual status information */
-  statusMap: Record<string, StatusEntry>
+  statusMap: Record<string, StatusEntry>;
   /** ID of the message that currently sits at the bottom edge of the viewport */
-  activeMessageId: string | null
+  activeMessageId: string | null;
   /** Whether the inline collapse button of the active message is overlapped */
-  inlineOverlap: boolean
+  inlineOverlap: boolean;
   /** Visible height (within viewport) of the active message */
-  activeVisibleHeight: number | null
+  activeVisibleHeight: number | null;
   /** ID of the message that has a pending collapse request */
-  pendingCollapseId: string | null
+  pendingCollapseId: string | null;
   /** Latest layout sync callback registered by collapse hook */
-  layoutSync: (() => void) | null
+  layoutSync: (() => void) | null;
   /** Whether auto-scroll should be suppressed due to user interaction */
-  shouldSuppressAutoScroll: boolean
+  shouldSuppressAutoScroll: boolean;
   /** Timestamp when suppression was activated */
-  suppressionTimestamp: number | null
+  suppressionTimestamp: number | null;
   /** Updates the status information for a specific message */
-  setStatus: (id: string, status: StatusEntry) => void
+  setStatus: (id: string, status: StatusEntry) => void;
   /** Updates which message is controlling the floating collapse button */
   setActiveInfo: (
     messageId: string | null,
     inlineOverlap: boolean,
     visibleHeight: number | null
-  ) => void
+  ) => void;
   /** Requests a collapse operation for a specific message */
-  requestCollapse: (id: string) => void
+  requestCollapse: (id: string) => void;
   /** Acknowledges that a collapse request has been processed */
-  acknowledgeCollapse: () => void
+  acknowledgeCollapse: () => void;
   /** Registers latest layout sync callback */
-  registerLayoutSync: (cb: (() => void) | null) => void
+  registerLayoutSync: (cb: (() => void) | null) => void;
   /** Notifies that read-more layout may have changed */
-  notifyLayoutChange: () => void
+  notifyLayoutChange: () => void;
   /** Activates auto-scroll suppression due to user interaction */
-  activateAutoScrollSuppression: () => void
+  activateAutoScrollSuppression: () => void;
   /** Checks if auto-scroll should be suppressed (with time-based expiration) */
-  shouldSuppressAutoScrollNow: () => boolean
+  shouldSuppressAutoScrollNow: () => boolean;
 }
 
-export const AUTO_SCROLL_SUPPRESSION_TIME_MS = 600
+export const AUTO_SCROLL_SUPPRESSION_TIME_MS = 600;
 
 /**
  * Zustand store instance for read-more/collapse state management
@@ -69,37 +69,42 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
   layoutSync: null,
   shouldSuppressAutoScroll: false,
   suppressionTimestamp: null,
-  setStatus: (id, status) => set((state) => ({
-    statusMap: { ...state.statusMap, [id]: status },
-  })),
+  setStatus: (id, status) =>
+    set(state => ({
+      statusMap: { ...state.statusMap, [id]: status },
+    })),
   setActiveInfo: (messageId, inlineOverlap, visibleHeight) =>
     set({
       activeMessageId: messageId,
       inlineOverlap,
       activeVisibleHeight: visibleHeight,
     }),
-  requestCollapse: (id) => set({ pendingCollapseId: id }),
+  requestCollapse: id => set({ pendingCollapseId: id }),
   acknowledgeCollapse: () => set({ pendingCollapseId: null }),
-  registerLayoutSync: (cb) => set({ layoutSync: cb }),
+  registerLayoutSync: cb => set({ layoutSync: cb }),
   notifyLayoutChange: () => {
-    const cb = get().layoutSync
-    cb?.()
+    const cb = get().layoutSync;
+    cb?.();
   },
-  activateAutoScrollSuppression: () => set({ 
-    shouldSuppressAutoScroll: true, 
-    suppressionTimestamp: Date.now() 
-  }),
+  activateAutoScrollSuppression: () =>
+    set({
+      shouldSuppressAutoScroll: true,
+      suppressionTimestamp: Date.now(),
+    }),
   shouldSuppressAutoScrollNow: () => {
-    const state = get()
-    if (!state.shouldSuppressAutoScroll) return false
+    const state = get();
+    if (!state.shouldSuppressAutoScroll) return false;
     // Suppression expires after 300ms to handle multiple rapid scrollHeight changes
-    if (state.suppressionTimestamp && Date.now() - state.suppressionTimestamp > AUTO_SCROLL_SUPPRESSION_TIME_MS) {
-      set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null })
-      return false
+    if (
+      state.suppressionTimestamp &&
+      Date.now() - state.suppressionTimestamp > AUTO_SCROLL_SUPPRESSION_TIME_MS
+    ) {
+      set({ shouldSuppressAutoScroll: false, suppressionTimestamp: null });
+      return false;
     }
-    return true
+    return true;
   },
-}))
+}));
 
 /**
  * Selector function to determine if the floating collapse button should be shown
@@ -107,13 +112,13 @@ export const useReadMoreStore = create<ReadMoreStore>((set, get) => ({
  * @returns True if floating collapse button should be visible
  */
 export const selectShowFloatingCollapse = (state: ReadMoreStore) => {
-  const id = state.activeMessageId
-  if (!id) return false
-  const entry = state.statusMap[id]
-  if (!entry) return false
-  if (!entry.long || !entry.expanded) return false
-  if (!state.inlineOverlap) return false
-  if (entry.collapseThreshold <= 0) return true
-  if (state.activeVisibleHeight == null) return true
-  return state.activeVisibleHeight > entry.collapseThreshold + 1
-}
+  const id = state.activeMessageId;
+  if (!id) return false;
+  const entry = state.statusMap[id];
+  if (!entry) return false;
+  if (!entry.long || !entry.expanded) return false;
+  if (!state.inlineOverlap) return false;
+  if (entry.collapseThreshold <= 0) return true;
+  if (state.activeVisibleHeight == null) return true;
+  return state.activeVisibleHeight > entry.collapseThreshold + 1;
+};

@@ -2,17 +2,19 @@
  * Migration Logger - Professional logging with consistent prefixes
  */
 export class MigrationLogger {
-  private static readonly PREFIX = '[Migration]';
-  private static readonly PREFIX_STATE = '[MigrationState]';
-  private static readonly PREFIX_EXECUTOR = '[MigrationExecutor]';
-  private static readonly PREFIX_SERVICE = '[MigrationService]';
+  private static readonly PREFIX = "[Migration]";
+  private static readonly PREFIX_STATE = "[MigrationState]";
+  private static readonly PREFIX_EXECUTOR = "[MigrationExecutor]";
+  private static readonly PREFIX_SERVICE = "[MigrationService]";
 
   static printHeader(userId: string): void {
     console.log(`${this.PREFIX} 🚀 Starting migrations for user: ${userId}`);
   }
 
   static printOverview(total: number, completed: number, pending: number): void {
-    console.log(`${this.PREFIX} 📊 Status: ${total} total, ${completed} completed, ${pending} pending`);
+    console.log(
+      `${this.PREFIX} 📊 Status: ${total} total, ${completed} completed, ${pending} pending`
+    );
   }
 
   static printAllCompleted(skippedCount: number): void {
@@ -39,8 +41,14 @@ export class MigrationLogger {
     console.log(`${this.PREFIX}    ❌ Failed: ${errorMessage}`);
   }
 
-  static printExecutionSummary(successCount: number, failureCount: number, skippedCount: number): void {
-    console.log(`${this.PREFIX} 📈 Summary: ${successCount} executed, ${failureCount} failed, ${skippedCount} skipped`);
+  static printExecutionSummary(
+    successCount: number,
+    failureCount: number,
+    skippedCount: number
+  ): void {
+    console.log(
+      `${this.PREFIX} 📈 Summary: ${successCount} executed, ${failureCount} failed, ${skippedCount} skipped`
+    );
     if (failureCount === 0) {
       console.log(`${this.PREFIX} 🎉 All migrations completed successfully!`);
     }
@@ -56,7 +64,7 @@ export class MigrationLogger {
   }
 
   static printStateError(message: string, error?: unknown): void {
-    console.error(`${this.PREFIX_STATE} ❌ ${message}`, error || '');
+    console.error(`${this.PREFIX_STATE} ❌ ${message}`, error || "");
   }
 
   // Executor logs
@@ -65,7 +73,7 @@ export class MigrationLogger {
   }
 
   static printExecutorError(message: string, error?: unknown): void {
-    console.error(`${this.PREFIX_EXECUTOR} ❌ ${message}`, error || '');
+    console.error(`${this.PREFIX_EXECUTOR} ❌ ${message}`, error || "");
   }
 
   // Service logs
@@ -74,6 +82,6 @@ export class MigrationLogger {
   }
 
   static printServiceError(message: string, error?: unknown): void {
-    console.error(`${this.PREFIX_SERVICE} ❌ ${message}`, error || '');
+    console.error(`${this.PREFIX_SERVICE} ❌ ${message}`, error || "");
   }
 }

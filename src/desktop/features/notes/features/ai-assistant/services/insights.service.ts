@@ -1,23 +1,23 @@
-import { generateObject } from '@/common/services/ai/generate-object'
-import { ChannelContextService } from './context.service'
+import { generateObject } from "@/common/services/ai/generate-object";
+import { ChannelContextService } from "./context.service";
 
 // Define the JSON Schema for creative sparks
 const SparksSchema = {
-  type: 'object',
+  type: "object",
   properties: {
     sparks: {
-      type: 'array',
-      items: { type: 'string' },
+      type: "array",
+      items: { type: "string" },
       minItems: 3,
-      maxItems: 5
-    }
+      maxItems: 5,
+    },
   },
-  required: ['sparks']
-}
+  required: ["sparks"],
+};
 
 // Define the expected return type
 interface SparksResult {
-  sparks: string[]
+  sparks: string[];
 }
 
 // Define options for sparks generation
@@ -41,13 +41,13 @@ export interface SparksGenerationConfig {
 // Main function with clean configuration object
 export async function generateSparksForText(config: SparksGenerationConfig): Promise<string[]> {
   const { content, channelId, messageId, options = {} } = config;
-  
+
   // Build context-aware prompt
-  let contextInfo = '';
+  let contextInfo = "";
   if (options.includeChannelContext && channelId) {
     const context = ChannelContextService.getChannelContext(
-      channelId, 
-      messageId, 
+      channelId,
+      messageId,
       options.contextOptions
     );
     if (context) {
@@ -82,7 +82,7 @@ Since you can generate multiple sparks (3-5), strategically utilize this space t
 <objective priority="high" spark_allocation="1">Show care - Express warmth, understanding, and support like a thoughtful friend. Use 1 spark to provide emotional support and encouragement.</objective>
 <objective priority="high" spark_allocation="1-2">Adapt intelligently - Match the content type (analytical, emotional, creative, philosophical, etc.). Use 1-2 sparks to demonstrate different thinking styles or approaches.</objective>
 <objective priority="high" spark_allocation="1">Promote growth - Help users learn, reflect, and develop their thinking. Use 1 spark to suggest actionable next steps or reflection questions.</objective>
-${contextInfo ? '<objective priority="medium" spark_allocation="1">Connect contextually - Consider related thoughts from the same channel to provide more relevant and connected insights. Use 1 spark to draw connections with previous thoughts.</objective>' : ''}
+${contextInfo ? '<objective priority="medium" spark_allocation="1">Connect contextually - Consider related thoughts from the same channel to provide more relevant and connected insights. Use 1 spark to draw connections with previous thoughts.</objective>' : ""}
 <objective priority="highest" spark_allocation="flexible">Additional Instructions - If additional instructions are provided, prioritize and incorporate them into spark generation. Adjust spark allocation and focus to meet specific user requirements mentioned in additional instructions.</objective>
 </objectives>
 
@@ -91,29 +91,29 @@ ${contextInfo ? '<objective priority="medium" spark_allocation="1">Connect conte
 <requirement>Educational and thought-provoking</requirement>
 <requirement>Warm and supportive in tone</requirement>
 <requirement>Varied in approach and perspective</requirement>
-${contextInfo ? '<requirement>Connected to the broader context of their thinking journey</requirement>' : ''}
+${contextInfo ? "<requirement>Connected to the broader context of their thinking journey</requirement>" : ""}
 </quality_requirements>
 
 <user_content>
 ${content}
 </user_content>
-${contextInfo ? `<context>${contextInfo}</context>` : ''}${options.additionalInstructions ? `\n\n<additional_instructions>${options.additionalInstructions}</additional_instructions>` : ''}`
+${contextInfo ? `<context>${contextInfo}</context>` : ""}${options.additionalInstructions ? `\n\n<additional_instructions>${options.additionalInstructions}</additional_instructions>` : ""}`;
 
-  console.log('Generating creative sparks with schema:', SparksSchema)
-  
+  console.log("Generating creative sparks with schema:", SparksSchema);
+
   try {
     const result = await generateObject<SparksResult>({
       schema: SparksSchema,
       prompt,
       temperature: 0.9, // Higher temperature for more creativity
       jsonOnly: true,
-    })
-    
-    console.log('Successfully generated creative sparks:', result.sparks)
-    return result.sparks
+    });
+
+    console.log("Successfully generated creative sparks:", result.sparks);
+    return result.sparks;
   } catch (error) {
-    console.error('Failed to generate creative sparks:', error)
-    throw error
+    console.error("Failed to generate creative sparks:", error);
+    throw error;
   }
 }
 

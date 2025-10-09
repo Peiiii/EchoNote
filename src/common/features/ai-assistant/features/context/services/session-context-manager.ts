@@ -1,14 +1,15 @@
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { ConversationContextMode, type ConversationContextConfig } from "@/common/types/ai-conversation";
+import {
+  ConversationContextMode,
+  type ConversationContextConfig,
+} from "@/common/types/ai-conversation";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import type { Message } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { HybridMessageSummarizer } from "./hybrid-message-summarizer.strategy";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
-
 const MESSAGE_LIMIT_PER_CHANNEL = 1000;
-
 
 export class SessionContextManager {
   private summarizer = new HybridMessageSummarizer();
@@ -16,10 +17,15 @@ export class SessionContextManager {
   /**
    * Generate system instructions for unified context
    */
-  private generateSystemInstructions(channelCount: number, totalNotes: number, channelNames: string[], primaryChannelId: string): string {
+  private generateSystemInstructions(
+    channelCount: number,
+    totalNotes: number,
+    channelNames: string[],
+    primaryChannelId: string
+  ): string {
     const isMultiChannel = channelCount > 1;
     const channelContext = isMultiChannel
-      ? `a multi-channel context spanning ${channelCount} channels: ${channelNames.join(', ')}`
+      ? `a multi-channel context spanning ${channelCount} channels: ${channelNames.join(", ")}`
       : `the channel: ${channelNames[0]}`;
 
     const contextUnderstanding = isMultiChannel
@@ -51,9 +57,9 @@ This context contains ${totalNotes} thought records, representing the collective
 - Provide multi-dimensional thinking frameworks
 
 ### Objective 3: Knowledge Insight Discovery (Basic Priority)
-- Analyze hidden connections between notes${isMultiChannel ? ' across different channels' : ''}
+- Analyze hidden connections between notes${isMultiChannel ? " across different channels" : ""}
 - Discover users' knowledge blind spots and cognitive gaps
-- Provide new insights and connections${isMultiChannel ? ' across channel boundaries' : ''}
+- Provide new insights and connections${isMultiChannel ? " across channel boundaries" : ""}
 - Help users build comprehensive knowledge systems
 
 ## Your Working Approach:
@@ -97,9 +103,13 @@ Always be concise, actionable, and focused on helping users maximize their poten
   ensureContextsLoaded(contexts: ConversationContextConfig | null, fallbackChannelId: string) {
     if (!contexts) {
       // Auto mode: ensure fallback channel is loaded
-      const channelState = channelMessageService.dataContainer.get().messageByChannel[fallbackChannelId];
+      const channelState =
+        channelMessageService.dataContainer.get().messageByChannel[fallbackChannelId];
       if (!channelState || channelState.hasMore) {
-        channelMessageService.requestLoadInitialMessages$.next({ channelId: fallbackChannelId, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
+        channelMessageService.requestLoadInitialMessages$.next({
+          channelId: fallbackChannelId,
+          messageLimit: MESSAGE_LIMIT_PER_CHANNEL,
+        });
       }
       return;
     }
@@ -107,10 +117,14 @@ Always be concise, actionable, and focused on helping users maximize their poten
     const { mode, channelIds } = contexts;
 
     if (mode === ConversationContextMode.AUTO) {
-      const currentChannelId = useNotesViewStore.getState().currentChannelId!
-      const channelState = channelMessageService.dataContainer.get().messageByChannel[currentChannelId];
+      const currentChannelId = useNotesViewStore.getState().currentChannelId!;
+      const channelState =
+        channelMessageService.dataContainer.get().messageByChannel[currentChannelId];
       if (!channelState || channelState.hasMore) {
-        channelMessageService.requestLoadInitialMessages$.next({ channelId: currentChannelId, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
+        channelMessageService.requestLoadInitialMessages$.next({
+          channelId: currentChannelId,
+          messageLimit: MESSAGE_LIMIT_PER_CHANNEL,
+        });
       }
       return;
     }
@@ -120,7 +134,10 @@ Always be concise, actionable, and focused on helping users maximize their poten
       channelIds.forEach(id => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[id];
         if (!channelState || channelState.hasMore) {
-          channelMessageService.requestLoadInitialMessages$.next({ channelId: id, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
+          channelMessageService.requestLoadInitialMessages$.next({
+            channelId: id,
+            messageLimit: MESSAGE_LIMIT_PER_CHANNEL,
+          });
         }
       });
     } else if (mode === ConversationContextMode.ALL) {
@@ -129,7 +146,10 @@ Always be concise, actionable, and focused on helping users maximize their poten
       channels.forEach(channel => {
         const channelState = channelMessageService.dataContainer.get().messageByChannel[channel.id];
         if (!channelState || channelState.hasMore) {
-          channelMessageService.requestLoadInitialMessages$.next({ channelId: channel.id, messageLimit: MESSAGE_LIMIT_PER_CHANNEL });
+          channelMessageService.requestLoadInitialMessages$.next({
+            channelId: channel.id,
+            messageLimit: MESSAGE_LIMIT_PER_CHANNEL,
+          });
         }
       });
     }
@@ -149,9 +169,12 @@ Always be concise, actionable, and focused on helping users maximize their poten
     if (mode === ConversationContextMode.NONE) {
       return [
         {
-          description: 'System Instructions',
-          value: JSON.stringify({ instructions: 'No external context is attached to this conversation. Respond based on user input only unless the user explicitly asks to reference notes.' })
-        }
+          description: "System Instructions",
+          value: JSON.stringify({
+            instructions:
+              "No external context is attached to this conversation. Respond based on user input only unless the user explicitly asks to reference notes.",
+          }),
+        },
       ];
     }
 
@@ -202,11 +225,11 @@ Always be concise, actionable, and focused on helping users maximize their poten
 
       if (channel && channelState?.messages) {
         const userMessages = channelState.messages
-          .filter(msg => msg.sender === 'user')
+          .filter(msg => msg.sender === "user")
           .map(msg => ({
             ...msg,
             channelId,
-            channelName: channel.name
+            channelName: channel.name,
           }));
 
         allMessages.push(...userMessages);
@@ -224,8 +247,8 @@ Always be concise, actionable, and focused on helping users maximize their poten
       const channel = channels.find(c => c.id === id);
       return {
         id,
-        name: channel?.name || 'Unknown',
-        note_count: channel?.messageCount || 0
+        name: channel?.name || "Unknown",
+        note_count: channel?.messageCount || 0,
       };
     });
 
@@ -241,21 +264,20 @@ Always be concise, actionable, and focused on helping users maximize their poten
 
     return [
       {
-        description: 'System Instructions',
-        value: systemInstructions
+        description: "System Instructions",
+        value: systemInstructions,
       },
       {
-        description: 'Channel Information',
+        description: "Channel Information",
         value: JSON.stringify({
           channels: channelInfo,
           total_channels: channelIds.length,
-          total_notes: totalNotes
-        })
+          total_notes: totalNotes,
+        }),
       },
-      ...contextItems
+      ...contextItems,
     ];
   }
-
 }
 
 export const sessionContextManager = new SessionContextManager();

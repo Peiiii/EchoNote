@@ -1,4 +1,12 @@
-import { addDoc, collection, getDocs, limit, query, serverTimestamp, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor } from "./types";
 
@@ -42,4 +50,3 @@ export class CreateDefaultGeneralChannelMigration implements MigrationExecutor {
     });
   }
 }
-

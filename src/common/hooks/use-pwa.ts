@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface PWAState {
   isInstalled: boolean;
@@ -18,7 +18,7 @@ export const usePWA = () => {
   useEffect(() => {
     // Check if app is installed
     const checkInstalled = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
       const isInApp = (window.navigator as { standalone?: boolean }).standalone === true;
       setPWAState(prev => ({ ...prev, isInstalled: isStandalone || isInApp }));
     };
@@ -35,10 +35,10 @@ export const usePWA = () => {
 
     // Handle app installed
     const handleAppInstalled = () => {
-      setPWAState(prev => ({ 
-        ...prev, 
-        isInstalled: true, 
-        installPrompt: null 
+      setPWAState(prev => ({
+        ...prev,
+        isInstalled: true,
+        installPrompt: null,
       }));
     };
 
@@ -51,25 +51,25 @@ export const usePWA = () => {
     checkInstalled();
 
     // Add event listeners
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     // Listen for service worker updates
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_UPDATE_AVAILABLE') {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", event => {
+        if (event.data && event.data.type === "SW_UPDATE_AVAILABLE") {
           handleSWUpdate();
         }
       });
     }
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -77,32 +77,35 @@ export const usePWA = () => {
     if (!pwaState.installPrompt) return false;
 
     try {
-      const installPrompt = pwaState.installPrompt as unknown as { prompt: () => void; userChoice: Promise<{ outcome: string }> };
+      const installPrompt = pwaState.installPrompt as unknown as {
+        prompt: () => void;
+        userChoice: Promise<{ outcome: string }>;
+      };
       installPrompt.prompt();
       const { outcome } = await installPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
+
+      if (outcome === "accepted") {
         setPWAState(prev => ({ ...prev, installPrompt: null }));
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Failed to install app:', error);
+      console.error("Failed to install app:", error);
       return false;
     }
   };
 
   const updateApp = async () => {
     try {
-      if ('serviceWorker' in navigator) {
+      if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration && registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
         }
       }
       window.location.reload();
     } catch (error) {
-      console.error('Failed to update app:', error);
+      console.error("Failed to update app:", error);
     }
   };
 

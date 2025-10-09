@@ -17,12 +17,8 @@ interface DesktopActivityBarProps {
 export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
   const { activeId, setActiveId, items } = useActivityBarStore();
 
-  const mainGroupItems = items.filter(
-    (item) => item.group === ActivityBarGroup.MAIN
-  );
-  const footerItems = items.filter(
-    (item) => item.group === ActivityBarGroup.FOOTER
-  );
+  const mainGroupItems = items.filter(item => item.group === ActivityBarGroup.MAIN);
+  const footerItems = items.filter(item => item.group === ActivityBarGroup.FOOTER);
 
   const handleActiveChange = (activeId: string) => {
     setActiveId(activeId);
@@ -69,12 +65,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
                 activeClassName="bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                 collapsedLabel={item.collapsedLabel}
                 icon={
-                  <div
-                    data-testid={item.id}
-                    className={cn(
-                      "flex items-center justify-center",
-                    )}
-                  >
+                  <div data-testid={item.id} className={cn("flex items-center justify-center")}>
                     <IconRegistry id={item.icon} />
                   </div>
                 }

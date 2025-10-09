@@ -1,13 +1,13 @@
-import { Badge } from '@/common/components/ui/badge';
-import { Button } from '@/common/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { Input } from '@/common/components/ui/input';
-import { Textarea } from '@/common/components/ui/textarea';
+import { Badge } from "@/common/components/ui/badge";
+import { Button } from "@/common/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Input } from "@/common/components/ui/input";
+import { Textarea } from "@/common/components/ui/textarea";
 
 interface GitHubNoteSyncSectionProps {
   noteTitle: string;
   noteContent: string;
-  syncStatus: 'idle' | 'syncing' | 'success' | 'error';
+  syncStatus: "idle" | "syncing" | "success" | "error";
   lastSync: string;
   onNoteTitleChange: (title: string) => void;
   onNoteContentChange: (content: string) => void;
@@ -21,7 +21,7 @@ export function GitHubNoteSyncSection({
   lastSync,
   onNoteTitleChange,
   onNoteContentChange,
-  onSyncNote
+  onSyncNote,
 }: GitHubNoteSyncSectionProps) {
   return (
     <Card>
@@ -37,7 +37,7 @@ export function GitHubNoteSyncSection({
           <Input
             placeholder="Enter note title..."
             value={noteTitle}
-            onChange={(e) => onNoteTitleChange(e.target.value)}
+            onChange={e => onNoteTitleChange(e.target.value)}
           />
         </div>
 
@@ -46,7 +46,7 @@ export function GitHubNoteSyncSection({
           <Textarea
             placeholder="Enter note content..."
             value={noteContent}
-            onChange={(e) => onNoteContentChange(e.target.value)}
+            onChange={e => onNoteContentChange(e.target.value)}
             rows={6}
           />
         </div>
@@ -54,10 +54,10 @@ export function GitHubNoteSyncSection({
         <div className="flex items-center gap-4">
           <Button
             onClick={onSyncNote}
-            disabled={!noteTitle.trim() || !noteContent.trim() || syncStatus === 'syncing'}
+            disabled={!noteTitle.trim() || !noteContent.trim() || syncStatus === "syncing"}
             className="flex items-center gap-2"
           >
-            {syncStatus === 'syncing' ? (
+            {syncStatus === "syncing" ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 Syncing...
@@ -72,24 +72,16 @@ export function GitHubNoteSyncSection({
             )}
           </Button>
 
-          {syncStatus === 'success' && (
+          {syncStatus === "success" && (
             <Badge variant="secondary" className="text-green-600">
               ✅ Sync Successful
             </Badge>
           )}
 
-          {syncStatus === 'error' && (
-            <Badge variant="destructive">
-              ❌ Sync Failed
-            </Badge>
-          )}
+          {syncStatus === "error" && <Badge variant="destructive">❌ Sync Failed</Badge>}
         </div>
 
-        {lastSync && (
-          <p className="text-sm text-gray-500">
-            Last sync time: {lastSync}
-          </p>
-        )}
+        {lastSync && <p className="text-sm text-gray-500">Last sync time: {lastSync}</p>}
       </CardContent>
     </Card>
   );

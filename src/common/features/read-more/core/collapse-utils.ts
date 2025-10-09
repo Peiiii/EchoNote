@@ -1,4 +1,4 @@
-import { READ_MORE_SELECTORS, getMessageIdFromElement } from './dom-constants'
+import { READ_MORE_SELECTORS, getMessageIdFromElement } from "./dom-constants";
 
 /**
  * Computes the ID of the message that is currently focused (closest to container center)
@@ -7,19 +7,19 @@ import { READ_MORE_SELECTORS, getMessageIdFromElement } from './dom-constants'
  * @returns The ID of the focused message, or null if none found
  */
 export function computeFocusedId(container: HTMLElement): string | null {
-  const rect = container.getBoundingClientRect()
-  const centerY = rect.top + rect.height / 2
-  let best: { id: string; dist: number } | null = null
-  const nodes = container.querySelectorAll(READ_MORE_SELECTORS.message)
-  nodes.forEach((node) => {
-    const r = (node as HTMLElement).getBoundingClientRect()
-    if (r.bottom < rect.top || r.top > rect.bottom) return
-    const id = getMessageIdFromElement(node)
-    if (!id) return
-    const d = Math.abs((r.top + r.height / 2) - centerY)
-    if (!best || d < best.dist) best = { id, dist: d }
-  })
-  return best ? (best as { id: string; dist: number }).id : null
+  const rect = container.getBoundingClientRect();
+  const centerY = rect.top + rect.height / 2;
+  let best: { id: string; dist: number } | null = null;
+  const nodes = container.querySelectorAll(READ_MORE_SELECTORS.message);
+  nodes.forEach(node => {
+    const r = (node as HTMLElement).getBoundingClientRect();
+    if (r.bottom < rect.top || r.top > rect.bottom) return;
+    const id = getMessageIdFromElement(node);
+    if (!id) return;
+    const d = Math.abs(r.top + r.height / 2 - centerY);
+    if (!best || d < best.dist) best = { id, dist: d };
+  });
+  return best ? (best as { id: string; dist: number }).id : null;
 }
 
 /**
@@ -32,21 +32,21 @@ export function computeFocusedId(container: HTMLElement): string | null {
  * @param params.onCollapse - Callback function to trigger the actual collapse
  */
 export function collapseWithScrollTop(params: {
-  container: HTMLElement
-  element: HTMLElement
-  topVisibleBefore: boolean
-  onCollapse: () => void
+  container: HTMLElement;
+  element: HTMLElement;
+  topVisibleBefore: boolean;
+  onCollapse: () => void;
 }) {
-  const { container, element, topVisibleBefore, onCollapse } = params
-  const cRect = container.getBoundingClientRect()
-  onCollapse()
+  const { container, element, topVisibleBefore, onCollapse } = params;
+  const cRect = container.getBoundingClientRect();
+  onCollapse();
   requestAnimationFrame(() => {
     if (!topVisibleBefore) {
-      const rAfter = element.getBoundingClientRect()
-      const deltaTop = rAfter.top - cRect.top
-      container.scrollTop += deltaTop
+      const rAfter = element.getBoundingClientRect();
+      const deltaTop = rAfter.top - cRect.top;
+      container.scrollTop += deltaTop;
     }
-  })
+  });
 }
 
 /**
@@ -56,9 +56,9 @@ export function collapseWithScrollTop(params: {
  * @returns The floating offset value in pixels (default: 8)
  */
 export function getFloatOffset(container: HTMLElement | null): number {
-  if (!container) return 8
-  const cs = getComputedStyle(container)
-  const v = cs.getPropertyValue('--collapse-float-offset')
-  const n = parseFloat(v)
-  return Number.isFinite(n) ? n : 8
+  if (!container) return 8;
+  const cs = getComputedStyle(container);
+  const v = cs.getPropertyValue("--collapse-float-offset");
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : 8;
 }

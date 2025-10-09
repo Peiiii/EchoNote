@@ -18,21 +18,21 @@ expand_less
 // src/services/firebaseService.ts
 
 import {
-  collection,
-  doc,
-  onSnapshot,
-  query,
-  where,
-  orderBy,
-  limit,
-  startAfter,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp,
-  Timestamp,
-  DocumentSnapshot
+collection,
+doc,
+onSnapshot,
+query,
+where,
+orderBy,
+limit,
+startAfter,
+getDocs,
+addDoc,
+updateDoc,
+deleteDoc,
+serverTimestamp,
+Timestamp,
+DocumentSnapshot
 } from 'firebase/firestore';
 import { db, auth } from './firebaseConfig'; // 确保你已经正确初始化 Firebase App
 import { Message, Channel } from '../store/useChatDataStore'; // 从你的 store 导入类型
@@ -41,33 +41,32 @@ import { Message, Channel } from '../store/useChatDataStore'; // 从你的 store
 
 // 将 Firestore 文档快照转换为 Channel 类型
 const docToChannel = (doc: DocumentSnapshot): Channel => {
-  const data = doc.data()!;
-  return {
-    id: doc.id,
-    name: data.name,
-    description: data.description,
-    createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(), // 安全地将 Timestamp 转为 Date
-    messageCount: data.messageCount || 0,
-  };
+const data = doc.data()!;
+return {
+id: doc.id,
+name: data.name,
+description: data.description,
+createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(), // 安全地将 Timestamp 转为 Date
+messageCount: data.messageCount || 0,
+};
 };
 
 // 将 Firestore 文档快照转换为 Message 类型
 const docToMessage = (doc: DocumentSnapshot): Message => {
-  const data = doc.data()!;
-  return {
-    id: doc.id,
-    content: data.content,
-    sender: data.sender,
-    channelId: data.channelId,
-    timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
-    // 可选字段
-    tags: data.tags,
-    parentId: data.parentId,
-    threadId: data.threadId,
-    // 注意：UI 状态 (isThreadExpanded) 不应存储在数据库中
-  };
+const data = doc.data()!;
+return {
+id: doc.id,
+content: data.content,
+sender: data.sender,
+channelId: data.channelId,
+timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
+// 可选字段
+tags: data.tags,
+parentId: data.parentId,
+threadId: data.threadId,
+// 注意：UI 状态 (isThreadExpanded) 不应存储在数据库中
 };
-
+};
 
 // --- 获取集合引用的辅助函数 ---
 const getChannelsCollectionRef = (userId: string) => collection(db, `users/${userId}/channels`);
@@ -77,133 +76,144 @@ const getMessagesCollectionRef = (userId: string) => collection(db, `users/${use
 
 export const firebaseService = {
 
-  // --- Channel Services ---
+// --- Channel Services ---
 
-  /**
-   * 订阅用户的所有频道，实时更新。
-   * @param userId - 当前用户的 UID.
-   * @param onUpdate - 当频道列表变化时调用的回调函数.
-   * @returns 一个用于取消订阅的函数.
-   */
+/\*\*
+
+- 订阅用户的所有频道，实时更新。
+- @param userId - 当前用户的 UID.
+- @param onUpdate - 当频道列表变化时调用的回调函数.
+- @returns 一个用于取消订阅的函数.
+  \*/
   subscribeToChannels: (userId: string, onUpdate: (channels: Channel[]) => void): (() => void) => {
-    const q = query(getChannelsCollectionRef(userId), orderBy('createdAt', 'asc'));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const channels = snapshot.docs.map(docToChannel);
-      onUpdate(channels);
-    }, (error) => {
-        console.error("Error subscribing to channels:", error);
-    });
+  const q = query(getChannelsCollectionRef(userId), orderBy('createdAt', 'asc'));
 
-    return unsubscribe;
-  },
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+  const channels = snapshot.docs.map(docToChannel);
+  onUpdate(channels);
+  }, (error) => {
+  console.error("Error subscribing to channels:", error);
+  });
 
-  /**
-   * 创建一个新频道.
-   * @param userId - 当前用户的 UID.
-   * @param channelData - 不包含 id, createdAt, messageCount 的频道数据.
-   */
+  return unsubscribe;
+
+},
+
+/\*\*
+
+- 创建一个新频道.
+- @param userId - 当前用户的 UID.
+- @param channelData - 不包含 id, createdAt, messageCount 的频道数据.
+  \*/
   createChannel: async (userId: string, channelData: Omit<Channel, "id" | "createdAt" | "messageCount">): Promise<string> => {
-    const docRef = await addDoc(getChannelsCollectionRef(userId), {
-      ...channelData,
-      createdAt: serverTimestamp(),
-      messageCount: 0,
-    });
-    return docRef.id;
+  const docRef = await addDoc(getChannelsCollectionRef(userId), {
+  ...channelData,
+  createdAt: serverTimestamp(),
+  messageCount: 0,
+  });
+  return docRef.id;
   },
 
-  // --- Message Services ---
+// --- Message Services ---
 
-  /**
-   * 获取一个频道的第一页消息.
-   * @param userId - 当前用户的 UID.
-   * @param channelId - 目标频道的 ID.
-   * @param messagesLimit - 每页获取的消息数量.
-   * @returns 包含消息数组、最后一个文档引用和是否已全部加载的标志的对象.
-   */
+/\*\*
+
+- 获取一个频道的第一页消息.
+- @param userId - 当前用户的 UID.
+- @param channelId - 目标频道的 ID.
+- @param messagesLimit - 每页获取的消息数量.
+- @returns 包含消息数组、最后一个文档引用和是否已全部加载的标志的对象.
+  \*/
   fetchInitialMessages: async (userId: string, channelId: string, messagesLimit: number) => {
-    const q = query(
-      getMessagesCollectionRef(userId),
-      where('channelId', '==', channelId),
-      orderBy('timestamp', 'desc'),
-      limit(messagesLimit)
-    );
-    
-    const snapshot = await getDocs(q);
-    const messages = snapshot.docs.map(docToMessage);
-    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-    const allLoaded = messages.length < messagesLimit;
+  const q = query(
+  getMessagesCollectionRef(userId),
+  where('channelId', '==', channelId),
+  orderBy('timestamp', 'desc'),
+  limit(messagesLimit)
+  );
 
-    return { messages, lastVisible, allLoaded };
-  },
+  const snapshot = await getDocs(q);
+  const messages = snapshot.docs.map(docToMessage);
+  const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+  const allLoaded = messages.length < messagesLimit;
 
-  /**
-   * 获取一个频道的下一页消息.
-   * @param userId - 当前用户的 UID.
-   * @param channelId - 目标频道的 ID.
-   * @param messagesLimit - 每页获取的消息数量.
-   * @param cursor - 上一页的最后一个文档引用，用于分页.
-   * @returns 包含消息数组、最后一个文档引用和是否已全部加载的标志的对象.
-   */
+  return { messages, lastVisible, allLoaded };
+
+},
+
+/\*\*
+
+- 获取一个频道的下一页消息.
+- @param userId - 当前用户的 UID.
+- @param channelId - 目标频道的 ID.
+- @param messagesLimit - 每页获取的消息数量.
+- @param cursor - 上一页的最后一个文档引用，用于分页.
+- @returns 包含消息数组、最后一个文档引用和是否已全部加载的标志的对象.
+  \*/
   fetchMoreMessages: async (userId: string, channelId: string, messagesLimit: number, cursor: DocumentSnapshot) => {
-    const q = query(
-      getMessagesCollectionRef(userId),
-      where('channelId', '==', channelId),
-      orderBy('timestamp', 'desc'),
-      startAfter(cursor),
-      limit(messagesLimit)
-    );
+  const q = query(
+  getMessagesCollectionRef(userId),
+  where('channelId', '==', channelId),
+  orderBy('timestamp', 'desc'),
+  startAfter(cursor),
+  limit(messagesLimit)
+  );
 
-    const snapshot = await getDocs(q);
-    const messages = snapshot.docs.map(docToMessage);
-    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-    const allLoaded = messages.length < messagesLimit;
+  const snapshot = await getDocs(q);
+  const messages = snapshot.docs.map(docToMessage);
+  const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+  const allLoaded = messages.length < messagesLimit;
 
-    return { messages, lastVisible, allLoaded };
-  },
-  
-  /**
-   * 创建一条新消息.
-   * @param userId - 当前用户的 UID.
-   * @param messageData - 不包含 id 和 timestamp 的消息数据.
-   */
+  return { messages, lastVisible, allLoaded };
+
+},
+
+/\*\*
+
+- 创建一条新消息.
+- @param userId - 当前用户的 UID.
+- @param messageData - 不包含 id 和 timestamp 的消息数据.
+  \*/
   createMessage: async (userId: string, messageData: Omit<Message, "id" | "timestamp">): Promise<string> => {
-    // 准备写入 Firestore 的数据，将 Date 对象转为 serverTimestamp
-    const { timestamp, ...rest } = messageData as any; // 忽略前端可能传来的临时 timestamp
-    
-    const docRef = await addDoc(getMessagesCollectionRef(userId), {
-      ...rest,
-      timestamp: serverTimestamp(),
-    });
-    return docRef.id;
-  },
-  
-  /**
-   * 更新一条已存在的消息.
-   * @param userId - 当前用户的 UID.
-   * @param messageId - 要更新的消息的 ID.
-   * @param updates - 包含要更新字段的部分对象.
-   */
+  // 准备写入 Firestore 的数据，将 Date 对象转为 serverTimestamp
+  const { timestamp, ...rest } = messageData as any; // 忽略前端可能传来的临时 timestamp
+
+  const docRef = await addDoc(getMessagesCollectionRef(userId), {
+  ...rest,
+  timestamp: serverTimestamp(),
+  });
+  return docRef.id;
+
+},
+
+/\*\*
+
+- 更新一条已存在的消息.
+- @param userId - 当前用户的 UID.
+- @param messageId - 要更新的消息的 ID.
+- @param updates - 包含要更新字段的部分对象.
+  \*/
   updateMessage: async (userId: string, messageId: string, updates: Partial<Message>): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
-    // 如果更新中包含 timestamp，确保它是 serverTimestamp
-    if (updates.timestamp) {
-        (updates as any).timestamp = serverTimestamp();
-    }
-    await updateDoc(messageRef, updates);
+  const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+  // 如果更新中包含 timestamp，确保它是 serverTimestamp
+  if (updates.timestamp) {
+  (updates as any).timestamp = serverTimestamp();
+  }
+  await updateDoc(messageRef, updates);
   },
 
-  /**
-   * 删除一条消息.
-   * @param userId - 当前用户的 UID.
-   * @param messageId - 要删除的消息的 ID.
-   */
+/\*\*
+
+- 删除一条消息.
+- @param userId - 当前用户的 UID.
+- @param messageId - 要删除的消息的 ID.
+  \*/
   deleteMessage: async (userId: string, messageId: string): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
-    await deleteDoc(messageRef);
+  const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+  await deleteDoc(messageRef);
   },
-};
-如何使用和理解这份代码
+  };
+  如何使用和理解这份代码
 
 文件结构： 把这份代码保存在 src/services/firebaseService.ts。
 

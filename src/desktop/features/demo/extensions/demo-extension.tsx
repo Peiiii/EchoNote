@@ -11,7 +11,7 @@ import {
   Settings,
   Star,
   TestTube,
-  Users
+  Users,
 } from "lucide-react";
 import { DemoChatPage } from "../pages/demo-chat-page";
 import { DemoDocsPage } from "../pages/demo-docs-page";
@@ -150,4 +150,4 @@ export const demoExtension = defineExtension({
       )
     );
   },
-}); 
+});
