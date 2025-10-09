@@ -1,14 +1,15 @@
 import { Button } from "@/common/components/ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, X } from "lucide-react";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 interface MobileThreadSidebarProps {
   onSendMessage: (message: string) => void;
+  onClose?: () => void;
 }
 
-export const MobileThreadSidebar = ({ onSendMessage }: MobileThreadSidebarProps) => {
+export const MobileThreadSidebar = ({ onSendMessage, onClose }: MobileThreadSidebarProps) => {
   const { currentChannelId } = useNotesViewStore();
   const { messages } = useChannelMessages({});
   const parentMessage = currentChannelId ? messages.find(m => m.id === currentChannelId) : null;
@@ -19,11 +20,22 @@ export const MobileThreadSidebar = ({ onSendMessage }: MobileThreadSidebarProps)
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center justify-start p-4">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-foreground">Thread</h3>
         </div>
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Close"
+            className="h-8 w-8"
+            onClick={onClose}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
       {/* Parent Message */}

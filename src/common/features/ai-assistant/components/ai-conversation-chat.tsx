@@ -28,7 +28,6 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
   const isBrandNewConversation = !!conv && conv.messageCount === 0;
   const showLoading = loading && !isBrandNewConversation;
 
-  // const resetKey = useValueFromObservable(() => conversationId$.pipe(distinctUntilChanged((a, b) => isTempConversation(a) ? true : a === b)), conversationId);
   const lastConversationIdRef = useRef(conversationId);
   const resetKey = useMemo(() => {
     const lastConversationId = lastConversationIdRef.current;

@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { Settings, Info, Code } from "lucide-react";
+import { Settings, Info, Code, X } from "lucide-react";
 import { AuthStatus } from "@/common/components/firebase/auth-status";
 import { ThemeToggle } from "@/common/components/theme";
 import {
@@ -10,15 +10,31 @@ import {
   DialogTrigger,
 } from "@/common/components/ui/dialog";
 
-export const MobileSettingsSidebar = () => {
+interface MobileSettingsSidebarProps {
+  onClose?: () => void;
+}
+
+export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) => {
+
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center justify-start p-4">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <Settings className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-foreground">Settings</h3>
         </div>
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Close"
+            className="h-8 w-8"
+            onClick={onClose}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
       {/* Settings Content */}
