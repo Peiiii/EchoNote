@@ -291,7 +291,7 @@ export function ConversationContextControl({
             <button
               type="button"
               title={tooltip || label}
-              className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+              className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md bg-background/50 backdrop-blur-sm border border-border/30 shadow-xs hover:shadow-sm hover:border-border/50 hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all duration-200 ease-out"
             >
               {(() => {
                 const ctx = conv?.contexts;
