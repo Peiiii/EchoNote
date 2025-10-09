@@ -16,14 +16,13 @@ export const toolCallToToolInvocation = (toolCall: ToolCall): ToolInvocation => 
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const tryParseJson = (
   json: string,
-  defaultValue?: any
-): Record<string, unknown> | undefined => {
+  defaultValue?: unknown
+): Record<string, unknown> | unknown => {
   if (typeof json !== "string") return defaultValue;
   try {
-    return JSON.parse(json);
+    return JSON.parse(json) as Record<string, unknown>;
   } catch (_e) {
     return defaultValue;
   }

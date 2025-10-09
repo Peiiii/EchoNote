@@ -1,5 +1,6 @@
 import { Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { Children, useMemo, useState } from "react";
+import { MermaidBlock } from "./mermaid-block";
 
 interface CodeBlockProps {
   className?: string;
@@ -11,10 +12,17 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
   const match = /language-(\w+)/.exec(className || "");
   const language = match ? match[1] : "";
   const isInline = !className || !match;
+  const raw = useMemo(() => {
+    // Join all child text nodes into a single string and trim a single trailing newline
+    return Children.toArray(children)
+      .map(chunk => (typeof chunk === "string" ? chunk : ""))
+      .join("")
+      .replace(/\n$/, "");
+  }, [children]);
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(String(children));
+      await navigator.clipboard.writeText(raw);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -28,6 +36,11 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
         {children}
       </code>
     );
+  }
+
+  // Mermaid fenced code block: render diagram
+  if (language === "mermaid") {
+    return <MermaidBlock code={raw} />;
   }
 
   return (
