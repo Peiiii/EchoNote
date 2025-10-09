@@ -1,0 +1,1 @@
+import{r as t}from"./react-vendor-oUiNwJXW.js";import"./pkg-dayjs-CVSRrfvc.js";var c=function(e){var u=t.useRef(e);u.current=t.useMemo(function(){return e},[e]);var n=t.useRef(void 0);return n.current||(n.current=function(){for(var a=[],r=0;r<arguments.length;r++)a[r]=arguments[r];return u.current.apply(this,a)}),n.current};export{c as u};
