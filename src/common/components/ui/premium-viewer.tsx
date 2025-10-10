@@ -22,14 +22,23 @@ export function PremiumViewer({
   className = "",
 }: PremiumViewerProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsLoaded(false);
+      setShowHint(true);
       const timer = setTimeout(() => setIsLoaded(true), 100);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && showHint) {
+      const timer = setTimeout(() => setShowHint(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, showHint]);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +51,22 @@ export function PremiumViewer({
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -90,6 +115,12 @@ export function PremiumViewer({
         onClick={onClose}
         aria-label="Close viewer"
       />
+
+      <div className={`absolute top-16 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2 text-white/60 text-xs transition-all duration-500 ${
+        showHint ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
+      }`}>
+        Press <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-xs font-mono">ESC</kbd> to close
+      </div>
     </div>
   );
 }
