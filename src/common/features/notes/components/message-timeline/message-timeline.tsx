@@ -6,7 +6,7 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
-import { Bot, ChevronUp, PenLine } from "lucide-react";
+import { Bot, ChevronUp, Send } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
@@ -164,7 +164,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
             {inputCollapsed && (
               <div className="pointer-events-auto">
                 <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
-                  <PenLine className="h-4 w-4" />
+                  <Send className="h-4 w-4" />
                 </FloatingActionButton>
               </div>
             )}

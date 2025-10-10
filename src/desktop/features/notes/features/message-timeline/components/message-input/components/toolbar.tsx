@@ -7,7 +7,7 @@ import {
   Phone,
   Smile,
   Video,
-  PenLine,
+  Send,
 } from "lucide-react";
 import { ToolbarButton } from "./toolbar-button";
 import { useInputCollapse } from "../../../hooks/use-input-collapse";
@@ -77,7 +77,7 @@ export function Toolbar() {
   // Add collapse/expand button as the last button
   if (inputCollapsed) {
     rightButtons.push({
-      icon: PenLine,
+      icon: Send,
       title: "Show composer",
       onClick: handleExpandInput,
       enabled: true,
