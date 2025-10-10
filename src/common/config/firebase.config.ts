@@ -155,8 +155,8 @@ export class FirebaseConfig {
   }
 
   setUserIdForAnalytics(userId: string): void {
-    if (this.analytics) {
-      setUserId(this.analytics, userId);
+    if (this.getAnalytics()) {
+      setUserId(this.getAnalytics()!, userId);
     }
   } 
 
