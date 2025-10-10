@@ -1,3 +1,4 @@
+import { Analytics, initializeAnalytics, setUserId } from "firebase/analytics";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import {
   Auth,
@@ -39,6 +40,7 @@ const db = initializeFirestore(app, {
   experimentalForceLongPolling: false,
 });
 
+
 const tryLoadRegionFromLocalStorage = (defaultRegion: string): string => {
   const region = localStorage.getItem("region");
   if (region) {
@@ -57,6 +59,7 @@ export class FirebaseConfig {
   private static instance: FirebaseConfig | null = null;
   private app: FirebaseApp = app;
   private auth: Auth | null = null;
+  private analytics: Analytics | null = null;
   private db: Firestore = db;
   private region: string = tryLoadRegionFromLocalStorage(CN_REGION);
   private constructor() {
@@ -125,6 +128,38 @@ export class FirebaseConfig {
     }
     return this.auth;
   }
+
+  /**
+   * 获取 Analytics 实例。
+   * 如果用户在中国大陆地区，则返回 null，因为 Analytics 服务不可用。
+   * @returns {Analytics | null} Analytics 实例或 null
+   */
+  getAnalytics(): Analytics | null {
+    if (this.analytics) {
+      return this.analytics;
+    }
+
+    if (this.isInCNRegion()) {
+      console.log("[FirebaseConfig] In CN region, Analytics is disabled.");
+      return null;
+    }
+
+    console.log("[FirebaseConfig] Initializing Analytics for non-CN region.");
+    if (config.measurementId) {
+      this.analytics = initializeAnalytics(this.getApp()); 
+    } else {
+      console.warn("[FirebaseConfig] measurementId is not provided, Analytics will not be initialized.");
+    }
+
+    return this.analytics;
+  }
+
+  setUserIdForAnalytics(userId: string): void {
+    if (this.analytics) {
+      setUserId(this.analytics, userId);
+    }
+  } 
+
 
   getDb(): Firestore {
     return this.db;

@@ -171,6 +171,8 @@ export const firebaseAuthService = {
 
       console.log("✅ Email is verified, proceeding with login");
       console.log("🔗 Initializing Firebase listeners...");
+      firebaseConfig.setUserIdForAnalytics(result.user.uid);
+
       await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       console.log("✅ Firebase listeners initialized");
 
@@ -229,6 +231,8 @@ export const firebaseAuthService = {
       }
 
       if (user) {
+        firebaseConfig.setUserIdForAnalytics(user.uid);
+
         if (user.emailVerified) {
           console.log("✅ User email verified, initializing listeners");
           await useNotesDataStore.getState().initFirebaseListeners(user.uid);
