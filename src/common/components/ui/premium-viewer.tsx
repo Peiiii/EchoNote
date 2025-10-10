@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Download, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
+import { useZoom } from "@/common/hooks/use-zoom";
 
 interface PremiumViewerProps {
   isOpen: boolean;
@@ -144,58 +145,27 @@ export function PremiumImageViewer({
   onDownload,
   showDownload = true,
 }: PremiumImageViewerProps) {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale > 1) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(0.1, Math.min(5, scale * delta));
-    setScale(newScale);
-    
-    if (newScale <= 1) {
-      setPosition({ x: 0, y: 0 });
-    }
-  };
-
-  const resetView = () => {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
-  };
+  const {
+    scale,
+    position,
+    isDragging,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleWheel,
+    zoomIn,
+    zoomOut,
+    resetView,
+    reset,
+  } = useZoom();
 
   useEffect(() => {
     if (isOpen) {
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
+      reset();
       setImageLoaded(false);
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   return (
     <PremiumViewer
@@ -232,7 +202,7 @@ export function PremiumImageViewer({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setScale(Math.max(0.1, scale * 0.9))}
+          onClick={zoomOut}
           className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
         >
           <ZoomOut className="w-4 h-4" />
@@ -243,7 +213,7 @@ export function PremiumImageViewer({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setScale(Math.min(5, scale * 1.1))}
+          onClick={zoomIn}
           className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
         >
           <ZoomIn className="w-4 h-4" />
@@ -279,56 +249,24 @@ export function PremiumDiagramViewer({
   onDownload,
   showDownload = true,
 }: PremiumDiagramViewerProps) {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale > 1) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(0.1, Math.min(5, scale * delta));
-    setScale(newScale);
-    
-    if (newScale <= 1) {
-      setPosition({ x: 0, y: 0 });
-    }
-  };
-
-  const resetView = () => {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
-  };
+  const {
+    scale,
+    position,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleWheel,
+    zoomIn,
+    zoomOut,
+    resetView,
+    reset,
+  } = useZoom();
 
   useEffect(() => {
     if (isOpen) {
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
+      reset();
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   return (
     <PremiumViewer
@@ -360,7 +298,7 @@ export function PremiumDiagramViewer({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setScale(Math.max(0.1, scale * 0.9))}
+          onClick={zoomOut}
           className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
         >
           <ZoomOut className="w-4 h-4" />
@@ -371,7 +309,7 @@ export function PremiumDiagramViewer({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setScale(Math.min(5, scale * 1.1))}
+          onClick={zoomIn}
           className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
         >
           <ZoomIn className="w-4 h-4" />
