@@ -8,6 +8,7 @@ import { EmailPasswordForm } from "./email-password-form";
 import { LoginFooter } from "./login-footer";
 import { LoginIllustration } from "./login-illustration";
 import { SocialLogin } from "./social-login";
+import { AuthProgress } from "./auth-progress";
 
 export const LoginPage = () => {
   const {
@@ -313,6 +314,8 @@ export const LoginPage = () => {
               onPasswordReset={handlePasswordReset}
               onSubmit={handleEmailSubmit}
             />
+
+            <AuthProgress />
 
             <AuthMessages
               error=""

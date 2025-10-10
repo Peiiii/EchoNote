@@ -3,17 +3,18 @@ import { persist } from "zustand/middleware";
 import { User } from "firebase/auth";
 import { firebaseAuthService } from "@/common/services/firebase/firebase-auth.service";
 import { firebaseConfig } from "@/common/config/firebase.config";
+import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
 
 export interface AuthState {
   currentUser: User | null;
   authIsReady: boolean;
+  isInitializing: boolean;
+  isRefreshing: boolean;
+  isAuthenticating: boolean;
+  authStep: AuthStep;
+  authMessage: string;
+  authProgress: number;
 
-  // 三个核心状态
-  isInitializing: boolean; // 首次初始化（无缓存）
-  isRefreshing: boolean; // 有缓存，正在刷新
-  isAuthenticating: boolean; // 正在登录/登出
-
-  // 公共方法
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (
@@ -29,44 +30,77 @@ export interface AuthState {
   sendPasswordReset: (email: string) => Promise<void>;
   sendEmailVerification: () => Promise<void>;
   signOut: () => Promise<void>;
-
-  // 内部状态管理
   setAuth: (user: User | null) => void;
   setAuthReady: (ready: boolean) => void;
   setInitializing: (initializing: boolean) => void;
   setRefreshing: (refreshing: boolean) => void;
   setAuthenticating: (authenticating: boolean) => void;
-
-  // 初始化认证监听器
+  setAuthStep: (step: AuthStep, message: string, progress: number) => void;
   initAuthListener: () => Promise<() => void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      // 初始状态
       currentUser: null,
       authIsReady: false,
       isInitializing: false,
       isRefreshing: false,
       isAuthenticating: false,
+      authStep: AuthStep.IDLE,
+      authMessage: '',
+      authProgress: 0,
 
       signInWithGoogle: async () => {
         if (!firebaseConfig.supportGoogleAuth()) {
           throw new Error("Google authentication is not supported in this region");
         }
-        set({ isAuthenticating: true });
+        set({ 
+          isAuthenticating: true,
+          authStep: AuthStep.AUTHENTICATING,
+          authMessage: AuthMessage.CONNECTING_GOOGLE,
+          authProgress: AuthProgress.AUTHENTICATING
+        });
         try {
           await firebaseAuthService.signInWithGoogle();
+          set({
+            authStep: AuthStep.INITIALIZING_DATA,
+            authMessage: AuthMessage.SETTING_UP_WORKSPACE,
+            authProgress: AuthProgress.INITIALIZING_DATA
+          });
+        } catch (error) {
+          set({
+            authStep: AuthStep.ERROR,
+            authMessage: AuthMessage.SIGN_IN_FAILED,
+            authProgress: AuthProgress.START
+          });
+          throw error;
         } finally {
           set({ isAuthenticating: false });
         }
       },
 
       signInWithEmail: async (email: string, password: string) => {
-        set({ isAuthenticating: true });
+        set({ 
+          isAuthenticating: true,
+          authStep: AuthStep.AUTHENTICATING,
+          authMessage: AuthMessage.VERIFYING_CREDENTIALS,
+          authProgress: AuthProgress.AUTHENTICATING
+        });
         try {
           await firebaseAuthService.signInWithEmail(email, password);
+          set({
+            authStep: AuthStep.VERIFYING_EMAIL,
+            authMessage: AuthMessage.CHECKING_EMAIL_VERIFICATION,
+            authProgress: AuthProgress.VERIFYING_EMAIL
+          });
+        } catch (error) {
+          set({
+            authStep: AuthStep.ERROR,
+            authMessage: AuthMessage.CHECK_CREDENTIALS,
+            authProgress: AuthProgress.START
+          });
+          throw error;
         } finally {
           set({ isAuthenticating: false });
         }
@@ -144,29 +178,25 @@ export const useAuthStore = create<AuthState>()(
         set({ isAuthenticating: authenticating });
       },
 
-      // 初始化认证监听器
+      setAuthStep: (step: AuthStep, message: string, progress: number) => {
+        set({ authStep: step, authMessage: message, authProgress: progress });
+      },
+
       initAuthListener: async () => {
-        // 检查是否有缓存数据
         const hasCachedUser = get().currentUser !== null;
 
         if (hasCachedUser) {
-          // 有缓存数据，设置为刷新状态
           set({ isRefreshing: true, authIsReady: false });
         } else {
-          // 无缓存数据，设置为初始化状态
           set({ isInitializing: true, authIsReady: false });
         }
 
         const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
-          // 更新用户状态
           get().setAuth(user);
 
-          // 根据之前的状态设置相应的加载状态
           if (hasCachedUser) {
-            // 有缓存数据，刷新完成
             set({ isRefreshing: false, authIsReady: true });
           } else {
-            // 无缓存数据，初始化完成
             set({ isInitializing: false, authIsReady: true });
           }
         });

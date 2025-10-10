@@ -1,5 +1,7 @@
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useAuthStore } from "@/core/stores/auth.store";
+import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -153,10 +155,14 @@ export const firebaseAuthService = {
       isSigningIn = true;
       console.log("🔐 isSigningIn set to true");
 
+      useAuthStore.getState().setAuthStep(AuthStep.AUTHENTICATING, AuthMessage.VERIFYING_CREDENTIALS, AuthProgress.AUTHENTICATING);
+
       const auth = await firebaseConfig.getAuth();
       const result = await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ Firebase authentication successful");
       console.log("📧 Email verified:", result.user.emailVerified);
+
+      useAuthStore.getState().setAuthStep(AuthStep.VERIFYING_EMAIL, AuthMessage.CHECKING_EMAIL_VERIFICATION, AuthProgress.VERIFYING_EMAIL);
 
       if (!result.user.emailVerified) {
         console.log("📧 Email not verified, sending verification email...");
@@ -171,12 +177,16 @@ export const firebaseAuthService = {
 
       console.log("✅ Email is verified, proceeding with login");
       console.log("🔗 Initializing Firebase listeners...");
+      
+      useAuthStore.getState().setAuthStep(AuthStep.INITIALIZING_DATA, AuthMessage.SETTING_UP_WORKSPACE, AuthProgress.INITIALIZING_DATA);
+      
       firebaseConfig.setUserIdForAnalytics(result.user.uid);
 
       await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       console.log("✅ Firebase listeners initialized");
 
-      // 在初始化监听器后再重置标志，确保 onAuthStateChanged 能正确处理
+      useAuthStore.getState().setAuthStep(AuthStep.COMPLETE, AuthMessage.WELCOME_BACK, AuthProgress.COMPLETE);
+
       isSigningIn = false;
       console.log("🔐 isSigningIn set to false after listeners initialized");
 
@@ -186,6 +196,9 @@ export const firebaseAuthService = {
       console.error("❌ Email Sign-In Error:", error);
       isSigningIn = false;
       console.log("🔐 isSigningIn reset to false due to error");
+      
+      useAuthStore.getState().setAuthStep(AuthStep.ERROR, AuthMessage.SIGN_IN_FAILED, AuthProgress.START);
+      
       throw error;
     }
   },
