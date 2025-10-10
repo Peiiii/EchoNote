@@ -95,7 +95,7 @@ export function MoreActionsMenu({
           icon: <Trash2 />,
           title: "Delete thought",
           onClick: onDelete,
-          variant: "destructive" as const,
+          // variant: "destructive" as const,
         },
       ],
     },
