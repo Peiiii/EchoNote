@@ -1,14 +1,6 @@
 import { Check, Copy, Download, Maximize2, Code2, Image as ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/common/components/ui/dialog";
-import { Button } from "@/common/components/ui/button";
+import { PremiumDiagramViewer } from "@/common/components/ui/premium-viewer";
 
 interface MermaidBlockProps {
   code: string;
@@ -184,24 +176,14 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
         />
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-[95vw]">
-          <DialogHeader>
-            <DialogTitle>Diagram Preview</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[80vh] overflow-auto rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
-            <div dangerouslySetInnerHTML={{ __html: svg || "" }} />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleDownloadSvg} size="sm">
-              <Download className="w-4 h-4 mr-2" /> Download SVG
-            </Button>
-            <DialogClose asChild>
-              <Button size="sm">Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PremiumDiagramViewer
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        content={svg || ""}
+        title="Diagram Preview"
+        onDownload={handleDownloadSvg}
+        showDownload={!!svg}
+      />
     </div>
   );
 }

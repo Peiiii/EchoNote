@@ -1,14 +1,6 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/common/components/ui/dialog";
-import { Button } from "@/common/components/ui/button";
-import { Download, Maximize2 } from "lucide-react";
+import { Maximize2 } from "lucide-react";
+import { PremiumImageViewer } from "@/common/components/ui/premium-viewer";
 
 interface ZoomableImageProps {
   src?: string;
@@ -80,26 +72,15 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
         )}
       </span>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-[95vw]">
-          <DialogHeader>
-            <DialogTitle>{alt || filename}</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[80vh] overflow-auto">
-            <img src={src} alt={alt} className="mx-auto max-w-[90vw] max-h-[78vh] object-contain" />
-          </div>
-          <DialogFooter>
-            {!errored && (
-              <Button variant="outline" onClick={handleDownload} size="sm">
-                <Download className="w-4 h-4 mr-2" /> Download
-              </Button>
-            )}
-            <DialogClose asChild>
-              <Button size="sm">Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PremiumImageViewer
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        src={src || ""}
+        alt={alt}
+        title={alt || filename}
+        onDownload={!errored ? handleDownload : undefined}
+        showDownload={!errored}
+      />
     </>
   );
 }
