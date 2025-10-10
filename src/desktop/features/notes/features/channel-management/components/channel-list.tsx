@@ -2,6 +2,7 @@ import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { logService } from "@/common/services/log.service";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
@@ -20,14 +21,26 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [hasScroll, setHasScroll] = useState(false);
 
-  const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
-    addChannel(channel);
+  const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
+    await addChannel(channel);
+    logService.logChannelCreate(
+      channel.name,
+      channel.name,
+      !!channel.description
+    );
   };
 
   const handleDeleteChannel = async (channelId: string) => {
     try {
+      const channelToDelete = channels.find(c => c.id === channelId);
+      if (channelToDelete) {
+        logService.logChannelDelete(
+          channelToDelete.id,
+          channelToDelete.name,
+          channelToDelete.messageCount || 0
+        );
+      }
       await deleteChannel(channelId);
-      // If the deleted channel was the current channel, switch to first available channel
       if (currentChannelId === channelId && channels.length > 1) {
         const remainingChannels = channels.filter(c => c.id !== channelId);
         if (remainingChannels.length > 0) {
@@ -122,7 +135,14 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
               key={channel.id}
               channel={channel}
               isActive={currentChannelId === channel.id}
-              onClick={() => setCurrentChannel(channel.id)}
+              onClick={() => {
+                logService.logChannelSelect(
+                  channel.id,
+                  channel.name,
+                  channel.messageCount || 0
+                );
+                setCurrentChannel(channel.id);
+              }}
               onDelete={() => handleDeleteChannel(channel.id)}
             />
           ))

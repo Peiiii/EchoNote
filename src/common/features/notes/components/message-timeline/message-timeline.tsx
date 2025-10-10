@@ -6,6 +6,7 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { logService, AITrigger } from "@/common/services/log.service";
 import { Bot, ChevronUp, Send } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Button } from "@/common/components/ui/button";
@@ -171,6 +172,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
             <div className="pointer-events-auto">
               <FloatingActionButton
                 onClick={() => {
+                  logService.logAIAssistantOpen("", AITrigger.BUTTON);
                   openAIAssistant();
                 }}
                 isVisible={!isAIAssistantOpen}
@@ -181,7 +183,10 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
             </div>
             <div className="pointer-events-auto">
               <ScrollToBottomButton
-                onClick={() => scrollToBottom({ behavior: "smooth" })}
+                onClick={() => {
+                  logService.logScrollToBottom("", messages.length);
+                  scrollToBottom({ behavior: "smooth" });
+                }}
                 isVisible={showScrollToBottomButton}
               />
             </div>

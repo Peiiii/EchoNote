@@ -1,5 +1,6 @@
 import { Channel } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { logService, ChannelEditField } from "@/common/services/log.service";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
@@ -26,15 +27,29 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
 
     setIsLoading(true);
     try {
+      const hasNameChanged = editName.trim() !== channel.name;
+      const hasDescriptionChanged = editDescription.trim() !== (channel.description || "");
+      const hasEmojiChanged = editEmoji.trim() !== (channel.emoji || "");
+
       await updateChannel(channel.id, {
         name: editName.trim(),
         description: editDescription.trim(),
         emoji: editEmoji.trim() || undefined,
       });
+
+      if (hasNameChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.NAME);
+      }
+      if (hasDescriptionChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.DESCRIPTION);
+      }
+      if (hasEmojiChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.EMOJI);
+      }
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating channel:", error);
-      // Reset to original values on error
       setEditName(channel.name);
       setEditDescription(channel.description);
       setEditEmoji(channel.emoji || "");

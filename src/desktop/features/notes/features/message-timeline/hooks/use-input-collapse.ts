@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
+import { logService, InputAction } from "@/common/services/log.service";
 
 export function useInputCollapse() {
   const { currentChannelId } = useNotesViewStore();
@@ -24,6 +25,7 @@ export function useInputCollapse() {
   // Handle collapse input
   const handleCollapseInput = useCallback(() => {
     if (!currentChannelId) return;
+    logService.logInputCollapse(InputAction.COLLAPSE);
     setTimelineInputCollapsed(currentChannelId, true);
     notifyLayoutChange();
   }, [currentChannelId, setTimelineInputCollapsed, notifyLayoutChange]);
@@ -31,6 +33,7 @@ export function useInputCollapse() {
   // Handle expand input
   const handleExpandInput = useCallback(() => {
     if (!currentChannelId) return;
+    logService.logInputCollapse(InputAction.EXPAND);
     setTimelineInputCollapsed(currentChannelId, false);
     notifyLayoutChange();
   }, [currentChannelId, setTimelineInputCollapsed, notifyLayoutChange]);

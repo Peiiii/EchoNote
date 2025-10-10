@@ -1,5 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
+import { logService, SidebarType, SidebarAction } from "@/common/services/log.service";
 import { PanelLeft } from "lucide-react";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
@@ -47,12 +48,15 @@ const CollapsibleSidebarRoot = ({
   const toggleCollapse = () => {
     const newCollapsedState = !isCollapsed;
 
+    logService.logSidebarToggle(
+      SidebarType.LEFT,
+      newCollapsedState ? SidebarAction.CLOSE : SidebarAction.OPEN
+    );
+
     if (externalCollapsed === undefined) {
-      // If no external state, manage internally
       setInternalCollapsed(newCollapsedState);
     }
 
-    // Always call the callback to notify parent
     onCollapseChange?.(newCollapsedState);
   };
 

@@ -9,11 +9,13 @@ import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
-import { useEffect } from "react";
+import { logService, Platform } from "@/common/services/log.service";
+import { useEffect, useRef } from "react";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user, isInitializing } = useFirebaseAuth();
+  const sessionStartTime = useRef<number>(Date.now());
   console.log("[App] ", {
     user,
     isInitializing,
@@ -23,6 +25,16 @@ export const App = () => {
   useEffect(() => {
     setNotesViewAuth(user);
   }, [user, setNotesViewAuth]);
+
+  useEffect(() => {
+    const platform = currentBreakpoint === "sm" ? Platform.MOBILE : Platform.DESKTOP;
+    logService.logAppStart(platform, "1.0.0");
+    
+    return () => {
+      const sessionDuration = Date.now() - sessionStartTime.current;
+      logService.logAppClose(sessionDuration);
+    };
+  }, [currentBreakpoint]);
 
   if (isInitializing) {
     return (

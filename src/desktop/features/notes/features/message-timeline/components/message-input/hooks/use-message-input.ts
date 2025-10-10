@@ -4,6 +4,7 @@ import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
+import { logService, MessageType } from "@/common/services/log.service";
 import { MessageInputProps } from "../types";
 
 export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
@@ -26,15 +27,31 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
   const handleSend = async () => {
     if (!message.trim() || !currentChannelId) return;
 
+    const messageContent = message.trim();
+    const hasTags = messageContent.includes('#');
+    const messageType = MessageType.TEXT;
+
+    logService.logMessageSend(
+      currentChannelId,
+      messageType,
+      messageContent.length,
+      hasTags
+    );
+
     if (replyToMessageId) {
+      logService.logMessageReply(
+        replyToMessageId,
+        currentChannelId,
+        replyToMessageId
+      );
       addThreadMessage(replyToMessageId, {
-        content: message.trim(),
+        content: messageContent,
         sender: "user" as const,
         channelId: currentChannelId,
       });
     } else {
       sendMessage({
-        content: message.trim(),
+        content: messageContent,
         sender: "user" as const,
         channelId: currentChannelId,
       });
