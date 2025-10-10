@@ -1,4 +1,4 @@
-import{r}from"./pkg-at-firebase-app-Ch5plkeC.js";import"./pkg-at-firebase-auth--3PPvFPn.js";import"./pkg-at-firebase-logger-CNz1B4Yj.js";import"./pkg-at-firebase-firestore-gpL6lSot.js";var i="firebase",e="12.2.1";/**
+import"./pkg-at-firebase-analytics-CFSOJ71M.js";import{r}from"./pkg-at-firebase-app-B-jb69A0.js";import"./pkg-at-firebase-auth-DfkLc4it.js";import"./pkg-at-firebase-logger-CNz1B4Yj.js";import"./pkg-at-firebase-firestore-Dn_XiGxb.js";var i="firebase",o="12.2.1";/**
  * @license
  * Copyright 2020 Google LLC
  *
@@ -13,4 +13,4 @@ import{r}from"./pkg-at-firebase-app-Ch5plkeC.js";import"./pkg-at-firebase-auth--
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */r(i,e,"app");
+ */r(i,o,"app");

@@ -1,4 +1,4 @@
-import{C as h,a as B}from"./pkg-at-firebase-component-4vjQUi9Q.js";import{L as P}from"./pkg-at-firebase-logger-CNz1B4Yj.js";import{E as N,g as S,d as D,b as y,i as F,v as O,F as A}from"./pkg-at-firebase-util-ApsrsKOG.js";import{o as R}from"./pkg-idb-BXWtuYvb.js";/**
+import{C as h,a as B}from"./pkg-at-firebase-component-uLb4jufn.js";import{L as P}from"./pkg-at-firebase-logger-CNz1B4Yj.js";import{E as N,e as S,d as D,f as y,a as F,v as O,F as A}from"./pkg-at-firebase-util-DEf2dHJc.js";import{o as R}from"./pkg-idb-BXWtuYvb.js";/**
  * @license
  * Copyright 2019 Google LLC
  *
@@ -148,4 +148,4 @@ import{C as h,a as B}from"./pkg-at-firebase-component-4vjQUi9Q.js";import{L as P
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */function Se(a){u(new h("platform-logger",e=>new M(e),"PRIVATE")),u(new h("heartbeat",e=>new $e(e),"PRIVATE")),l(m,E,a),l(m,E,"esm2020"),l("fire-js","")}Se("");export{Ne as S,u as _,Pe as a,Be as b,Fe as g,ge as i,l as r};
+ */function Se(a){u(new h("platform-logger",e=>new M(e),"PRIVATE")),u(new h("heartbeat",e=>new $e(e),"PRIVATE")),l(m,E,a),l(m,E,"esm2020"),l("fire-js","")}Se("");export{Ne as S,u as _,Be as a,Pe as b,Fe as g,ge as i,l as r};
