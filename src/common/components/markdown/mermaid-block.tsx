@@ -1,6 +1,6 @@
 import { Check, Copy, Download, Maximize2, Code2, Image as ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PremiumDiagramViewer } from "@/common/components/ui/premium-viewer";
+import { MermaidViewer } from "@/common/components/ui/mermaid-viewer";
 
 interface MermaidBlockProps {
   code: string;
@@ -176,7 +176,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
         />
       )}
 
-      <PremiumDiagramViewer
+      <MermaidViewer
         isOpen={open}
         onClose={() => setOpen(false)}
         content={svg || ""}

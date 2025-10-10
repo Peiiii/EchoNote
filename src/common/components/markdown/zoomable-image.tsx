@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Maximize2 } from "lucide-react";
-import { PremiumImageViewer } from "@/common/components/ui/premium-viewer";
+import { ImageViewer } from "@/common/components/ui/image-viewer";
 
 interface ZoomableImageProps {
   src?: string;
@@ -72,7 +72,7 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
         )}
       </span>
 
-      <PremiumImageViewer
+      <ImageViewer
         isOpen={open}
         onClose={() => setOpen(false)}
         src={src || ""}
