@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, Download, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
-import { useZoom } from "@/common/hooks/use-zoom";
 
 interface MermaidViewerProps {
   isOpen: boolean;
@@ -22,18 +21,6 @@ export function MermaidViewer({
 }: MermaidViewerProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const {
-    scale,
-    position,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
-    zoomIn,
-    zoomOut,
-    resetView,
-    reset,
-  } = useZoom();
 
   useEffect(() => {
     if (isOpen) {
@@ -79,11 +66,6 @@ export function MermaidViewer({
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      reset();
-    }
-  }, [isOpen, reset]);
 
   if (!isOpen) return null;
 
@@ -96,19 +78,10 @@ export function MermaidViewer({
           }`}
         >
           <div
-            className="relative w-full h-full flex items-center justify-center overflow-hidden bg-white dark:bg-gray-900 rounded-lg"
-            onWheel={handleWheel}
+            className="relative w-full h-full flex items-center justify-center overflow-hidden bg-white dark:bg-gray-900 rounded-lg p-4"
           >
             <div
-              className="transition-all duration-200"
-              style={{
-                transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                transformOrigin: "center center",
-              }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+              className="w-full h-full flex items-center justify-center [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:w-auto [&_svg]:h-auto"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
@@ -155,36 +128,6 @@ export function MermaidViewer({
         Press <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-xs font-mono">ESC</kbd> to close
       </div>
 
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={zoomOut}
-          className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
-        >
-          <ZoomOut className="w-4 h-4" />
-        </Button>
-        <span className="text-white/80 text-xs font-medium min-w-[3rem] text-center">
-          {Math.round(scale * 100)}%
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={zoomIn}
-          className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
-        >
-          <ZoomIn className="w-4 h-4" />
-        </Button>
-        <div className="w-px h-4 bg-white/20" />
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={resetView}
-          className="text-white/80 hover:text-white hover:bg-white/10 border-0 h-8 w-8 p-0"
-        >
-          <RotateCw className="w-4 h-4" />
-        </Button>
-      </div>
     </div>
   );
 }
