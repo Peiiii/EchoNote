@@ -180,27 +180,27 @@ function getChannelPrompts(_channelId: string) {
   return [
     {
       id: "prompt-1",
-      prompt: "Let's chat",
+      prompt: "Analyze my recent notes",
     },
     {
       id: "prompt-2",
-      prompt: "Summarize this",
+      prompt: "Summarize my thoughts",
     },
     {
       id: "prompt-3",
-      prompt: "Any suggestions?",
+      prompt: "What patterns do you see?",
     },
     {
       id: "prompt-4",
-      prompt: "What should I do next?",
+      prompt: "Help me organize these ideas",
     },
     {
       id: "prompt-5",
-      prompt: "What important thing am I missing?",
+      prompt: "What am I missing?",
     },
     {
       id: "prompt-6",
-      prompt: "Suggestions for next week",
+      prompt: "Suggest improvements",
     },
   ];
 }

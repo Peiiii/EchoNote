@@ -101,27 +101,27 @@ export function AIAssistantCore({
               items: [
                 {
                   id: "prompt-1",
-                  prompt: "聊聊吧",
+                  prompt: "Analyze my recent notes",
                 },
                 {
                   id: "prompt-2",
-                  prompt: "帮我总结一下",
+                  prompt: "Summarize my thoughts",
                 },
                 {
                   id: "prompt-3",
-                  prompt: "你有啥建议吗",
+                  prompt: "What patterns do you see?",
                 },
                 {
                   id: "prompt-4",
-                  prompt: "我接下来该做什么呢？",
+                  prompt: "Help me organize these ideas",
                 },
                 {
                   id: "prompt-5",
-                  prompt: "有什么很重要但是被我忽略的东西？",
+                  prompt: "What am I missing?",
                 },
                 {
                   id: "prompt-6",
-                  prompt: "接下来一周的建议",
+                  prompt: "Suggest improvements",
                 },
               ],
               onItemClick: ({ prompt }) => {
