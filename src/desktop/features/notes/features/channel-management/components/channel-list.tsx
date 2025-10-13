@@ -2,7 +2,7 @@ import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { logService } from "@/common/services/log.service";
+import { logService } from "@/core/services/log.service";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";

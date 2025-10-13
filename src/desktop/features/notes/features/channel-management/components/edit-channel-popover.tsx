@@ -1,6 +1,6 @@
 import { Channel } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { logService, ChannelEditField } from "@/common/services/log.service";
+import { logService, ChannelEditField } from "@/core/services/log.service";
 import { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";

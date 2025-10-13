@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useUIPreferencesStore } from "@/core/stores/ui-preferences.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
-import { logService, InputAction } from "@/common/services/log.service";
+import { logService, InputAction } from "@/core/services/log.service";
 
 export function useInputCollapse() {
   const { currentChannelId } = useNotesViewStore();

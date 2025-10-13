@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { logService, AITrigger } from "@/common/services/log.service";
+import { logService, AITrigger } from "@/core/services/log.service";
 
 export function useAIAssistant() {
   const { currentChannelId } = useNotesViewStore();

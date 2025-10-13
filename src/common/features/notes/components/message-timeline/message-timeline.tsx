@@ -6,7 +6,7 @@ import { RxEvent } from "@/common/lib/rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
-import { logService, AITrigger } from "@/common/services/log.service";
+import { logService, AITrigger } from "@/core/services/log.service";
 import { Bot, ChevronUp, Send } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Button } from "@/common/components/ui/button";

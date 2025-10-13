@@ -49,14 +49,14 @@ logService.logChannelDelete(channel.id, channel.name, channel.messageCount || 0)
 
 **文件**: `src/desktop/features/notes/features/message-timeline/components/message-input/hooks/use-message-input.ts`
 
-- **logMessageSend**: 消息发送时记录消息类型、长度和标签信息
+- **logNoteCreate**: 笔记创建时记录笔记类型、长度和标签信息
 - **logMessageReply**: 消息回复时记录回复信息
 
 ```typescript
-// 消息发送
-logService.logMessageSend(
+// 笔记创建
+logService.logNoteCreate(
   currentChannelId,
-  MessageType.TEXT,
+  NoteType.TEXT,
   messageContent.length,
   hasTags
 );

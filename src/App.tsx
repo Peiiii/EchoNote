@@ -9,7 +9,7 @@ import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
-import { logService, Platform } from "@/common/services/log.service";
+import { logService, Platform } from "@/core/services/log.service";
 import { useEffect, useRef } from "react";
 
 export const App = () => {

@@ -16,7 +16,7 @@ export enum AnalyticsEvent {
   CHANNEL_SELECT = 'channel_select',
   CHANNEL_EDIT = 'channel_edit',
   CHANNEL_DELETE = 'channel_delete',
-  MESSAGE_SEND = 'message_send',
+  NOTE_CREATE = 'note_create',
   MESSAGE_EDIT = 'message_edit',
   MESSAGE_DELETE = 'message_delete',
   MESSAGE_REPLY = 'message_reply',
@@ -66,10 +66,10 @@ export enum Platform {
 }
 ```
 
-### 3. MessageType - 消息类型
+### 3. NoteType - 笔记类型
 
 ```typescript
-export enum MessageType {
+export enum NoteType {
   TEXT = 'text',
   IMAGE = 'image',
   FILE = 'file'
@@ -200,7 +200,7 @@ export enum SearchScope {
 import { 
   logService, 
   Platform, 
-  MessageType, 
+  NoteType, 
   ChannelEditField,
   AITrigger,
   ContextMode,
@@ -221,10 +221,10 @@ import {
 // 应用启动
 logService.logAppStart(Platform.DESKTOP, '1.0.0');
 
-// 消息发送
-logService.logMessageSend(
+// 笔记创建
+logService.logNoteCreate(
   'channel_123', 
-  MessageType.TEXT, 
+  NoteType.TEXT, 
   150, 
   true
 );
@@ -305,7 +305,7 @@ logService.logFeedback(
 ### 1. 导入策略
 ```typescript
 // 推荐：按需导入
-import { logService, Platform, MessageType } from '@/common/services/log.service';
+import { logService, Platform, NoteType } from '@/common/services/log.service';
 
 // 避免：全量导入
 import * as LogService from '@/common/services/log.service';

@@ -4,7 +4,7 @@ import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
-import { logService, MessageType } from "@/common/services/log.service";
+import { logService, NoteType } from "@/core/services/log.service";
 import { MessageInputProps } from "../types";
 
 export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
@@ -29,11 +29,11 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
 
     const messageContent = message.trim();
     const hasTags = messageContent.includes('#');
-    const messageType = MessageType.TEXT;
+    const noteType = NoteType.TEXT;
 
-    logService.logMessageSend(
+    logService.logNoteCreate(
       currentChannelId,
-      messageType,
+      noteType,
       messageContent.length,
       hasTags
     );

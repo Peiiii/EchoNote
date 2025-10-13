@@ -50,7 +50,7 @@ logService.logAppStart('desktop', '1.0.0');
 logService.logChannelCreate('channel_123', '工作日志', true);
 
 // 记录消息发送
-logService.logMessageSend('channel_123', 'text', 150, true);
+logService.logNoteCreate('channel_123', 'text', 150, true);
 ```
 
 ### 高级使用

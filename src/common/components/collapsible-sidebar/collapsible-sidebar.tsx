@@ -1,6 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { cn } from "@/common/lib/utils";
-import { logService, SidebarType, SidebarAction } from "@/common/services/log.service";
+import { logService, SidebarType, SidebarAction } from "@/core/services/log.service";
 import { PanelLeft } from "lucide-react";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 

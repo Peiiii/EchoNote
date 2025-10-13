@@ -106,7 +106,7 @@
 
 ### 3. 消息操作事件
 
-#### message_send
+#### note_create
 **用途**: 记录消息发送事件
 **参数**:
 - `channel_id`: string - 频道ID
@@ -117,7 +117,7 @@
 **示例**:
 ```json
 {
-  "event_name": "message_send",
+  "event_name": "note_create",
   "channel_id": "channel_123",
   "message_type": "text",
   "content_length": 150,

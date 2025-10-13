@@ -9,7 +9,7 @@ export enum AnalyticsEvent {
   CHANNEL_SELECT = 'channel_select',
   CHANNEL_EDIT = 'channel_edit',
   CHANNEL_DELETE = 'channel_delete',
-  MESSAGE_SEND = 'message_send',
+  NOTE_CREATE = 'note_create',
   MESSAGE_EDIT = 'message_edit',
   MESSAGE_DELETE = 'message_delete',
   MESSAGE_REPLY = 'message_reply',
@@ -54,7 +54,7 @@ export enum Platform {
   MOBILE = 'mobile'
 }
 
-export enum MessageType {
+export enum NoteType {
   TEXT = 'text',
   IMAGE = 'image',
   FILE = 'file'
@@ -190,10 +190,10 @@ export class LogService {
     });
   };
 
-  logMessageSend = (channelId: string, messageType: MessageType, contentLength: number, hasTags: boolean) => {
-    this.logEvent(AnalyticsEvent.MESSAGE_SEND, {
+  logNoteCreate = (channelId: string, noteType: NoteType, contentLength: number, hasTags: boolean) => {
+    this.logEvent(AnalyticsEvent.NOTE_CREATE, {
       channel_id: channelId,
-      message_type: messageType,
+      note_type: noteType,
       content_length: contentLength,
       has_tags: hasTags
     });

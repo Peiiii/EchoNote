@@ -7,7 +7,7 @@ LogService 为 StillRoot 应用提供了全面的用户行为分析和性能监�
 ## 基础使用
 
 ```typescript
-import { logService, Platform, MessageType, ChannelEditField } from '@/common/services/log.service';
+import { logService, Platform, NoteType, ChannelEditField } from '@/common/services/log.service';
 
 // 基础事件记录
 logService.logEvent('custom_event', {
@@ -79,47 +79,47 @@ const handleChannelDelete = (channel: Channel) => {
 };
 ```
 
-### 3. 消息操作
+### 3. 笔记操作
 
 ```typescript
-import { logService, MessageType } from '@/common/services/log.service';
+import { logService, NoteType } from '@/common/services/log.service';
 
-// 发送消息
-const handleSendMessage = (content: string, channelId: string) => {
-  const messageType = detectMessageType(content);
+// 创建笔记
+const handleCreateNote = (content: string, channelId: string) => {
+  const noteType = detectNoteType(content);
   const hasTags = content.includes('#');
   
-  logService.logMessageSend(
+  logService.logNoteCreate(
     channelId,
-    messageType,
+    noteType,
     content.length,
     hasTags
   );
   
-  sendMessage(content);
+  createNote(content);
 };
 
-// 编辑消息
-const handleEditMessage = (messageId: string, channelId: string, editCount: number) => {
-  logService.logMessageEdit(messageId, channelId, editCount);
-  updateMessage(messageId, newContent);
+// 编辑笔记
+const handleEditNote = (noteId: string, channelId: string, editCount: number) => {
+  logService.logMessageEdit(noteId, channelId, editCount);
+  updateNote(noteId, newContent);
 };
 
-// 删除消息
-const handleDeleteMessage = (message: Message) => {
-  const messageAge = Date.now() - message.timestamp;
+// 删除笔记
+const handleDeleteNote = (note: Message) => {
+  const noteAge = Date.now() - note.timestamp;
   logService.logMessageDelete(
-    message.id,
-    message.channelId,
-    messageAge
+    note.id,
+    note.channelId,
+    noteAge
   );
-  deleteMessage(message.id);
+  deleteNote(note.id);
 };
 
-// 回复消息
-const handleReplyMessage = (messageId: string, channelId: string, threadId: string) => {
-  logService.logMessageReply(messageId, channelId, threadId);
-  openThread(messageId);
+// 回复笔记
+const handleReplyNote = (noteId: string, channelId: string, threadId: string) => {
+  logService.logMessageReply(noteId, channelId, threadId);
+  openThread(noteId);
 };
 ```
 

@@ -16,7 +16,7 @@
 - [ ] 频道删除埋点 (`logChannelDelete`)
 
 #### 3. 消息操作
-- [ ] 消息发送埋点 (`logMessageSend`)
+- [x] 笔记创建埋点 (`logNoteCreate`)
 - [ ] 消息编辑埋点 (`logMessageEdit`)
 - [ ] 消息删除埋点 (`logMessageDelete`)
 - [ ] 消息回复埋点 (`logMessageReply`)
