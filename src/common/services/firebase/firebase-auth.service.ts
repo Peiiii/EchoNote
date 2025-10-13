@@ -17,6 +17,8 @@ import {
 
 let isRegistering = false;
 let isSigningIn = false;
+// Ensure we only initialize listeners once per session to prevent duplicate init/flicker
+let hasInitializedListeners = false;
 
 export const firebaseAuthService = {
   signInWithGoogle: async (): Promise<User | null> => {
@@ -30,9 +32,10 @@ export const firebaseAuthService = {
     // const signInWithPopup = await import('firebase/auth').then(mod => mod.signInWithPopup);
     const provider = new GoogleAuthProvider();
     try {
+      // Let onAuthStateChanged handle initialization to avoid double init
+      isSigningIn = true;
       const auth = await firebaseConfig.getAuth();
       const result = await signInWithPopup(auth, provider);
-      await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
       return result.user;
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -176,19 +179,14 @@ export const firebaseAuthService = {
       }
 
       console.log("✅ Email is verified, proceeding with login");
-      console.log("🔗 Initializing Firebase listeners...");
-      
-      useAuthStore.getState().setAuthStep(AuthStep.INITIALIZING_DATA, AuthMessage.SETTING_UP_WORKSPACE, AuthProgress.INITIALIZING_DATA);
+      useAuthStore.getState().setAuthStep(
+        AuthStep.INITIALIZING_DATA,
+        AuthMessage.SETTING_UP_WORKSPACE,
+        AuthProgress.INITIALIZING_DATA
+      );
       
       firebaseConfig.setUserIdForAnalytics(result.user.uid);
-
-      await useNotesDataStore.getState().initFirebaseListeners(result.user.uid);
-      console.log("✅ Firebase listeners initialized");
-
-      useAuthStore.getState().setAuthStep(AuthStep.COMPLETE, AuthMessage.WELCOME_BACK, AuthProgress.COMPLETE);
-
-      isSigningIn = false;
-      console.log("🔐 isSigningIn set to false after listeners initialized");
+      // Do not init listeners here. Let onAuthStateChanged handle it once.
 
       console.log("🎉 Login process completed successfully");
       return result.user;
@@ -217,6 +215,7 @@ export const firebaseAuthService = {
     const auth = await firebaseConfig.getAuth();
     await signOut(auth);
     useNotesDataStore.getState().cleanupListeners();
+    hasInitializedListeners = false;
   },
 
   onAuthStateChanged: async (callback: (user: User | null) => void): Promise<() => void> => {
@@ -234,10 +233,28 @@ export const firebaseAuthService = {
         return;
       }
 
-      // 如果是登录过程，但用户已通过邮箱验证，则处理这个状态变化
+      // 登录流程：已验证用户
       if (isSigningIn && user && user.emailVerified) {
-        console.log("✅ Processing login state change - user is verified");
-        // 不在这里初始化监听器，因为 signInWithEmail 已经处理了
+        console.log("✅ Processing login state change - user is verified (init once)");
+        firebaseConfig.setUserIdForAnalytics(user.uid);
+        if (!hasInitializedListeners) {
+          hasInitializedListeners = true;
+          useAuthStore.getState().setAuthStep(
+            AuthStep.INITIALIZING_DATA,
+            AuthMessage.SETTING_UP_WORKSPACE,
+            AuthProgress.INITIALIZING_DATA
+          );
+          await useNotesDataStore.getState().initFirebaseListeners(user.uid);
+        }
+        useAuthStore.getState().setAuthStep(
+          AuthStep.COMPLETE,
+          AuthMessage.WELCOME_BACK,
+          AuthProgress.COMPLETE
+        );
+        isSigningIn = false;
+        // Ensure auth store receives the new user immediately
+        callback(user);
+        return;
       } else if (isSigningIn) {
         console.log("⏸️ Skipping auth state change due to ongoing sign-in (unverified user)");
         return;
@@ -248,7 +265,12 @@ export const firebaseAuthService = {
 
         if (user.emailVerified) {
           console.log("✅ User email verified, initializing listeners");
-          await useNotesDataStore.getState().initFirebaseListeners(user.uid);
+          if (!hasInitializedListeners) {
+            hasInitializedListeners = true;
+            await useNotesDataStore.getState().initFirebaseListeners(user.uid);
+          } else {
+            console.log("ℹ️ Listeners already initialized, skipping duplicate init");
+          }
         } else {
           console.log("❌ User email not verified, cleaning up listeners");
           useNotesDataStore.getState().cleanupListeners();
@@ -256,6 +278,7 @@ export const firebaseAuthService = {
       } else {
         console.log("🚪 No user, cleaning up listeners");
         useNotesDataStore.getState().cleanupListeners();
+        hasInitializedListeners = false;
       }
 
       console.log("📞 Calling auth state callback");

@@ -1,10 +1,12 @@
 import {
-  addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   limit,
   query,
   serverTimestamp,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { firebaseConfig } from "@/common/config/firebase.config";
@@ -26,19 +28,22 @@ export class CreateDefaultGeneralChannelMigration implements MigrationExecutor {
   async execute(userId: string): Promise<void> {
     const db = firebaseConfig.getDb();
     const channelsRef = collection(db, `users/${userId}/channels`);
+    const defaultGeneralRef = doc(channelsRef, "default-general");
 
     // Check if there is already at least one non-deleted channel
     const existingSnap = await getDocs(
       query(channelsRef, where("isDeleted", "==", false), limit(1))
     );
 
-    if (!existingSnap.empty) {
+    // If user already has any channel, or the default-general doc already exists, skip
+    const defaultExists = (await getDoc(defaultGeneralRef)).exists();
+    if (!existingSnap.empty || defaultExists) {
       // Nothing to do
       return;
     }
 
-    // Create the default General channel
-    await addDoc(channelsRef, {
+    // Create the default General channel with a deterministic ID to avoid duplicates
+    await setDoc(defaultGeneralRef, {
       name: "General",
       description: "",
       // emoji intentionally omitted; UI handles optional field

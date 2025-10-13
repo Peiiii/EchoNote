@@ -134,11 +134,20 @@ class MigrationExecutorManager {
 }
 
 class FirebaseMigrateService {
+  // Prevent concurrent runs for the same user within this session
+  private inProgressUsers = new Set<string>();
   private stateManager = new MigrationStateManager();
   private executorManager = new MigrationExecutorManager();
 
   async runAllMigrations(userId: string): Promise<void> {
     try {
+      if (this.inProgressUsers.has(userId)) {
+        MigrationLogger.printServiceInfo(
+          `Migration already in progress for user: ${userId}, skipping duplicate trigger`
+        );
+        return;
+      }
+      this.inProgressUsers.add(userId);
       MigrationLogger.printHeader(userId);
 
       const currentState = await this.stateManager.getUserMigrationState(userId);
@@ -186,6 +195,8 @@ class FirebaseMigrateService {
     } catch (error) {
       MigrationLogger.printCriticalError(error);
       throw error;
+    } finally {
+      this.inProgressUsers.delete(userId);
     }
   }
 

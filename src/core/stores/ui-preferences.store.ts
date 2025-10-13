@@ -44,7 +44,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
       layoutMode: "default",
       showTimestamps: true,
       showUserAvatars: true,
-      timelineCoverCollapsed: false,
+      timelineCoverCollapsed: true,
       timelineInputCollapsed: {},
 
       // Actions

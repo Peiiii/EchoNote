@@ -368,11 +368,17 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   },
 
   initFirebaseListeners: async (userId: string) => {
+    const { userId: currentUserId, unsubscribeChannels: existingUnsub } = get();
+    // Guard: if already initialized for this user, skip duplicate init to avoid flicker
+    if (existingUnsub && currentUserId === userId) {
+      return;
+    }
+
     get().cleanupListeners();
     set({ userId, channelsLoading: true });
 
-    await get().fetchInitialData(userId);
-
+    // Ensure migrations (e.g., default General) are applied before we subscribe,
+    // so the first snapshot already contains the default space.
     await withErrorHandling(async () => {
       await firebaseMigrateService.runAllMigrations(userId);
     }, "runMigrations");
