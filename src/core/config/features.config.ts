@@ -55,5 +55,13 @@ export const getFeaturesConfig = () => {
         },
       },
     },
+    ui: {
+      globalProcess: {
+        workspaceInit: {
+          // display mode for the initial workspace setup overlay: 'dialog' | 'fullscreen'
+          displayMode: "fullscreen" as "dialog" | "fullscreen",
+        },
+      },
+    },
   };
 };

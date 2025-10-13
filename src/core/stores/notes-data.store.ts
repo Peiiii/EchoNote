@@ -5,6 +5,8 @@ import { create } from "zustand";
 import { DocumentSnapshot } from "firebase/firestore";
 import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { getFeaturesConfig } from "@/core/config/features.config";
+import { useGlobalProcessStore } from "@/core/stores/global-process.store";
 
 export interface AIAnalysis {
   keywords: string[];
@@ -377,16 +379,42 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     get().cleanupListeners();
     set({ userId, channelsLoading: true });
 
-    // Ensure migrations (e.g., default General) are applied before we subscribe,
-    // so the first snapshot already contains the default space.
-    await withErrorHandling(async () => {
+    // Global process overlay: workspace initialization
+    const globalProcess = useGlobalProcessStore.getState();
+    const displayMode = getFeaturesConfig().ui?.globalProcess?.workspaceInit?.displayMode ?? "dialog";
+    globalProcess.show({
+      id: "workspace-init",
+      title: "Setting up your workspace",
+      message: "Preparing your spaces and notes...",
+      displayMode,
+      steps: [
+        { id: "migrations", title: "Applying migrations", status: "pending" },
+        { id: "subscribe", title: "Connecting to spaces", status: "pending" },
+      ],
+    });
+
+    // Ensure migrations (e.g., default General) are applied before subscribe
+    try {
+      globalProcess.setStepStatus("migrations", "running");
       await firebaseMigrateService.runAllMigrations(userId);
-    }, "runMigrations");
+      globalProcess.setStepStatus("migrations", "success");
+    } catch (e) {
+      globalProcess.setStepStatus("migrations", "error");
+      globalProcess.fail("Failed to apply migrations");
+      throw e;
+    }
 
     const unsubscribeChannels = firebaseNotesService.subscribeToChannels(userId, channels => {
       const { isListenerEnabled } = get();
       if (!isListenerEnabled) return;
       set({ channels, channelsLoading: false });
+
+      // First successful snapshot completes the init overlay
+      if (channels) {
+        globalProcess.setStepStatus("subscribe", "success");
+        globalProcess.succeed();
+        setTimeout(() => useGlobalProcessStore.getState().hide(), 400);
+      }
 
       get().validateAndCleanupCurrentChannel(channels);
     });

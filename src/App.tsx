@@ -11,6 +11,7 @@ import { DesktopApp } from "@/desktop/desktop-app";
 import { MobileApp } from "@/mobile/mobile-app";
 import { logService, Platform } from "@/core/services/log.service";
 import { useEffect, useRef } from "react";
+import { GlobalProcessOverlay } from "@/common/components/global-process/global-process-overlay";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
@@ -56,6 +57,7 @@ export const App = () => {
 
   return (
     <>
+      <GlobalProcessOverlay />
       {currentBreakpoint === "sm" ? <MobileApp /> : <DesktopApp />}
       <Toaster />
       <PWAStatusIndicator />
