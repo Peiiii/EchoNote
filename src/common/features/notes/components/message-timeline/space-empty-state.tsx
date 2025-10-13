@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/common/components/ui/card";
-import { Lightbulb, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface SpaceEmptyStateProps {
   className?: string;
@@ -10,13 +10,8 @@ export const SpaceEmptyState = ({ className = "" }: SpaceEmptyStateProps) => {
     <div className={`flex-1 flex items-center justify-center p-8 ${className}`}>
       <Card className="max-w-md w-full border-2 border-dashed border-muted-foreground/20 bg-gradient-to-br from-background to-muted/20 shadow-lg">
         <CardContent className="p-8 text-center space-y-6">
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-              <Sparkles className="w-10 h-10 text-blue-500 dark:text-blue-400" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-              <Lightbulb className="w-3 h-3 text-white" />
-            </div>
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+            <Sparkles className="w-10 h-10 text-blue-500 dark:text-blue-400" />
           </div>
           
           <div className="space-y-3">
@@ -39,7 +34,7 @@ export const SpaceEmptyState = ({ className = "" }: SpaceEmptyStateProps) => {
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Build threads of connected thoughts</span>
+              <span>Connect your ideas together</span>
             </div>
           </div>
         </CardContent>
