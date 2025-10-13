@@ -17,6 +17,9 @@ interface AuthProgressProps {
   forceOpen?: boolean;
   // Callback when dialog should be closed
   onClose?: () => void;
+  // Resend email cooldown state
+  resendCooldown?: number;
+  isResending?: boolean;
 }
 
 // Separate component for sign-in progress
@@ -163,11 +166,15 @@ const SignUpProgress = ({ authStep, authMessage, authProgress }: {
 const EmailVerificationGuidance = ({ 
   email, 
   onResendVerification, 
-  onBackToSignIn 
+  onBackToSignIn,
+  resendCooldown = 0,
+  isResending = false
 }: {
   email?: string;
   onResendVerification?: () => void;
   onBackToSignIn?: () => void;
+  resendCooldown?: number;
+  isResending?: boolean;
 }) => {
   return (
     <>
@@ -190,9 +197,19 @@ const EmailVerificationGuidance = ({
         <div className="flex items-center justify-center gap-4 pt-2">
           <button
             onClick={onResendVerification}
-            className="px-4 py-2 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border border-green-200 dark:border-green-800/30 rounded-lg transition-colors disabled:opacity-50"
+            disabled={resendCooldown > 0 || isResending}
+            className="px-4 py-2 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 border border-green-200 dark:border-green-800/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Resend link
+            {isResending ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                <span>Sending...</span>
+              </div>
+            ) : resendCooldown > 0 ? (
+              `Resend in ${resendCooldown}s`
+            ) : (
+              "Resend link"
+            )}
           </button>
           <button
             onClick={onBackToSignIn}
@@ -214,6 +231,8 @@ export const AuthProgress = ({
   isSignUpFlow,
   forceOpen,
   onClose,
+  resendCooldown = 0,
+  isResending = false,
 }: AuthProgressProps) => {
   const { authStep, authMessage, authProgress, isAuthenticating } = useAuthStore();
 
@@ -239,6 +258,8 @@ export const AuthProgress = ({
           email={email}
           onResendVerification={onResendVerification}
           onBackToSignIn={onBackToSignIn}
+          resendCooldown={resendCooldown}
+          isResending={isResending}
         />
       );
     }

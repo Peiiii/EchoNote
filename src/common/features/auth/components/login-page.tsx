@@ -1,6 +1,6 @@
 import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { useAuthStore } from "@/core/stores/auth.store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
 import { EmailPasswordForm } from "./email-password-form";
 import { LoginFooter } from "./login-footer";
@@ -31,6 +31,22 @@ export const LoginPage = () => {
   const [pendingUser, setPendingUser] = useState<{ email: string } | null>(null);
   // Keep auth modal open throughout the sign-up flow to avoid flicker
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  // Resend email cooldown state
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [resendCooldown]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -105,6 +121,8 @@ export const LoginPage = () => {
           setIsEmailVerificationSent(true);
           setError("");
           setStatusMessage("");
+          // Start cooldown timer for initial email send (60 seconds)
+          setResendCooldown(60);
         }
       } else {
         await signInWithEmail(email, password);
@@ -219,8 +237,16 @@ export const LoginPage = () => {
       return;
     }
 
+    // Check cooldown
+    if (resendCooldown > 0) {
+      setError(`Please wait ${resendCooldown} seconds before resending`);
+      return;
+    }
+
     try {
       setError("");
+      setIsResending(true);
+      
       // Show progress in modal while resending
       setIsEmailVerificationSent(false);
       setAuthStep(
@@ -228,8 +254,12 @@ export const LoginPage = () => {
         AuthMessage.SENDING_VERIFICATION,
         AuthProgressEnum.VERIFYING_EMAIL
       );
+      
       await sendEmailVerification();
       setIsEmailVerificationSent(true);
+      
+      // Start cooldown timer (60 seconds)
+      setResendCooldown(60);
     } catch (error: unknown) {
       console.error("Resend verification failed:", error);
       const firebaseError = error as { code?: string; message?: string };
@@ -237,6 +267,8 @@ export const LoginPage = () => {
       switch (firebaseError.code) {
         case "auth/too-many-requests":
           setError("Too many verification attempts. Please try again later.");
+          // Set longer cooldown for rate limiting
+          setResendCooldown(120);
           break;
         case "auth/network-request-failed":
           setError("Network error. Please check your connection and try again.");
@@ -244,6 +276,8 @@ export const LoginPage = () => {
         default:
           setError("Failed to resend verification email. Please try again.");
       }
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -254,6 +288,8 @@ export const LoginPage = () => {
     setIsEmailVerificationSent(false);
     setPendingUser(null);
     setConfirmPassword("");
+    setResendCooldown(0);
+    setIsResending(false);
   };
 
   const handleBackToSignIn = () => {
@@ -264,6 +300,8 @@ export const LoginPage = () => {
     setError("");
     setPassword("");
     setConfirmPassword("");
+    setResendCooldown(0);
+    setIsResending(false);
   };
 
   const handleAuthProgressClose = () => {
@@ -271,6 +309,8 @@ export const LoginPage = () => {
     setIsEmailVerificationSent(false);
     setPendingUser(null);
     setError("");
+    setResendCooldown(0);
+    setIsResending(false);
   };
 
   const { isGoogleAuthSupported } = useGoogleAuthSupport();
@@ -338,6 +378,8 @@ export const LoginPage = () => {
               isSignUpFlow={isSignUp || isEmailVerificationSent}
               forceOpen={isSignUpModalOpen}
               onClose={handleAuthProgressClose}
+              resendCooldown={resendCooldown}
+              isResending={isResending}
             />
 
             {/* Only show password reset message inline, email verification is handled in modal */}
