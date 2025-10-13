@@ -3,6 +3,7 @@ import {
   MessageTimeline,
   MessageTimelineRef,
 } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
@@ -41,6 +42,10 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
 
     const groupedMessages = useGroupedMessages(messages);
 
+    const hasMessages = Object.values(groupedMessages).some(dayMessages =>
+      (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
+    );
+
     if (!currentChannelId) {
       return <DesktopWelcomeGuide />;
     }
@@ -49,18 +54,20 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
       return <MessageTimelineSkeleton count={5} />;
     }
 
+    if (!hasMessages) {
+      return <SpaceEmptyState />;
+    }
+
     return (
       <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
-        {messages && (
-          <MessageTimeline
-            ref={ref}
-            renderThoughtRecord={renderThoughtRecord}
-            groupedMessages={groupedMessages}
-            messages={messages}
-            onScroll={handleScroll}
-            onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
-          />
-        )}
+        <MessageTimeline
+          ref={ref}
+          renderThoughtRecord={renderThoughtRecord}
+          groupedMessages={groupedMessages}
+          messages={messages}
+          onScroll={handleScroll}
+          onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
+        />
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import { EmptyState } from "@/common/features/notes/components/message-timeline/empty-state";
+import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import {
   MessageTimeline,
@@ -87,7 +87,7 @@ export const MobileTimelineContent = forwardRef<
   }
 
   if (!hasMessages) {
-    return <EmptyState />;
+    return <SpaceEmptyState />;
   }
 
   return (
