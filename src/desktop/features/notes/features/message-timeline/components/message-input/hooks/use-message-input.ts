@@ -85,8 +85,8 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
   }, [message]);
 
   const placeholder = replyToMessage
-    ? `Reply to this message... (Enter to create, Shift+Enter for new line)`
-    : `Record your thoughts... (Enter to create, Shift+Enter for new line)`;
+    ? `Reply to this message... (Enter to add, Shift+Enter for new line)`
+    : `Record your thoughts... (Enter to add, Shift+Enter for new line)`;
 
   return {
     message,
