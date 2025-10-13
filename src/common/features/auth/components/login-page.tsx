@@ -2,7 +2,6 @@ import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { useAuthStore } from "@/core/stores/auth.store";
 import { useState } from "react";
 import { MessageSquare } from "lucide-react";
-import { AuthMessages } from "./auth-messages";
 import { EmailPasswordForm } from "./email-password-form";
 import { LoginFooter } from "./login-footer";
 import { LoginIllustration } from "./login-illustration";
@@ -341,16 +340,12 @@ export const LoginPage = () => {
               onClose={handleAuthProgressClose}
             />
 
-            {/* Keep only password-reset banner below; email verification moves into modal */}
-            <AuthMessages
-              error=""
-              isPasswordReset={isPasswordReset}
-              isEmailVerificationSent={false}
-              email={email}
-              onResendVerification={handleResendVerification}
-              onBackToSignIn={handleBackToSignIn}
-              isAuthenticating={isAuthenticating}
-            />
+            {/* Only show password reset message inline, email verification is handled in modal */}
+            {isPasswordReset && (
+              <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-lg p-3">
+                Password reset email sent! Check your inbox.
+              </div>
+            )}
 
             <LoginFooter />
           </div>
