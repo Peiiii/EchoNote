@@ -1,7 +1,6 @@
 import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { useAuthStore } from "@/core/stores/auth.store";
 import { useState } from "react";
-import { toast } from "sonner";
 import { MessageSquare } from "lucide-react";
 import { AuthMessages } from "./auth-messages";
 import { EmailPasswordForm } from "./email-password-form";
@@ -9,6 +8,7 @@ import { LoginFooter } from "./login-footer";
 import { LoginIllustration } from "./login-illustration";
 import { SocialLogin } from "./social-login";
 import { AuthProgress } from "./auth-progress";
+import { AuthStep, AuthMessage, AuthProgress as AuthProgressEnum } from "@/common/types/auth.types";
 
 export const LoginPage = () => {
   const {
@@ -18,6 +18,7 @@ export const LoginPage = () => {
     sendPasswordReset,
     sendEmailVerification,
     isAuthenticating,
+    setAuthStep,
   } = useAuthStore();
 
   const [email, setEmail] = useState("");
@@ -85,35 +86,26 @@ export const LoginPage = () => {
       setStatusMessage("");
 
       if (isSignUp) {
-        toast.loading("Creating your account...", {
-          id: "creating-account",
-          duration: 1000,
-        });
-
+        // Show progress in modal: creating account -> sending verification
+        setAuthStep(
+          AuthStep.AUTHENTICATING,
+          AuthMessage.CREATING_ACCOUNT,
+          AuthProgressEnum.AUTHENTICATING
+        );
         const result = await sendSignUpLink(email, password);
         if (result.verificationSent) {
+          setAuthStep(
+            AuthStep.VERIFYING_EMAIL,
+            AuthMessage.SENDING_VERIFICATION,
+            AuthProgressEnum.VERIFYING_EMAIL
+          );
           setPendingUser({ email });
           setIsEmailVerificationSent(true);
           setError("");
           setStatusMessage("");
-
-          toast.success("Account created! Please check your email to verify your account.", {
-            id: "creating-account",
-            duration: 3000,
-          });
         }
       } else {
-        toast.loading("Signing you in...", {
-          id: "signing-in",
-          duration: 1000,
-        });
-
         await signInWithEmail(email, password);
-
-        toast.success("Login successful! Welcome back!", {
-          id: "signing-in",
-          duration: 1500,
-        });
       }
     } catch (error: unknown) {
       console.error("Email auth failed:", error);
@@ -172,10 +164,14 @@ export const LoginPage = () => {
       }
 
       setError(errorMessage);
-      toast.error(errorMessage, {
-        id: isSignUp ? "creating-account" : "signing-in",
-        duration: 4000,
-      });
+      // Reflect failure state in modal briefly (only if still authenticating)
+      try {
+        setAuthStep(
+          AuthStep.ERROR,
+          isSignUp ? "Sign-up failed. Please try again." : AuthMessage.SIGN_IN_FAILED,
+          AuthProgressEnum.START
+        );
+      } catch {}
     }
   };
 
@@ -221,6 +217,13 @@ export const LoginPage = () => {
 
     try {
       setError("");
+      // Show progress in modal while resending
+      setIsEmailVerificationSent(false);
+      setAuthStep(
+        AuthStep.VERIFYING_EMAIL,
+        AuthMessage.SENDING_VERIFICATION,
+        AuthProgressEnum.VERIFYING_EMAIL
+      );
       await sendEmailVerification();
       setIsEmailVerificationSent(true);
     } catch (error: unknown) {
@@ -315,12 +318,18 @@ export const LoginPage = () => {
               onSubmit={handleEmailSubmit}
             />
 
-            <AuthProgress />
+            <AuthProgress
+              isEmailVerificationSent={isEmailVerificationSent}
+              email={email}
+              onResendVerification={handleResendVerification}
+              onBackToSignIn={handleBackToSignIn}
+            />
 
+            {/* Keep only password-reset banner below; email verification moves into modal */}
             <AuthMessages
               error=""
               isPasswordReset={isPasswordReset}
-              isEmailVerificationSent={isEmailVerificationSent}
+              isEmailVerificationSent={false}
               email={email}
               onResendVerification={handleResendVerification}
               onBackToSignIn={handleBackToSignIn}
