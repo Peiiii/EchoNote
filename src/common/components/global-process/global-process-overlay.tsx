@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/common/components/ui/dialog";
 import { Progress } from "@/common/components/ui/progress";
 import { useGlobalProcessStore } from "@/core/stores/global-process.store";
+import { getFeaturesConfig } from "@/core/config/features.config";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 export const GlobalProcessOverlay = () => {
@@ -18,13 +19,19 @@ export const GlobalProcessOverlay = () => {
   };
 
   if (displayMode === "fullscreen") {
+    const branding = getFeaturesConfig().ui?.globalProcess?.branding;
     return (
       <div
         aria-live="polite"
         aria-busy={status === "running"}
         role="dialog"
-        className="fixed inset-0 z-50 bg-background select-none"
+        className="fixed inset-0 z-50 bg-background select-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
       >
+        {branding?.enabled && (
+          <div className="absolute top-6 left-6 text-sm text-muted-foreground">
+            {branding.brandName || "StillRoot"}
+          </div>
+        )}
         <div className="h-full w-full flex items-center justify-center p-6">
           <div className="w-full max-w-md space-y-4">
             <div className="flex items-center gap-2">

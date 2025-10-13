@@ -61,6 +61,10 @@ export const getFeaturesConfig = () => {
           // display mode for the initial workspace setup overlay: 'dialog' | 'fullscreen'
           displayMode: "fullscreen" as "dialog" | "fullscreen",
         },
+        branding: {
+          enabled: true,
+          brandName: "StillRoot",
+        },
       },
     },
   };
