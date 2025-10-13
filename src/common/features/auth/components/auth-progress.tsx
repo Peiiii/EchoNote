@@ -11,6 +11,12 @@ interface AuthProgressProps {
   email?: string;
   onResendVerification?: () => void;
   onBackToSignIn?: () => void;
+  // When true, render sign-up specific steps instead of sign-in steps
+  isSignUpFlow?: boolean;
+  // Force the dialog to stay open across transient store flips (prevents flicker)
+  forceOpen?: boolean;
+  // Callback when dialog should be closed
+  onClose?: () => void;
 }
 
 export const AuthProgress = ({
@@ -18,11 +24,16 @@ export const AuthProgress = ({
   email,
   onResendVerification,
   onBackToSignIn,
+  isSignUpFlow,
+  forceOpen,
+  onClose,
 }: AuthProgressProps) => {
   const { authStep, authMessage, authProgress, isAuthenticating } = useAuthStore();
 
   // Open the dialog when authenticating, or when we want to show the email verification guidance
-  const shouldOpen = isAuthenticating || isEmailVerificationSent;
+  // Keep dialog open if either the store says authenticating / verification view
+  // OR caller explicitly wants to force it open (e.g., bridging signup step transitions)
+  const shouldOpen = !!forceOpen || isAuthenticating || !!isEmailVerificationSent;
   if (!shouldOpen) {
     return null;
   }
@@ -49,8 +60,18 @@ export const AuthProgress = ({
     }
   };
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={true}>
+    <Dialog open={shouldOpen} onOpenChange={(open) => {
+      if (!open) {
+        handleClose();
+      }
+    }}>
       <DialogContent className="max-w-md w-full mx-4 p-8">
         <div className="text-center space-y-6">
           {/* If verification email has been sent, show guidance UI inside the dialog */}
@@ -110,20 +131,37 @@ export const AuthProgress = ({
                         : 'bg-blue-100 dark:bg-blue-900/20'
                   }`}
                 />
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <div className={`flex items-center gap-2 ${authStep === AuthStep.AUTHENTICATING ? 'text-blue-600 dark:text-blue-400' : ''}`}>
-                    <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.AUTHENTICATING ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                    <span>Authenticating</span>
+                {isSignUpFlow ? (
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div className={`flex items-center gap-2 ${authStep === AuthStep.AUTHENTICATING ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                      <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.AUTHENTICATING ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      <span>Creating</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${authStep === AuthStep.VERIFYING_EMAIL ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                      <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.VERIFYING_EMAIL ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      <span>Sending link</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600`} />
+                      <span>Check inbox</span>
+                    </div>
                   </div>
-                  <div className={`flex items-center gap-2 ${authStep === AuthStep.VERIFYING_EMAIL ? 'text-blue-600 dark:text-blue-400' : ''}`}>
-                    <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.VERIFYING_EMAIL ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                    <span>Verifying</span>
+                ) : (
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div className={`flex items-center gap-2 ${authStep === AuthStep.AUTHENTICATING ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                      <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.AUTHENTICATING ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      <span>Authenticating</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${authStep === AuthStep.VERIFYING_EMAIL ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                      <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.VERIFYING_EMAIL ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      <span>Verifying</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${authStep === AuthStep.INITIALIZING_DATA ? 'text-blue-600 dark:text-blue-400' : ''}`}>
+                      <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.INITIALIZING_DATA ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      <span>Setting up</span>
+                    </div>
                   </div>
-                  <div className={`flex items-center gap-2 ${authStep === AuthStep.INITIALIZING_DATA ? 'text-blue-600 dark:text-blue-400' : ''}`}>
-                    <div className={`w-2 h-2 rounded-full ${authStep === AuthStep.INITIALIZING_DATA ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
-                    <span>Setting up</span>
-                  </div>
-                </div>
+                )}
               </div>
             </>
           )}

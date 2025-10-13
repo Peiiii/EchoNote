@@ -30,6 +30,8 @@ export const LoginPage = () => {
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [isEmailVerificationSent, setIsEmailVerificationSent] = useState(false);
   const [pendingUser, setPendingUser] = useState<{ email: string } | null>(null);
+  // Keep auth modal open throughout the sign-up flow to avoid flicker
+  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
@@ -86,6 +88,7 @@ export const LoginPage = () => {
       setStatusMessage("");
 
       if (isSignUp) {
+        setIsSignUpModalOpen(true);
         // Show progress in modal: creating account -> sending verification
         setAuthStep(
           AuthStep.AUTHENTICATING,
@@ -171,7 +174,9 @@ export const LoginPage = () => {
           isSignUp ? "Sign-up failed. Please try again." : AuthMessage.SIGN_IN_FAILED,
           AuthProgressEnum.START
         );
-      } catch {}
+      } catch {
+        // Ignore errors when setting auth step
+      }
     }
   };
 
@@ -256,9 +261,17 @@ export const LoginPage = () => {
     setIsEmailVerificationSent(false);
     setPendingUser(null);
     setIsSignUp(false);
+    setIsSignUpModalOpen(false);
     setError("");
     setPassword("");
     setConfirmPassword("");
+  };
+
+  const handleAuthProgressClose = () => {
+    setIsSignUpModalOpen(false);
+    setIsEmailVerificationSent(false);
+    setPendingUser(null);
+    setError("");
   };
 
   const { isGoogleAuthSupported } = useGoogleAuthSupport();
@@ -323,6 +336,9 @@ export const LoginPage = () => {
               email={email}
               onResendVerification={handleResendVerification}
               onBackToSignIn={handleBackToSignIn}
+              isSignUpFlow={isSignUp || isEmailVerificationSent}
+              forceOpen={isSignUpModalOpen}
+              onClose={handleAuthProgressClose}
             />
 
             {/* Keep only password-reset banner below; email verification moves into modal */}
