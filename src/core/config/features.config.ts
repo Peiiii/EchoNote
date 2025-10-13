@@ -3,7 +3,7 @@ export const getFeaturesConfig = () => {
     /* Channel or Timeline */
     channel: {
       autoCreateDefault: {
-        enabled: false,
+        enabled: true,
       },
       settings: {
         enabled: false,

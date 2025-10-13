@@ -159,8 +159,9 @@ export const EmailPasswordForm = ({
         </div>
       )}
 
+      {/* Use a submit button and rely on the form's onSubmit to avoid double-invocation */}
       <Button
-        onClick={onSubmit}
+        type="submit"
         disabled={
           isAuthenticating ||
           !email ||
@@ -183,7 +184,9 @@ export const EmailPasswordForm = ({
       </Button>
 
       <div className="text-center">
+        {/* Prevent unintended form submission when toggling between Sign in / Sign up */}
         <button
+          type="button"
           onClick={onToggleSignUp}
           className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors underline underline-offset-2"
           disabled={isAuthenticating}
@@ -194,7 +197,9 @@ export const EmailPasswordForm = ({
 
       {!isSignUp && (
         <div className="text-center">
+          {/* Prevent unintended form submission when requesting password reset */}
           <button
+            type="button"
             onClick={onPasswordReset}
             className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors underline underline-offset-2"
             disabled={isAuthenticating || !email}
