@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Channel } from "@/core/stores/notes-data.store";
 import { ChannelCoverHeader } from "./channel-cover-header";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 
 interface TimelineLayoutProps {
   content?: ReactNode;
@@ -17,6 +18,11 @@ export const TimelineLayout = ({
   onOpenSettings,
   className = "",
 }: TimelineLayoutProps) => {
+  // Classic Focus Mode: when no right sidebar (AI Assistant/Thread) is open,
+  // keep the reading width comfortable and centered.
+  const { isAIAssistantOpen, isThreadOpen } = useUIStateStore();
+  const isFocusMode = !isAIAssistantOpen && !isThreadOpen;
+
   return (
     <div
       data-component="timeline-container"
@@ -26,10 +32,23 @@ export const TimelineLayout = ({
       {channel && <ChannelCoverHeader channel={channel} onOpenSettings={onOpenSettings} />}
 
       {/* Timeline content area */}
-      <div className="flex-1 flex flex-col min-h-0">{content}</div>
+      <div className="flex-1 flex flex-col min-h-0">
+        {isFocusMode ? (
+          <div className="w-full max-w-[850px] mx-auto px-4 sm:px-6 flex-1 flex flex-col min-h-0">
+            {content}
+          </div>
+        ) : (
+          content
+        )}
+      </div>
 
       {/* Actions area */}
-      {actions}
+      {actions &&
+        (isFocusMode ? (
+          <div className="w-full max-w-[850px] mx-auto px-4 sm:px-6">{actions}</div>
+        ) : (
+          actions
+        ))}
     </div>
   );
 };
