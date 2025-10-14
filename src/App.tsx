@@ -15,11 +15,12 @@ import { GlobalProcessOverlay } from "@/common/components/global-process/global-
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
-  const { user, isInitializing } = useFirebaseAuth();
+  const { user, isInitializing, isRefreshing } = useFirebaseAuth();
   const sessionStartTime = useRef<number>(Date.now());
   console.log("[App] ", {
     user,
     isInitializing,
+    isRefreshing,
   });
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
 
@@ -37,9 +38,11 @@ export const App = () => {
     };
   }, [currentBreakpoint]);
 
+  // Only show a skeleton during session refresh, not for a fresh (logged-out) visit
   if (isInitializing) {
     return (
       <>
+        <GlobalProcessOverlay />
         <AppSkeleton />
         <Toaster />
       </>
@@ -47,8 +50,10 @@ export const App = () => {
   }
 
   if (!user) {
+    // Keep overlay mounted on auth screens as well (e.g., refresh, email link, etc.)
     return (
       <>
+        {/* <GlobalProcessOverlay /> */}
         <LoginPage />
         <Toaster />
       </>

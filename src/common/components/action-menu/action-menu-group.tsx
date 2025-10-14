@@ -29,7 +29,7 @@ export function ActionMenuGroup({
 
   return (
     <>
-      {showSeparator && <DropdownMenuSeparator className="my-1 bg-slate-200 dark:bg-slate-700" />}
+      {showSeparator && <DropdownMenuSeparator className="my-1 bg-slate-200/50 dark:bg-slate-700/50" />}
 
       <DropdownMenuGroup className={cn("space-y-0.5", className)}>
         {title && (

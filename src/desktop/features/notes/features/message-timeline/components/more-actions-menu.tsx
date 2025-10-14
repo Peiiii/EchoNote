@@ -35,15 +35,15 @@ export function MoreActionsMenu({
       items: [
         ...(onEdit
           ? [
-              {
-                id: "edit",
-                icon: <Edit />,
-                title: "Edit thought",
-                description: "Modify this thought",
-                onClick: onEdit,
-                variant: "default" as const,
-              },
-            ]
+            {
+              id: "edit",
+              icon: <Edit />,
+              title: "Edit thought",
+              description: "Modify this thought",
+              onClick: onEdit,
+              variant: "default" as const,
+            },
+          ]
           : []),
         {
           id: "copy",
@@ -54,16 +54,23 @@ export function MoreActionsMenu({
         },
         ...(onShare
           ? [
-              {
-                id: "share",
-                icon: <Share2 />,
-                title: "Share thought",
-                description: "Share with others",
-                onClick: onShare,
-                variant: "default" as const,
-              },
-            ]
+            {
+              id: "share",
+              icon: <Share2 />,
+              title: "Share thought",
+              description: "Share with others",
+              onClick: onShare,
+              variant: "default" as const,
+            },
+          ]
           : []),
+        {
+          id: "delete",
+          icon: <Trash2 />,
+          title: "Delete thought",
+          onClick: onDelete,
+          variant: "destructive" as const,
+        },
       ],
     },
     {
@@ -73,32 +80,32 @@ export function MoreActionsMenu({
       items: [
         ...(onReport
           ? [
-              {
-                id: "report",
-                icon: <Flag />,
-                title: "Report",
-                description: "Report inappropriate content",
-                onClick: onReport,
-                variant: "warning" as const,
-              },
-            ]
+            {
+              id: "report",
+              icon: <Flag />,
+              title: "Report",
+              description: "Report inappropriate content",
+              onClick: onReport,
+              variant: "warning" as const,
+            },
+          ]
           : []),
       ],
     },
-    {
-      id: "danger",
-      title: "Danger Zone",
-      variant: "danger",
-      items: [
-        {
-          id: "delete",
-          icon: <Trash2 />,
-          title: "Delete thought",
-          onClick: onDelete,
-          // variant: "destructive" as const,
-        },
-      ],
-    },
+    // {
+    //   id: "danger",
+    //   title: "Danger Zone",
+    //   variant: "danger",
+    //   items: [
+    //     {
+    //       id: "delete",
+    //       icon: <Trash2 />,
+    //       title: "Delete thought",
+    //       onClick: onDelete,
+    //       // variant: "destructive" as const,
+    //     },
+    //   ],
+    // },
   ];
 
   return <ConfigurableActionMenu groups={menuGroups} />;
