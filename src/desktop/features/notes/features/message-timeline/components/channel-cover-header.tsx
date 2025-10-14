@@ -390,14 +390,6 @@ export const ChannelCoverHeader = ({
             >
               <Bot className="h-4 w-4" />
             </Button>
-            <BackgroundSwitcher
-              currentBackground={{
-                type: channel.backgroundColor ? "color" : "image",
-                value: channel.backgroundColor || channel.backgroundImage,
-              }}
-              onBackgroundChange={handleBackgroundChange}
-              onRemoveBackground={handleRemoveBackground}
-            />
             {getFeaturesConfig().channel.settings.enabled && (
               <Button
                 variant="ghost"
