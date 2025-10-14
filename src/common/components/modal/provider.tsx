@@ -8,19 +8,17 @@ import {
   DialogTitle,
 } from "@/common/components/ui/dialog";
 import { cn } from "@/common/lib/utils";
-import React from "react";
 import { useModalStore } from "@/core/stores/modal.store";
+import React from "react";
 
 // This component renders the modal dialog and reads state from zustand store
 export function ModalProvider({ children }: { children: React.ReactNode }) {
-  const { isOpen, options, isOkLoading, error, handleOk, handleCancel } = useModalStore(state => ({
-    isOpen: state.isOpen,
-    options: state.options,
-    isOkLoading: state.isOkLoading,
-    error: state.error,
-    handleOk: state.handleOk,
-    handleCancel: state.handleCancel,
-  }));
+  const isOpen = useModalStore(state => state.isOpen);
+  const options = useModalStore(state => state.options);
+  const isOkLoading = useModalStore(state => state.isOkLoading);
+  const error = useModalStore(state => state.error);
+  const handleOk = useModalStore(state => state.handleOk);
+  const handleCancel = useModalStore(state => state.handleCancel);
 
   return (
     <>
