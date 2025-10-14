@@ -84,7 +84,8 @@ export const MobileMessageInput = ({
             value={message}
             onChange={e => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="min-h-[52px] max-h-[120px] resize-none rounded-2xl border border-border/50 dark:border-border/50 bg-background/90 backdrop-blur-sm shadow-none focus:shadow-none focus:outline-none transition-all duration-200 pl-4 pr-12 py-3 text-base"
+            placeholder="What's on your mind?"
+            className="min-h-[52px] max-h-[120px] resize-none rounded-2xl border border-border/50 dark:border-border/50 bg-background/90 backdrop-blur-sm shadow-none focus:shadow-none focus:outline-none transition-all duration-200 pl-4 pr-12 py-3 text-base placeholder:text-muted-foreground/60"
             rows={1}
           />
           <Button
