@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
 import { ConfigurableActionMenuContent } from "@/common/components/action-menu";
-import { useModal } from "@/common/components/modal/hooks";
+import { modalStore } from "@/core/stores/modal.store";
 
 interface ChannelMoreActionsMenuProps {
   channel: Channel;
@@ -15,7 +15,6 @@ interface ChannelMoreActionsMenuProps {
 }
 
 export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActionsMenuProps) {
-  const { confirm } = useModal();
 
   return (
     <DropdownMenu>
@@ -46,7 +45,7 @@ export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActions
                     icon: <Trash2 />,
                     title: `Delete ${channel.name}`,
                     onClick: () =>
-                      confirm({
+                      modalStore.confirm({
                         title: "Delete Channel",
                         description:
                           `This will permanently delete the channel "${channel.name}" and all its messages. This action cannot be undone.`,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useModal } from "@/common/components/modal/hooks";
+import { modalStore } from "@/core/stores/modal.store";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
@@ -30,7 +30,6 @@ export function useThoughtRecord(message: Message) {
   const isSaving = isEditing ? globalIsSaving : false;
   const aiAnalysis = message.aiAnalysis;
   const hasSparks = Boolean(aiAnalysis?.insights?.length);
-  const { confirm } = useModal();
 
   useEffect(() => {
     setEditingTags(message.tags || []);
@@ -40,7 +39,7 @@ export function useThoughtRecord(message: Message) {
     const messagePreview =
       message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
-    confirm({
+    modalStore.confirm({
       title: "Delete Thought",
       description:
         `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
