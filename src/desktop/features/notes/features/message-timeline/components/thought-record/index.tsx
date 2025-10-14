@@ -43,7 +43,7 @@ export function ThoughtRecord({
           isEditing
             ? "bg-gray-100/60 dark:bg-gray-800/30"
             : "hover:bg-gray-100/80 dark:hover:bg-gray-800/20"
-        }`}
+        } ${message.isNew ? "animate-in slide-in-from-bottom-5 fade-in duration-400" : ""}`}
       >
         {/* Record Header */}
         <div className="flex items-center justify-between mb-4 px-6">

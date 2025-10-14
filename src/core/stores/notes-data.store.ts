@@ -34,6 +34,7 @@ export interface Message {
   deletedAt?: Date;
   deletedBy?: string;
   canRestore?: boolean;
+  isNew?: boolean;
 }
 
 export interface Channel {

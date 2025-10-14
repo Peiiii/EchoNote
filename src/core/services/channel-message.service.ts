@@ -129,7 +129,7 @@ export class ChannelMessageService {
       if (realMessage) {
         setMessages(prevMessages.filter(m => m.id !== fakeId));
       } else {
-        setMessages(prevMessages.map(m => (m.id === fakeId ? { ...m, id: realId } : m)));
+        setMessages(prevMessages.map(m => (m.id === fakeId ? { ...m, id: realId, isNew: false } : m)));
       }
     };
     const clearChannel = () => {
@@ -316,7 +316,7 @@ export class ChannelMessageService {
     const { userId } = useNotesDataStore.getState();
     if (!userId) return;
     const { addMessage, fixFakeMessage } = this.getChannelStateControl(message.channelId);
-    const tmpMessage: Message = { ...message, id: v4(), timestamp: new Date() };
+    const tmpMessage: Message = { ...message, id: v4(), timestamp: new Date(), isNew: true };
     addMessage(tmpMessage);
     const realMsgId = await firebaseNotesService.createMessage(userId, message);
     fixFakeMessage(tmpMessage.id, realMsgId);

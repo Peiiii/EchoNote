@@ -47,7 +47,9 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
     const { inputCollapsed, handleExpandInput } = useInputCollapse();
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollToBottom, showScrollToBottomButton } = useChatScroll(containerRef, [], {
+    // Pass messages as dependency so when a new message is appended and we're in sticky mode,
+    // the timeline auto-scrolls to the bottom (fixes: not auto-scrolling after sending a note).
+    const { scrollToBottom, showScrollToBottomButton } = useChatScroll(containerRef, [messages], {
       smoothScroll: true,
     });
     const { recordScrollPosition, restoreScrollPosition } = useLazyLoadingScrollControl({
