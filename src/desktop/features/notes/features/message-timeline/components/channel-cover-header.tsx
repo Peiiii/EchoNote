@@ -189,26 +189,28 @@ export const ChannelCoverHeader = ({
       )}
 
       {isLeftSidebarCollapsed ? (
-        <ChannelDropdownSelector
-          currentChannel={channel}
-          channels={channels}
-          onChannelSelect={setCurrentChannel}
-          className="flex-1 min-w-0 max-w-full"
-        />
+        <div className="flex flex-1 min-w-0 max-w-full">
+          <ChannelDropdownSelector
+            currentChannel={channel}
+            channels={channels}
+            onChannelSelect={setCurrentChannel}
+            className="min-w-0 max-w-full"
+          />
+        </div>
       ) : (
         <>
           {channel.emoji && (
-            <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out">
+            <div className="text-lg flex-shrink-0 transition-all duration-300 ease-out hover:scale-110 cursor-pointer">
               {channel.emoji}
             </div>
           )}
-          <div className="flex items-center space-x-1.5 min-w-0 flex-1 max-w-full overflow-hidden">
-            <h1 className="text-lg font-semibold text-muted-foreground truncate transition-all duration-300 ease-out min-w-0">
+          <div className="flex items-center space-x-1.5 min-w-0 p-2 rounded-lg hover:bg-accent/50 transition-all duration-200 cursor-pointer group flex-1 overflow-hidden">
+            <h1 className="text-lg font-semibold text-muted-foreground group-hover:text-foreground truncate transition-all duration-200 min-w-0">
               {channel.name}
             </h1>
             <Badge
               variant="secondary"
-              className="text-xs flex-shrink-0 transition-all duration-300 ease-out text-muted-foreground"
+              className="text-xs flex-shrink-0 transition-all duration-200 text-muted-foreground group-hover:text-foreground"
             >
               {channel.messageCount}
             </Badge>
