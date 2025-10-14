@@ -17,6 +17,8 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     isOpen: false,
     options: {},
   });
+  const [isOkLoading, setIsOkLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const close = useCallback(() => {
     setState(prev => {
@@ -26,10 +28,9 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const show = useCallback((options: ModalOptions) => {
-    setState({
-      isOpen: true,
-      options,
-    });
+    setState({ isOpen: true, options });
+    setIsOkLoading(false);
+    setError(null);
   }, []);
 
   const confirm = useCallback(
@@ -44,14 +45,21 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
   );
 
   const handleOk = async () => {
+    setIsOkLoading(true);
+    setError(null);
     try {
       await state.options.onOk?.();
       setState(prev => {
         prev.options.afterClose?.();
         return { ...prev, isOpen: false };
       });
-    } catch (error) {
-      console.error("Modal onOk error:", error);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Operation failed";
+      console.error("Modal onOk error:", err);
+      setError(msg);
+    } finally {
+      // Keep dialog open on error; close already handled on success path above
+      setIsOkLoading(false);
     }
   };
 
@@ -79,12 +87,31 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
 
           {state.options.content}
 
+          {error && (
+            <div className="mt-2 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
           {state.options.showFooter !== false && (
             <DialogFooter>
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="outline" onClick={handleCancel} disabled={isOkLoading}>
                 {state.options.cancelText ?? "Cancel"}
               </Button>
-              <Button onClick={handleOk}>{state.options.okText ?? "Confirm"}</Button>
+              <Button
+                onClick={handleOk}
+                disabled={isOkLoading}
+                variant={state.options.okVariant === "destructive" ? "destructive" : undefined}
+              >
+                {isOkLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {state.options.okLoadingText ?? state.options.okText ?? "Processing..."}
+                  </div>
+                ) : (
+                  state.options.okText ?? "Confirm"
+                )}
+              </Button>
             </DialogFooter>
           )}
         </DialogContent>

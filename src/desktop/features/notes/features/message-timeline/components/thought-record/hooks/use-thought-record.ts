@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useModal } from "@/common/components/modal/hooks";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
@@ -29,25 +30,25 @@ export function useThoughtRecord(message: Message) {
   const isSaving = isEditing ? globalIsSaving : false;
   const aiAnalysis = message.aiAnalysis;
   const hasSparks = Boolean(aiAnalysis?.insights?.length);
+  const { confirm } = useModal();
 
   useEffect(() => {
     setEditingTags(message.tags || []);
   }, [message.tags]);
 
   const handleDelete = async () => {
-    setTimeout(async () => {
-      const messagePreview =
-        message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
+    const messagePreview =
+      message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
-      const confirmed = window.confirm(
-        `🗑️ Delete Thought\n\n` +
-          `"${messagePreview}"\n\n` +
-          `⚠️ This action cannot be undone.\n` +
-          `The thought will be moved to trash.\n\n` +
-          `Are you sure you want to continue?`
-      );
-
-      if (confirmed) {
+    confirm({
+      title: "Delete Thought",
+      description:
+        `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
+      okText: "Delete",
+      okLoadingText: "Deleting...",
+      okVariant: "destructive",
+      cancelText: "Cancel",
+      onOk: async () => {
         try {
           await deleteMessage({
             messageId: message.id,
@@ -58,8 +59,8 @@ export function useThoughtRecord(message: Message) {
           const errorMessage = error instanceof Error ? error.message : "Unknown error";
           alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
         }
-      }
-    }, 0);
+      },
+    });
   };
 
   const handleToggleAnalysis = () => {

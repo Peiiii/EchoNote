@@ -7,8 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
 import { ConfigurableActionMenuContent } from "@/common/components/action-menu";
-import { DeleteConfirmationDialog } from "@/common/components/delete-confirmation-dialog";
-import { useState } from "react";
+import { useModal } from "@/common/components/modal/hooks";
 
 interface ChannelMoreActionsMenuProps {
   channel: Channel;
@@ -16,11 +15,10 @@ interface ChannelMoreActionsMenuProps {
 }
 
 export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActionsMenuProps) {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { confirm } = useModal();
 
   return (
-    <>
-      <DropdownMenu>
+    <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             size="sm"
@@ -47,7 +45,19 @@ export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActions
                     id: "delete",
                     icon: <Trash2 />,
                     title: `Delete ${channel.name}`,
-                    onClick: () => setIsDeleteDialogOpen(true),
+                    onClick: () =>
+                      confirm({
+                        title: "Delete Channel",
+                        description:
+                          `This will permanently delete the channel "${channel.name}" and all its messages. This action cannot be undone.`,
+                        okText: "Delete",
+                        okLoadingText: "Deleting...",
+                        okVariant: "destructive",
+                        cancelText: "Cancel",
+                        onOk: async () => {
+                          await onDelete();
+                        },
+                      }),
                     variant: "destructive",
                   },
                 ],
@@ -56,15 +66,5 @@ export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActions
           />
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title="Delete Channel"
-        description="This will permanently delete the channel and all its messages. This action cannot be undone."
-        itemName={channel.name}
-        onConfirm={onDelete}
-      />
-    </>
   );
 }

@@ -6,6 +6,8 @@ export interface ModalOptions {
   onCancel?: () => void;
   afterClose?: () => void;
   okText?: string;
+  okLoadingText?: string;
+  okVariant?: "default" | "destructive";
   cancelText?: string;
   className?: string;
   showFooter?: boolean;
