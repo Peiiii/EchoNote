@@ -46,7 +46,7 @@ export function AIConversationList({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-3 sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b flex items-center gap-3">
+      <div className="p-3 sticky top-0 z-10 flex items-center gap-3">
         <div className="flex-1">
           <input
             value={query}

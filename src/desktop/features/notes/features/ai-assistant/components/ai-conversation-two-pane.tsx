@@ -13,7 +13,7 @@ export function AIConversationTwoPane({
 
   return (
     <>
-      <div className="w-80 flex flex-col border-r border-border">
+      <div className="w-80 flex flex-col">
         <AIConversationList
           conversations={conversations}
           currentConversationId={currentConversationId}

@@ -98,7 +98,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
     return (
       <div className="relative flex-1 flex flex-col">
         {/* Header Controls */}
-        <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-background">
+        <div className="flex items-center justify-between px-3 pt-2 pb-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {view === "chat" && (
               <Button
