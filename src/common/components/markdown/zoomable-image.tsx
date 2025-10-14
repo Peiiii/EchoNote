@@ -11,6 +11,7 @@ interface ZoomableImageProps {
 export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
   const [open, setOpen] = useState(false);
   const [errored, setErrored] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const filename = (() => {
     if (!src) return "image";
@@ -50,7 +51,11 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
 
   return (
     <>
-      <span className="group inline-block relative">
+      <span 
+        className="inline-block relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <img
           src={src}
           alt={alt}
@@ -60,10 +65,10 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
           onError={() => setErrored(true)}
           onClick={() => !errored && setOpen(true)}
         />
-        {!errored && (
+        {!errored && isHovered && (
           <button
             type="button"
-            className="absolute top-1 right-1 hidden group-hover:flex items-center justify-center w-6 h-6 rounded bg-black/50 text-white"
+            className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded bg-black/50 text-white transition-opacity duration-200"
             title="View larger"
             onClick={() => setOpen(true)}
           >
