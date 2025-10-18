@@ -199,9 +199,9 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
   };
 
   return (
-    <div className="flex flex-col w-screen max-w-none h-svh sm:max-w-2xl sm:h-auto sm:max-h-[80vh]">
+    <div className="flex flex-col w-full h-full min-h-0">
       {/* Mobile: Full-screen header with safe area */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b shrink-0">
         {/* Mobile: Status bar spacer */}
         <div className="h-[env(safe-area-inset-top)] sm:hidden" />
 
@@ -236,8 +236,8 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
           </div>
 
           {/* Row 2: Status (left) + Scope toggle (right) */}
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <div className="text-xs text-muted-foreground">
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-xs text-muted-foreground text-center sm:text-left sm:flex-1 sm:min-w-0">
               {scope === "all" ? (
                 <span>
                   <span className="inline-block w-2 h-2 mr-2 align-middle rounded-full bg-primary animate-pulse" />
@@ -253,7 +253,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
                 </span>
               )}
             </div>
-            <div className="shrink-0">
+            <div className="flex justify-center sm:justify-end sm:shrink-0">
               <div
                 role="radiogroup"
                 aria-label="Search scope"
@@ -292,7 +292,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
       {/* Results area - Always fill remaining space */}
       <div
         ref={listRef}
-        className="flex-1 overflow-y-auto overscroll-contain flex flex-col"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col"
         role="listbox"
         aria-activedescendant={results[activeIndex]?.id}
       >
@@ -381,7 +381,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
       </div>
 
       {/* Footer with keyboard shortcuts */}
-      <div className="border-t bg-muted/30 px-4 py-2 sm:px-6">
+      <div className="border-t bg-muted/30 px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-2 shrink-0">
         <div className="text-xs text-muted-foreground text-center sm:text-left">
           <span className="hidden sm:inline">↑/↓ Select • Enter Open • Esc Close</span>
           <span className="sm:hidden">↑/↓ Select • Enter Open</span>

@@ -4,8 +4,9 @@ export interface ModalOptions {
   content: ReactNode;
   className?: string;
   onClose?: (result?: unknown) => void;
-  position?: 'center' | 'top';
+  position?: "center" | "top";
   topOffset?: number;
+  width?: string | number;
 }
 
 export interface ModalController {

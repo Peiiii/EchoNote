@@ -30,12 +30,14 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  const position = instance.options.position || "center";
+  const isTopPosition = position === "top";
+
   const getPositionClasses = () => {
-    const position = instance.options.position || 'center';
     
     switch (position) {
       case 'top':
-        return 'fixed top-12 left-1/2 -translate-x-1/2 pointer-events-none';
+        return 'fixed inset-x-0 top-0 sm:top-12 pointer-events-none flex justify-center items-start';
       case 'center':
       default:
         return 'fixed inset-0 flex items-center justify-center pointer-events-none';
@@ -43,8 +45,6 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
   };
 
   const getContentAnimation = () => {
-    const position = instance.options.position || 'center';
-    
     switch (position) {
       case 'top':
         return {
@@ -63,6 +63,9 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
   };
 
   const contentAnimation = getContentAnimation();
+  const baseContainerClasses = isTopPosition
+    ? "relative bg-background shadow-lg overflow-hidden pointer-events-auto w-full max-w-none max-h-none rounded-none sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg"
+    : "relative bg-background rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-hidden pointer-events-auto";
 
   return (
     <AnimatePresence>
@@ -84,7 +87,7 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
           className={`${getPositionClasses()}`}
           {...swipeHandlers}
         >
-          <div className={`relative bg-background rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-hidden pointer-events-auto ${instance.options.className || ""}`}>
+          <div className={`${baseContainerClasses} ${instance.options.className || ""}`}>
             {instance.options.content}
           </div>
         </motion.div>
