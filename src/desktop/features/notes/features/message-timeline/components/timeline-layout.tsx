@@ -20,8 +20,8 @@ export const TimelineLayout = ({
 }: TimelineLayoutProps) => {
   // Classic Focus Mode: when no right sidebar (AI Assistant/Thread) is open,
   // keep the reading width comfortable and centered.
-  const { isAIAssistantOpen, isThreadOpen } = useUIStateStore();
-  const isFocusMode = !isAIAssistantOpen && !isThreadOpen;
+  const { sideView } = useUIStateStore();
+  const isFocusMode = !sideView;
 
   return (
     <div

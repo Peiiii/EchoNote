@@ -12,4 +12,3 @@ export { MobileSidebarManager } from "./components/mobile-sidebar-manager";
 // Hooks
 export { useMobileTimelineState } from "./hooks/use-mobile-timeline-state";
 export { useMobileViewportHeight } from "./hooks/use-mobile-viewport-height";
-export { useMobileSidebars } from "./hooks/use-mobile-sidebars";

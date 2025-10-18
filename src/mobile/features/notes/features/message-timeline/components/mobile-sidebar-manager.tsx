@@ -1,19 +1,18 @@
+import { Sheet, SheetContent } from "@/common/components/ui/sheet";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
+import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
 import { MobileAIAssistant } from "@/mobile/features/notes/features/ai-assistant";
 import { MobileChannelList } from "@/mobile/features/notes/features/channel-management";
-import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
-import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 export const MobileSidebarManager = () => {
   const { setCurrentChannel, currentChannelId } = useNotesViewStore();
   const {
     isChannelListOpen,
-    isAIAssistantOpen,
+    sideView,
     isSettingsOpen,
-    isThreadOpen,
     closeChannelList,
     closeAIAssistant,
     closeSettings,
@@ -48,7 +47,7 @@ export const MobileSidebarManager = () => {
 
       {/* AI Assistant - Bottom Sheet */}
       {currentChannelId && (
-        <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
+        <Sheet open={sideView === SideViewEnum.AI_ASSISTANT} onOpenChange={closeAIAssistant}>
           <SheetContent
             side="bottom"
             className="h-[80vh] p-0 border-t border-border/60"
@@ -57,7 +56,7 @@ export const MobileSidebarManager = () => {
           >
             <MobileAIAssistant
               channelId={currentChannelId}
-              isOpen={isAIAssistantOpen}
+              isOpen={sideView === SideViewEnum.AI_ASSISTANT}
               onClose={closeAIAssistant}
             />
           </SheetContent>
@@ -65,8 +64,8 @@ export const MobileSidebarManager = () => {
       )}
 
       {/* Thread Sidebar */}
-      {isThreadOpen && (
-        <Sheet open={isThreadOpen} onOpenChange={closeThread}>
+      {sideView === SideViewEnum.THREAD && (
+        <Sheet open={sideView === SideViewEnum.THREAD} onOpenChange={closeThread}>
           <SheetContent
             side="right"
             className="w-full max-w-md p-0 border-l border-border/60"

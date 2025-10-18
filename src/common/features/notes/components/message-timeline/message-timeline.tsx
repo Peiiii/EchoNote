@@ -1,17 +1,17 @@
+import { Button } from "@/common/components/ui/button";
 import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
 import { ScrollToBottomButton } from "@/common/features/notes/components/scroll-to-bottom-button";
 import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useLazyLoadingScrollControl } from "@/common/features/notes/hooks/use-lazy-loading-scroll-control";
+import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
+import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
 import { RxEvent } from "@/common/lib/rx-event";
+import { AITrigger, logService } from "@/core/services/log.service";
 import { Message } from "@/core/stores/notes-data.store";
-import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
-import { logService, AITrigger } from "@/core/services/log.service";
 import { Bot, ChevronUp, Send } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
-import { Button } from "@/common/components/ui/button";
-import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
-import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
@@ -41,7 +41,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
     },
     ref
   ) => {
-    const { isAIAssistantOpen, openAIAssistant } = useUIStateStore();
+    const { sideView, openAIAssistant } = useUIStateStore();
 
     // Use unified input collapse hook
     const { inputCollapsed, handleExpandInput } = useInputCollapse();
@@ -177,7 +177,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
                   logService.logAIAssistantOpen("", AITrigger.BUTTON);
                   openAIAssistant();
                 }}
-                isVisible={!isAIAssistantOpen}
+                isVisible={sideView !== SideViewEnum.AI_ASSISTANT}
                 ariaLabel="Open AI Assistant"
               >
                 <Bot className="h-4 w-4" />

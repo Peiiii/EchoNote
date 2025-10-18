@@ -1,13 +1,19 @@
+import { isMobile } from "@/common/lib/breakpoint-utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { isMobile } from "@/common/lib/breakpoint-utils";
+
+export enum SideViewEnum {
+  AI_ASSISTANT = "ai_assistant",
+  THREAD = "thread",
+}
 
 export interface UIState {
   // AI Assistant state
-  isAIAssistantOpen: boolean;
+  // isAIAssistantOpen: boolean;
 
   // Thread sidebar state
-  isThreadOpen: boolean;
+  // isThreadOpen: boolean;
+  sideView?: SideViewEnum;
   currentThreadId: string | null;
 
   // Settings sidebar state
@@ -46,30 +52,28 @@ export const useUIStateStore = create<UIState>()(
       // AI Assistant actions (mutually exclusive with thread sidebar)
       openAIAssistant: () => {
         set({
-          isAIAssistantOpen: true,
-          isThreadOpen: false,
+          sideView: SideViewEnum.AI_ASSISTANT,
           currentThreadId: null,
         });
       },
 
       closeAIAssistant: () => {
         set({
-          isAIAssistantOpen: false,
+          sideView: undefined,
         });
       },
 
       // Thread actions (mutually exclusive with AI assistant)
       openThread: (messageId: string) => {
         set({
-          isThreadOpen: true,
+          sideView: SideViewEnum.THREAD,
           currentThreadId: messageId,
-          isAIAssistantOpen: false,
         });
       },
 
       closeThread: () => {
         set({
-          isThreadOpen: false,
+          sideView: undefined,
           currentThreadId: null,
         });
       },
@@ -95,7 +99,7 @@ export const useUIStateStore = create<UIState>()(
     {
       name: "echonote-ui-state",
       // Only persist the AI assistant open/close state to satisfy the requirement
-      partialize: state => ({ isAIAssistantOpen: state.isAIAssistantOpen }),
+      partialize: state => ({ sideView: state.sideView }),
     }
   )
 );
