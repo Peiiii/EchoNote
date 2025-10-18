@@ -5,6 +5,8 @@ import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useLazyLoadingScrollControl } from "@/common/features/notes/hooks/use-lazy-loading-scroll-control";
 import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-constants";
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
 import { RxEvent } from "@/common/lib/rx-event";
 import { AITrigger, logService } from "@/core/services/log.service";
 import { Message } from "@/core/stores/notes-data.store";
@@ -41,14 +43,10 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
     },
     ref
   ) => {
-    const { sideView, openAIAssistant } = useUIStateStore();
-
-    // Use unified input collapse hook
+    const presenter = useCommonPresenterContext();
+    const sideView = useUIStateStore(s => s.sideView);
     const { inputCollapsed, handleExpandInput } = useInputCollapse();
-
     const containerRef = useRef<HTMLDivElement>(null);
-    // Pass messages as dependency so when a new message is appended and we're in sticky mode,
-    // the timeline auto-scrolls to the bottom (fixes: not auto-scrolling after sending a note).
     const { scrollToBottom, showScrollToBottomButton } = useChatScroll(containerRef, [messages], {
       smoothScroll: true,
     });
@@ -62,8 +60,6 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
       collapseCurrent,
     } = useGlobalCollapse(containerRef);
 
-    const messageDataAttr = READ_MORE_DATA_ATTRS.messageId;
-
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
         onScroll?.(e);
@@ -73,11 +69,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
       [onScroll, recordScrollPosition, handleCollapseScroll]
     );
 
-    useEffect(() => {
-      return onHistoryMessagesLoadedEvent$?.listen(() => {
-        restoreScrollPosition();
-      });
-    }, [onHistoryMessagesLoadedEvent$, restoreScrollPosition]);
+    useHandleRxEvent(onHistoryMessagesLoadedEvent$, restoreScrollPosition);
 
     useImperativeHandle(
       ref,
@@ -138,7 +130,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
                     return (
                       <div
                         key={message.id}
-                        {...{ [messageDataAttr]: message.id }}
+                        {...{ [READ_MORE_DATA_ATTRS.messageId]: message.id }}
                         className="w-full"
                         style={{ height: "auto", minHeight: "auto" }}
                       >
@@ -175,7 +167,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
               <FloatingActionButton
                 onClick={() => {
                   logService.logAIAssistantOpen("", AITrigger.BUTTON);
-                  openAIAssistant();
+                  presenter.openAIAssistant();
                 }}
                 isVisible={sideView !== SideViewEnum.AI_ASSISTANT}
                 ariaLabel="Open AI Assistant"

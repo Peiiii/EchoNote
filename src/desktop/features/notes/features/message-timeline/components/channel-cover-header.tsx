@@ -26,7 +26,6 @@ import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
-  onOpenSettings?: () => void;
   className?: string;
   defaultCollapsed?: boolean;
 }
@@ -62,7 +61,6 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
 
 export const ChannelCoverHeader = ({
   channel,
-  onOpenSettings,
   className = "",
   defaultCollapsed = false,
 }: ChannelCoverHeaderProps) => {
@@ -286,7 +284,7 @@ export const ChannelCoverHeader = ({
               variant="ghost"
               size="sm"
               className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-              onClick={onOpenSettings}
+              onClick={() => presenter.openSettings()}
             >
               <Settings className="h-4 w-4" />
             </Button>
@@ -394,7 +392,7 @@ export const ChannelCoverHeader = ({
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-                onClick={onOpenSettings}
+                onClick={() => presenter.openSettings()}
               >
                 <Settings className="h-4 w-4" />
               </Button>

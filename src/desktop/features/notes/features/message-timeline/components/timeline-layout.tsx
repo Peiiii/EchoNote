@@ -7,7 +7,6 @@ interface TimelineLayoutProps {
   content?: ReactNode;
   actions?: ReactNode;
   channel?: Channel;
-  onOpenSettings?: () => void;
   className?: string;
 }
 
@@ -15,7 +14,6 @@ export const TimelineLayout = ({
   content,
   actions,
   channel,
-  onOpenSettings,
   className = "",
 }: TimelineLayoutProps) => {
   // Classic Focus Mode: when no right sidebar (AI Assistant/Thread) is open,
@@ -29,7 +27,7 @@ export const TimelineLayout = ({
       className={`relative flex-1 flex flex-col h-full ${className}`}
     >
       {/* Channel Cover Header */}
-      {channel && <ChannelCoverHeader channel={channel} onOpenSettings={onOpenSettings} />}
+      {channel && <ChannelCoverHeader channel={channel} />}
 
       {/* Timeline content area */}
       <div className="flex-1 flex flex-col min-h-0">

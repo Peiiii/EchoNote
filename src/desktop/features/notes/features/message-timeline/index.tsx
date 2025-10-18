@@ -8,7 +8,6 @@ import { TimelineContent } from "@/desktop/features/notes/features/message-timel
 import { TimelineLayout } from "@/desktop/features/notes/features/message-timeline/components/timeline-layout";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
-import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useCallback, useRef } from "react";
 
 interface MessageTimelineFeatureProps {
@@ -17,7 +16,6 @@ interface MessageTimelineFeatureProps {
 
 export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatureProps) => {
   const currentChannel = useCurrentChannel();
-  const presenter = useDesktopPresenterContext();
   const timelineContentRef = useRef<MessageTimelineRef>(null);
   const { inputCollapsed } = useInputCollapse();
 
@@ -37,7 +35,6 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
       {/* Timeline layout with content and actions */}
       <TimelineLayout
         channel={currentChannel || undefined}
-        onOpenSettings={() => presenter.openSettings()}
         content={
           <div className="flex flex-1 flex-col min-h-0 relative">
             <TimelineContent ref={timelineContentRef} renderThoughtRecord={renderThoughtRecord} />
