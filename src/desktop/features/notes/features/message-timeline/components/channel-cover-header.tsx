@@ -346,9 +346,7 @@ export const ChannelCoverHeader = ({
             variant="secondary"
             size="sm"
             className="bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm transition-all duration-200 hover:scale-105"
-            onClick={() =>
-              rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })
-            }
+            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
           >
             <Bot className="h-4 w-4 mr-2" />
             <span className="font-medium">AI Assistant</span>

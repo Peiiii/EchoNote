@@ -1,14 +1,14 @@
 import { useState } from "react";
 
 export const useChatActions = () => {
-  const [replyToMessageId, setReplyToMessageId] = useState<string | null>(null);
+  const [replyToMessageId, setReplyToMessageId] = useState<string | undefined>(undefined);
 
   const handleSend = () => {
-    setReplyToMessageId(null);
+    setReplyToMessageId(undefined);
   };
 
   const handleCancelReply = () => {
-    setReplyToMessageId(null);
+    setReplyToMessageId(undefined);
   };
 
   return {

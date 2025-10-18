@@ -1,16 +1,16 @@
+import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 import { MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
+import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Message } from "@/core/stores/notes-data.store";
 import { ExpandedEditorOverlayContainer } from "@/desktop/features/notes/features/message-timeline/components/expanded-editor-overlay-container";
-import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 import { MessageInput } from "@/desktop/features/notes/features/message-timeline/components/message-input";
+import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 import { TimelineContent } from "@/desktop/features/notes/features/message-timeline/components/timeline-content";
 import { TimelineLayout } from "@/desktop/features/notes/features/message-timeline/components/timeline-layout";
-import { useTimelineState } from "@/desktop/features/notes/features/message-timeline/hooks/use-timeline-state";
-import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
 import { useCallback, useRef } from "react";
-import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 
 interface MessageTimelineFeatureProps {
   className?: string;
@@ -18,7 +18,11 @@ interface MessageTimelineFeatureProps {
 
 export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatureProps) => {
   // Use unified timeline state management
-  const { chatActions } = useTimelineState();
+  const  {
+    handleSend,
+    handleCancelReply,
+    replyToMessageId,
+  }  = useChatActions();
 
   // Get current channel for cover header
   const currentChannel = useCurrentChannel();
@@ -39,7 +43,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
   // Create wrapper function for onSend to match MessageInput interface
   const handleSendMessage = () => {
     timelineContentRef.current?.scrollToBottom({ behavior: "instant" });
-    chatActions.handleSend();
+    handleSend();
   };
 
   return (
@@ -58,8 +62,8 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
           currentChannel && !inputCollapsed ? (
             <MessageInput
               onSend={handleSendMessage}
-              replyToMessageId={chatActions.replyToMessageId ?? undefined}
-              onCancelReply={chatActions.handleCancelReply}
+              replyToMessageId={replyToMessageId}
+              onCancelReply={handleCancelReply}
             />
           ) : null
         }
