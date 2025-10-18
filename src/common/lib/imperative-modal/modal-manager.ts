@@ -1,6 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-import { ReactNode } from "react";
-import { ModalInstance, ModalController, ModalOptions } from "./types";
+import { ModalController, ModalInstance, ModalOptions } from "./types";
 
 class ModalManager {
   private instances$ = new BehaviorSubject<ModalInstance[]>([]);
@@ -15,13 +14,12 @@ class ModalManager {
     return this.instances$;
   }
 
-  show(content: ReactNode, options: ModalOptions = {}): ModalController {
+  show(options: ModalOptions): ModalController {
     const id = `modal-${++this.nextId}`;
     const zIndex = this.baseZIndex + this.instances.length;
     
     const instance: ModalInstance = {
       id,
-      content,
       options,
       zIndex,
     };

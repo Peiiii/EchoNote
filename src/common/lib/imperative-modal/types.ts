@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 export interface ModalOptions {
+  content: ReactNode;
   className?: string;
   onClose?: (result?: unknown) => void;
   position?: 'center' | 'top';
@@ -14,7 +15,6 @@ export interface ModalController {
 
 export interface ModalInstance {
   id: string;
-  content: ReactNode;
   options: ModalOptions;
   zIndex: number;
 }

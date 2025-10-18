@@ -1,10 +1,9 @@
-import { ReactNode } from "react";
 import { modalManager } from "./modal-manager";
-import { ModalOptions, ModalController } from "./types";
+import { ModalController, ModalOptions } from "./types";
 
 export const modal = {
-  show: (content: ReactNode, options?: ModalOptions): ModalController => 
-    modalManager.show(content, options),
+  show: (options: ModalOptions): ModalController => 
+    modalManager.show(options),
     
   hide: (id: string, result?: unknown): void => 
     modalManager.hide(id, result),
@@ -14,4 +13,5 @@ export const modal = {
 };
 
 export { ModalRenderer } from "./modal-renderer";
-export type { ModalOptions, ModalController } from "./types";
+export type { ModalController, ModalOptions } from "./types";
+

@@ -85,7 +85,7 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
           {...swipeHandlers}
         >
           <div className={`relative bg-background rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-hidden pointer-events-auto ${instance.options.className || ""}`}>
-            {instance.content}
+            {instance.options.content}
           </div>
         </motion.div>
       </div>
