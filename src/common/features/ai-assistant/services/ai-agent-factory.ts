@@ -82,12 +82,7 @@ export class AIAgentFactory {
    * Get channel-specific tools
    */
   getChannelTools() {
-    console.log("🔔 [AIAgentFactory][getChannelTools] requesting tools");
     const tools = channelToolsManager.getChannelTools();
-    console.log(
-      "🔔 [AIAgentFactory][getChannelTools] returning tools:",
-      tools.map(t => ({ name: t.name, description: t.description }))
-    );
     return tools;
   }
 

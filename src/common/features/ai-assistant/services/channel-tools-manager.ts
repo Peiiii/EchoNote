@@ -17,7 +17,6 @@ export class ChannelToolsManager {
    * Get channel-specific CRUD tools
    */
   getChannelTools(): Tool[] {
-    console.log("🔔 [ChannelToolsManager][getChannelTools] creating tools");
     const tools = [
       this.createNoteTool(),
       this.readNoteTool(),
@@ -26,10 +25,6 @@ export class ChannelToolsManager {
       this.listNotesTool(),
       this.grepNotesTool(),
     ];
-    console.log(
-      "🔔 [ChannelToolsManager][getChannelTools] created tools:",
-      tools.map(t => ({ name: t.name, description: t.description }))
-    );
     return tools;
   }
 

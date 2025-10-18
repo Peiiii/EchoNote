@@ -21,7 +21,6 @@ interface TimelineContentProps {
 export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(
   ({ renderThoughtRecord, className = "" }, ref) => {
     const { currentChannelId } = useNotesViewStore();
-    console.log("🔔 [TimelineContent] currentChannelId", currentChannelId);
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
@@ -31,7 +30,6 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
       },
     });
 
-    console.log("🔔 [TimelineContent] messages", messages);
 
     const { handleScroll } = useLazyLoading({
       onTrigger: () =>

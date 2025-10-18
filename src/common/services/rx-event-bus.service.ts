@@ -3,7 +3,6 @@ import { RxEvent } from "@/common/lib/rx-event";
 export class RxEventBusService {
   // AI Assistant events
   requestOpenAIAssistant$ = new RxEvent<{ channelId: string }>();
-  requestOpenAIConversation$ = new RxEvent<{ channelId: string }>();
 
   // Thread management events
   requestOpenThread$ = new RxEvent<{ messageId: string }>();
