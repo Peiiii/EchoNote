@@ -2,8 +2,6 @@ import { Message } from "@/core/stores/notes-data.store";
 
 export interface MessageInputProps {
   onSend: () => void;
-  replyToMessageId?: string;
-  onCancelReply: () => void;
 }
 
 export interface ToolbarButtonProps {

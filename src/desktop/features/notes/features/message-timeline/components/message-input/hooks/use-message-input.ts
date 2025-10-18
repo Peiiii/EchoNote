@@ -1,12 +1,21 @@
-import { useState, useRef, useEffect, useMemo } from "react";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
+import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { logService, NoteType } from "@/core/services/log.service";
-import { MessageInputProps } from "../types";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
+export function useMessageInput(props: { onSend: () => void }) {
+  const { onSend } = props;
+  const {
+    clearReplyToMessageId,
+    replyToMessageId,
+    handleCancelReply
+  } = useChatActions();
+
+  
+
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage } = channelMessageService;
@@ -56,6 +65,7 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
       });
     }
 
+    clearReplyToMessageId();
     onSend();
     setMessage("");
   };
@@ -98,5 +108,6 @@ export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps)
     handleMessageChange,
     placeholder,
     currentChannelId,
+    handleCancelReply,
   };
 }

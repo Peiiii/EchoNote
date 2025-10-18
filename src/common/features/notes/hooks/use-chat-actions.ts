@@ -3,7 +3,7 @@ import { useState } from "react";
 export const useChatActions = () => {
   const [replyToMessageId, setReplyToMessageId] = useState<string | undefined>(undefined);
 
-  const handleSend = () => {
+  const clearReplyToMessageId = () => {
     setReplyToMessageId(undefined);
   };
 
@@ -17,7 +17,7 @@ export const useChatActions = () => {
 
   return {
     replyToMessageId,
-    handleSend,
+    clearReplyToMessageId,
     handleCancelReply,
     handleReply,
   };

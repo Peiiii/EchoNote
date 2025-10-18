@@ -5,7 +5,7 @@ import { Toolbar } from "./components/toolbar";
 import { useMessageInput } from "./hooks/use-message-input";
 import { MessageInputProps } from "./types";
 
-export function MessageInput({ onSend, replyToMessageId, onCancelReply }: MessageInputProps) {
+export function MessageInput({ onSend }: MessageInputProps) {
   const {
     message,
     textareaRef,
@@ -15,12 +15,13 @@ export function MessageInput({ onSend, replyToMessageId, onCancelReply }: Messag
     handleKeyDown,
     handleMessageChange,
     placeholder,
-  } = useMessageInput({ onSend, replyToMessageId, onCancelReply });
+    handleCancelReply,
+  } = useMessageInput({ onSend });
 
   return (
     <div className="bg-white dark:bg-background border-t border-slate-200/50 dark:border-slate-700/50">
       {replyToMessage && (
-        <ReplyIndicator replyToMessage={replyToMessage} onCancelReply={onCancelReply} />
+        <ReplyIndicator replyToMessage={replyToMessage} onCancelReply={handleCancelReply} />
       )}
 
       <Toolbar />
