@@ -24,7 +24,7 @@ import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 
-interface ChannelCoverHeaderProps {
+interface ChannelHeaderProps {
   channel: Channel;
   className?: string;
   defaultCollapsed?: boolean;
@@ -59,11 +59,11 @@ const getChannelBackground = (channel: Channel): { background: string; isImage: 
   return getPicsumBackground(hash);
 };
 
-export const ChannelCoverHeader = ({
+export const ChannelHeader = ({
   channel,
   className = "",
   defaultCollapsed = false,
-}: ChannelCoverHeaderProps) => {
+}: ChannelHeaderProps) => {
   const presenter = useDesktopPresenterContext();
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-import { ExpandedEditor } from "./thought-record/expanded-editor";
+import { ExpandedEditor } from "./expanded-editor";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 
 interface ExpandedEditorOverlayProps {

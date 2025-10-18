@@ -1,7 +1,6 @@
 import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 import { MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
 import { Message } from "@/core/stores/notes-data.store";
-import { ExpandedEditorOverlayContainer } from "@/desktop/features/notes/features/message-timeline/components/expanded-editor-overlay-container";
 import { MessageInput } from "@/desktop/features/notes/features/message-timeline/components/message-input";
 import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 import { TimelineContent } from "@/desktop/features/notes/features/message-timeline/components/timeline-content";
@@ -9,6 +8,7 @@ import { TimelineLayout } from "@/desktop/features/notes/features/message-timeli
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
 import { useCallback, useRef } from "react";
+import { ExpandedEditorOverlayContainer } from "./components/expanded-edit/expanded-editor-overlay-container";
 
 interface MessageTimelineFeatureProps {
   className?: string;

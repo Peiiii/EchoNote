@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Channel } from "@/core/stores/notes-data.store";
-import { ChannelCoverHeader } from "./channel-cover-header";
+import { ChannelHeader } from "./channel-header";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 
 interface TimelineLayoutProps {
@@ -27,7 +27,7 @@ export const TimelineLayout = ({
       className={`relative flex-1 flex flex-col h-full ${className}`}
     >
       {/* Channel Cover Header */}
-      {channel && <ChannelCoverHeader channel={channel} />}
+      {channel && <ChannelHeader channel={channel} />}
 
       {/* Timeline content area */}
       <div className="flex-1 flex flex-col min-h-0">

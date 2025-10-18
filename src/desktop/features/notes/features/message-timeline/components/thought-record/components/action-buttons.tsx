@@ -1,6 +1,6 @@
 import { Bookmark, Edit2, Eye, Lightbulb, MessageCircle } from "lucide-react";
 import { ActionButton } from "./action-button";
-import { MoreActionsMenu } from "../../more-actions-menu";
+import { MoreActionsMenu } from "../more-actions-menu";
 import { ActionButtonsProps } from "../types";
 import { getFeaturesConfig } from "@/core/config/features.config";
 

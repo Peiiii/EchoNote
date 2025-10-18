@@ -7,7 +7,7 @@ import {
 } from "@/common/components/ui/dropdown-menu";
 import { Channel } from "@/core/stores/notes-data.store";
 import { ChevronDown } from "lucide-react";
-import { getChannelIcon } from "../../channel-management/components/channel-icons";
+import { getChannelIcon } from "../../../channel-management/components/channel-icons";
 
 interface ChannelDropdownSelectorProps {
   currentChannel: Channel;
