@@ -15,5 +15,3 @@ export class RxEventBusService {
   // Request the UI to navigate to a specific message, switching channel if necessary
   requestJumpToMessage$ = new RxEvent<{ channelId: string; messageId: string }>();
 }
-
-export const rxEventBusService = new RxEventBusService();

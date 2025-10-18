@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
+import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 
 interface ThreadIndicatorProps {
   threadCount: number;
@@ -8,9 +8,9 @@ interface ThreadIndicatorProps {
 
 export function ThreadIndicator({ threadCount, messageId }: ThreadIndicatorProps) {
   const displayText = threadCount > 0 ? `${threadCount} replies` : "Start discussion";
-
+  const presenter = useDesktopPresenterContext();
   const handleOpenThread = () => {
-    rxEventBusService.requestOpenThread$.emit({ messageId });
+    presenter.openThread({ messageId });
   };
 
   return (

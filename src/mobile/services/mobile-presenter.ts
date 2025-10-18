@@ -1,11 +1,11 @@
 import { CommonPresenter } from "@/common/services/common-presenter";
 
 export class MobilePresenter extends CommonPresenter {
-  openAIAssistant(channelId: string) {
+  openAIAssistant({ channelId }: { channelId: string }) {
     this.rxEventBus.requestOpenAIAssistant$.emit({ channelId });
   }
 
-  openThread(messageId: string) {
+  openThread({ messageId }: { messageId: string }) {
     this.rxEventBus.requestOpenThread$.emit({ messageId });
   }
 
@@ -13,11 +13,11 @@ export class MobilePresenter extends CommonPresenter {
     this.rxEventBus.requestCloseThread$.emit();
   }
 
-  openSettings(channelId?: string) {
-    this.rxEventBus.requestOpenSettings$.emit({ channelId });
+  openSettings(options: { channelId?: string }) {
+    this.rxEventBus.requestOpenSettings$.emit(options);
   }
 
-  jumpToMessage(channelId: string, messageId: string) {
-    this.rxEventBus.requestJumpToMessage$.emit({ channelId, messageId });
+  jumpToNote(options: { channelId: string; messageId: string }) {
+    this.rxEventBus.requestJumpToMessage$.emit(options);
   }
 }

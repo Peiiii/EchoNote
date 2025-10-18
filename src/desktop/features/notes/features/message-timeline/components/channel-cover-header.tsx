@@ -3,7 +3,6 @@ import { Button } from "@/common/components/ui/button";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { cn } from "@/common/lib/utils";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -23,6 +22,7 @@ import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
+import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 
 interface ChannelCoverHeaderProps {
   channel: Channel;
@@ -66,6 +66,7 @@ export const ChannelCoverHeader = ({
   className = "",
   defaultCollapsed = false,
 }: ChannelCoverHeaderProps) => {
+  const presenter = useDesktopPresenterContext();
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const notifyLayoutChange = useReadMoreStore(useCallback(state => state.notifyLayoutChange, []));
@@ -346,7 +347,7 @@ export const ChannelCoverHeader = ({
             variant="secondary"
             size="sm"
             className="bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm transition-all duration-200 hover:scale-105"
-            onClick={() => rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })}
+            onClick={() => presenter.openAIAssistant({ channelId: channel.id })}
           >
             <Bot className="h-4 w-4 mr-2" />
             <span className="font-medium">AI Assistant</span>
@@ -384,9 +385,7 @@ export const ChannelCoverHeader = ({
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={() =>
-                rxEventBusService.requestOpenAIAssistant$.emit({ channelId: channel.id })
-              }
+              onClick={() => presenter.openAIAssistant({ channelId: channel.id })}
             >
               <Bot className="h-4 w-4" />
             </Button>

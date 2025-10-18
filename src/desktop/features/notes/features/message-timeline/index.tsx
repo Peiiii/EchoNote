@@ -1,7 +1,6 @@
 import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
 import { MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
 import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { Message } from "@/core/stores/notes-data.store";
 import { ExpandedEditorOverlayContainer } from "@/desktop/features/notes/features/message-timeline/components/expanded-editor-overlay-container";
 import { MessageInput } from "@/desktop/features/notes/features/message-timeline/components/message-input";
@@ -10,6 +9,7 @@ import { TimelineContent } from "@/desktop/features/notes/features/message-timel
 import { TimelineLayout } from "@/desktop/features/notes/features/message-timeline/components/timeline-layout";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
+import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useCallback, useRef } from "react";
 
 interface MessageTimelineFeatureProps {
@@ -26,7 +26,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
 
   // Get current channel for cover header
   const currentChannel = useCurrentChannel();
-
+  const presenter = useDesktopPresenterContext();
   const timelineContentRef = useRef<MessageTimelineRef>(null);
 
   // Get input collapsed state for conditional rendering
@@ -51,7 +51,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
       {/* Timeline layout with content and actions */}
       <TimelineLayout
         channel={currentChannel || undefined}
-        onOpenSettings={() => rxEventBusService.requestOpenSettings$.emit({})}
+        onOpenSettings={() => presenter.openSettings()}
         content={
           <div className="flex flex-1 flex-col min-h-0 relative">
             <TimelineContent ref={timelineContentRef} renderThoughtRecord={renderThoughtRecord} />

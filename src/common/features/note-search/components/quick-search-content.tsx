@@ -8,8 +8,8 @@ import {
 } from "@/common/features/note-search/services/note-search.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useValueFromObservable } from "@/common/features/note-search/hooks/use-value-from-observable";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 
 interface QuickSearchContentProps {
   onClose: () => void;
@@ -18,7 +18,7 @@ interface QuickSearchContentProps {
 export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
   const { currentChannelId } = useNotesViewStore();
   const channels = useNotesDataStore(s => s.channels);
-
+  const presenter = useCommonPresenterContext();
   const [q, setQ] = useState("");
   const [scope, setScope] = useState<"all" | "current">("current");
   const [results, setResults] = useState<NoteSearchMatch[]>([]);
@@ -183,7 +183,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
 
   const handlePick = (noteId: string, channelId: string) => {
     onClose();
-    rxEventBusService.requestJumpToMessage$.emit({ channelId, messageId: noteId });
+    presenter.rxEventBus.requestJumpToMessage$.emit({ channelId, messageId: noteId });
   };
 
   // Mobile: Handle pull-to-refresh for search results

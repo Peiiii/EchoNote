@@ -2,11 +2,11 @@ import { CommonPresenter } from "@/common/services/common-presenter";
 
 
 export class DesktopPresenter extends CommonPresenter {
-  openAIAssistant(channelId: string) {
+  openAIAssistant({ channelId }: { channelId: string }) {
     this.rxEventBus.requestOpenAIAssistant$.emit({ channelId });
   }
 
-  openThread(messageId: string) {
+  openThread({ messageId }: { messageId: string }) {
     this.rxEventBus.requestOpenThread$.emit({ messageId });
   }
 

@@ -1,5 +1,4 @@
 import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
-import { rxEventBusService } from "@/common/services/rx-event-bus.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { NotesLayout } from "@/desktop/features/notes/components/notes-layout";
@@ -7,6 +6,7 @@ import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assista
 import { ChannelList } from "@/desktop/features/notes/features/channel-management/components/channel-list";
 import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
 import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
+import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useJumpToNote } from "../hooks/use-jump-to-note";
 
 export function NotesPage() {
@@ -22,12 +22,12 @@ export function NotesPage() {
   } = useUIStateStore();
   const { currentChannelId } = useNotesViewStore();
   const { jumpToNote } = useJumpToNote();
-
-  useHandleRxEvent(rxEventBusService.requestOpenAIAssistant$, openAIAssistant);
-  useHandleRxEvent(rxEventBusService.requestOpenThread$, ({ messageId }) => openThread(messageId));
-  useHandleRxEvent(rxEventBusService.requestCloseThread$, closeThread);
-  useHandleRxEvent(rxEventBusService.requestOpenSettings$, openSettings);
-  useHandleRxEvent(rxEventBusService.requestJumpToMessage$, jumpToNote);
+  const presenter = useDesktopPresenterContext();
+  useHandleRxEvent(presenter.rxEventBus.requestOpenAIAssistant$, openAIAssistant);
+  useHandleRxEvent(presenter.rxEventBus.requestOpenThread$, ({ messageId }) => openThread(messageId));
+  useHandleRxEvent(presenter.rxEventBus.requestCloseThread$, closeThread);
+  useHandleRxEvent(presenter.rxEventBus.requestOpenSettings$, openSettings);
+  useHandleRxEvent(presenter.rxEventBus.requestJumpToMessage$, jumpToNote);
 
   const renderSidebar = () => {
     if (sideView === SideViewEnum.THREAD) {
