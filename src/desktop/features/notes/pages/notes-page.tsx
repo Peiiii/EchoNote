@@ -10,23 +10,12 @@ import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presente
 import { useJumpToNote } from "../hooks/use-jump-to-note";
 
 export function NotesPage() {
+  const presenter = useDesktopPresenterContext();
   // Use UI state store
-  const {
-    sideView,
-    currentThreadId,
-    openAIAssistant,
-    closeAIAssistant,
-    openThread,
-    closeThread,
-    openSettings,
-  } = useUIStateStore();
+  const sideView = useUIStateStore(s => s.sideView);
+  const currentThreadId = useUIStateStore(s => s.currentThreadId);
   const { currentChannelId } = useNotesViewStore();
   const { jumpToNote } = useJumpToNote();
-  const presenter = useDesktopPresenterContext();
-  useHandleRxEvent(presenter.rxEventBus.requestOpenAIAssistant$, openAIAssistant);
-  useHandleRxEvent(presenter.rxEventBus.requestOpenThread$, ({ messageId }) => openThread(messageId));
-  useHandleRxEvent(presenter.rxEventBus.requestCloseThread$, closeThread);
-  useHandleRxEvent(presenter.rxEventBus.requestOpenSettings$, openSettings);
   useHandleRxEvent(presenter.rxEventBus.requestJumpToMessage$, jumpToNote);
 
   const renderSidebar = () => {
@@ -34,7 +23,7 @@ export function NotesPage() {
       return (
         <ThreadSidebar
           isOpen
-          onClose={closeThread}
+          onClose={() => presenter.closeThread()}
           currentThreadId={currentThreadId || undefined}
         />
       );
@@ -43,7 +32,7 @@ export function NotesPage() {
       return (
         <AIAssistantSidebar
           isOpen
-          onClose={closeAIAssistant}
+          onClose={() => presenter.closeAIAssistant()}
           channelId={currentChannelId || ""}
         />
       );
