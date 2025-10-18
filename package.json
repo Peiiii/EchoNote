@@ -46,6 +46,7 @@
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.13.3",
     "firebase": "^12.1.0",
+    "framer-motion": "^12.23.24",
     "katex": "^0.16.23",
     "lodash-es": "^4.17.21",
     "lowlight": "2.8.0",

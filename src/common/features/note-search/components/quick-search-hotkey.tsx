@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { openQuickSearchModal } from "./quick-search-modal.store";
+import { openQuickSearchModal } from "./quick-search-modal";
 
 export function QuickSearchHotkey() {
   useEffect(() => {

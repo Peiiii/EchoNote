@@ -10,7 +10,6 @@ import {
   type MobileTimelineContentRef,
 } from "@/mobile/features/notes/features/message-timeline";
 import { useRef } from "react";
-import { QuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 
 interface MobileNotesLayoutProps {
   currentChannelName?: string;
@@ -79,8 +78,6 @@ export const MobileNotesLayout = ({
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Timeline content */}
         <MobileTimelineContent ref={timelineContentRef} onReply={timelineState.handleReply} />
-        {/* Global quick search dialog */}
-        <QuickSearchModal />
 
         {/* Input area - only show when there's a current channel */}
         {currentChannel && (

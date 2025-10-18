@@ -1,5 +1,6 @@
 import { DesktopSetupApp } from "./desktop-setup-app";
 import { notesExtension } from "./features/notes/extensions";
+import { ModalRenderer } from "@/common/lib/imperative-modal";
 
 export const DesktopApp = () => {
   return (
@@ -11,6 +12,7 @@ export const DesktopApp = () => {
           // githubExtension,
         ]}
       />
+      <ModalRenderer />
     </div>
   );
 };

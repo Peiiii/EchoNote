@@ -1,5 +1,5 @@
 import { Button } from "@/common/components/ui/button";
-import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";

@@ -1,5 +1,6 @@
 import { MobileSetupApp } from "./mobile-setup-app";
 import { mobileNotesExtension } from "./features/notes";
+import { ModalRenderer } from "@/common/lib/imperative-modal";
 
 export const MobileApp = () => {
   return (
@@ -10,6 +11,7 @@ export const MobileApp = () => {
       }}
     >
       <MobileSetupApp extensions={[mobileNotesExtension]} />
+      <ModalRenderer />
     </div>
   );
 };

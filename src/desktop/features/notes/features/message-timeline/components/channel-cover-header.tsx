@@ -1,6 +1,6 @@
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
-import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal.store";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
 import { cn } from "@/common/lib/utils";
 import { rxEventBusService } from "@/common/services/rx-event-bus.service";
