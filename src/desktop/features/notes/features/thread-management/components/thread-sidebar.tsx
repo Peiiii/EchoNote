@@ -6,7 +6,7 @@ import { isModifierKeyPressed } from "@/common/lib/keyboard-shortcuts";
 interface ThreadSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onSendMessage: (content: string) => void;
+  onSendMessage?: (content: string) => void;
   currentThreadId?: string;
 }
 
@@ -30,7 +30,7 @@ export const ThreadSidebar = ({
 
   const handleSend = () => {
     if (newMessage.trim()) {
-      onSendMessage(newMessage.trim());
+      onSendMessage?.(newMessage.trim());
       setNewMessage("");
     }
   };
