@@ -28,7 +28,11 @@ export function MobileNotesPage() {
         isAddingMessage={notesState.isAddingMessage}
         onSendMessage={notesState.handleSendMessage}
         onCancelReply={notesState.handleCancelReply}
-        setReplyToMessageId={notesState.setReplyToMessageId}
+        setReplyToMessageId={(messageId: string | null) => {
+          if (messageId) {
+            notesState.handleReply(messageId);
+          }
+        }}
       />
 
       {/* Sidebar Manager */}

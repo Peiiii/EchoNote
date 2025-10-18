@@ -18,7 +18,7 @@ export const useMobileNotesState = () => {
     currentChannelId,
     messages.length,
   ]);
-  const { replyToMessageId, handleCancelReply, setReplyToMessageId } = useChatActions();
+  const { replyToMessageId, handleCancelReply, handleReply } = useChatActions();
   const { isThreadOpen, handleOpenThread, handleCloseThread, handleSendThreadMessage } =
     useThreadSidebar();
   const { sendMessage, isAddingMessage } = useMessageSender();
@@ -74,6 +74,6 @@ export const useMobileNotesState = () => {
     handleCloseThread,
     handleSendThreadMessage,
     scrollToBottom,
-    setReplyToMessageId,
+    handleReply,
   };
 };

@@ -11,10 +11,14 @@ export const useChatActions = () => {
     setReplyToMessageId(undefined);
   };
 
+  const handleReply = (messageId: string) => {
+    setReplyToMessageId(messageId);
+  };
+
   return {
     replyToMessageId,
     handleSend,
     handleCancelReply,
-    setReplyToMessageId,
+    handleReply,
   };
 };
