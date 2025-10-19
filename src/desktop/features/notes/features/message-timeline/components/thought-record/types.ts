@@ -48,7 +48,6 @@ export interface MessageFooterProps {
 export interface ActionButtonsProps {
   onToggleAnalysis: () => void;
   onReply?: () => void;
-  onEdit: () => void;
   message: Message;
   isEditing: boolean;
 }

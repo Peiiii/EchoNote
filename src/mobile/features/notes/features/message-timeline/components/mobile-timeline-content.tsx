@@ -47,14 +47,6 @@ export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelin
     getState: getChannelState,
   });
 
-  const renderThoughtRecord = (message: Message, threadCount: number) => (
-    <MobileThoughtRecord
-      message={message}
-      onReply={() => onReply(message.id)}
-      threadCount={threadCount}
-    />
-  );
-
   const hasMessages = Object.values(groupedMessages).some(dayMessages =>
     (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
   );
@@ -77,7 +69,13 @@ export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelin
     >
       <MessageTimeline
         className="h-full"
-        renderThoughtRecord={renderThoughtRecord}
+        renderThoughtRecord={(message: Message, threadCount: number) => (
+          <MobileThoughtRecord
+            message={message}
+            onReply={() => onReply(message.id)}
+            threadCount={threadCount}
+          />
+        )}
         groupedMessages={groupedMessages}
         messages={messages}
         onScroll={handleScroll}

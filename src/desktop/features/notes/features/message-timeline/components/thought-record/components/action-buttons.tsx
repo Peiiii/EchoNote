@@ -1,6 +1,6 @@
 import { Bookmark, Edit2, Eye, Lightbulb, MessageCircle } from "lucide-react";
 import { ActionButton } from "./action-button";
-import { MoreActionsMenu } from "../more-actions-menu";
+import { MoreActionsMenu } from "./more-actions-menu";
 import { ActionButtonsProps } from "../types";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
@@ -10,7 +10,6 @@ import { modal } from "@/common/components/modal";
 export function ActionButtons({
   onToggleAnalysis,
   onReply,
-  onEdit,
   message,
   isEditing,
 }: ActionButtonsProps) {
@@ -42,10 +41,14 @@ export function ActionButtons({
     });
   };
 
+  const handleEdit = () => {
+    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
+  };
+
   const actionButtons = [
     {
       icon: Edit2,
-      onClick: onEdit,
+      onClick: handleEdit,
       title: "Edit thought",
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.edit.enabled,

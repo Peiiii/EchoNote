@@ -1,10 +1,10 @@
 import { MarkdownContent } from "@/common/components/markdown";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/notes-data.store";
-import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { useState, useEffect } from "react";
+import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
+import { useEffect, useState } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";
 import { MobileInlineEditor } from "./mobile-inline-editor";
 import { MobileMoreActionsMenu } from "./mobile-more-actions-menu";
@@ -23,24 +23,10 @@ export const MobileThoughtRecord = ({
   onReply,
   threadCount = 0,
 }: MobileThoughtRecordProps) => {
-  const { deleteMessage } = channelMessageService;
+  const presenter = useCommonPresenterContext();
+  const { isEditing, editMode, isSaving, isExpandedEditing } = useEditNote(message);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
-
-  // Edit state management
-  const editingMessageId = useEditStateStore(s => s.editingMessageId);
-  const globalEditMode = useEditStateStore(s => s.editMode);
-  const globalIsSaving = useEditStateStore(s => s.isSaving);
-  const startEdit = useEditStateStore(s => s.startEditing);
-  const save = useEditStateStore(s => s.save);
-  const cancel = useEditStateStore(s => s.cancel);
-  const switchToExpandedMode = useEditStateStore(s => s.switchToExpandedMode);
-  const switchToInlineMode = useEditStateStore(s => s.switchToInlineMode);
-
-  const isEditing = editingMessageId === message.id;
-  const isExpandedEditing = isEditing && globalEditMode === "expanded";
-  const isSaving = isEditing ? globalIsSaving : false;
-  const editMode = isEditing ? globalEditMode : "inline";
 
   // 重置自动生成标志
   useEffect(() => {
@@ -56,7 +42,7 @@ export const MobileThoughtRecord = ({
 
   // Action handlers
   const handleEdit = () => {
-    startEdit(message.id, message.content);
+    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
   };
 
   const handleDelete = async () => {
@@ -72,15 +58,10 @@ export const MobileThoughtRecord = ({
     );
 
     if (confirmed) {
-      try {
-        await deleteMessage({
-          messageId: message.id,
-          channelId: message.channelId,
-        });
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
-      }
+      await presenter.noteManager.deleteMessage({
+        messageId: message.id,
+        channelId: message.channelId,
+      });
     }
   };
 
@@ -103,20 +84,22 @@ export const MobileThoughtRecord = ({
 
   // Edit handlers
   const handleSave = async () => {
-    await save();
+    await presenter.noteEditManager.save();
   };
 
   const handleCancel = () => {
-    cancel();
+    presenter.noteEditManager.cancel();
   };
 
   const handleExpand = () => {
-    switchToExpandedMode();
+    presenter.noteEditManager.switchToExpandedMode();
   };
 
   return (
     <div className="w-full flex flex-col overflow-hidden group">
-      <div className={`relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out ${message.isNew ? "animate-in slide-in-from-bottom-5 fade-in duration-400" : ""}`}>
+      <div
+        className={`relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out ${message.isNew ? "animate-in slide-in-from-bottom-5 fade-in duration-400" : ""}`}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
@@ -177,7 +160,7 @@ export const MobileThoughtRecord = ({
           open={isExpandedEditing}
           onOpenChange={open => {
             if (!open) {
-              switchToInlineMode();
+              presenter.noteEditManager.switchToInlineMode();
             }
           }}
         >
@@ -192,7 +175,7 @@ export const MobileThoughtRecord = ({
               originalContent={message.content}
               onSave={handleSave}
               onCancel={handleCancel}
-              onCollapse={switchToInlineMode}
+              onCollapse={() => presenter.noteEditManager.switchToInlineMode()}
               isSaving={isSaving}
             />
           </DialogContent>

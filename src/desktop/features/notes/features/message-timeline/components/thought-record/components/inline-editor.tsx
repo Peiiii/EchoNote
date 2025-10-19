@@ -5,24 +5,20 @@ import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { cn } from "@/common/lib/utils";
 import { useEditor } from "@/common/hooks/use-editor";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 
 interface InlineEditorProps {
   content: string;
-  onSave: () => void;
-  onCancel: () => void;
-  onExpand: () => void;
   isSaving: boolean;
   className?: string;
 }
 
 export function InlineEditor({
   content,
-  onSave,
-  onCancel,
-  onExpand,
   isSaving,
   className,
 }: InlineEditorProps) {
+  const presenter = useCommonPresenterContext();
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Select only the updater to avoid subscribing to edit content changes here
@@ -58,12 +54,12 @@ export function InlineEditor({
 
   const handleSave = () => {
     if (localContent.trim()) {
-      onSave();
+      presenter.noteEditManager.save();
     }
   };
 
   const handleCancel = () => {
-    onCancel();
+    presenter.noteEditManager.cancel();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -112,7 +108,7 @@ export function InlineEditor({
           rightActions={[
             {
               label: "Expand",
-              onClick: onExpand,
+              onClick: () => presenter.noteEditManager.switchToExpandedMode(),
               disabled: isSaving,
               icon: <Maximize2 className="w-3.5 h-3.5 mr-1.5" />,
               className:
@@ -120,7 +116,7 @@ export function InlineEditor({
             },
             {
               label: "Cancel",
-              onClick: handleCancel,
+              onClick: () => presenter.noteEditManager.cancel(),
               disabled: isSaving,
               icon: <X className="w-3.5 h-3.5 mr-1.5" />,
               className:
@@ -128,7 +124,7 @@ export function InlineEditor({
             },
             {
               label: isSaving ? "Saving..." : "Save",
-              onClick: handleSave,
+              onClick: () => presenter.noteEditManager.save(),
               disabled: isSaving || !localContent.trim(),
               icon: isSaving ? (
                 <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />

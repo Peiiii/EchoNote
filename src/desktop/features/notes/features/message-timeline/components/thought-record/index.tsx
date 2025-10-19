@@ -1,13 +1,17 @@
 import { MarkdownContent } from "@/common/components/markdown";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
 import { Clock } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ActionButtons } from "./components/action-buttons";
+import { InlineEditor } from "./components/inline-editor";
 import { MessageFooter } from "./components/message-footer";
+import { ReadMoreWrapper } from "./components/read-more-wrapper";
+import { ThoughtRecordSparks } from "./components/thought-record-sparks";
 import { useNoteAnalysis } from "./hooks/use-note-analysis";
-import { InlineEditor } from "./inline-editor";
-import { ReadMoreWrapper } from "./read-more-wrapper";
-import { ThoughtRecordSparks } from "./thought-record-sparks";
 import { ThoughtRecordProps } from "./types";
 
 export function ThoughtRecord({
@@ -15,20 +19,39 @@ export function ThoughtRecord({
   onReply,
   threadCount = 0,
 }: Omit<ThoughtRecordProps, "isFirstInGroup" | "onOpenThread">) {
+  const presenter = useCommonPresenterContext();
+  const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
+  const userId = useNotesDataStore(s => s.userId);
   const {
-    editingTags,
     isEditing,
     editContent,
     editMode,
     isSaving,
-    handleEdit,
-    handleSave,
-    handleCancel,
-    handleExpand,
-    handleTagsChange,
   } = useEditNote(message);
-
   const { showAnalysis, aiAnalysis, hasSparks, handleToggleAnalysis } = useNoteAnalysis(message);
+  const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
+
+  useEffect(() => {
+    setEditingTags(message.tags || []);
+  }, [message.tags]);
+
+  const handleTagsChange = async (newTags: string[]) => {
+    setEditingTags(newTags);
+
+    if (!userId || !currentChannelId) return;
+
+    try {
+      await presenter.noteManager.updateMessage({
+        messageId: message.id,
+        channelId: currentChannelId,
+        updates: { tags: newTags },
+        userId,
+      });
+    } catch (error) {
+      console.error("Failed to update tags:", error);
+      setEditingTags(message.tags || []);
+    }
+  };
 
   if (message.isDeleted) {
     return null;
@@ -55,7 +78,6 @@ export function ThoughtRecord({
           <ActionButtons
             onToggleAnalysis={handleToggleAnalysis}
             onReply={onReply}
-            onEdit={handleEdit}
             message={message}
             isEditing={isEditing}
           />
@@ -65,9 +87,6 @@ export function ThoughtRecord({
         {isEditing && editMode === "inline" ? (
           <InlineEditor
             content={editContent}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            onExpand={handleExpand}
             isSaving={isSaving}
             className="px-6"
           />

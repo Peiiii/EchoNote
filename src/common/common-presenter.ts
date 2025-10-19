@@ -4,6 +4,7 @@ import { RxEventBusService } from "./services/rx-event-bus.service";
 import { ThreadManager } from "./services/thread-manager.service";
 import { ViewStateManager } from "./services/view-state-manager.service";
 import { NoteManager } from "@/common/services/note-manager.service";
+import { NoteEditManager } from "@/common/services/note-edit-manager";
 
 export class CommonPresenter {
   readonly rxEventBus = new RxEventBusService();
@@ -11,7 +12,8 @@ export class CommonPresenter {
   readonly channelManager = new ChannelManager();
   readonly viewStateManager = new ViewStateManager();
   readonly noteManager = new NoteManager();
-
+  readonly noteEditManager = new NoteEditManager();
+  
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();
   };
