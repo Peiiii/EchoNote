@@ -13,23 +13,20 @@ interface MessageTimelineFeatureProps {
 export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatureProps) => {
   const currentChannel = useCurrentChannel();
   const { inputCollapsed } = useInputCollapse();
-
   return (
-    <div className={`relative w-full h-full ${className}`}>
-      {/* Timeline layout with content and actions */}
+    <>
       <TimelineLayout
         channel={currentChannel || undefined}
         content={
-          <div className="flex flex-1 flex-col min-h-0 relative">
+          <>
             <TimelineContent />
-            <QuickSearchHotkey />
-          </div>
+          </>
         }
         actions={currentChannel && !inputCollapsed ? <MessageInput /> : null}
+        className={className}
       />
-
-      {/* Expanded editor overlay (isolated from parent re-renders) */}
       <ExpandedEditorOverlayContainer />
-    </div>
+      <QuickSearchHotkey />
+    </>
   );
 };

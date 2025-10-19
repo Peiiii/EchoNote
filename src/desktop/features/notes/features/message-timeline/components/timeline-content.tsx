@@ -7,69 +7,90 @@ import { SpaceEmptyState } from "@/common/features/notes/components/message-time
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
-import { forwardRef, useCallback, useRef } from "react";
-import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
-import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
+import { useCallback, useRef } from "react";
+
+interface TimelineContentWrapperProps {
+  children: React.ReactNode;
+  className?: string;
+}
 
 interface TimelineContentProps {
   className?: string;
 }
 
-export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(
-  ({ className = "" }) => {
-    const presenter = useCommonPresenterContext();
-    const timelineScrollContainerRef = useRef<MessageTimelineRef>(null);
-    const { currentChannelId } = useNotesViewStore();
+const TimelineContentWrapper = ({ children = "", className = "" }: TimelineContentWrapperProps) => {
+  return <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>{children}</div>;
+};
 
-    const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
+export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
+  const presenter = useCommonPresenterContext();
+  const timelineScrollContainerRef = useRef<MessageTimelineRef>(null);
+  const { currentChannelId } = useNotesViewStore();
 
-    useHandleRxEvent(presenter.rxEventBus.requestTimelineScrollToBottom$, () => {
-      timelineScrollContainerRef.current?.scrollToBottom({ behavior: "instant" });
-    });
+  const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
-    const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
-      onHistoryMessagesChange: messages => {
-        onHistoryMessagesLoadedEvent$.emit(messages);
-      },
-    });
-    const { handleScroll } = useLazyLoading({
-      onTrigger: () =>
-        currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
-      canTrigger: !!hasMore && !loading,
-      getState: getChannelState,
-    });
+  useHandleRxEvent(presenter.rxEventBus.requestTimelineScrollToBottom$, () => {
+    timelineScrollContainerRef.current?.scrollToBottom({ behavior: "instant" });
+  });
 
-    const groupedMessages = useGroupedMessages(messages);
+  const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
+    onHistoryMessagesChange: messages => {
+      onHistoryMessagesLoadedEvent$.emit(messages);
+    },
+  });
+  const { handleScroll } = useLazyLoading({
+    onTrigger: () =>
+      currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
+    canTrigger: !!hasMore && !loading,
+    getState: getChannelState,
+  });
 
-    const renderThoughtRecord = useCallback(
-      (message: Message, threadCount: number) => (
-        <ThoughtRecord message={message} threadCount={threadCount} />
-      ),
-      []
-    );
+  const groupedMessages = useGroupedMessages(messages);
 
-    const hasMessages = Object.values(groupedMessages).some(dayMessages =>
-      (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
-    );
+  const renderThoughtRecord = useCallback(
+    (message: Message, threadCount: number) => (
+      <ThoughtRecord message={message} threadCount={threadCount} />
+    ),
+    []
+  );
 
-    if (!currentChannelId) {
-      return <DesktopWelcomeGuide />;
-    }
+  const hasMessages = Object.values(groupedMessages).some(dayMessages =>
+    (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
+  );
 
-    if (loading) {
-      return <MessageTimelineSkeleton count={5} />;
-    }
-
-    if (!hasMessages) {
-      return <SpaceEmptyState />;
-    }
-
+  if (!currentChannelId) {
     return (
+      <TimelineContentWrapper>
+        <DesktopWelcomeGuide />
+      </TimelineContentWrapper>
+    );
+  }
+
+  if (loading) {
+    return (
+      <TimelineContentWrapper>
+        <MessageTimelineSkeleton count={5} />
+      </TimelineContentWrapper>
+    );
+  }
+
+  if (!hasMessages) {
+    return (
+      <TimelineContentWrapper>
+        <SpaceEmptyState />
+      </TimelineContentWrapper>
+    );
+  }
+
+  return (
+    <TimelineContentWrapper className={className}>
       <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
         <MessageTimeline
           ref={timelineScrollContainerRef}
@@ -80,6 +101,6 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
           onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
         />
       </div>
-    );
-  }
-);
+    </TimelineContentWrapper>
+  );
+};

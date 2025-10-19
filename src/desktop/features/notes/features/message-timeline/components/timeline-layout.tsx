@@ -22,24 +22,25 @@ export const TimelineLayout = ({
   const isFocusMode = !sideView;
 
   return (
-    <div
-      data-component="timeline-container"
-      className={`relative flex-1 flex flex-col h-full ${className}`}
-    >
-      {/* Channel Cover Header */}
-      {channel && <ChannelHeader channel={channel} />}
+    <div className={`relative w-full h-full ${className}`} data-component="timeline-layout">
+      <div className="relative flex-1 flex flex-col h-full">
+        {/* Channel Cover Header */}
+        {channel && <ChannelHeader channel={channel} />}
 
-      {/* Timeline content area */}
-      <div className={`flex-1 flex flex-col min-h-0 ${isFocusMode ? 'w-full max-w-[850px] mx-auto px-4 sm:px-6' : ''}`}>
-        {content}
-      </div>
-
-      {/* Actions area */}
-      {actions && (
-        <div className={isFocusMode ? 'w-full max-w-[850px] mx-auto px-4 sm:px-6' : ''}>
-          {actions}
+        {/* Timeline content area */}
+        <div
+          className={`flex-1 flex flex-col min-h-0 ${isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : ""}`}
+        >
+          {content}
         </div>
-      )}
+
+        {/* Actions area */}
+        {actions && (
+          <div className={isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : ""}>
+            {actions}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
