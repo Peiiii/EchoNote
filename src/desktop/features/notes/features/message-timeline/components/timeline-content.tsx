@@ -4,22 +4,22 @@ import {
   MessageTimelineRef,
 } from "@/common/features/notes/components/message-timeline/message-timeline";
 import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
-import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
 import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { forwardRef } from "react";
+import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
+import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
+import { forwardRef, useCallback } from "react";
 
 interface TimelineContentProps {
-  renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
   className?: string;
 }
 
 export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(
-  ({ renderThoughtRecord, className = "" }, ref) => {
+  ({ className = "" }, ref) => {
     const { currentChannelId } = useNotesViewStore();
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
@@ -29,8 +29,6 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
         onHistoryMessagesLoadedEvent$.emit(messages);
       },
     });
-
-
     const { handleScroll } = useLazyLoading({
       onTrigger: () =>
         currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
@@ -39,6 +37,13 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     });
 
     const groupedMessages = useGroupedMessages(messages);
+
+    const renderThoughtRecord = useCallback(
+      (message: Message, threadCount: number) => (
+        <ThoughtRecord message={message} threadCount={threadCount} />
+      ),
+      []
+    );
 
     const hasMessages = Object.values(groupedMessages).some(dayMessages =>
       (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
