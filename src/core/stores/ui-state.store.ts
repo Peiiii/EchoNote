@@ -4,7 +4,8 @@ import { persist } from "zustand/middleware";
 
 export enum SideViewEnum {
   AI_ASSISTANT = "ai_assistant",
-  THREAD = "thread",
+  THREAD = "thread",  
+  SETTINGS = "settings",
 }
 
 export interface UIState {
@@ -15,9 +16,6 @@ export interface UIState {
   // isThreadOpen: boolean;
   sideView?: SideViewEnum;
   currentThreadId: string | null;
-
-  // Settings sidebar state
-  isSettingsOpen: boolean;
 
   // Mobile specific states
   isChannelListOpen: boolean;
@@ -41,7 +39,7 @@ export interface UIState {
 
 export const useUIStateStore = create<UIState>()(
   persist(
-    set => ({
+    (set, get) => ({
       // Initial state - open on desktop, closed on mobile
       isAIAssistantOpen: !isMobile(),
       isThreadOpen: false,
@@ -80,11 +78,13 @@ export const useUIStateStore = create<UIState>()(
 
       // Settings actions
       openSettings: () => {
-        set({ isSettingsOpen: true });
+        set({ sideView: SideViewEnum.SETTINGS });
       },
 
       closeSettings: () => {
-        set({ isSettingsOpen: false });
+        if (get().sideView === SideViewEnum.SETTINGS) {
+          set({ sideView: undefined });
+        }
       },
 
       // Mobile actions

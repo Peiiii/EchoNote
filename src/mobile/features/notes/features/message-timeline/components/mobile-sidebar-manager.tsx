@@ -1,5 +1,5 @@
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
@@ -9,16 +9,15 @@ import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-man
 
 export const MobileSidebarManager = () => {
   const { setCurrentChannel, currentChannelId } = useNotesViewStore();
+  const presenter = useCommonPresenterContext();
   const {
     isChannelListOpen,
     sideView,
-    isSettingsOpen,
     closeChannelList,
     closeAIAssistant,
     closeSettings,
     closeThread,
   } = useUIStateStore();
-  const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
 
   // Handle channel selection: switch channel and close channel list
   const handleChannelSelect = (channelId: string) => {
@@ -29,7 +28,7 @@ export const MobileSidebarManager = () => {
   // Handle thread message sending
   const handleSendThreadMessage = (content: string) => {
     if (currentChannelId) {
-      addThreadMessage(currentChannelId, {
+      presenter.threadManager.addThreadMessage(currentChannelId, {
         content,
         sender: "user" as const,
         channelId: currentChannelId,
@@ -38,14 +37,11 @@ export const MobileSidebarManager = () => {
   };
   return (
     <>
-      {/* Channel List Sidebar */}
       <MobileChannelList
         isOpen={isChannelListOpen}
         onClose={closeChannelList}
         onChannelSelect={handleChannelSelect}
       />
-
-      {/* AI Assistant - Bottom Sheet */}
       {currentChannelId && (
         <Sheet open={sideView === SideViewEnum.AI_ASSISTANT} onOpenChange={closeAIAssistant}>
           <SheetContent
@@ -62,8 +58,6 @@ export const MobileSidebarManager = () => {
           </SheetContent>
         </Sheet>
       )}
-
-      {/* Thread Sidebar */}
       {sideView === SideViewEnum.THREAD && (
         <Sheet open={sideView === SideViewEnum.THREAD} onOpenChange={closeThread}>
           <SheetContent
@@ -75,9 +69,7 @@ export const MobileSidebarManager = () => {
           </SheetContent>
         </Sheet>
       )}
-
-      {/* Settings Sidebar */}
-      <Sheet open={isSettingsOpen} onOpenChange={closeSettings}>
+      <Sheet open={sideView === SideViewEnum.SETTINGS} onOpenChange={closeSettings}>
         <SheetContent
           side="right"
           className="w-full max-w-md p-0 border-l border-border/60"

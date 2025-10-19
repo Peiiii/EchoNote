@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { CommonPresenter } from "../services/common-presenter";
+import { CommonPresenter } from "../common-presenter";
 
 export const CommonPresenterContext = createContext<CommonPresenter | null>(null);
 

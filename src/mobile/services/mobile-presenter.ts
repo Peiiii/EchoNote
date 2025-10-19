@@ -1,4 +1,4 @@
-import { CommonPresenter } from "@/common/services/common-presenter";
+import { CommonPresenter } from "@/common/common-presenter";
 
 export class MobilePresenter extends CommonPresenter {
 

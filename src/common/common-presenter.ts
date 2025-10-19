@@ -1,8 +1,10 @@
 import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { RxEventBusService } from "./rx-event-bus.service";
+import { RxEventBusService } from "./services/rx-event-bus.service";
+import { ThreadManager } from "./services/thread-manager.service";
 
 export class CommonPresenter {
   public readonly rxEventBus: RxEventBusService = new RxEventBusService();
+  public readonly threadManager: ThreadManager = new ThreadManager();
 
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();
