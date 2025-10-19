@@ -1,7 +1,6 @@
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import {
-  MessageTimeline,
-  MessageTimelineRef,
+  MessageTimeline
 } from "@/common/features/notes/components/message-timeline/message-timeline";
 import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
@@ -11,8 +10,7 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
-import { forwardRef, useImperativeHandle, useRef } from "react";
-import { MobileThoughtRecord } from "./thought-record";
+import { MobileThoughtRecord } from "@/mobile/features/notes/features/message-timeline/components/thought-record/index";
 
 export interface MobileTimelineContentRef {
   scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => void;
@@ -23,13 +21,9 @@ interface MobileTimelineContentProps {
   className?: string;
 }
 
-export const MobileTimelineContent = forwardRef<
-  MobileTimelineContentRef,
-  MobileTimelineContentProps
->(({ onReply, className = "" }, ref) => {
+export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelineContentProps) => {
   const presenter = useCommonPresenterContext();
   const { currentChannelId } = useNotesViewStore();
-  const messageTimelineRef = useRef<MessageTimelineRef>(null);
   const {
     messages = [],
     loading,
@@ -52,17 +46,6 @@ export const MobileTimelineContent = forwardRef<
     canTrigger: !!hasMore && !loading,
     getState: getChannelState,
   });
-
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => {
-        messageTimelineRef.current?.scrollToBottom(options);
-      },
-    }),
-    [messageTimelineRef]
-  );
 
   const renderThoughtRecord = (message: Message, threadCount: number) => (
     <MobileThoughtRecord
@@ -93,7 +76,6 @@ export const MobileTimelineContent = forwardRef<
       className={`flex-1 min-h-0 relative overflow-hidden bg-white dark:bg-slate-950 ${className}`}
     >
       <MessageTimeline
-        ref={messageTimelineRef}
         className="h-full"
         renderThoughtRecord={renderThoughtRecord}
         groupedMessages={groupedMessages}
@@ -102,4 +84,4 @@ export const MobileTimelineContent = forwardRef<
       />
     </div>
   );
-});
+};

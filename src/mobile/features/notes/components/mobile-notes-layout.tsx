@@ -1,3 +1,4 @@
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -7,6 +8,7 @@ import { MobileMessageInput } from "@/mobile/features/notes/features/message-tim
 import { MobileTimelineContent, MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
 import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
 import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";
+import { useMobilePresenterContext } from "@/mobile/hooks/use-mobile-presenter-context";
 import { useRef } from "react";
 
 interface MobileNotesLayoutProps {
@@ -26,6 +28,7 @@ export const MobileNotesLayout = ({
   onCancelReply,
   setReplyToMessageId,
 }: MobileNotesLayoutProps) => {
+  const presenter = useMobilePresenterContext();
   // Use custom hooks for state management
   const timelineState = useMobileTimelineState({
     onSendMessage,
@@ -39,8 +42,6 @@ export const MobileNotesLayout = ({
   const { channels } = useNotesDataStore();
   const currentChannel = channels.find(channel => channel.id === currentChannelId);
 
-  // Ref to access timeline content methods
-  const timelineContentRef = useRef<MobileTimelineContentRef>(null);
 
   // Enhanced send message handler that scrolls to bottom after sending
   const handleSendMessage = (content: string) => {
@@ -52,7 +53,7 @@ export const MobileNotesLayout = ({
     });
     // Auto-scroll to bottom after sending message
     setTimeout(() => {
-      timelineContentRef.current?.scrollToBottom({ behavior: "instant" });
+      presenter.rxEventBus.requestTimelineScrollToBottom$.emit();
     }, 100);
   };
 
@@ -75,7 +76,7 @@ export const MobileNotesLayout = ({
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Timeline content */}
-        <MobileTimelineContent ref={timelineContentRef} onReply={timelineState.handleReply} />
+        <MobileTimelineContent onReply={timelineState.handleReply} />
 
         {/* Input area - only show when there's a current channel */}
         {currentChannel && (
