@@ -1,28 +1,33 @@
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { logService } from "@/core/services/log.service";
+import { Plus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
-import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
-import { Plus } from "lucide-react";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-  const { channels, channelsLoading, addChannel, deleteChannel } = useNotesDataStore();
-  const { currentChannelId, setCurrentChannel } = useNotesViewStore();
-  useAutoSelectFirstChannel();
+  const presenter = useCommonPresenterContext();
+  const channels = useNotesDataStore(state => state.channels);
+  const channelsLoading = useNotesDataStore(state => state.channelsLoading);
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
+  const setCurrentChannel = useNotesViewStore(state => state.setCurrentChannel);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [hasScroll, setHasScroll] = useState(false);
 
+  useAutoSelectFirstChannel();
+
   const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
-    await addChannel(channel);
+    await presenter.channelManager.addChannel(channel);
     logService.logChannelCreate(
       channel.name,
       channel.name,
@@ -40,7 +45,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
           channelToDelete.messageCount || 0
         );
       }
-      await deleteChannel(channelId);
+      await presenter.channelManager.deleteChannel(channelId);
       if (currentChannelId === channelId && channels.length > 1) {
         const remainingChannels = channels.filter(c => c.id !== channelId);
         if (remainingChannels.length > 0) {

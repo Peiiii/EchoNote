@@ -1,15 +1,13 @@
-import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 
 import { MobileMessageInput } from "@/mobile/features/notes/features/message-timeline/components/mobile-message-input";
-import { MobileTimelineContent, MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
+import { MobileTimelineContent } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
 import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
 import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";
 import { useMobilePresenterContext } from "@/mobile/hooks/use-mobile-presenter-context";
-import { useRef } from "react";
 
 interface MobileNotesLayoutProps {
   currentChannelName?: string;
