@@ -42,9 +42,6 @@ export const MobileHeader = ({
           </Button>
           <CreateChannelPopover
             variant="dialog"
-            onAddChannel={channel => {
-              void useNotesDataStore.getState().addChannel(channel);
-            }}
             trigger={
               <Button
                 variant="ghost"

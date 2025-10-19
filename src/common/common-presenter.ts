@@ -1,12 +1,14 @@
 import { useUIStateStore } from "@/core/stores/ui-state.store";
+import { ChannelManager } from "./services/channel-manager.service";
 import { RxEventBusService } from "./services/rx-event-bus.service";
 import { ThreadManager } from "./services/thread-manager.service";
-import { ChannelManager } from "./services/channel-manager.service";
+import { ViewStateManager } from "./services/view-state-manager.service";
 
 export class CommonPresenter {
   readonly rxEventBus: RxEventBusService = new RxEventBusService();
   readonly threadManager: ThreadManager = new ThreadManager();
   readonly channelManager: ChannelManager = new ChannelManager();
+  readonly viewStateManager: ViewStateManager = new ViewStateManager();
   
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();

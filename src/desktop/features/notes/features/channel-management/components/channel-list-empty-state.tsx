@@ -1,10 +1,18 @@
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { logService } from "@/core/services/log.service";
 import { Plus } from "lucide-react";
 
-interface ChannelListEmptyStateProps {
-  onCreateChannel: (channel: { name: string; description: string; emoji?: string }) => void;
-}
+export const ChannelListEmptyState = () => {
+  const presenter = useCommonPresenterContext();
 
-export const ChannelListEmptyState = ({ onCreateChannel }: ChannelListEmptyStateProps) => {
+  const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
+    await presenter.channelManager.addChannel(channel);
+    logService.logChannelCreate(
+      channel.name,
+      channel.name,
+      !!channel.description
+    );
+  };
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
       <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
@@ -16,7 +24,7 @@ export const ChannelListEmptyState = ({ onCreateChannel }: ChannelListEmptyState
       </p>
       <button
         onClick={() =>
-          onCreateChannel({
+          handleAddChannel({
             name: "My First Space",
             emoji: "🚀",
             description: "Start your journey here",

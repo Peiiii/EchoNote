@@ -1,6 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
+import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -17,42 +18,7 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
   const channels = useNotesDataStore(state => state.channels);
   const currentChannelId = useNotesViewStore(state => state.currentChannelId);
 
-  const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
-    presenter.channelManager.addChannel(channel);
-  };
-
-  const handleChannelClick = (channelId: string) => {
-    useNotesViewStore.getState().setCurrentChannel(channelId);
-  };
-
-  const handleDeleteChannel = async (channelId: string) => {
-    const channel = channels.find(c => c.id === channelId);
-    if (!channel) return;
-
-    const confirmed = window.confirm(
-      `🗑️ Delete Channel\n\n` +
-        `"${channel.name}"\n\n` +
-        `⚠️ This action cannot be undone.\n` +
-        `The channel and all its messages will be moved to trash.\n\n` +
-        `Are you sure you want to continue?`
-    );
-
-    if (confirmed) {
-      try {
-        await presenter.channelManager.deleteChannel(channelId);
-        // If the deleted channel was the current channel, switch to first available channel
-        if (currentChannelId === channelId && channels.length > 1) {
-          const remainingChannels = channels.filter(c => c.id !== channelId);
-          if (remainingChannels.length > 0) {
-            useNotesViewStore.getState().setCurrentChannel(remainingChannels[0].id);
-          }
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
-      }
-    }
-  };
+  useAutoSelectFirstChannel();
 
   // Sort channels by activity for consistent ordering
   const orderedChannels = useMemo(() => {
@@ -69,7 +35,6 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
     <Sheet open={isOpen} onOpenChange={() => presenter.closeChannelList()}>
       <SheetContent side="left" className="w-80 p-0 border-r border-border" hideClose>
         <div className="flex flex-col h-full bg-background">
-          {/* Header - align with desktop: title + actions (right) */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground">Spaces</h3>
@@ -77,7 +42,6 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
             <div className="flex items-center gap-2">
               <CreateChannelPopover
                 variant="dialog"
-                onAddChannel={handleAddChannel}
                 trigger={
                   <Button
                     variant="ghost"
@@ -92,21 +56,15 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
               />
             </div>
           </div>
-
-          {/* Channel List - Consistent with Settings */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {orderedChannels.map(channel => (
               <MobileChannelItem
                 key={channel.id}
                 channel={channel}
                 isActive={currentChannelId === channel.id}
-                onClick={() => handleChannelClick(channel.id)}
-                onDelete={() => handleDeleteChannel(channel.id)}
               />
             ))}
           </div>
-
-          {/* Footer removed: moved to header as icon trigger */}
         </div>
       </SheetContent>
     </Sheet>

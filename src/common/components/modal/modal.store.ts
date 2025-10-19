@@ -63,7 +63,7 @@ export const useModalStore = create<ModalStoreState>()((set, get) => ({
 }));
 
 // Simple facade for non-hook usage
-export const modalStore = {
+export const modal = {
   show: (options: ModalOptions) => useModalStore.getState().show(options),
   confirm: (options: Omit<ModalOptions, "content">) =>
     useModalStore.getState().confirm(options),

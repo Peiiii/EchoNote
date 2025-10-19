@@ -1,21 +1,21 @@
-import { Channel } from "@/core/stores/notes-data.store";
-import { MoreVertical, Trash2 } from "lucide-react";
+import { ConfigurableActionMenuContent } from "@/common/components/action-menu";
+import { modal } from "@/common/components/modal/modal.store";
 import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
-import { ConfigurableActionMenuContent } from "@/common/components/action-menu";
-import { modalStore } from "@/core/stores/modal.store";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { Channel } from "@/core/stores/notes-data.store";
+import { MoreVertical, Trash2 } from "lucide-react";
 
 interface ChannelMoreActionsMenuProps {
   channel: Channel;
-  onDelete: () => void;
 }
 
-export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActionsMenuProps) {
-
+export function ChannelMoreActionsMenu({ channel }: ChannelMoreActionsMenuProps) {
+  const presenter = useCommonPresenterContext();
   return (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -45,7 +45,7 @@ export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActions
                     icon: <Trash2 />,
                     title: `Delete ${channel.name}`,
                     onClick: () =>
-                      modalStore.confirm({
+                      modal.confirm({
                         title: "Delete Channel",
                         description:
                           `This will permanently delete the channel "${channel.name}" and all its messages. This action cannot be undone.`,
@@ -54,7 +54,7 @@ export function ChannelMoreActionsMenu({ channel, onDelete }: ChannelMoreActions
                         okVariant: "destructive",
                         cancelText: "Cancel",
                         onOk: async () => {
-                          await onDelete();
+                          await presenter.channelManager.deleteChannel(channel.id);
                         },
                       }),
                     variant: "destructive",

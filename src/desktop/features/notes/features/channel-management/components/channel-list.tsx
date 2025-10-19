@@ -1,7 +1,6 @@
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
-import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -16,7 +15,6 @@ interface ChannelListProps {
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-  const presenter = useCommonPresenterContext();
   const channels = useNotesDataStore(state => state.channels);
   const channelsLoading = useNotesDataStore(state => state.channelsLoading);
   const currentChannelId = useNotesViewStore(state => state.currentChannelId);
@@ -25,42 +23,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
   const [hasScroll, setHasScroll] = useState(false);
 
   useAutoSelectFirstChannel();
-
-  const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
-    await presenter.channelManager.addChannel(channel);
-    logService.logChannelCreate(
-      channel.name,
-      channel.name,
-      !!channel.description
-    );
-  };
-
-  const handleDeleteChannel = async (channelId: string) => {
-    try {
-      const channelToDelete = channels.find(c => c.id === channelId);
-      if (channelToDelete) {
-        logService.logChannelDelete(
-          channelToDelete.id,
-          channelToDelete.name,
-          channelToDelete.messageCount || 0
-        );
-      }
-      await presenter.channelManager.deleteChannel(channelId);
-      if (currentChannelId === channelId && channels.length > 1) {
-        const remainingChannels = channels.filter(c => c.id !== channelId);
-        if (remainingChannels.length > 0) {
-          console.log(
-            "🔔 [handleDeleteChannel] Switching to first available channel",
-            remainingChannels[0].id
-          );
-          setCurrentChannel(remainingChannels[0].id);
-        }
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
-    }
-  };
 
   // Sort channels by activity:
   // 1) lastMessageTime (desc) if exists
@@ -106,7 +68,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
         </div>
         <div className="flex items-center gap-2">
           <CreateChannelPopover
-            onAddChannel={handleAddChannel}
             trigger={
               <button
                 type="button"
@@ -133,7 +94,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
         }}
       >
         {orderedChannels.length === 0 ? (
-          <ChannelListEmptyState onCreateChannel={handleAddChannel} />
+          <ChannelListEmptyState />
         ) : (
           orderedChannels.map(channel => (
             <ChannelItem
@@ -148,7 +109,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                 );
                 setCurrentChannel(channel.id);
               }}
-              onDelete={() => handleDeleteChannel(channel.id)}
             />
           ))
         )}

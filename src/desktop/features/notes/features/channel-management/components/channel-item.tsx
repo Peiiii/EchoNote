@@ -2,17 +2,16 @@ import { Button } from "@/common/components/ui/button";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Edit2 } from "lucide-react";
 import { getChannelIcon } from "./channel-icons";
-import { EditChannelPopover } from "./edit-channel-popover";
 import { ChannelMoreActionsMenu } from "./channel-more-actions-menu";
+import { EditChannelPopover } from "./edit-channel-popover";
 
 interface ChannelItemProps {
   channel: Channel;
   isActive: boolean;
   onClick: () => void;
-  onDelete: () => void;
 }
 
-export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelItemProps) => {
+export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) => {
   const hasDescription = !!(channel.description && channel.description.trim());
 
   return (
@@ -76,7 +75,7 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
                     </EditChannelPopover>
 
                     {/* More Actions Button */}
-                    <ChannelMoreActionsMenu channel={channel} onDelete={onDelete} />
+                    <ChannelMoreActionsMenu channel={channel} />
                   </div>
                 </div>
 
@@ -120,7 +119,7 @@ export const ChannelItem = ({ channel, isActive, onClick, onDelete }: ChannelIte
                   </EditChannelPopover>
 
                   {/* More Actions Button */}
-                  <ChannelMoreActionsMenu channel={channel} onDelete={onDelete} />
+                  <ChannelMoreActionsMenu channel={channel} />
                 </div>
               </>
             )}

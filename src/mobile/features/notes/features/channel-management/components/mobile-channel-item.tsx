@@ -1,21 +1,38 @@
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { cn } from "@/common/lib/utils";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Hash } from "lucide-react";
-import { cn } from "@/common/lib/utils";
 import { MobileChannelMoreActionsMenu } from "./mobile-channel-more-actions-menu";
 
 interface MobileChannelItemProps {
   channel: Channel;
   isActive: boolean;
-  onClick: () => void;
-  onDelete?: () => void;
 }
 
-export function MobileChannelItem({
-  channel,
-  isActive,
-  onClick,
-  onDelete,
-}: MobileChannelItemProps) {
+export function MobileChannelItem({ channel, isActive }: MobileChannelItemProps) {
+  const presenter = useCommonPresenterContext();
+  const onClick = () => {
+    presenter.viewStateManager.setCurrentChannel(channel.id);
+  };
+
+  const handleDeleteChannel = async (channelId: string) => {
+    const confirmed = window.confirm(
+      `🗑️ Delete Channel\n\n` +
+        `"${channel.name}"\n\n` +
+        `⚠️ This action cannot be undone.\n` +
+        `The channel and all its messages will be moved to trash.\n\n` +
+        `Are you sure you want to continue?`
+    );
+
+    if (confirmed) {
+      try {
+        await presenter.channelManager.deleteChannel(channelId);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
+      }
+    }
+  };
   return (
     <button
       onClick={onClick}
@@ -52,11 +69,12 @@ export function MobileChannelItem({
       </div>
 
       {/* More Actions - Always visible on mobile */}
-      {onDelete && (
-        <div className="flex-shrink-0">
-          <MobileChannelMoreActionsMenu channel={channel} onDelete={onDelete} />
-        </div>
-      )}
+      <div className="flex-shrink-0">
+        <MobileChannelMoreActionsMenu
+          channel={channel}
+          onDelete={() => handleDeleteChannel(channel.id)}
+        />
+      </div>
     </button>
   );
 }

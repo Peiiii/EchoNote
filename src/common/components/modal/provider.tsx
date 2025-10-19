@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/common/components/ui/dialog";
 import { cn } from "@/common/lib/utils";
-import { useModalStore } from "@/core/stores/modal.store";
+import { useModalStore } from "@/common/components/modal/modal.store";
 import React from "react";
 
 // This component renders the modal dialog and reads state from zustand store

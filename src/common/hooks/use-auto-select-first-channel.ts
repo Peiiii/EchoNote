@@ -1,8 +1,9 @@
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { isEqual } from "lodash-es";
 import { useEffect } from "react";
 import { useBehaviorSubjectFromState } from "rx-nested-bean";
-import { filter, take, withLatestFrom } from "rxjs";
+import { distinctUntilChanged, filter, withLatestFrom } from "rxjs";
 
 export const useAutoSelectFirstChannel = () => {
   const channels = useNotesDataStore(s => s.channels);
@@ -15,11 +16,14 @@ export const useAutoSelectFirstChannel = () => {
     const sub = channels$
       .pipe(
         filter(channels => channels.length > 0),
-        take(1),
+        distinctUntilChanged((a, b) => isEqual(a, b)),
         withLatestFrom(currentChannelId$)
       )
       .subscribe(([channels, currentChannelId]) => {
-        if (channels.length > 0 && !currentChannelId) {
+        if (
+          channels.length > 0 &&
+          (!currentChannelId || !channels.some(c => c.id === currentChannelId))
+        ) {
           setCurrentChannel(channels[0].id);
         }
       });

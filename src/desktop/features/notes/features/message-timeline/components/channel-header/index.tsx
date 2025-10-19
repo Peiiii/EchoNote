@@ -80,7 +80,7 @@ export const ChannelHeader = ({
   const setLeftSidebarCollapsed = useUIPreferencesStore(
     useCallback(state => state.setLeftSidebarCollapsed, [])
   );
-  const { updateChannel, channels, addChannel } = useNotesDataStore();
+  const channels = useNotesDataStore(state => state.channels);
   const { setCurrentChannel } = useNotesViewStore();
   const { background: backgroundStyle, isImage: hasBackgroundImage } =
     getChannelBackground(channel);
@@ -134,23 +134,18 @@ export const ChannelHeader = ({
   }) => {
     try {
       if (type === "color") {
-        await updateChannel(channel.id, { backgroundColor: value, backgroundImage: undefined });
+        await presenter.channelManager.updateChannel(channel.id, { backgroundColor: value, backgroundImage: undefined });
       } else if (type === "image") {
-        await updateChannel(channel.id, { backgroundImage: value, backgroundColor: undefined });
+        await presenter.channelManager.updateChannel(channel.id, { backgroundImage: value, backgroundColor: undefined });
       }
     } catch (error) {
       console.error("Failed to update channel background:", error);
     }
   };
 
-  const handleCreateChannel = (channel: { name: string; description: string; emoji?: string }) => {
-    // Reuse global store action; async fire-and-forget
-    void addChannel(channel);
-  };
-
   const handleRemoveBackground = async () => {
     try {
-      await updateChannel(channel.id, { backgroundColor: undefined, backgroundImage: undefined });
+      await presenter.channelManager.updateChannel(channel.id, { backgroundColor: undefined, backgroundImage: undefined });
     } catch (error) {
       console.error("Failed to remove channel background:", error);
     }
@@ -171,7 +166,6 @@ export const ChannelHeader = ({
             <PanelLeft className="h-4 w-4" />
           </Button>
           <CreateChannelPopover
-            onAddChannel={handleCreateChannel}
             trigger={
               <Button
                 variant="ghost"
@@ -236,7 +230,6 @@ export const ChannelHeader = ({
                 <PanelLeft className="h-4 w-4" />
               </Button>
               <CreateChannelPopover
-                onAddChannel={handleCreateChannel}
                 trigger={
                   <Button
                     variant="ghost"

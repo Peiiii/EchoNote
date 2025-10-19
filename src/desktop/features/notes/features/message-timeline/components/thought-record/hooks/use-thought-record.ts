@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { modalStore } from "@/core/stores/modal.store";
+import { modal } from "@/common/components/modal/modal.store";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
@@ -39,7 +39,7 @@ export function useThoughtRecord(message: Message) {
     const messagePreview =
       message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
-    modalStore.confirm({
+    modal.confirm({
       title: "Delete Thought",
       description:
         `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,

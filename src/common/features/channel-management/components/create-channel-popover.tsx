@@ -1,11 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { RefinedPopover } from "@/common/components/refined-popover";
 import { Button } from "@/common/components/ui/button";
-import { Input } from "@/common/components/ui/input";
-import { Label } from "@/common/components/ui/label";
-import { Textarea } from "@/common/components/ui/textarea";
-import { Plus } from "lucide-react";
-import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
-import { getRandomEmoji } from "@/common/utils/emoji";
 import {
   Dialog,
   DialogContent,
@@ -15,28 +9,44 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/common/components/ui/dialog";
-import { RefinedPopover } from "@/common/components/refined-popover";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
+import { Input } from "@/common/components/ui/input";
+import { Label } from "@/common/components/ui/label";
+import { Textarea } from "@/common/components/ui/textarea";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { getRandomEmoji } from "@/common/utils/emoji";
+import { logService } from "@/core/services/log.service";
+import { Plus } from "lucide-react";
+import { useState, type ReactNode } from "react";
 
 interface CreateChannelPopoverProps {
-  onAddChannel: (channel: { name: string; description: string; emoji?: string }) => void;
   trigger?: ReactNode;
   variant?: "dialog" | "popover";
 }
 
 export function CreateChannelPopover({
-  onAddChannel,
   trigger,
   variant = "popover",
 }: CreateChannelPopoverProps) {
+  const presenter = useCommonPresenterContext();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState<string>(getRandomEmoji());
 
+  const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
+    await presenter.channelManager.addChannel(channel);
+    logService.logChannelCreate(
+      channel.name,
+      channel.name,
+      !!channel.description
+    );
+  };
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!name.trim()) return;
-    onAddChannel({
+    handleAddChannel({
       name: name.trim(),
       description: description.trim(),
       emoji: emoji?.trim() || undefined,
