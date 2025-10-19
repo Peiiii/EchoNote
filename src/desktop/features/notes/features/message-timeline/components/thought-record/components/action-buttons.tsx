@@ -3,15 +3,45 @@ import { ActionButton } from "./action-button";
 import { MoreActionsMenu } from "../more-actions-menu";
 import { ActionButtonsProps } from "../types";
 import { getFeaturesConfig } from "@/core/config/features.config";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { modal } from "@/common/components/modal";
 
 export function ActionButtons({
   onToggleAnalysis,
   onReply,
   onEdit,
   message,
-  onDelete,
   isEditing,
 }: ActionButtonsProps) {
+  const presenter = useCommonPresenterContext();
+  const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
+  const handleDelete = async () => {
+    const messagePreview =
+      message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
+
+    modal.confirm({
+      title: "Delete Thought",
+      description: `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
+      okText: "Delete",
+      okLoadingText: "Deleting...",
+      okVariant: "destructive",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await presenter.noteManager.deleteMessage({
+            messageId: message.id,
+            hardDelete: false,
+            channelId: currentChannelId!,
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
+        }
+      },
+    });
+  };
+
   const actionButtons = [
     {
       icon: Edit2,
@@ -57,7 +87,7 @@ export function ActionButtons({
       ))}
       <MoreActionsMenu
         message={message}
-        onDelete={onDelete}
+        onDelete={handleDelete}
         onCopy={() => navigator.clipboard.writeText(message.content)}
       />
     </div>

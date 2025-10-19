@@ -1,12 +1,13 @@
+import { MarkdownContent } from "@/common/components/markdown";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
+import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
 import { Clock } from "lucide-react";
+import { ActionButtons } from "./components/action-buttons";
+import { MessageFooter } from "./components/message-footer";
+import { useNoteAnalysis } from "./hooks/use-note-analysis";
 import { InlineEditor } from "./inline-editor";
 import { ReadMoreWrapper } from "./read-more-wrapper";
 import { ThoughtRecordSparks } from "./thought-record-sparks";
-import { MarkdownContent } from "@/common/components/markdown";
-import { ActionButtons } from "./components/action-buttons";
-import { MessageFooter } from "./components/message-footer";
-import { useThoughtRecord } from "./hooks/use-thought-record";
 import { ThoughtRecordProps } from "./types";
 
 export function ThoughtRecord({
@@ -15,22 +16,19 @@ export function ThoughtRecord({
   threadCount = 0,
 }: Omit<ThoughtRecordProps, "isFirstInGroup" | "onOpenThread">) {
   const {
-    showAnalysis,
     editingTags,
     isEditing,
-    aiAnalysis,
-    hasSparks,
     editContent,
     editMode,
     isSaving,
-    handleDelete,
-    handleToggleAnalysis,
     handleEdit,
     handleSave,
     handleCancel,
     handleExpand,
     handleTagsChange,
-  } = useThoughtRecord(message);
+  } = useEditNote(message);
+
+  const { showAnalysis, aiAnalysis, hasSparks, handleToggleAnalysis } = useNoteAnalysis(message);
 
   if (message.isDeleted) {
     return null;
@@ -59,7 +57,6 @@ export function ThoughtRecord({
             onReply={onReply}
             onEdit={handleEdit}
             message={message}
-            onDelete={handleDelete}
             isEditing={isEditing}
           />
         </div>

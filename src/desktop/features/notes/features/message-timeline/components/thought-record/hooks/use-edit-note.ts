@@ -1,17 +1,14 @@
-import { modal } from "@/common/components/modal/modal.store";
+
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect, useState } from "react";
 
-export function useThoughtRecord(message: Message) {
+export function useEditNote(message: Message) {
   const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
   const userId = useNotesDataStore(s => s.userId);
-  const [showAnalysis, setShowAnalysis] = useState(false);
   const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
-
-  const deleteMessage = channelMessageService.deleteMessage;
 
   // Select only the relevant slices for this message to avoid re-rendering all items while typing
   const editingMessageId = useEditStateStore(s => s.editingMessageId);
@@ -27,43 +24,12 @@ export function useThoughtRecord(message: Message) {
   const editContent = isEditing ? globalEditContent : message.content;
   const editMode = isEditing ? globalEditMode : "inline";
   const isSaving = isEditing ? globalIsSaving : false;
-  const aiAnalysis = message.aiAnalysis;
-  const hasSparks = Boolean(aiAnalysis?.insights?.length);
 
   useEffect(() => {
     setEditingTags(message.tags || []);
   }, [message.tags]);
 
-  const handleDelete = async () => {
-    const messagePreview =
-      message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
-
-    modal.confirm({
-      title: "Delete Thought",
-      description: `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
-      okText: "Delete",
-      okLoadingText: "Deleting...",
-      okVariant: "destructive",
-      cancelText: "Cancel",
-      onOk: async () => {
-        try {
-          await deleteMessage({
-            messageId: message.id,
-            hardDelete: false,
-            channelId: currentChannelId!,
-          });
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
-          alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
-        }
-      },
-    });
-  };
-
-  const handleToggleAnalysis = () => {
-    setShowAnalysis(!showAnalysis);
-  };
-
+  
   const handleEdit = () => {
     startEditing(message.id, message.content);
   };
@@ -99,16 +65,11 @@ export function useThoughtRecord(message: Message) {
   };
 
   return {
-    showAnalysis,
     editingTags,
     isEditing,
-    aiAnalysis,
-    hasSparks,
     editContent,
     editMode,
     isSaving,
-    handleDelete,
-    handleToggleAnalysis,
     handleEdit,
     handleSave,
     handleCancel,
@@ -116,3 +77,5 @@ export function useThoughtRecord(message: Message) {
     handleTagsChange,
   };
 }
+
+

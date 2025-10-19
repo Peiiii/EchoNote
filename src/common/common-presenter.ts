@@ -3,13 +3,15 @@ import { ChannelManager } from "./services/channel-manager.service";
 import { RxEventBusService } from "./services/rx-event-bus.service";
 import { ThreadManager } from "./services/thread-manager.service";
 import { ViewStateManager } from "./services/view-state-manager.service";
+import { NoteManager } from "@/common/services/note-manager.service";
 
 export class CommonPresenter {
-  readonly rxEventBus: RxEventBusService = new RxEventBusService();
-  readonly threadManager: ThreadManager = new ThreadManager();
-  readonly channelManager: ChannelManager = new ChannelManager();
-  readonly viewStateManager: ViewStateManager = new ViewStateManager();
-  
+  readonly rxEventBus = new RxEventBusService();
+  readonly threadManager = new ThreadManager();
+  readonly channelManager = new ChannelManager();
+  readonly viewStateManager = new ViewStateManager();
+  readonly noteManager = new NoteManager();
+
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();
   };

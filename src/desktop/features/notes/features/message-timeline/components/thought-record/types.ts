@@ -50,6 +50,5 @@ export interface ActionButtonsProps {
   onReply?: () => void;
   onEdit: () => void;
   message: Message;
-  onDelete: () => void;
   isEditing: boolean;
 }
