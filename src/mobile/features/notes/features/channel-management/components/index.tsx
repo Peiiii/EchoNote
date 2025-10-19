@@ -1,28 +1,29 @@
+import { Button } from "@/common/components/ui/button";
+import { Sheet, SheetContent } from "@/common/components/ui/sheet";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { MobileChannelItem } from "./mobile-channel-item";
-import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
-import { Sheet, SheetContent } from "@/common/components/ui/sheet";
-import { Button } from "@/common/components/ui/button";
+import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
+import { MobileChannelItem } from "./mobile-channel-item";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 
 interface MobileChannelListProps {
   isOpen: boolean;
-  onClose: () => void;
-  onChannelSelect: (channelId: string) => void;
 }
 
-export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileChannelListProps) {
-  const { channels, addChannel, deleteChannel } = useNotesDataStore();
-  const { currentChannelId, setCurrentChannel } = useNotesViewStore();
+export function MobileChannelList({ isOpen }: MobileChannelListProps) {
+  const presenter = useCommonPresenterContext();
+  const channels = useNotesDataStore(state => state.channels);
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
 
   const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
-    addChannel(channel);
+    presenter.channelManager.addChannel(channel);
   };
 
   const handleChannelClick = (channelId: string) => {
-    onChannelSelect(channelId);
+    useNotesViewStore.getState().setCurrentChannel(channelId);
   };
 
   const handleDeleteChannel = async (channelId: string) => {
@@ -39,13 +40,12 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
 
     if (confirmed) {
       try {
-        await deleteChannel(channelId);
+        await presenter.channelManager.deleteChannel(channelId);
         // If the deleted channel was the current channel, switch to first available channel
         if (currentChannelId === channelId && channels.length > 1) {
           const remainingChannels = channels.filter(c => c.id !== channelId);
           if (remainingChannels.length > 0) {
-            setCurrentChannel(remainingChannels[0].id);
-            onChannelSelect(remainingChannels[0].id);
+            useNotesViewStore.getState().setCurrentChannel(remainingChannels[0].id);
           }
         }
       } catch (error) {
@@ -67,7 +67,7 @@ export function MobileChannelList({ isOpen, onClose, onChannelSelect }: MobileCh
   }, [channels]);
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isOpen} onOpenChange={() => useUIStateStore.getState().closeChannelList()}>
       <SheetContent side="left" className="w-80 p-0 border-r border-border" hideClose>
         <div className="flex flex-col h-full bg-background">
           {/* Header - align with desktop: title + actions (right) */}

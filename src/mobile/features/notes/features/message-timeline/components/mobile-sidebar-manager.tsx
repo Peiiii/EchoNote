@@ -8,22 +8,10 @@ import { MobileChannelList } from "@/mobile/features/notes/features/channel-mana
 import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
 
 export const MobileSidebarManager = () => {
-  const { setCurrentChannel, currentChannelId } = useNotesViewStore();
   const presenter = useCommonPresenterContext();
-  const {
-    isChannelListOpen,
-    sideView,
-    closeChannelList,
-    closeAIAssistant,
-    closeSettings,
-    closeThread,
-  } = useUIStateStore();
-
-  // Handle channel selection: switch channel and close channel list
-  const handleChannelSelect = (channelId: string) => {
-    setCurrentChannel(channelId);
-    closeChannelList();
-  };
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
+  const isChannelListOpen = useUIStateStore(state => state.isChannelListOpen);
+  const sideView = useUIStateStore(state => state.sideView);
 
   // Handle thread message sending
   const handleSendThreadMessage = (content: string) => {
@@ -39,11 +27,9 @@ export const MobileSidebarManager = () => {
     <>
       <MobileChannelList
         isOpen={isChannelListOpen}
-        onClose={closeChannelList}
-        onChannelSelect={handleChannelSelect}
       />
       {currentChannelId && (
-        <Sheet open={sideView === SideViewEnum.AI_ASSISTANT} onOpenChange={closeAIAssistant}>
+        <Sheet open={sideView === SideViewEnum.AI_ASSISTANT} onOpenChange={presenter.closeAIAssistant}>
           <SheetContent
             side="bottom"
             className="h-[80vh] p-0 border-t border-border/60"
@@ -53,29 +39,29 @@ export const MobileSidebarManager = () => {
             <MobileAIAssistant
               channelId={currentChannelId}
               isOpen={sideView === SideViewEnum.AI_ASSISTANT}
-              onClose={closeAIAssistant}
+              onClose={() => presenter.closeAIAssistant()}
             />
           </SheetContent>
         </Sheet>
       )}
       {sideView === SideViewEnum.THREAD && (
-        <Sheet open={sideView === SideViewEnum.THREAD} onOpenChange={closeThread}>
+        <Sheet open={sideView === SideViewEnum.THREAD} onOpenChange={() => presenter.closeThread()}>
           <SheetContent
             side="right"
             className="w-full max-w-md p-0 border-l border-border/60"
             hideClose
           >
-            <MobileThreadSidebar onSendMessage={handleSendThreadMessage} onClose={closeThread} />
+            <MobileThreadSidebar onSendMessage={handleSendThreadMessage} onClose={() => presenter.closeThread()} />
           </SheetContent>
         </Sheet>
       )}
-      <Sheet open={sideView === SideViewEnum.SETTINGS} onOpenChange={closeSettings}>
+      <Sheet open={sideView === SideViewEnum.SETTINGS} onOpenChange={() => presenter.closeSettings()}>
         <SheetContent
           side="right"
           className="w-full max-w-md p-0 border-l border-border/60"
           hideClose
         >
-          <MobileSettingsSidebar onClose={closeSettings} />
+          <MobileSettingsSidebar onClose={() => presenter.closeSettings()} />
         </SheetContent>
       </Sheet>
     </>

@@ -1,11 +1,13 @@
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { RxEventBusService } from "./services/rx-event-bus.service";
 import { ThreadManager } from "./services/thread-manager.service";
+import { ChannelManager } from "./services/channel-manager.service";
 
 export class CommonPresenter {
-  public readonly rxEventBus: RxEventBusService = new RxEventBusService();
-  public readonly threadManager: ThreadManager = new ThreadManager();
-
+  readonly rxEventBus: RxEventBusService = new RxEventBusService();
+  readonly threadManager: ThreadManager = new ThreadManager();
+  readonly channelManager: ChannelManager = new ChannelManager();
+  
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();
   };
@@ -25,6 +27,18 @@ export class CommonPresenter {
   openSettings = () => {
     useUIStateStore.getState().openSettings();
   };
+  closeSettings = () => {
+    useUIStateStore.getState().closeSettings();
+  };
+
+  openChannelList = () => {
+    useUIStateStore.getState().openChannelList();
+  };
+
+  closeChannelList = () => {
+    useUIStateStore.getState().closeChannelList();
+  };
+
 
   jumpToNote = (options: { channelId: string; messageId: string }) => {
     this.rxEventBus.requestJumpToMessage$.emit(options);
