@@ -1,16 +1,13 @@
 import { Button } from "@/common/components/ui/button";
-import { MessageSquare, X } from "lucide-react";
-import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { MessageSquare, X } from "lucide-react";
 
-interface MobileThreadSidebarProps {
-  onSendMessage: (message: string) => void;
-  onClose?: () => void;
-}
-
-export const MobileThreadSidebar = ({ onSendMessage, onClose }: MobileThreadSidebarProps) => {
-  const { currentChannelId } = useNotesViewStore();
+export const MobileThreadSidebar = () => {
+  const presenter = useCommonPresenterContext();
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
   const { messages } = useChannelMessages({});
   const parentMessage = currentChannelId ? messages.find(m => m.id === currentChannelId) : null;
   const threadMessages = currentChannelId
@@ -25,17 +22,15 @@ export const MobileThreadSidebar = ({ onSendMessage, onClose }: MobileThreadSide
           <MessageSquare className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-foreground">Thread</h3>
         </div>
-        {onClose && (
           <Button
             variant="ghost"
             size="icon"
             aria-label="Close"
             className="h-8 w-8"
-            onClick={onClose}
+            onClick={() => presenter.closeThread()}
           >
             <X className="w-4 h-4" />
           </Button>
-        )}
       </div>
 
       {/* Parent Message */}
@@ -77,7 +72,13 @@ export const MobileThreadSidebar = ({ onSendMessage, onClose }: MobileThreadSide
             className="flex-1 px-3 py-2 border border-border rounded-md text-sm bg-background text-foreground placeholder:text-muted-foreground"
             onKeyDown={e => {
               if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                onSendMessage(e.currentTarget.value.trim());
+                if (currentChannelId) {
+                  presenter.threadManager.addThreadMessage(currentChannelId, {
+                    content: e.currentTarget.value.trim(),
+                    sender: "user" as const,
+                    channelId: currentChannelId,
+                  });
+                }
                 e.currentTarget.value = "";
               }
             }}
@@ -87,7 +88,13 @@ export const MobileThreadSidebar = ({ onSendMessage, onClose }: MobileThreadSide
             onClick={e => {
               const input = e.currentTarget.previousElementSibling as HTMLInputElement;
               if (input && input.value.trim()) {
-                onSendMessage(input.value.trim());
+                if (currentChannelId) {
+                  presenter.threadManager.addThreadMessage(currentChannelId, {
+                    content: input.value.trim(),
+                    sender: "user" as const,
+                    channelId: currentChannelId,
+                  });
+                }
                 input.value = "";
               }
             }}

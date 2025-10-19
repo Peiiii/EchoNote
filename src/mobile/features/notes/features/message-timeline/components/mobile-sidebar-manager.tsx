@@ -13,16 +13,6 @@ export const MobileSidebarManager = () => {
   const isChannelListOpen = useUIStateStore(state => state.isChannelListOpen);
   const sideView = useUIStateStore(state => state.sideView);
 
-  // Handle thread message sending
-  const handleSendThreadMessage = (content: string) => {
-    if (currentChannelId) {
-      presenter.threadManager.addThreadMessage(currentChannelId, {
-        content,
-        sender: "user" as const,
-        channelId: currentChannelId,
-      });
-    }
-  };
   return (
     <>
       <MobileChannelList
@@ -51,7 +41,7 @@ export const MobileSidebarManager = () => {
             className="w-full max-w-md p-0 border-l border-border/60"
             hideClose
           >
-            <MobileThreadSidebar onSendMessage={handleSendThreadMessage} onClose={() => presenter.closeThread()} />
+            <MobileThreadSidebar />
           </SheetContent>
         </Sheet>
       )}
