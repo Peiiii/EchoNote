@@ -1,14 +1,13 @@
-import { useState, useEffect } from "react";
 import { modal } from "@/common/components/modal/modal.store";
-import { Message } from "@/core/stores/notes-data.store";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useEffect, useState } from "react";
 
 export function useThoughtRecord(message: Message) {
-  const { currentChannelId } = useNotesViewStore();
-  const { userId } = useNotesDataStore();
+  const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
+  const userId = useNotesDataStore(s => s.userId);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
 
@@ -41,8 +40,7 @@ export function useThoughtRecord(message: Message) {
 
     modal.confirm({
       title: "Delete Thought",
-      description:
-        `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
+      description: `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
       okText: "Delete",
       okLoadingText: "Deleting...",
       okVariant: "destructive",

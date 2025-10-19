@@ -17,16 +17,11 @@ import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
 interface MessageTimelineProps {
-  renderThoughtRecord?: (message: Message, threadCount: number) => React.ReactNode;
+  renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
   className?: string;
   groupedMessages: Record<string, Message[]>;
   messages: Message[];
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
-  containerRef?: React.RefObject<HTMLDivElement | null>;
-}
-
-export interface MessageTimelineRef {
-  scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => void;
 }
 
 export const MessageTimeline = ({
@@ -123,18 +118,7 @@ export const MessageTimeline = ({
                       className="w-full"
                       style={{ height: "auto", minHeight: "auto" }}
                     >
-                      {renderThoughtRecord ? (
-                        renderThoughtRecord(message, threadCount)
-                      ) : (
-                        <div className="p-4">
-                          <div className="text-sm text-muted-foreground">
-                            Message: {message.content}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Thread count: {threadCount}
-                          </div>
-                        </div>
-                      )}
+                      {renderThoughtRecord(message, threadCount)}
                     </div>
                   );
                 })}
