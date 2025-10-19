@@ -5,7 +5,7 @@ import { Toolbar } from "./components/toolbar";
 import { useMessageInput } from "./hooks/use-message-input";
 import { MessageInputProps } from "./types";
 
-export function MessageInput({ onSend }: MessageInputProps) {
+export function MessageInput({  }: MessageInputProps) {
   const {
     message,
     textareaRef,
@@ -16,7 +16,7 @@ export function MessageInput({ onSend }: MessageInputProps) {
     handleMessageChange,
     placeholder,
     handleCancelReply,
-  } = useMessageInput({ onSend });
+  } = useMessageInput();
   return (
     <div className="bg-white dark:bg-background border-t border-slate-200/50 dark:border-slate-700/50">
       {replyToMessage && (

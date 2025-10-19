@@ -1,7 +1,6 @@
 import { Message } from "@/core/stores/notes-data.store";
 
 export interface MessageInputProps {
-  onSend: () => void;
 }
 
 export interface ToolbarButtonProps {

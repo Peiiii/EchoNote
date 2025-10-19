@@ -12,17 +12,25 @@ import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
-import { forwardRef, useCallback } from "react";
+import { forwardRef, useCallback, useRef } from "react";
+import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 
 interface TimelineContentProps {
   className?: string;
 }
 
 export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(
-  ({ className = "" }, ref) => {
+  ({ className = "" }) => {
+    const presenter = useCommonPresenterContext();
+    const timelineScrollContainerRef = useRef<MessageTimelineRef>(null);
     const { currentChannelId } = useNotesViewStore();
 
     const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
+
+    useHandleRxEvent(presenter.rxEventBus.requestTimelineScrollToBottom$, () => {
+      timelineScrollContainerRef.current?.scrollToBottom({ behavior: "instant" });
+    });
 
     const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
       onHistoryMessagesChange: messages => {
@@ -64,7 +72,7 @@ export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentPro
     return (
       <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
         <MessageTimeline
-          ref={ref}
+          ref={timelineScrollContainerRef}
           renderThoughtRecord={renderThoughtRecord}
           groupedMessages={groupedMessages}
           messages={messages}

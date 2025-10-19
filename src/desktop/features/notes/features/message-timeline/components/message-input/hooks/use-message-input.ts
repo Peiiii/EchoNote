@@ -1,21 +1,19 @@
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export function useMessageInput(props: { onSend: () => void }) {
-  const { onSend } = props;
+export function useMessageInput() {
+  const presenter = useCommonPresenterContext();
   const {
     clearReplyToMessageId,
     replyToMessageId,
     handleCancelReply
   } = useChatActions();
-
-  
-
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage } = channelMessageService;
@@ -66,7 +64,7 @@ export function useMessageInput(props: { onSend: () => void }) {
     }
 
     clearReplyToMessageId();
-    onSend();
+    presenter.rxEventBus.requestTimelineScrollToBottom$.emit();
     setMessage("");
   };
 
