@@ -36,7 +36,6 @@ export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResu
     // execute: 直接通过底层 service 拉取数据，避免缓存导致的顺序问题
     execute: async toolCallArgs => {
       try {
-        console.log("🔔 [listNotesTool][execute][toolCallArgs]:", toolCallArgs);
         const { limit = 10, order = "desc", channelId } = toolCallArgs as ListNotesToolArgs;
         const { userId } = useNotesDataStore.getState();
         if (!userId) throw new Error("User not signed in");
@@ -46,8 +45,6 @@ export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResu
           channelId,
           limit
         );
-
-        console.log("🔔 [listNotesTool][execute][messages]:", messages);
 
         const sorted =
           order === "asc"

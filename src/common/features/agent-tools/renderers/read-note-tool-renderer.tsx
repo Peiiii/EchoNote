@@ -6,7 +6,6 @@ import { NoteContent } from "@/common/features/agent-tools";
 import { ErrorMessage } from "@/common/lib/agent-tools-ui";
 
 export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
-  console.log("🔔 [ReadNoteToolRenderer] invocation:", invocation);
   const args = getParsedArgs<ReadNoteRenderArgs>(invocation);
   const noteId = args?.noteId;
 

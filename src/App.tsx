@@ -15,13 +15,8 @@ import { GlobalProcessOverlay } from "@/common/components/global-process/global-
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
-  const { user, isInitializing, isRefreshing } = useFirebaseAuth();
+  const { user, isInitializing } = useFirebaseAuth();
   const sessionStartTime = useRef<number>(Date.now());
-  console.log("[App] ", {
-    user,
-    isInitializing,
-    isRefreshing,
-  });
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
 
   useEffect(() => {

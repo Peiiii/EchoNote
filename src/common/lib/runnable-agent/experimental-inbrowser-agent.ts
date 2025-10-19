@@ -52,11 +52,6 @@ export class ExperimentalInBrowserAgent implements IAgent {
   run(input: RunAgentInput) {
     // Pre-trim input messages by character limit before sending to the underlying agent.
     const trimmedInput = this.trimInputByCharLimit(input, this.contextCharLimit);
-    console.log("🔔 [ExperimentalInBrowserAgent][run] trimmedInput:", {
-      input,
-      trimmedInput,
-      contextCharLimit: this.contextCharLimit,
-    });
     const createChunkObservable = (generator: AsyncGenerator<string>) =>
       new Observable<string>(subscriber => {
         (async () => {
@@ -93,7 +88,6 @@ export class ExperimentalInBrowserAgent implements IAgent {
             )
             .subscribe({
               next: (event: unknown) => {
-                console.log("event", event);
                 observer.next(event as AgentEvent);
               },
               error: err => observer.error(err),

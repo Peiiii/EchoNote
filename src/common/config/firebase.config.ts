@@ -63,7 +63,6 @@ export class FirebaseConfig {
   private db: Firestore = db;
   private region: string = tryLoadRegionFromLocalStorage(CN_REGION);
   private constructor() {
-    console.log("[FirebaseConfig] constructor, region", this.region);
     this.getAuth();
     this.validateRegionAndMaybeReloadPage();
   }

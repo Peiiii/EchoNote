@@ -1,5 +1,5 @@
-import { CollapsibleSidebar } from "./collapsible-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CollapsibleSidebar } from "./collapsible-sidebar";
 
 export const CollapsibleSidebarExamples = () => {
   return (
@@ -106,11 +106,10 @@ export const CollapsibleSidebarExamples = () => {
         <CardContent>
           <div className="h-64 border rounded-lg relative">
             <CollapsibleSidebar
-              onCollapseChange={(collapsed: boolean) => {
-                console.log("Sidebar collapsed:", collapsed);
-                // You can use this callback to sync state with parent component
-                // or trigger other actions when sidebar state changes
-              }}
+              // onCollapseChange={(collapsed: boolean) => {
+              //   // You can use this callback to sync state with parent component
+              //   // or trigger other actions when sidebar state changes
+              // }}
             >
               <CollapsibleSidebar.Header>
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">

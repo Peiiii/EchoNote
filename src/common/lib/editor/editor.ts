@@ -26,7 +26,6 @@ export class Editor {
     const start = this.textarea.selectionStart;
     const end = this.textarea.selectionEnd;
     const value = this.textarea.value;
-    console.log("handleTabIndentation", start, end, value);
 
     if (start === end) {
       // Single cursor position - insert/remove indentation
@@ -101,7 +100,6 @@ export class Editor {
     selectionStart: number,
     selectionEnd: number
   ): void => {
-    console.log("setContentAndFocus", content, selectionStart, selectionEnd);
 
     // Add cursor operation to pending operations queue
     this.addPendingOperation(() => {

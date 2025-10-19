@@ -30,23 +30,16 @@ export const TimelineLayout = ({
       {channel && <ChannelHeader channel={channel} />}
 
       {/* Timeline content area */}
-      <div className="flex-1 flex flex-col min-h-0">
-        {isFocusMode ? (
-          <div className="w-full max-w-[850px] mx-auto px-4 sm:px-6 flex-1 flex flex-col min-h-0">
-            {content}
-          </div>
-        ) : (
-          content
-        )}
+      <div className={`flex-1 flex flex-col min-h-0 ${isFocusMode ? 'w-full max-w-[850px] mx-auto px-4 sm:px-6' : ''}`}>
+        {content}
       </div>
 
       {/* Actions area */}
-      {actions &&
-        (isFocusMode ? (
-          <div className="w-full max-w-[850px] mx-auto px-4 sm:px-6">{actions}</div>
-        ) : (
-          actions
-        ))}
+      {actions && (
+        <div className={isFocusMode ? 'w-full max-w-[850px] mx-auto px-4 sm:px-6' : ''}>
+          {actions}
+        </div>
+      )}
     </div>
   );
 };

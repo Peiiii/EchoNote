@@ -3,8 +3,7 @@ import {
   IAgent,
   Tool,
   useAgentSessionManager,
-  useAgentSessionManagerState,
-  useParseTools,
+  useParseTools
 } from "@agent-labs/agent-chat";
 import { Bot } from "lucide-react";
 import { v4 } from "uuid";
@@ -42,9 +41,6 @@ export function AIAssistantCore({
     initialMessages: [],
     getToolExecutor: (name: string) => toolExecutors[name],
   });
-  const { messages, isAgentResponding, threadId } =
-    useAgentSessionManagerState(agentSessionManager);
-  console.log("[AIAssistantCore] messages", { messages, isAgentResponding, threadId });
   if (!isOpen) return null;
 
   const containerClasses =

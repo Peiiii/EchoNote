@@ -30,6 +30,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
     []
   );
 
+
   return (
     <div className={`relative w-full h-full ${className}`}>
       {/* Timeline layout with content and actions */}

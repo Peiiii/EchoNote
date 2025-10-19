@@ -111,7 +111,6 @@ export class OpenAIAgent {
     inputData: RunAgentInput,
     _acceptHeader: string
   ): AsyncGenerator<string, void, unknown> {
-    console.log("🔔 [OpenAIAgent][run] inputData:", inputData);
     const encoder = new EventEncoder();
 
     // 发送开始事件
@@ -129,12 +128,6 @@ export class OpenAIAgent {
       if (inputData.context) {
         messages = this.addContextToMessages(messages, inputData.context);
       }
-      console.log(
-        "🔔 [OpenAIAgent][run] messages:",
-        messages,
-        "inputData.messages:",
-        inputData.messages
-      );
       const tools = inputData.tools ? this.convertToolsToOpenAIFormat(inputData.tools) : [];
 
       // 创建流

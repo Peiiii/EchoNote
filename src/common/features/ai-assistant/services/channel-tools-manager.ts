@@ -82,14 +82,6 @@ export class ChannelToolsManager {
             channelMessageService.dataContainer.get().messageByChannel[channelId];
           const note = channelState?.messages.find(msg => msg.id === noteId);
 
-          console.log("🔔 [readNoteTool][result]:", {
-            noteId,
-            note: note ? { id: note.id, content: note.content.substring(0, 50) + "..." } : null,
-            channelState: channelState
-              ? { messagesCount: channelState.messages?.length || 0 }
-              : null,
-          });
-
           if (!note) {
             throw new Error(`Note with ID ${noteId} not found`);
           }

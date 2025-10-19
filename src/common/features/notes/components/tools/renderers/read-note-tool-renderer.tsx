@@ -5,7 +5,6 @@ import { getParsedArgs } from "../utils/invocation-utils";
 import { NoteContent, ErrorMessage } from "../components";
 
 export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
-  console.log("🔔 [ReadNoteToolRenderer] invocation:", invocation);
   const args = getParsedArgs<ReadNoteRenderArgs>(invocation);
   const noteId = args?.noteId;
 

@@ -1,6 +1,6 @@
 import { createDataContainer, createSlice } from "rx-nested-bean";
 import { ReplaySubject, from } from "rxjs";
-import { distinctUntilChanged, filter, switchMap, tap } from "rxjs/operators";
+import { distinctUntilChanged, filter, shareReplay, switchMap, tap } from "rxjs/operators";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import { firebaseAIConversationService } from "@/common/services/firebase/firebase-ai-conversation.service";
@@ -30,10 +30,14 @@ export class ConversationMessageService {
   requestLoadInitialMessages$ = new ReplaySubject<string>(1);
 
   handleRequestWorkflow$ = this.requestLoadInitialMessages$.pipe(
-    distinctUntilChanged(),
+    distinctUntilChanged((a,b)=> a === b),
     tap(id => console.log("[ConversationMessageService] handleRequestWorkflow$", id)),
     filter(id => !this.dataContainer.get().messageByConversation[id]),
-    switchMap(id => from(this.loadInitialMessages({ conversationId: id })))
+    switchMap(id => from(this.loadInitialMessages({ conversationId: id }))),
+    shareReplay({
+      bufferSize: 1,
+      refCount: false,
+    })
   );
 
   connectToRequestWorkflow = () => {
