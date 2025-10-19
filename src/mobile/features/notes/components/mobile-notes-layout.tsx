@@ -1,14 +1,12 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
-import {
-  MobileMessageInput,
-  MobileTimelineContent,
-  useMobileTimelineState,
-  useMobileViewportHeight,
-  type MobileTimelineContentRef,
-} from "@/mobile/features/notes/features/message-timeline";
+
+import { MobileMessageInput } from "@/mobile/features/notes/features/message-timeline/components/mobile-message-input";
+import { MobileTimelineContent, MobileTimelineContentRef } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
+import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
+import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";
 import { useRef } from "react";
 
 interface MobileNotesLayoutProps {

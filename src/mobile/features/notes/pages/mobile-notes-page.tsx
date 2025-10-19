@@ -4,9 +4,9 @@ import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { useNotesViewStore as notesViewStore } from "@/core/stores/notes-view.store";
 import { MobileNotesLayout } from "@/mobile/features/notes/components/mobile-notes-layout";
-import { MobileSidebarManager } from "@/mobile/features/notes/features/message-timeline";
 import { useMobileNotesState } from "@/mobile/features/notes/hooks";
 import { useMobilePresenterContext } from "@/mobile/hooks/use-mobile-presenter-context";
+import { MobileSidebarManager } from "../features/message-timeline/components/mobile-sidebar-manager";
 
 export function MobileNotesPage() {
   const presenter = useMobilePresenterContext();

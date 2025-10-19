@@ -9,7 +9,6 @@ import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-me
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
-import { useRxEvent } from "@/common/hooks/use-rx-event";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
@@ -34,7 +33,6 @@ export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
   const timelineScrollContainerRef = useRef<MessageTimelineRef>(null);
   const { currentChannelId } = useNotesViewStore();
 
-  const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
 
   useHandleRxEvent(presenter.rxEventBus.requestTimelineScrollToBottom$, () => {
     timelineScrollContainerRef.current?.scrollToBottom({ behavior: "instant" });
@@ -42,7 +40,7 @@ export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
 
   const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
     onHistoryMessagesChange: messages => {
-      onHistoryMessagesLoadedEvent$.emit(messages);
+      presenter.rxEventBus.onHistoryMessagesLoadedEvent$.emit(messages);
     },
   });
   const { handleScroll } = useLazyLoading({
@@ -98,7 +96,6 @@ export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
           groupedMessages={groupedMessages}
           messages={messages}
           onScroll={handleScroll}
-          onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
         />
       </div>
     </TimelineContentWrapper>

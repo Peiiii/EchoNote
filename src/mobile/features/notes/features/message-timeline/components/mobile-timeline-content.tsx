@@ -1,18 +1,18 @@
-import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
 import {
   MessageTimeline,
   MessageTimelineRef,
 } from "@/common/features/notes/components/message-timeline/message-timeline";
-import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
+import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
-import { useRxEvent } from "@/common/hooks/use-rx-event";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { MobileThoughtRecord } from "@/mobile/features/notes/features/message-timeline";
+import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
 import { forwardRef, useImperativeHandle, useRef } from "react";
+import { MobileThoughtRecord } from "./thought-record";
 
 export interface MobileTimelineContentRef {
   scrollToBottom: (options?: { behavior?: "smooth" | "instant" }) => void;
@@ -27,11 +27,9 @@ export const MobileTimelineContent = forwardRef<
   MobileTimelineContentRef,
   MobileTimelineContentProps
 >(({ onReply, className = "" }, ref) => {
+  const presenter = useCommonPresenterContext();
   const { currentChannelId } = useNotesViewStore();
   const messageTimelineRef = useRef<MessageTimelineRef>(null);
-
-  const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
-
   const {
     messages = [],
     loading,
@@ -40,9 +38,10 @@ export const MobileTimelineContent = forwardRef<
     getChannelState,
   } = useChannelMessages({
     onHistoryMessagesChange: messages => {
-      onHistoryMessagesLoadedEvent$.emit(messages);
+      presenter.rxEventBus.onHistoryMessagesLoadedEvent$.emit(messages);
     },
   });
+  const groupedMessages = useGroupedMessages(messages);
 
   const { handleScroll } = useLazyLoading({
     onTrigger: () => {
@@ -54,7 +53,6 @@ export const MobileTimelineContent = forwardRef<
     getState: getChannelState,
   });
 
-  const groupedMessages = useGroupedMessages(messages);
 
   useImperativeHandle(
     ref,
@@ -101,7 +99,6 @@ export const MobileTimelineContent = forwardRef<
         groupedMessages={groupedMessages}
         messages={messages}
         onScroll={handleScroll}
-        onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
       />
     </div>
   );

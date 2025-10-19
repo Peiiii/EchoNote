@@ -7,7 +7,6 @@ import { READ_MORE_DATA_ATTRS } from "@/common/features/read-more/core/dom-const
 import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-collapse";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
-import { RxEvent } from "@/common/lib/rx-event";
 import { AITrigger, logService } from "@/core/services/log.service";
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
@@ -24,7 +23,6 @@ interface MessageTimelineProps {
   messages: Message[];
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
   containerRef?: React.RefObject<HTMLDivElement | null>;
-  onHistoryMessagesLoadedEvent$?: RxEvent<Message[]>;
 }
 
 export interface MessageTimelineRef {
@@ -39,7 +37,6 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
       groupedMessages,
       messages,
       onScroll,
-      onHistoryMessagesLoadedEvent$,
     },
     ref
   ) => {
@@ -69,7 +66,7 @@ export const MessageTimeline = forwardRef<MessageTimelineRef, MessageTimelinePro
       [onScroll, recordScrollPosition, handleCollapseScroll]
     );
 
-    useHandleRxEvent(onHistoryMessagesLoadedEvent$, restoreScrollPosition);
+    useHandleRxEvent(presenter.rxEventBus.onHistoryMessagesLoadedEvent$, restoreScrollPosition);
 
     useImperativeHandle(
       ref,
