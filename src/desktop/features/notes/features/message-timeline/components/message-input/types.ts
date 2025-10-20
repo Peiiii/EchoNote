@@ -1,8 +1,4 @@
 import { Message } from "@/core/stores/notes-data.store";
-
-export interface MessageInputProps {
-}
-
 export interface ToolbarButtonProps {
   icon: React.ComponentType<{ className?: string }>;
   onClick?: () => void;

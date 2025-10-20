@@ -1,13 +1,13 @@
-import { Channel } from "@/core/stores/notes-data.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { logService, ChannelEditField } from "@/core/services/log.service";
-import { useState } from "react";
+import { RefinedPopover } from "@/common/components/refined-popover";
 import { Button } from "@/common/components/ui/button";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
-import { RefinedPopover } from "@/common/components/refined-popover";
-import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { ChannelEditField, logService } from "@/core/services/log.service";
+import { Channel } from "@/core/stores/notes-data.store";
 import { Edit3 } from "lucide-react";
+import { useState } from "react";
 
 interface EditChannelPopoverProps {
   channel: Channel;
@@ -15,12 +15,12 @@ interface EditChannelPopoverProps {
 }
 
 export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProps) => {
+  const presenter = useCommonPresenterContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editName, setEditName] = useState(channel.name);
   const [editDescription, setEditDescription] = useState(channel.description);
   const [editEmoji, setEditEmoji] = useState(channel.emoji || "");
   const [isLoading, setIsLoading] = useState(false);
-  const { updateChannel } = useNotesDataStore();
 
   const handleSave = async () => {
     if (!editName.trim()) return;
@@ -31,7 +31,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
       const hasDescriptionChanged = editDescription.trim() !== (channel.description || "");
       const hasEmojiChanged = editEmoji.trim() !== (channel.emoji || "");
 
-      await updateChannel(channel.id, {
+      await presenter.channelManager.updateChannel(channel.id, {
         name: editName.trim(),
         description: editDescription.trim(),
         emoji: editEmoji.trim() || undefined,

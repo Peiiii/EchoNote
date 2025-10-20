@@ -9,16 +9,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
+  const presenter = useCommonPresenterContext();
   const channels = useNotesDataStore(state => state.channels);
   const channelsLoading = useNotesDataStore(state => state.channelsLoading);
   const currentChannelId = useNotesViewStore(state => state.currentChannelId);
-  const setCurrentChannel = useNotesViewStore(state => state.setCurrentChannel);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [hasScroll, setHasScroll] = useState(false);
 
@@ -107,7 +108,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
                   channel.name,
                   channel.messageCount || 0
                 );
-                setCurrentChannel(channel.id);
+                presenter.viewStateManager.setCurrentChannel(channel.id);
               }}
             />
           ))
@@ -120,8 +121,6 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
           <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-100/90 dark:from-slate-800/90 to-transparent pointer-events-none" />
         </div>
       )}
-
-      {/* Footer removed: create entry moved to header */}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
-import { useChatActions } from "@/common/features/notes/hooks/use-chat-actions";
+import { useChatReply } from "@/common/features/notes/hooks/use-chat-reply";
 import { useChatScroll } from "@/common/features/notes/hooks/use-chat-scroll";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -18,7 +18,7 @@ export const useMobileNotesState = () => {
     currentChannelId,
     messages.length,
   ]);
-  const { replyToMessageId, handleCancelReply, handleReply } = useChatActions();
+  const { replyToMessageId, handleCancelReply, handleReply } = useChatReply();
   const { isThreadOpen, handleOpenThread, handleCloseThread, handleSendThreadMessage } =
     useThreadSidebar();
   const { sendMessage, isAddingMessage } = useMessageSender();

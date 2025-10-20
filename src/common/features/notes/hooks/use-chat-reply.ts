@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useChatActions = () => {
+export const useChatReply = () => {
   const [replyToMessageId, setReplyToMessageId] = useState<string | undefined>(undefined);
 
   const clearReplyToMessageId = () => {

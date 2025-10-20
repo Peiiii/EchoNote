@@ -3,9 +3,8 @@ import { ReplyIndicator } from "./components/reply-indicator";
 import { SendButton } from "./components/send-button";
 import { Toolbar } from "./components/toolbar";
 import { useMessageInput } from "./hooks/use-message-input";
-import { MessageInputProps } from "./types";
 
-export function MessageInput({  }: MessageInputProps) {
+export function MessageInput() {
   const {
     message,
     textareaRef,

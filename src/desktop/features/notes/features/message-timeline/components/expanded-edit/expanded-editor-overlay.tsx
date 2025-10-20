@@ -1,30 +1,27 @@
-import { ExpandedEditor } from "./expanded-editor";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
+import { ExpandedEditor } from "./expanded-editor";
 
 interface ExpandedEditorOverlayProps {
-  isVisible: boolean;
-  editContent: string;
-  isSaving: boolean;
-  onSave: () => Promise<void>;
-  onCancel: () => void;
-  onCollapse: () => void;
   className?: string;
 }
 
 export const ExpandedEditorOverlay = ({
-  isVisible,
-  editContent,
-  isSaving,
-  onSave,
-  onCancel,
-  onCollapse,
   className = "",
 }: ExpandedEditorOverlayProps) => {
+  const presenter = useCommonPresenterContext();
+  const isVisible = useEditStateStore(s =>
+    Boolean(s.editingMessageId && s.editMode === "expanded")
+  );
+  const editContent = useEditStateStore(s => s.editContent);
+  const isSaving = useEditStateStore(s => s.isSaving);
+
   return (
     <Dialog
       open={isVisible}
       onOpenChange={open => {
-        if (!open) onCancel();
+        if (!open) presenter.noteEditManager.cancel();
       }}
     >
       <DialogContent
@@ -33,9 +30,9 @@ export const ExpandedEditorOverlay = ({
       >
         <ExpandedEditor
           content={editContent}
-          onSave={onSave}
-          onCancel={onCancel}
-          onCollapse={onCollapse}
+          onSave={() => presenter.noteEditManager.save()}
+          onCancel={() => presenter.noteEditManager.cancel()}
+          onCollapse={() => presenter.noteEditManager.switchToInlineMode()}
           isSaving={isSaving}
         />
       </DialogContent>

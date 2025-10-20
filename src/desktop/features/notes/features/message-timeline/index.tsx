@@ -1,10 +1,10 @@
 import { QuickSearchHotkey } from "@/common/features/note-search/components/quick-search-hotkey";
+import { ExpandedEditorOverlay } from "@/desktop/features/notes/features/message-timeline/components/expanded-edit/expanded-editor-overlay";
 import { MessageInput } from "@/desktop/features/notes/features/message-timeline/components/message-input";
 import { TimelineContent } from "@/desktop/features/notes/features/message-timeline/components/timeline-content";
 import { TimelineLayout } from "@/desktop/features/notes/features/message-timeline/components/timeline-layout";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
-import { ExpandedEditorOverlayContainer } from "./components/expanded-edit/expanded-editor-overlay-container";
 
 interface MessageTimelineFeatureProps {
   className?: string;
@@ -25,7 +25,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
         actions={currentChannel && !inputCollapsed ? <MessageInput /> : null}
         className={className}
       />
-      <ExpandedEditorOverlayContainer />
+      <ExpandedEditorOverlay />
       <QuickSearchHotkey />
     </>
   );
