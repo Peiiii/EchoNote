@@ -11,8 +11,10 @@ import { AITrigger, logService } from "@/core/services/log.service";
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
 import { Bot, ChevronUp, Send } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { Virtuoso } from "react-virtuoso";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
@@ -33,6 +35,7 @@ export const MessageTimeline = ({
 }: MessageTimelineProps) => {
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
+  const channel = useCurrentChannel();
   const { inputCollapsed, handleExpandInput } = useInputCollapse();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollToBottom, showScrollToBottomButton } = useChatScroll(containerRef, [messages], {
@@ -77,9 +80,63 @@ export const MessageTimeline = ({
     return map;
   }, [messages]);
 
+  const items = useMemo<({ type: 'date-divider'; date: string; } | {
+    type: 'message';
+    message: Message;
+  })[]>(() => {
+    return Object.entries(groupedMessages).map(([date, dayMessages]) => {
+      return [
+        {
+          type: 'date-divider' as const,
+          date: date,
+        },
+        ...dayMessages.map((message: Message) => {
+          return {
+            type: 'message' as const,
+            message: message,
+          };
+        }),
+      ]
+    }).flat();
+  }, [groupedMessages]);
+
+  const renderDateDivider = (date: string) => {
+    return (
+      <div key={date} className="w-full" style={{ height: "auto", minHeight: "auto" }}>
+        <DateDivider date={date} />
+      </div>
+    );
+  };
+
+  const renderMessage = (message: Message) => {
+    const groupKey = message.threadId || message.id;
+    const count = threadCounts.get(groupKey) ?? 0;
+    const threadCount = count > 1 ? count - 1 : 0;
+    return (
+      <div
+        key={message.id}
+        {...{ [READ_MORE_DATA_ATTRS.messageId]: message.id }}
+        className="w-full"
+        style={{ height: "auto", minHeight: "auto" }}
+      >
+        {renderThoughtRecord(message, threadCount)}
+      </div>
+    );
+  };
+
+  const renderItem = (item: { type: 'date-divider'; date: string; } | {
+    type: 'message';
+    message: Message;
+  }) => {
+    if (item.type === 'date-divider') {
+      return renderDateDivider(item.date);
+    }
+    return renderMessage(item.message);
+  };
+
   return (
     <>
-      <div
+      {/* <div
         data-component="message-timeline"
         ref={containerRef}
         className={`w-full bg-background flex-1 overflow-y-auto min-h-0 timeline-scroll ${className}`}
@@ -92,41 +149,43 @@ export const MessageTimeline = ({
         }}
         onScroll={handleScroll}
       >
-        {Object.entries(groupedMessages).map(([date, dayMessages]) => {
-          // Filter only user messages for display (excluding thread messages)
-          const userMessages = (dayMessages as Message[]).filter(
-            (msg: Message) => msg.sender === "user" && !msg.parentId // Ensure only main messages are shown, not thread messages
-          );
-          // Use cached thread counts to derive per-message thread size quickly
-
-          return (
-            <div key={date} className="w-full" style={{ height: "auto", minHeight: "auto" }}>
-              <DateDivider date={date} />
-
-              {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
-              {/* Align separators: no extra padding on mobile (edge-to-edge), keep desktop alignment; enhanced visibility in both modes */}
-              <div className="px-0 divide-y divide-slate-200/80 dark:divide-slate-800/80">
-                {userMessages.map((message: Message) => {
-                  const groupKey = message.threadId || message.id;
-                  const count = threadCounts.get(groupKey) ?? 0;
-                  const threadCount = count > 1 ? count - 1 : 0;
-
-                  return (
-                    <div
-                      key={message.id}
-                      {...{ [READ_MORE_DATA_ATTRS.messageId]: message.id }}
-                      className="w-full"
-                      style={{ height: "auto", minHeight: "auto" }}
-                    >
-                      {renderThoughtRecord(message, threadCount)}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
+        {items.map((item) => {
+          return renderItem(item);
         })}
-      </div>
+      </div> */}
+      <Virtuoso
+        data={items}
+        style={{
+          height: "100%",
+          minHeight: "100%",
+          maxHeight: "100%",
+        }}
+        firstItemIndex={
+          (channel?.messageCount ?? 1000) - items.length
+        }
+        // overscan={
+        //   {
+        //     main: 200,
+        //     reverse: 200
+        //   }
+        // }
+        computeItemKey={(_, item) => {
+          if (item.type === 'date-divider') {
+            return item.date;
+          }
+          return item.message.id;
+        }}
+        itemContent={(_, item) => renderItem(item)}
+        initialTopMostItemIndex={{
+          index: items.length - 1,
+          align: "start",
+        }}
+        defaultItemHeight={100}
+        startReached={() => {
+          console.log('startReached');
+          presenter.noteTimelineManager.loadMoreNotes();
+        }}
+      />
       <div className="absolute bottom-4 right-4 z-20 pointer-events-none">
         <div className="flex flex-col items-end gap-2">
           {inputCollapsed && (
