@@ -31,7 +31,7 @@ export const MessageTimeline = ({
 }: MessageTimelineProps) => {
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
-  const { inputCollapsed, handleExpandInput } = useInputCollapse();
+  const { inputCollapsed, handleExpandInput, handleCollapseInput } = useInputCollapse();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollToTopButton, setShowScrollToTopButton] = useState(false);
   const threshold = 30;
@@ -54,6 +54,9 @@ export const MessageTimeline = ({
     collapseCurrent,
   } = useGlobalCollapse(containerRef);
 
+  const lastAutoRef = useRef<"top" | "away" | null>(null);
+  const collapseThreshold = 40; // px from top to auto-collapse
+
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
       onScroll?.(e);
@@ -61,9 +64,21 @@ export const MessageTimeline = ({
       const el = containerRef.current;
       if (el) {
         setShowScrollToTopButton(el.scrollTop > threshold);
+        // Auto collapse/expand input based on distance from top
+        if (el.scrollTop > collapseThreshold) {
+          if (lastAutoRef.current !== "away") {
+            handleCollapseInput();
+            lastAutoRef.current = "away";
+          }
+        } else {
+          if (lastAutoRef.current !== "top") {
+            handleExpandInput();
+            lastAutoRef.current = "top";
+          }
+        }
       }
     },
-    [onScroll, handleCollapseScroll]
+    [onScroll, handleCollapseScroll, handleCollapseInput, handleExpandInput]
   );
 
   // Listen to new event (alias keeps old name working)

@@ -4,6 +4,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 
 import { MobileMessageInput } from "@/mobile/features/notes/features/message-timeline/components/mobile-message-input";
+import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { MobileTimelineContent } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
 import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
 import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";
@@ -75,7 +76,12 @@ export const MobileNotesLayout = ({
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Input area - only show when there's a current channel; move to top */}
         {currentChannel && (
-          <div className="flex-shrink-0 bg-transparent">
+          <div
+            className={`flex-shrink-0 bg-transparent overflow-hidden transition-[max-height,opacity,padding] duration-200 ease-out ${
+              inputCollapsed ? "max-h-0 opacity-0 py-0" : "max-h-[220px] opacity-100"
+            }`}
+            aria-hidden={inputCollapsed}
+          >
             <MobileMessageInput
               onSend={handleSendMessage}
               replyToMessageId={replyToMessageId || undefined}
@@ -91,3 +97,4 @@ export const MobileNotesLayout = ({
     </div>
   );
 };
+  const { inputCollapsed } = useInputCollapse();

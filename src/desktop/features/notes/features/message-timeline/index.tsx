@@ -12,7 +12,7 @@ interface MessageTimelineFeatureProps {
 
 export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatureProps) => {
   const currentChannel = useCurrentChannel();
-  const { inputCollapsed } = useInputCollapse();
+  useInputCollapse();
   return (
     <>
       <TimelineLayout
@@ -22,7 +22,7 @@ export const MessageTimelineFeature = ({ className = "" }: MessageTimelineFeatur
             <TimelineContent />
           </>
         }
-        actions={currentChannel && !inputCollapsed ? <MessageInput /> : null}
+        actions={currentChannel ? <MessageInput /> : null}
         className={className}
       />
       <ExpandedEditorOverlay />
