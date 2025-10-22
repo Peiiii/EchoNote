@@ -9,6 +9,7 @@ import { MobileTimelineContent } from "@/mobile/features/notes/features/message-
 import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
 import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";
 import { useMobilePresenterContext } from "@/mobile/hooks/use-mobile-presenter-context";
+import { useRef } from "react";
 
 interface MobileNotesLayoutProps {
   currentChannelName?: string;
@@ -40,6 +41,8 @@ export const MobileNotesLayout = ({
   const { currentChannelId } = useNotesViewStore();
   const { channels } = useNotesDataStore();
   const currentChannel = channels.find(channel => channel.id === currentChannelId);
+  const { inputCollapsed } = useInputCollapse();
+  const panelRef = useRef<HTMLDivElement>(null);
 
 
   // Enhanced send message handler that scrolls to bottom after sending
@@ -77,8 +80,9 @@ export const MobileNotesLayout = ({
         {/* Input area - only show when there's a current channel; move to top */}
         {currentChannel && (
           <div
-            className={`flex-shrink-0 bg-transparent overflow-hidden transition-[max-height,opacity,padding] duration-200 ease-out ${
-              inputCollapsed ? "max-h-0 opacity-0 py-0" : "max-h-[220px] opacity-100"
+            ref={panelRef}
+            className={`flex-shrink-0 bg-transparent overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out origin-top ${
+              inputCollapsed ? "max-h-0 opacity-0 -translate-y-1 py-0" : "max-h-[220px] opacity-100 translate-y-0"
             }`}
             aria-hidden={inputCollapsed}
           >
@@ -97,4 +101,3 @@ export const MobileNotesLayout = ({
     </div>
   );
 };
-  const { inputCollapsed } = useInputCollapse();
