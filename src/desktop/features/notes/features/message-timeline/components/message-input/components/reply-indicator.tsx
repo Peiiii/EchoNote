@@ -3,7 +3,7 @@ import { ReplyIndicatorProps } from "../types";
 
 export function ReplyIndicator({ replyToMessage, onCancelReply }: ReplyIndicatorProps) {
   return (
-    <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+    <div className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Reply className="w-4 h-4 text-blue-500" />

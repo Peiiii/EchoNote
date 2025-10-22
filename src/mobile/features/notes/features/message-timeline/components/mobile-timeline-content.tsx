@@ -35,7 +35,8 @@ export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelin
       presenter.rxEventBus.onHistoryMessagesLoadedEvent$.emit(messages);
     },
   });
-  const groupedMessages = useGroupedMessages(messages);
+  // Latest messages first for top-down reading
+  const groupedMessages = useGroupedMessages(messages, { latestFirst: true });
 
   const { handleScroll } = useLazyLoading({
     onTrigger: () => {
@@ -45,6 +46,7 @@ export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelin
     },
     canTrigger: !!hasMore && !loading,
     getState: getChannelState,
+    direction: 'bottom',
   });
 
   const hasMessages = Object.values(groupedMessages).some(dayMessages =>

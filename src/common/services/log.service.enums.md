@@ -33,7 +33,8 @@ export enum AnalyticsEvent {
   SEARCH_SELECT = 'search_select',
   SIDEBAR_TOGGLE = 'sidebar_toggle',
   INPUT_COLLAPSE = 'input_collapse',
-  SCROLL_TO_BOTTOM = 'scroll_to_bottom',
+  SCROLL_TO_BOTTOM = 'scroll_to_bottom', // deprecated
+  SCROLL_TO_LATEST = 'scroll_to_latest',
   MESSAGE_EXPAND = 'message_expand',
   SETTINGS_OPEN = 'settings_open',
   THEME_CHANGE = 'theme_change',

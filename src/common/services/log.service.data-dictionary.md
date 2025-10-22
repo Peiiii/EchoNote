@@ -403,8 +403,8 @@
 }
 ```
 
-#### scroll_to_bottom
-**用途**: 记录滚动到底部事件
+#### scroll_to_latest
+**用途**: 记录滚动到最新（顶部）事件
 **参数**:
 - `channel_id`: string - 频道ID
 - `message_count`: number - 消息数量
@@ -412,7 +412,7 @@
 **示例**:
 ```json
 {
-  "event_name": "scroll_to_bottom",
+  "event_name": "scroll_to_latest",
   "channel_id": "channel_123",
   "message_count": 45
 }

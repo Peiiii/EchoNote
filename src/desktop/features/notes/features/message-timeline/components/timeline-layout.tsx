@@ -27,19 +27,21 @@ export const TimelineLayout = ({
         {/* Channel Cover Header */}
         {channel && <ChannelHeader channel={channel} />}
 
-        {/* Timeline content area */}
+        {/* Actions area at top (composer)
+            - Focus mode: keep the same width as content (centered)
+            - Otherwise: full-width so its bottom border divides the whole container */}
+        {actions && (
+          <div className={isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : "w-full"}>
+            {actions}
+          </div>
+        )}
+
+        {/* Timeline content area below actions */}
         <div
           className={`flex-1 flex flex-col min-h-0 ${isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : ""}`}
         >
           {content}
         </div>
-
-        {/* Actions area */}
-        {actions && (
-          <div className={isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : ""}>
-            {actions}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -26,7 +26,8 @@ export enum AnalyticsEvent {
   SEARCH_SELECT = 'search_select',
   SIDEBAR_TOGGLE = 'sidebar_toggle',
   INPUT_COLLAPSE = 'input_collapse',
-  SCROLL_TO_BOTTOM = 'scroll_to_bottom',
+  SCROLL_TO_BOTTOM = 'scroll_to_bottom', // deprecated in timeline v2
+  SCROLL_TO_LATEST = 'scroll_to_latest',
   MESSAGE_EXPAND = 'message_expand',
   SETTINGS_OPEN = 'settings_open',
   THEME_CHANGE = 'theme_change',
@@ -328,6 +329,14 @@ export class LogService {
 
   logScrollToBottom = (channelId: string, messageCount: number) => {
     this.logEvent(AnalyticsEvent.SCROLL_TO_BOTTOM, {
+      channel_id: channelId,
+      message_count: messageCount
+    });
+  };
+
+  // Timeline v2: latest-at-top
+  logScrollToLatest = (channelId: string, messageCount: number) => {
+    this.logEvent(AnalyticsEvent.SCROLL_TO_LATEST, {
       channel_id: channelId,
       message_count: messageCount
     });

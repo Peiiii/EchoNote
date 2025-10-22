@@ -59,7 +59,7 @@ export function useMessageInput() {
     }
 
     clearReplyToMessageId();
-    presenter.rxEventBus.requestTimelineScrollToBottom$.emit();
+    presenter.rxEventBus.requestTimelineScrollToLatest$.emit();
     setMessage("");
   };
 

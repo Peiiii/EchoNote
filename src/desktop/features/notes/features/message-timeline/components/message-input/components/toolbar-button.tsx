@@ -8,7 +8,7 @@ export function ToolbarButton({
   className = "",
 }: ToolbarButtonProps) {
   const baseClasses =
-    "w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200";
+    "w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all duration-200";
   const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer";
 
   return (

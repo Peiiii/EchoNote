@@ -49,9 +49,9 @@ export const MobileNotesLayout = ({
       content: content,
       sender: "user",
     });
-    // Auto-scroll to bottom after sending message
+    // Auto-scroll to latest (top) after sending message
     setTimeout(() => {
-      presenter.rxEventBus.requestTimelineScrollToBottom$.emit();
+      presenter.rxEventBus.requestTimelineScrollToLatest$.emit();
     }, 100);
   };
 
@@ -73,12 +73,9 @@ export const MobileNotesLayout = ({
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Timeline content */}
-        <MobileTimelineContent onReply={timelineState.handleReply} />
-
-        {/* Input area - only show when there's a current channel */}
+        {/* Input area - only show when there's a current channel; move to top */}
         {currentChannel && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 bg-transparent">
             <MobileMessageInput
               onSend={handleSendMessage}
               replyToMessageId={replyToMessageId || undefined}
@@ -87,6 +84,9 @@ export const MobileNotesLayout = ({
             />
           </div>
         )}
+
+        {/* Timeline content */}
+        <MobileTimelineContent onReply={timelineState.handleReply} />
       </div>
     </div>
   );

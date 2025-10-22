@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
-import { Send } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 
 interface MobileMessageInputProps {
@@ -21,6 +21,7 @@ export const MobileMessageInput = ({
 }: MobileMessageInputProps) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Mobile default: single-row minimalist input, actions hidden by design
 
   // Auto-resize textarea
   useEffect(() => {
@@ -57,10 +58,10 @@ export const MobileMessageInput = ({
   const isReplyMode = !!replyToMessageId;
 
   return (
-    <div className={cn("bg-background p-4 space-y-3", className)}>
+    <div className={cn("bg-background px-3 sm:px-4 py-2 space-y-2 border-b border-border/60", className)}>
       {/* Reply indicator */}
       {isReplyMode && (
-        <div className="flex items-center justify-between bg-muted/50 rounded-xl px-4 py-3 border border-border/50">
+        <div className="flex items-center justify-between bg-muted/50 rounded-xl px-3 py-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Replying to message</span>
           </div>
@@ -77,7 +78,6 @@ export const MobileMessageInput = ({
 
       {/* Input area - unified, with embedded actions (like top AI products) */}
       <div className="flex items-end">
-        {/* Message input with inline send button */}
         <div className="flex-1 relative">
           <Textarea
             ref={textareaRef}
@@ -85,30 +85,30 @@ export const MobileMessageInput = ({
             onChange={e => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="What's on your mind?"
-            className="min-h-[52px] max-h-[120px] resize-none rounded-2xl border border-border/50 dark:border-border/50 bg-background/90 backdrop-blur-sm shadow-none focus:shadow-none focus:outline-none transition-all duration-200 pl-4 pr-12 py-3 text-base placeholder:text-muted-foreground/60"
+            className="min-h-[48px] max-h-[120px] resize-none bg-transparent shadow-none focus:shadow-none focus:outline-none transition-all duration-200 text-base placeholder:text-muted-foreground/60 border-0 pl-0 pr-12 py-2"
             rows={1}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleSend}
-            disabled={!message.trim() || isSending}
-            size="icon"
-            className={`absolute right-2 bottom-2 h-9 w-9 rounded-full transition-colors duration-150 ${
-              message.trim() && !isSending
-                ? "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-            }`}
-            aria-label="Send"
-          >
-            {isSending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={!message.trim() || isSending}
+              className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-150 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 ${
+                !message.trim() || isSending ? "opacity-40 cursor-not-allowed hover:bg-transparent" : ""
+              }`}
+              aria-label="Send"
+            >
+              {isSending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+              ) : (
+                <ArrowDown className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* No bottom actions for mobile minimalist mode */}
     </div>
   );
 };

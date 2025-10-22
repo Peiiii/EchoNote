@@ -37,9 +37,12 @@ export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
       currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
     canTrigger: !!hasMore && !loading,
     getState: getChannelState,
+    // With latest-first ordering, we load older messages when the user nears the bottom
+    direction: 'bottom',
   });
 
-  const groupedMessages = useGroupedMessages(messages);
+  // Use latest-first ordering for a top-down reading experience
+  const groupedMessages = useGroupedMessages(messages, { latestFirst: true });
 
   const hasMessages = Object.values(groupedMessages).some(dayMessages =>
     (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
