@@ -22,6 +22,11 @@ interface MessageTimelineProps {
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
+interface MessageTimelineItem {
+  type: "date-divider" | "message";
+  date?: string;
+  message?: Message;
+}
 export const MessageTimeline = ({
   renderThoughtRecord,
   className = "",
@@ -102,6 +107,55 @@ export const MessageTimeline = ({
     return map;
   }, [messages]);
 
+  const items = useMemo(() => {
+    return Object.entries(groupedMessages).map(([date, dayMessages]) => {
+      return [
+        {
+          type: "date-divider",
+          date,
+        },
+        ...dayMessages.filter(msg => msg.sender === "user" && !msg.parentId).map((message: Message) => ({
+          type: "message",
+          message,
+        })),
+      ];
+    }).flat() as MessageTimelineItem[];
+  }, [groupedMessages]);
+
+  const renderMessageItem = (message: Message) => {
+    const groupKey = message.threadId || message.id;
+    const count = threadCounts.get(groupKey) ?? 0;
+    const threadCount = count > 1 ? count - 1 : 0;
+    return (
+      // <div className="px-0 divide-y border-t border-slate-200/80 dark:border-slate-800/80">
+      <div
+        key={message.id}
+        {...{ [READ_MORE_DATA_ATTRS.messageId]: message.id }}
+        className="w-full"
+        style={{ height: "auto", minHeight: "auto" }}
+      >
+        {renderThoughtRecord(message, threadCount)}
+      </div>
+      // </div>
+    )
+  };
+
+  const renderDateDivider = (date: string) => {
+    return (
+      <div key={date} className="w-full" style={{ height: "auto", minHeight: "auto" }}>
+        <DateDivider date={date} />
+      </div>
+    );
+  };
+
+  const renderItem = (item: MessageTimelineItem) => {
+    if (item.type === "date-divider") {
+      return renderDateDivider(item.date as string);
+    } else {
+      return renderMessageItem(item.message as Message);
+    }
+  };
+
   return (
     <>
       <div
@@ -117,40 +171,7 @@ export const MessageTimeline = ({
         }}
         onScroll={handleScroll}
       >
-        {Object.entries(groupedMessages).map(([date, dayMessages]) => {
-          // Filter only user messages for display (excluding thread messages)
-          const userMessages = (dayMessages as Message[]).filter(
-            (msg: Message) => msg.sender === "user" && !msg.parentId // Ensure only main messages are shown, not thread messages
-          );
-          // Use cached thread counts to derive per-message thread size quickly
-
-          return (
-            <div key={date} className="w-full" style={{ height: "auto", minHeight: "auto" }}>
-              <DateDivider date={date} />
-
-              {/* Elegant timeline of thoughts with subtle separators (like X/Twitter) */}
-              {/* Align separators: no extra padding on mobile (edge-to-edge), keep desktop alignment; enhanced visibility in both modes */}
-              <div className="px-0 divide-y divide-slate-200/80 dark:divide-slate-800/80">
-                {userMessages.map((message: Message) => {
-                  const groupKey = message.threadId || message.id;
-                  const count = threadCounts.get(groupKey) ?? 0;
-                  const threadCount = count > 1 ? count - 1 : 0;
-
-                  return (
-                    <div
-                      key={message.id}
-                      {...{ [READ_MORE_DATA_ATTRS.messageId]: message.id }}
-                      className="w-full"
-                      style={{ height: "auto", minHeight: "auto" }}
-                    >
-                      {renderThoughtRecord(message, threadCount)}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        {items.map(renderItem)}
       </div>
       <div className="absolute top-4 right-4 z-20 pointer-events-none">
         <div className="flex flex-col items-end gap-2">
