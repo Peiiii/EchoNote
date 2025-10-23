@@ -185,9 +185,9 @@ export const MessageTimeline = ({
         </div>
       </div>
       <div
-        className={`pointer-events-none absolute left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showFloatingCollapse ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"}`}
+        className={`pointer-events-none absolute left-1/2 -translate-x-1/2 z-20 transition-all duration-150 ${showFloatingCollapse ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-0"}`}
         style={{
-          top: "calc(env(safe-area-inset-top, 0px) + var(--collapse-float-offset, 8px))",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + var(--collapse-float-offset, 8px))",
         }}
       >
         {showFloatingCollapse && (
