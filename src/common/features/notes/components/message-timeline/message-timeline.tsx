@@ -11,6 +11,7 @@ import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
 import { Bot, ChevronUp, Send } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { DateDivider } from "./date-divider";
 // removed global collapse bus usage
 
@@ -37,21 +38,22 @@ export const MessageTimeline = ({
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
   const { inputCollapsed, handleExpandInput, handleCollapseInput } = useInputCollapse();
+  // We render the timeline with react-virtuoso for virtualization.
+  // containerRef points to the scrollable container (the Virtuoso Scroller)
   const containerRef = useRef<HTMLDivElement>(null);
+  const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const [showScrollToTopButton, setShowScrollToTopButton] = useState(false);
   const threshold = 30;
-  const scrollToTop = useCallback(
-    (options?: { behavior?: "smooth" | "instant" }) => {
-      const el = containerRef.current;
-      if (!el) return;
-      if (options?.behavior === "smooth") {
-        el.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        el.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-      }
-    },
-    []
-  );
+  const scrollToTop = useCallback((options?: { behavior?: "smooth" | "instant" }) => {
+    // Virtuoso exposes an imperative scrollTo API; fall back to DOM if needed
+    const behavior = options?.behavior === "smooth" ? "smooth" : "auto";
+    if (virtuosoRef.current) {
+      virtuosoRef.current.scrollTo({ top: 0, behavior });
+      return;
+    }
+    const el = containerRef.current;
+    el?.scrollTo({ top: 0, behavior });
+  }, []);
 
   const {
     showFloatingCollapse,
@@ -85,6 +87,17 @@ export const MessageTimeline = ({
     },
     [onScroll, handleCollapseScroll, handleCollapseInput, handleExpandInput]
   );
+
+  // Bind scroll listener to the Virtuoso scroller element (simplest usage)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onScrollHandler = (ev: Event) => {
+      handleScroll(ev as unknown as React.UIEvent<HTMLDivElement>);
+    };
+    el.addEventListener("scroll", onScrollHandler, { passive: true });
+    return () => el.removeEventListener("scroll", onScrollHandler);
+  }, [handleScroll]);
 
   // Listen to new event (alias keeps old name working)
   useHandleRxEvent(presenter.rxEventBus.requestTimelineScrollToLatest$, event => {
@@ -151,27 +164,31 @@ export const MessageTimeline = ({
   const renderItem = (item: MessageTimelineItem) => {
     if (item.type === "date-divider") {
       return renderDateDivider(item.date as string);
-    } else {
-      return renderMessageItem(item.message as Message);
     }
+    return renderMessageItem(item.message as Message);
   };
 
   return (
     <>
+      {/**
+       * 最简单用法：直接使用 Virtuoso，scrollerRef 获取滚动容器，
+       * 我们在 useEffect 里绑定 scroll 事件给 existing 逻辑（懒加载、折叠）。
+       */}
       <div
-        data-component="message-timeline"
-        ref={containerRef}
-        className={`w-full bg-background flex-1 overflow-y-auto min-h-0 timeline-scroll ${className}`}
-        style={{
-          height: "100%",
-          minHeight: "100%",
-          maxHeight: "100%",
-          scrollbarWidth: "thin",
-          scrollbarColor: "rgba(148, 163, 184, 0.4) transparent",
-        }}
-        onScroll={handleScroll}
+        className={`w-full bg-background flex-1 overflow-hidden min-h-0 ${className}`}
+        style={{ height: "100%", minHeight: "100%", maxHeight: "100%" }}
       >
-        {items.map(renderItem)}
+        <Virtuoso
+          ref={instance => {
+            virtuosoRef.current = instance;
+          }}
+          data={items}
+          itemContent={(_, item) => renderItem(item)}
+          scrollerRef={ref => {
+            containerRef.current = (ref as HTMLDivElement) || null;
+          }}
+          style={{ height: "100%", width: "100%" }}
+        />
       </div>
       <div className="absolute top-4 right-4 z-20 pointer-events-none">
         <div className="flex flex-col items-end gap-2">
