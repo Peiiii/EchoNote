@@ -10,7 +10,7 @@ import type { TimelineScrollAlign, TimelineScrollBehavior, TimelineVirtualScroll
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
-import { Bot, ChevronUp, Send } from "lucide-react";
+import { Bot, ChevronUp, Pencil } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { DateDivider } from "./date-divider";
@@ -231,7 +231,7 @@ export const MessageTimeline = ({
           {inputCollapsed && (
             <div className="pointer-events-auto">
               <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
-                <Send className="h-4 w-4" />
+                <Pencil className="h-4 w-4" />
               </FloatingActionButton>
             </div>
           )}
