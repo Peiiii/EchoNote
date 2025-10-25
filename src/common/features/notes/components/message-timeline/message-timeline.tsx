@@ -41,6 +41,7 @@ export const MessageTimeline = ({
   // We render the timeline with react-virtuoso for virtualization.
   // containerRef points to the scrollable container (the Virtuoso Scroller)
   const containerRef = useRef<HTMLDivElement>(null);
+  presenter.scrollManager.setScrollContainerRef(containerRef);
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const [showScrollToTopButton, setShowScrollToTopButton] = useState(false);
   const threshold = 30;

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
-import { collapseWithScrollTop, getFloatOffset } from "../core/collapse-utils";
+import { collapseMakeElementAtVisibleTopOfContainer, getFloatOffset } from "../core/collapse-utils";
 import {
   READ_MORE_DATA_ATTRS,
   READ_MORE_SELECTORS,
   getMessageIdFromElement,
 } from "../core/dom-constants";
 import { useReadMoreStore, selectShowFloatingCollapse } from "../store/read-more.store";
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 function findBottomCandidate(container: HTMLElement) {
   const nodes = Array.from(
@@ -132,12 +134,9 @@ export function useGlobalCollapse(containerRef: React.RefObject<HTMLDivElement |
       READ_MORE_SELECTORS.messageById(id)
     ) as HTMLElement | null;
     if (!element) return;
-    const cRect = container.getBoundingClientRect();
-    const topVisible = element.getBoundingClientRect().top >= cRect.top;
-    collapseWithScrollTop({
+    collapseMakeElementAtVisibleTopOfContainer({
       container,
       element,
-      topVisibleBefore: topVisible,
       onCollapse: () => requestCollapse(id),
     });
   }, [containerRef, requestCollapse]);

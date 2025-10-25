@@ -1,8 +1,10 @@
+import { collapseMakeElementAtVisibleTopOfContainer, collapseWithElementTopToContainerTop } from "@/common/features/read-more/core/collapse-utils";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { READ_MORE_DATA_ATTRS, READ_MORE_SELECTORS } from "../core/dom-constants";
 import { selectShowFloatingCollapse, useReadMoreStore } from "../store/read-more.store";
-import { READ_MORE_DATA_ATTRS } from "../core/dom-constants";
 
 interface ReadMoreBaseWrapperProps {
   children: React.ReactNode;
@@ -25,6 +27,7 @@ export function ReadMoreBaseWrapper({
   readMoreLabel = "Read more",
   collapseLabel = "Collapse",
 }: ReadMoreBaseWrapperProps) {
+  const presenter = useCommonPresenterContext();
   const setStatus = useReadMoreStore(useCallback(state => state.setStatus, []));
   const pendingCollapseId = useReadMoreStore(state => state.pendingCollapseId);
   const acknowledgeCollapse = useReadMoreStore(useCallback(state => state.acknowledgeCollapse, []));
@@ -72,7 +75,27 @@ export function ReadMoreBaseWrapper({
     previousExpandedRef.current = isExpanded;
   }, [isExpanded, activateAutoScrollSuppression]);
 
-  const handleToggle = () => setIsExpanded(prev => !prev);
+  const handleCollapse = () => {
+    const container = presenter.scrollManager.getScrollContainer();
+    if (!container) return;
+    const element = container.querySelector(
+      READ_MORE_SELECTORS.messageById(messageId)
+    ) as HTMLElement | null;
+    collapseWithElementTopToContainerTop({
+      container: container,
+      element: element!,
+      onCollapse: () => setIsExpanded(false),
+    });
+  };
+
+  const handleToggle = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+      return;
+    } else {
+      handleCollapse();
+    }
+  };
   const inlineHidden = showFloatingCollapse && activeMessageId === messageId && isExpanded;
   const collapseInlineData = {
     [READ_MORE_DATA_ATTRS.collapseInlineFor]: messageId,

@@ -31,24 +31,52 @@ export function computeFocusedId(container: HTMLElement): string | null {
  * @param params.topVisibleBefore - Whether the element's top was visible before collapse
  * @param params.onCollapse - Callback function to trigger the actual collapse
  */
-export function collapseWithScrollTop(params: {
+export function collapseMakeElementAtVisibleTopOfContainer(params: {
   container: HTMLElement;
   element: HTMLElement;
-  topVisibleBefore: boolean;
   onCollapse: () => void;
 }) {
-  const { container, element, topVisibleBefore, onCollapse } = params;
+  const { container, element, onCollapse } = params;
   const cRect = container.getBoundingClientRect();
+  const rBefore = element.getBoundingClientRect();
+  const topVisibleBefore = rBefore.top >= cRect.top;
   onCollapse();
-  requestAnimationFrame(() => {
-    if (!topVisibleBefore) {
-      const rAfter = element.getBoundingClientRect();
-      const deltaTop = rAfter.top - cRect.top;
-      container.scrollTop += deltaTop;
-    }
-  });
+  const handleScrollCompensation = () => {
+    const rAfter = element.getBoundingClientRect();
+    const deltaTop = rAfter.top - cRect.top;
+    container.scrollTop += deltaTop;
+  };
+  if (!topVisibleBefore) {
+    setTimeout(handleScrollCompensation, 300);
+  }
 }
 
+export const scrollElementTopToContainerTop = (element: HTMLElement, container: HTMLElement) => {
+  const rBefore = element.getBoundingClientRect();
+  const cRect = container.getBoundingClientRect();
+  const deltaTop = rBefore.top - cRect.top;
+  container.scrollTop += deltaTop;
+};
+
+export function collapseWithElementTopToContainerTop(params: {
+  container: HTMLElement;
+  element: HTMLElement;
+  onCollapse: () => void;
+}) {
+  const { container, element, onCollapse } = params;
+  const cRect = container.getBoundingClientRect();
+  const rBefore = element.getBoundingClientRect();
+  const isTopVisible = rBefore.top >= cRect.top;
+  if (isTopVisible) {
+    onCollapse();
+    return;
+  } else {
+    scrollElementTopToContainerTop(element, container);
+    setTimeout(() => {
+      onCollapse();
+    }, 200);
+  }
+}
 /**
  * Gets the floating offset value for collapse button positioning
  * Reads from CSS custom property --collapse-float-offset or returns default value
