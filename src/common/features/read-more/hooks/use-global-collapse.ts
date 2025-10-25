@@ -6,8 +6,6 @@ import {
   getMessageIdFromElement,
 } from "../core/dom-constants";
 import { useReadMoreStore, selectShowFloatingCollapse } from "../store/read-more.store";
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
 function findBottomCandidate(container: HTMLElement) {
   const nodes = Array.from(

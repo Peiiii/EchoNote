@@ -1,4 +1,4 @@
-import { collapseMakeElementAtVisibleTopOfContainer, collapseWithElementTopToContainerTop } from "@/common/features/read-more/core/collapse-utils";
+import { collapseWithElementTopToContainerTop } from "@/common/features/read-more/core/collapse-utils";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";

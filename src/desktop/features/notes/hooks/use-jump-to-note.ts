@@ -1,4 +1,5 @@
 import { READ_MORE_SELECTORS } from "@/common/features/read-more/core/dom-constants";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import {
     useNotesViewStore as notesViewStore
@@ -6,10 +7,12 @@ import {
 import { useRef } from "react";
 
 export const useJumpToNote = () => {
+  const presenter = useCommonPresenterContext();
   const jumpingRef = useRef(false);
   const jumpToNote = ({ channelId, messageId }: { channelId: string; messageId: string }) => {
     if (jumpingRef.current) return; // simple throttle to avoid rapid repeated jumps
     jumpingRef.current = true;
+    const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     const ensureHighlightStyle = () => {
       const id = "search-target-highlight-style";
@@ -89,12 +92,30 @@ export const useJumpToNote = () => {
         }
 
         const selector = READ_MORE_SELECTORS.messageById(messageId);
-        const tryScroll = () => {
-          const el = document.querySelector(selector);
-          if (el) {
-            (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "start" });
-            applyHighlightWhenVisible(el as HTMLElement, 3000);
+        const applyScrollAndHighlight = (el: HTMLElement, alreadyScrolled?: boolean) => {
+          if (!alreadyScrolled) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          applyHighlightWhenVisible(el, 3000);
+        };
+        const tryScroll = async () => {
+          const existing = document.querySelector(selector) as HTMLElement | null;
+          if (existing) {
+            applyScrollAndHighlight(existing);
             return true;
+          }
+
+          const virtualApi = presenter.scrollManager.getTimelineVirtualScrollApi();
+          const didVirtualScroll =
+            virtualApi?.scrollToMessageId(messageId, { align: "start", behavior: "smooth" }) ?? false;
+
+          if (didVirtualScroll) {
+            await wait(120);
+            const afterVirtual = document.querySelector(selector) as HTMLElement | null;
+            if (afterVirtual) {
+              applyScrollAndHighlight(afterVirtual, true);
+              return true;
+            }
           }
           return false;
         };
@@ -108,7 +129,7 @@ export const useJumpToNote = () => {
 
         // Loop: try find → load more if possible → wait → retry
         while (Date.now() - startedAt < MAX_WAIT_MS) {
-          if (tryScroll()) return;
+          if (await tryScroll()) return;
 
           const state = channelMessageService.dataContainer.get().messageByChannel[channelId];
           const canLoadMore = state?.hasMore && !state.loadingMore;

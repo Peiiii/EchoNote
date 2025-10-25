@@ -6,6 +6,7 @@ import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
 import { AITrigger, logService } from "@/core/services/log.service";
+import type { TimelineScrollAlign, TimelineScrollBehavior, TimelineVirtualScrollApi } from "@/common/services/scroll.manager";
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
@@ -121,20 +122,51 @@ export const MessageTimeline = ({
     return map;
   }, [messages]);
 
-  const items = useMemo(() => {
-    return Object.entries(groupedMessages).map(([date, dayMessages]) => {
-      return [
-        {
-          type: "date-divider",
-          date,
-        },
-        ...dayMessages.filter(msg => msg.sender === "user" && !msg.parentId).map((message: Message) => ({
-          type: "message",
-          message,
-        })),
-      ];
-    }).flat() as MessageTimelineItem[];
+  const { items, indexMap } = useMemo(() => {
+    const list: MessageTimelineItem[] = [];
+    const map = new Map<string, number>();
+    Object.entries(groupedMessages).forEach(([date, dayMessages]) => {
+      list.push({
+        type: "date-divider",
+        date,
+      });
+      dayMessages
+        .filter(msg => msg.sender === "user" && !msg.parentId)
+        .forEach((message: Message) => {
+          list.push({
+            type: "message",
+            message,
+          });
+          map.set(message.id, list.length - 1);
+        });
+    });
+    return { items: list, indexMap: map };
   }, [groupedMessages]);
+
+  const indexMapRef = useRef(indexMap);
+  indexMapRef.current = indexMap;
+
+  useEffect(() => {
+    const api: TimelineVirtualScrollApi = {
+      scrollToMessageId: (messageId: string, options?: { align?: TimelineScrollAlign; behavior?: TimelineScrollBehavior }) => {
+        const index = indexMapRef.current.get(messageId);
+        const virtuoso = virtuosoRef.current;
+        if (index === undefined || !virtuoso) {
+          return false;
+        }
+        virtuoso.scrollToIndex({
+          index,
+          align: options?.align ?? "start",
+          behavior: options?.behavior ?? "auto",
+        });
+        return true;
+      },
+    };
+    presenter.scrollManager.setTimelineVirtualScrollApi(api);
+    return () => {
+      presenter.scrollManager.setTimelineVirtualScrollApi(null);
+    };
+  }, [presenter]);
 
   const renderMessageItem = (message: Message) => {
     const groupKey = message.threadId || message.id;
