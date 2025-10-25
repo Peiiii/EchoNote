@@ -219,6 +219,9 @@ export const MessageTimeline = ({
           itemContent={(_, item) => renderItem(item)}
           scrollerRef={ref => {
             containerRef.current = (ref as HTMLDivElement) || null;
+            if (ref instanceof HTMLDivElement) {
+              ref.classList.add("timeline-scroll");
+            }
           }}
           style={{ height: "100%", width: "100%" }}
         />
