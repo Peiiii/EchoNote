@@ -20,6 +20,7 @@ export const TimelineLayout = ({
   // keep the reading width comfortable and centered.
   const { sideView } = useUIStateStore();
   const isFocusMode = !sideView;
+  const sectionWidthClass = isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : "w-full";
 
   return (
     <div className={`relative w-full h-full ${className}`} data-component="timeline-layout">
@@ -27,21 +28,19 @@ export const TimelineLayout = ({
         {/* Channel Cover Header */}
         {channel && <ChannelHeader channel={channel} />}
 
-        {/* Actions area at top (composer)
+        {/* Timeline content area */}
+        <div className={`flex-1 flex flex-col min-h-0 ${sectionWidthClass}`}>
+          {content}
+        </div>
+
+        {/* Actions area at bottom (composer)
             - Focus mode: keep the same width as content (centered)
-            - Otherwise: full-width so its bottom border divides the whole container */}
+            - Otherwise: full-width so its top border divides the whole container */}
         {actions && (
-          <div className={isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : "w-full"}>
+          <div className={`${sectionWidthClass} shrink-0`}>
             {actions}
           </div>
         )}
-
-        {/* Timeline content area below actions */}
-        <div
-          className={`flex-1 flex flex-col min-h-0 ${isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : ""}`}
-        >
-          {content}
-        </div>
       </div>
     </div>
   );

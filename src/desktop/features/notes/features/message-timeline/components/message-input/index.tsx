@@ -22,14 +22,14 @@ export function MessageInput() {
   const isFocusMode = !sideView;
   const { inputCollapsed } = useInputCollapse();
   // Outer container stays borderless so when collapsed nothing is visible
-  const containerClass = "sticky top-0 z-10";
+  const containerClass = `sticky bottom-0 z-10 shrink-0 ${isFocusMode ? "pb-4" : ""}`;
   const panelBase =
-    "overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out will-change-[max-height,opacity,transform] origin-top";
+    "overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out will-change-[max-height,opacity,transform] origin-bottom";
   const panelOpen = "max-h-[360px] opacity-100 translate-y-0";
-  const panelClosed = "max-h-0 opacity-0 -translate-y-1 py-0";
+  const panelClosed = "max-h-0 opacity-0 translate-y-1 py-0";
   const panelDecorOpen = isFocusMode
     ? "rounded-xl border border-border/60 shadow-xs"
-    : "border-b border-border/60";
+    : "border-t border-border/60";
   const panelRef = useRef<HTMLDivElement>(null);
   return (
     <div className={containerClass}>

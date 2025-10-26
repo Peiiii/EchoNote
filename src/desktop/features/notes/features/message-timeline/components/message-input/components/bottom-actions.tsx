@@ -1,11 +1,4 @@
-import {
-  FileText,
-  Image,
-  Mic,
-  MoreHorizontal,
-  PanelBottomClose,
-  ArrowDown,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, FileText, Image, Mic, MoreHorizontal, PanelBottomClose } from "lucide-react";
 import { ToolbarButton } from "./toolbar-button";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { useInputCollapse } from "../../../hooks/use-input-collapse";
@@ -51,10 +44,9 @@ export function BottomActions({ onSend, canSend }: BottomActionsProps) {
           }`}
           aria-label="Send note"
         >
-          <ArrowDown className="w-4 h-4" />
+          <ArrowUp className="w-4 h-4" />
         </button>
       </div>
     </div>
   );
 }
-
