@@ -40,14 +40,6 @@ export function ExpandedEditor({
     setLocalContent(content);
   }, [content]);
 
-  // Auto-adjust textarea height
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [localContent]);
-
   const handleContentChange = (value: string) => {
     setLocalContent(value);
     updateContent(value);
@@ -111,7 +103,7 @@ export function ExpandedEditor({
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 p-6 overflow-y-auto">
+          <div className="flex-1 min-h-0 p-6 overflow-hidden flex items-start">
             <textarea
               ref={textareaRef}
               value={localContent}
