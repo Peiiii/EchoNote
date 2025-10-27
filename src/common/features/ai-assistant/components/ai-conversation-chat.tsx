@@ -3,7 +3,6 @@ import {
   isTempConversation,
   useConversationStore,
 } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import {
   AgentChatCore,
   UIMessage,
@@ -21,11 +20,12 @@ import { aiAgentFactory } from "../services/ai-agent-factory";
 import { ConversationChatProps } from "../types/conversation.types";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
-  const { userId: _userId } = useNotesDataStore();
   const { messages, createMessage, updateMessage, loading } =
     useConversationMessages(conversationId);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
+  const allConversations = useConversationStore(s => s.conversations);
   const isBrandNewConversation = !!conv && conv.messageCount === 0;
+  const isFirstConversation = allConversations.filter(c => !c.id.startsWith("temp-")).length === 1 && isBrandNewConversation;
   const showLoading = loading && !isBrandNewConversation;
 
   const lastConversationIdRef = useRef(conversationId);
@@ -55,6 +55,7 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
             messages={messages}
             createMessage={createMessage}
             updateMessage={updateMessage}
+            isFirstConversation={isFirstConversation}
           />
         )}
       </div>
@@ -68,6 +69,7 @@ interface AgentChatCoreWrapperProps {
   messages: UIMessage[];
   createMessage: (message: UIMessage) => Promise<void>;
   updateMessage: (message: UIMessage) => Promise<void>;
+  isFirstConversation: boolean;
 }
 
 function AgentChatCoreWrapper({
@@ -76,6 +78,7 @@ function AgentChatCoreWrapper({
   messages,
   createMessage,
   updateMessage,
+  isFirstConversation,
 }: AgentChatCoreWrapperProps) {
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => {
@@ -83,13 +86,91 @@ function AgentChatCoreWrapper({
   }, []);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
 
+  const getContextsWithFirstSessionInfo = useMemo(() => {
+    return () => {
+      const baseContexts = aiAgentFactory.getSessionContexts(conversationId, channelId);
+
+      if (isFirstConversation) {
+        return [
+          {
+            description: "Product Information & First Session Guide",
+            value: JSON.stringify({
+              welcomeMessage: "This is the user's first AI conversation. Please DEMONSTRATE your agent capabilities by actively using tools to show what you can do.",
+              productInfo: {
+                name: "StillRoot",
+                purpose: "A personal growth companion platform that helps users become who they want to be",
+                coreFeatures: [
+                  "Personal Growth Guidance: Monitor progress, identify problems in thinking and behavior, provide specific improvement suggestions",
+                  "Deep Understanding: Help users dig deeper from surface phenomena to underlying essence and patterns",
+                  "Insight Discovery: Analyze connections between notes, discover knowledge blind spots, provide new insights",
+                  "Note Management: Create, read, update, and organize notes across channels with AI assistance"
+                ],
+                valueProposition: "StillRoot helps users track thoughts, discover patterns, and grow personally through AI-powered analysis of their notes and ideas.",
+                mission: "Help users become who they want to be through cognitive enhancement and personal growth supervision"
+              },
+              engagementStrategy: "Be enthusiastic, show value by USING TOOLS, demonstrate capabilities, and encourage exploration. Make them feel excited about using StillRoot regularly.",
+              demonstrationRequirements: [
+                "You MUST actively use at least 2-3 tools to demonstrate your capabilities",
+                "Use listNotes to show you can access their notes and provide insights",
+                "Use grepNotes to search their notes and find patterns or interesting content",
+                "Analyze their notes to provide meaningful insights",
+                "Show excitement about their data and suggest ways to explore it",
+                "CRITICAL: Call tools ONE AT A TIME. Wait for each tool to complete before calling the next one. Do not send multiple tool calls in parallel.",
+                "For example, first call listNotes, wait for results, then call grepNotes, wait for results, then analyze"
+              ],
+              suggestedApproach: [
+                "Greet them warmly as their personal growth companion",
+                "Briefly introduce StillRoot's mission and your role",
+                "IMMEDIATELY start using tools (listNotes, grepNotes, etc.) to demonstrate your capabilities",
+                "Show actual insights from their notes, even if they're just starting out",
+                "Highlight the value of having AI-powered analysis of their thoughts",
+                "Invite them to try asking questions or exploring specific topics",
+                "Be encouraging and show enthusiasm about helping them grow"
+              ]
+            }),
+          },
+          ...baseContexts,
+        ];
+      }
+      return baseContexts;
+    };
+  }, [conversationId, channelId, isFirstConversation]);
+
+  const initialMessagesWithWelcome = useMemo(() => {
+    if (isFirstConversation && !isTempConversation(conversationId) && messages.length === 0) {
+      const welcomePrompt: UIMessage = {
+        id: `welcome-${conversationId}`,
+        role: "user",
+        parts: [
+          {
+            type: "text",
+            text: "Hi! I'm new here. Could you please introduce yourself and explain what you can do to help me?",
+          },
+        ],
+      };
+      return [welcomePrompt];
+    }
+    return messages;
+  }, [isFirstConversation, conversationId, messages]);
+
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
-    getContexts: () => aiAgentFactory.getSessionContexts(conversationId, channelId),
-    initialMessages: messages,
+    getContexts: getContextsWithFirstSessionInfo,
+    initialMessages: initialMessagesWithWelcome,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
+
+  const welcomeMessageSentRef = useRef(false);
+
+  useEffect(() => {
+    if (isFirstConversation) {
+      if (!welcomeMessageSentRef.current) {
+        welcomeMessageSentRef.current = true;
+        agentSessionManager.runAgent();
+      }
+    }
+  }, [isFirstConversation, conversationId, agentSessionManager]);
 
   const memoizedCreateMessage = useMemoizedFn(createMessage);
   const memoizedUpdateMessage = useMemoizedFn(updateMessage);
