@@ -39,6 +39,22 @@ export const MessageTimeline = ({
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
   const { inputCollapsed, handleExpandInput, handleCollapseInput } = useInputCollapse();
+  // Delay showing the bottom FAB until the input collapse animation finishes,
+  // to avoid the visual "sliding down" caused by the content area resizing.
+  const [showComposerFab, setShowComposerFab] = useState(false);
+  useEffect(() => {
+    // Match the composer panel transition (~220ms) with a small buffer
+    const DELAY_MS = 260;
+    let timer: number | null = null;
+    if (inputCollapsed) {
+      timer = window.setTimeout(() => setShowComposerFab(true), DELAY_MS);
+    } else {
+      setShowComposerFab(false);
+    }
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [inputCollapsed]);
   // We render the timeline with react-virtuoso for virtualization.
   // containerRef points to the scrollable container (the Virtuoso Scroller)
   const containerRef = useRef<HTMLDivElement>(null);
@@ -228,13 +244,6 @@ export const MessageTimeline = ({
       </div>
       <div className="absolute top-4 right-4 z-20 pointer-events-none">
         <div className="flex flex-col items-end gap-2">
-          {inputCollapsed && (
-            <div className="pointer-events-auto">
-              <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
-                <Pencil className="h-4 w-4" />
-              </FloatingActionButton>
-            </div>
-          )}
           <div className="pointer-events-auto">
             <FloatingActionButton
               onClick={() => {
@@ -256,6 +265,23 @@ export const MessageTimeline = ({
               isVisible={showScrollToTopButton}
             />
           </div>
+        </div>
+      </div>
+      {/** Bottom-right floating area: reveal after collapse settles (no sliding) */}
+      <div
+        className="absolute right-4 z-20 pointer-events-none"
+        style={{
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+        }}
+      >
+        <div className={`transition-opacity duration-150 ${showComposerFab ? "opacity-100" : "opacity-0"}`}>
+          {showComposerFab && (
+            <div className="pointer-events-auto">
+            <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
+              <Pencil className="h-4 w-4" />
+            </FloatingActionButton>
+          </div>
+          )}
         </div>
       </div>
       <div
