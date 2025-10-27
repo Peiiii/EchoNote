@@ -7,7 +7,7 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { ChannelEditField, logService } from "@/core/services/log.service";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Edit3 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface EditChannelPopoverProps {
   channel: Channel;
@@ -21,6 +21,15 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   const [editDescription, setEditDescription] = useState(channel.description);
   const [editEmoji, setEditEmoji] = useState(channel.emoji || "");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sync form state with latest channel when popover opens or when channel switches while open.
+  // This fixes stale data when user switches space via dropdown and then clicks edit.
+  useEffect(() => {
+    if (!isOpen) return;
+    setEditName(channel.name);
+    setEditDescription(channel.description);
+    setEditEmoji(channel.emoji || "");
+  }, [isOpen, channel.id, channel.name, channel.description, channel.emoji]);
 
   const handleSave = async () => {
     if (!editName.trim()) return;

@@ -171,6 +171,7 @@ export const ChannelHeader = ({
             <PanelLeft className="h-4 w-4" />
           </Button>
           <CreateChannelPopover
+            instantCreate
             trigger={
               <Button
                 variant="ghost"
@@ -249,6 +250,7 @@ export const ChannelHeader = ({
               </Button>
               {/* New space button remains useful in collapsed mode */}
               <CreateChannelPopover
+                instantCreate
                 trigger={
                   <Button
                     variant="ghost"

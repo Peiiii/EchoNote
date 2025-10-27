@@ -17,16 +17,22 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { getRandomEmoji } from "@/common/utils/emoji";
 import { logService } from "@/core/services/log.service";
 import { Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import React, { useState, type ReactNode, isValidElement, cloneElement } from "react";
 
 interface CreateChannelPopoverProps {
   trigger?: ReactNode;
   variant?: "dialog" | "popover";
+  /** When true, clicking trigger will instantly create a space with a default name */
+  instantCreate?: boolean;
+  /** Optional default name when instant creating (defaults to 'Untitled') */
+  defaultName?: string;
 }
 
 export function CreateChannelPopover({
   trigger,
   variant = "popover",
+  instantCreate = false,
+  defaultName = "Untitled",
 }: CreateChannelPopoverProps) {
   const presenter = useCommonPresenterContext();
   const [open, setOpen] = useState(false);
@@ -52,6 +58,15 @@ export function CreateChannelPopover({
       emoji: emoji?.trim() || undefined,
     });
     setOpen(false);
+  };
+
+  // Instant create flow: create a space immediately without asking for inputs
+  const handleInstantCreate = async () => {
+    await handleAddChannel({
+      name: defaultName,
+      description: "",
+      emoji: undefined,
+    });
   };
 
   const handleCancel = () => {
@@ -83,6 +98,7 @@ export function CreateChannelPopover({
     <Button
       variant="outline"
       className="w-full h-10 text-muted-foreground hover:text-foreground border-dashed"
+      onClick={instantCreate ? handleInstantCreate : undefined}
     >
       <Plus className="w-4 h-4 mr-2" />
       New Space
@@ -162,6 +178,26 @@ export function CreateChannelPopover({
       </RefinedPopover.Button>
     </>
   );
+
+  // If instant create is enabled, we don't render any popover/dialog at all,
+  // just return the trigger with the instant create handler attached.
+  if (instantCreate) {
+    // Attach click handler to custom trigger if provided
+    if (trigger) {
+      if (isValidElement(trigger)) {
+        const existing = (trigger.props as any)?.onClick as
+          | ((e: React.MouseEvent) => void)
+          | undefined;
+        const mergedOnClick = async (e: React.MouseEvent) => {
+          existing?.(e);
+          await handleInstantCreate();
+        };
+        return cloneElement(trigger as React.ReactElement<any>, { onClick: mergedOnClick } as any);
+      }
+      return <span onClick={handleInstantCreate}>{trigger}</span>;
+    }
+    return defaultTrigger;
+  }
 
   if (variant === "dialog") {
     return (

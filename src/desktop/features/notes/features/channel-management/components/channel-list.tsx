@@ -69,6 +69,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
         </div>
         <div className="flex items-center gap-2">
           <CreateChannelPopover
+            instantCreate
             trigger={
               <button
                 type="button"

@@ -41,6 +41,7 @@ export const MobileHeader = ({
             <PanelLeft className="size-5" />
           </Button>
           <CreateChannelPopover
+            instantCreate
             variant="dialog"
             trigger={
               <Button

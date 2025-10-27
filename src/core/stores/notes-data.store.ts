@@ -150,6 +150,26 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     if (typeof newId === "string" && newId) {
       try {
         useNotesViewStore.getState().setCurrentChannel(newId);
+        // Optimistically add the new channel to local store so UI updates immediately
+        // This prevents a brief mismatch where header actions still reference the old channel
+        // before Firestore subscription pushes the new channel doc.
+        const optimisticChannel: Channel = {
+          id: newId,
+          name: finalChannel.name,
+          description: finalChannel.description,
+          emoji: finalChannel.emoji,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          messageCount: 0,
+          lastMessageTime: new Date(),
+          backgroundColor: undefined,
+          backgroundImage: undefined,
+        };
+        const { channels } = useNotesDataStore.getState();
+        const exists = channels.some(c => c.id === newId);
+        if (!exists) {
+          useNotesDataStore.setState({ channels: [optimisticChannel, ...channels] });
+        }
       } catch (err) {
         console.warn("[addChannel] Failed to set current channel after creation", err);
       }
