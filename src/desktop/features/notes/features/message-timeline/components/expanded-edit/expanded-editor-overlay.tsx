@@ -26,7 +26,7 @@ export const ExpandedEditorOverlay = ({
     >
       <DialogContent
         showCloseButton={false}
-        className={`p-0 gap-0 overflow-hidden sm:max-w-[95vw] md:max-w-5xl w-[95vw] h-[85vh] ${className}`}
+        className={`p-0 gap-0 overflow-hidden !inset-0 !max-w-none !w-screen !h-screen !translate-x-0 !translate-y-0 !rounded-none ${className}`}
       >
         <ExpandedEditor
           content={editContent}
