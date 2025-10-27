@@ -40,11 +40,9 @@ export interface UIState {
 export const useUIStateStore = create<UIState>()(
   persist(
     (set, get) => ({
-      // Initial state - open on desktop, closed on mobile
-      isAIAssistantOpen: !isMobile(),
-      isThreadOpen: false,
+      // Initial state - desktop: AI panel open by default
+      sideView: !isMobile() ? SideViewEnum.AI_ASSISTANT : undefined,
       currentThreadId: null,
-      isSettingsOpen: false,
       isChannelListOpen: false,
 
       // AI Assistant actions (mutually exclusive with thread sidebar)
@@ -98,7 +96,6 @@ export const useUIStateStore = create<UIState>()(
     }),
     {
       name: "echonote-ui-state",
-      // Only persist the AI assistant open/close state to satisfy the requirement
       partialize: state => ({ sideView: state.sideView }),
     }
   )
