@@ -19,7 +19,7 @@ export interface EditState {
   updateContent: (content: string) => void;
   switchToExpandedMode: () => void;
   switchToInlineMode: () => void;
-  save: () => Promise<void>;
+  save: (shouldCloseAfterSave?: boolean) => Promise<void>;
   cancel: () => void;
   reset: () => void;
 }
@@ -65,7 +65,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   },
 
   // Save the edited message
-  save: async () => {
+  save: async (shouldCloseAfterSave = true) => {
     const { editingMessageId, editContent } = get();
     if (!editingMessageId || !editContent.trim()) return;
 
@@ -89,11 +89,21 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
         userId,
       });
 
-      get().reset();
+      if (shouldCloseAfterSave) {
+        get().reset();
+      } else {
+        set({ 
+          isSaving: false,
+          isDirty: false,
+          originalContent: editContent.trim(),
+        });
+      }
     } catch (error) {
       console.error("Failed to save message:", error);
     } finally {
-      set({ isSaving: false });
+      if (shouldCloseAfterSave) {
+        set({ isSaving: false });
+      }
     }
   },
 

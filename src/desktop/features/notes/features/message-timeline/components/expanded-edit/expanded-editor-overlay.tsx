@@ -30,7 +30,7 @@ export const ExpandedEditorOverlay = ({
       >
         <ExpandedEditor
           content={editContent}
-          onSave={() => presenter.noteEditManager.save()}
+          onSave={() => presenter.noteEditManager.save(false)}
           onCancel={() => presenter.noteEditManager.cancel()}
           onCollapse={() => presenter.noteEditManager.switchToInlineMode()}
           isSaving={isSaving}

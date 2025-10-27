@@ -22,6 +22,7 @@ export function ExpandedEditor({
   isSaving,
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
+  const [isLocalSaving, setIsLocalSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Select only the updater to avoid subscribing to edit content changes here
   const updateContent = useEditStateStore(s => s.updateContent);
@@ -45,9 +46,14 @@ export function ExpandedEditor({
     updateContent(value);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (localContent.trim()) {
-      onSave();
+      setIsLocalSaving(true);
+      try {
+        await onSave();
+      } finally {
+        setIsLocalSaving(false);
+      }
     }
   };
 
@@ -58,7 +64,8 @@ export function ExpandedEditor({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       handleCancel();
-    } else if (e.key === "Enter" && isModifierKeyPressed(e)) {
+    } else if (e.key === "s" && isModifierKeyPressed(e)) {
+      e.preventDefault();
       handleSave();
     }
     // Tab handling is now managed by useEditor hook
@@ -148,7 +155,7 @@ export function ExpandedEditor({
           {/* Left side - Keyboard shortcuts hint */}
           <div className="text-xs text-slate-500 dark:text-slate-400">
             <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700">
-              {SHORTCUTS.SAVE}
+              Cmd+S
             </kbd>
             <span className="ml-2">to save,</span>
             <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700 ml-2">
@@ -163,7 +170,7 @@ export function ExpandedEditor({
               variant="ghost"
               size="sm"
               onClick={handleCancel}
-              disabled={isSaving}
+              disabled={isLocalSaving}
               className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               <X className="w-3.5 h-3.5 mr-1.5" />
@@ -173,10 +180,10 @@ export function ExpandedEditor({
             <Button
               size="sm"
               onClick={handleSave}
-              disabled={isSaving || !localContent.trim()}
+              disabled={isLocalSaving || !localContent.trim()}
               className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
             >
-              {isSaving ? (
+              {isLocalSaving ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                   Saving...
@@ -184,7 +191,7 @@ export function ExpandedEditor({
               ) : (
                 <>
                   <Check className="w-3.5 h-3.5 mr-1.5" />
-                  Save Changes
+                  Save
                 </>
               )}
             </Button>
