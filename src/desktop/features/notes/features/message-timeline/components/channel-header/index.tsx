@@ -23,6 +23,8 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
+import { EditChannelPopover } from "../../../channel-management/components/edit-channel-popover";
+import { Edit2 } from "lucide-react";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -151,6 +153,9 @@ export const ChannelHeader = ({
     }
   };
 
+  // Collapsed header content. When the left sidebar is collapsed, we also expose
+  // an inline edit entry so users can quickly edit space name/emoji/description
+  // without expanding the sidebar.
   const collapsedContent = (
     <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
       {/* Sidebar expand button when sidebar is collapsed */}
@@ -182,13 +187,26 @@ export const ChannelHeader = ({
       )}
 
       {isLeftSidebarCollapsed ? (
-        <div className="flex flex-1 min-w-0 max-w-full">
+        <div className="flex flex-1 min-w-0 max-w-full items-center gap-1">
           <ChannelDropdownSelector
             currentChannel={channel}
             channels={channels}
             onChannelSelect={setCurrentChannel}
             className="min-w-0 max-w-full"
           />
+          {/* Inline edit when sidebar is collapsed */}
+          <EditChannelPopover channel={channel}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0"
+              title="Edit space"
+              aria-label="Edit space"
+              onClick={e => e.stopPropagation()}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+          </EditChannelPopover>
         </div>
       ) : (
         <>
@@ -229,6 +247,7 @@ export const ChannelHeader = ({
               >
                 <PanelLeft className="h-4 w-4" />
               </Button>
+              {/* New space button remains useful in collapsed mode */}
               <CreateChannelPopover
                 trigger={
                   <Button
@@ -263,6 +282,21 @@ export const ChannelHeader = ({
         </div>
 
         <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
+          {/* Offer edit in header when sidebar is collapsed as well */}
+          {isLeftSidebarCollapsed && (
+            <EditChannelPopover channel={channel}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+                title="Edit space"
+                aria-label="Edit space"
+                onClick={e => e.stopPropagation()}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+            </EditChannelPopover>
+          )}
           <Button
             variant="ghost"
             size="sm"
