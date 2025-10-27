@@ -14,9 +14,13 @@ import React from "react";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 
-// Escape regex special characters for fixed string searches
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function detectRegexPattern(pattern: string): boolean {
+  const regexOperators = /[|*+?^${}()[\]\\]/;
+  return regexOperators.test(pattern);
 }
 
 function buildMatcher(args: GrepToolArgs): {
@@ -40,14 +44,17 @@ function buildMatcher(args: GrepToolArgs): {
     };
   }
 
-  // Regex or plain substring
-  const source = args.isRegex ? pattern : escapeRegExp(pattern);
-  const wordWrapped = args.word ? `\\b${source}\\b` : source;
+  const effectiveIsRegex = args.isRegex ?? detectRegexPattern(pattern);
+  let source = effectiveIsRegex ? pattern : escapeRegExp(pattern);
+  
+  if (args.word) {
+    source = `\\b${source}\\b`;
+  }
+  
   let re: RegExp;
   try {
-    re = new RegExp(wordWrapped, flags);
+    re = new RegExp(source, flags);
   } catch {
-    // Fallback to safe literal search
     const term = args.ignoreCase ? pattern.toLowerCase() : pattern;
     return {
       test: (text: string) => {
@@ -137,8 +144,8 @@ async function grepExecute(args: GrepToolArgs): Promise<GrepToolResult> {
         await localDataManager.updateAll();
       }
       allNotes = await firstValueFrom(localDataManager.getNotes(filters));
-    } catch (_e) {
-      // ignore refresh error
+    } catch {
+      void 0;
     }
   }
   if (args.excludeChannels && args.excludeChannels.length > 0) {
@@ -229,24 +236,54 @@ export function createGrepTool(): Tool<GrepToolArgs, GrepToolResult> {
   return {
     name: "grepNotes",
     description:
-      "Search notes with grep-like semantics. Supports regex, case-insensitive, word boundary, context lines, and filtering by channel/tags/date.",
+      "Search notes with grep-like semantics (equivalent to 'grep -E' by default). Automatically detects and enables extended regex mode when pattern contains special characters (|, *, +, ?, etc). Supports regex alternation (e.g., '产品|时间线'), case-insensitive, word boundary, context lines, and filtering by channel/tags/date. Use fixedStrings=true for literal string search (like 'grep -F').",
     parameters: {
       type: "object",
       properties: {
         pattern: {
           type: "string",
-          description: "Search pattern (string or regex source when isRegex=true)",
+          description: "Search pattern. Extended regex mode is automatically enabled if pattern contains special characters like | (alternation), *, +, ?, etc. Matches 'grep -E' behavior.",
         },
-        isRegex: { type: "boolean" },
-        ignoreCase: { type: "boolean" },
-        word: { type: "boolean" },
-        fixedStrings: { type: "boolean" },
-        before: { type: "number" },
-        after: { type: "number" },
-        context: { type: "number" },
-        countOnly: { type: "boolean" },
-        listOnly: { type: "boolean" },
-        onlyMatching: { type: "boolean" },
+        isRegex: { 
+          type: "boolean",
+          description: "Force regex mode on/off. By default, mode is auto-detected based on pattern content."
+        },
+        ignoreCase: { 
+          type: "boolean",
+          description: "Case-insensitive search (like 'grep -i')"
+        },
+        word: { 
+          type: "boolean",
+          description: "Match whole words only (like 'grep -w')"
+        },
+        fixedStrings: { 
+          type: "boolean",
+          description: "Disable regex and search for literal string (like 'grep -F')"
+        },
+        before: { 
+          type: "number",
+          description: "Print N lines of leading context before each match (like 'grep -B N')"
+        },
+        after: { 
+          type: "number",
+          description: "Print N lines of trailing context after each match (like 'grep -A N')"
+        },
+        context: { 
+          type: "number",
+          description: "Print N lines of surrounding context (like 'grep -C N')"
+        },
+        countOnly: { 
+          type: "boolean",
+          description: "Only output count of matching lines (like 'grep -c')"
+        },
+        listOnly: { 
+          type: "boolean",
+          description: "Only output filenames with matches (like 'grep -l')"
+        },
+        onlyMatching: { 
+          type: "boolean",
+          description: "Only output the matching part (like 'grep -o')"
+        },
         includeChannels: { type: "array", items: { type: "string" } },
         excludeChannels: { type: "array", items: { type: "string" } },
         tags: { type: "array", items: { type: "string" } },
