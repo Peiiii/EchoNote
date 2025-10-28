@@ -19,7 +19,87 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { ConversationContextMode } from "@/common/types/ai-conversation";
+import { ConversationContextMode, AIConversation } from "@/common/types/ai-conversation";
+
+// Context trigger component - encapsulates the trigger button logic
+interface ContextTriggerProps {
+  variant: "inline" | "banner" | "compact";
+  label: string;
+  tooltip?: string;
+  totalCount: number;
+  anyLoading: boolean;
+  conv: AIConversation | null | undefined;
+  showModeNameInCompact?: boolean;
+  modeName?: string;
+}
+
+function ContextTrigger({ variant, label, tooltip, totalCount, anyLoading, conv, showModeNameInCompact: _showModeNameInCompact = false, modeName: _modeName }: ContextTriggerProps) {
+  if (variant === "compact") {
+    return (
+      <button
+        type="button"
+        aria-label={`Context: ${label}`}
+        title={tooltip || label}
+        className="relative h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+      >
+        {(() => {
+          const ctx = conv?.contexts;
+          if (!ctx) return <Sparkles className="w-4 h-4" />; // Auto
+          if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4" />;
+          if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4" />;
+          if (ctx.mode === ConversationContextMode.CHANNELS)
+            return <Layers className="w-4 h-4" />;
+          return <SlidersHorizontal className="w-4 h-4" />;
+        })()}
+        {/* Total count badge (top-right). Show total instead of +N since compact does not show names */}
+        {totalCount > 0 && (
+          <span className="absolute top-0 right-0.5 min-w-[14px] h-3 px-1 rounded-full bg-muted text-foreground/80 text-[10px] leading-3 flex items-center justify-center">
+            {totalCount}
+          </span>
+        )}
+        {/* Status dot at bottom-center for better proximity (slightly more inset) */}
+        <span
+          className={
+            "absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full " +
+            (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
+          }
+        />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      title={tooltip || label}
+      className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md bg-background/50 backdrop-blur-sm border border-border/30 shadow-xs hover:shadow-sm hover:border-border/50 hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all duration-200 ease-out"
+    >
+      {(() => {
+        const ctx = conv?.contexts;
+        if (!ctx || ctx.mode === ConversationContextMode.AUTO) return <Sparkles className="w-4 h-4 text-muted-foreground/70" />; // Auto
+        if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4 text-muted-foreground/70" />;
+        if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4 text-muted-foreground/70" />;
+        if (ctx.mode === ConversationContextMode.CHANNELS)
+          return <Layers className="w-4 h-4 text-muted-foreground/70" />;
+        return <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />;
+      })()}
+      <span className="font-medium text-foreground/90 truncate max-w-[10rem]">{label}</span>
+      {/* Count badge */}
+      {totalCount > 0 && (
+        <span className="min-w-[18px] h-4 px-1.5 rounded-full bg-muted text-foreground/80 text-[10px] leading-4 flex items-center justify-center">
+          {totalCount}
+        </span>
+      )}
+      {/* Status dot */}
+      <span
+        className={
+          "w-1.5 h-1.5 rounded-full " +
+          (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
+        }
+      />
+    </button>
+  );
+}
 
 // Internal component for context option items
 interface ContextOptionProps {
@@ -200,6 +280,7 @@ interface Props {
   activeToolChannelId?: string | null;
   variant?: "inline" | "banner" | "compact";
   className?: string;
+  showModeNameInCompact?: boolean;
 }
 
 export function ConversationContextControl({
@@ -209,6 +290,7 @@ export function ConversationContextControl({
   activeToolChannelId,
   variant = "inline",
   className,
+  showModeNameInCompact = false,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
@@ -237,7 +319,7 @@ export function ConversationContextControl({
     getChannelName,
   });
 
-  const { label, otherCount, totalCount } = useContextDisplay({
+  const { label, totalCount } = useContextDisplay({
     contexts: conv?.contexts,
     fallbackChannelId,
     getChannelName,
@@ -257,70 +339,41 @@ export function ConversationContextControl({
     className
   );
 
+  // Get current mode name for display
+  const getCurrentModeName = () => {
+    const ctx = conv?.contexts;
+    if (!ctx || ctx.mode === ConversationContextMode.AUTO) return "Auto";
+    if (ctx.mode === ConversationContextMode.NONE) return "None";
+    if (ctx.mode === ConversationContextMode.ALL) return "All";
+    if (ctx.mode === ConversationContextMode.CHANNELS) return "Custom";
+    return "Auto";
+  };
+
   return (
     <div className={containerClass}>
       <RefinedPopover open={isOpen} onOpenChange={setIsOpen} modal>
         <RefinedPopover.Trigger asChild>
-          {variant === "compact" ? (
-            <button
-              type="button"
-              aria-label={`Context: ${label}`}
-              title={tooltip || label}
-              className="relative h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
-            >
-              {(() => {
-                const ctx = conv?.contexts;
-                if (!ctx) return <Sparkles className="w-4 h-4" />; // Auto
-                if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4" />;
-                if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4" />;
-                if (ctx.mode === ConversationContextMode.CHANNELS)
-                  return <Layers className="w-4 h-4" />;
-                return <SlidersHorizontal className="w-4 h-4" />;
-              })()}
-              {/* Total count badge (top-right). Show total instead of +N since compact does not show names */}
-              {totalCount > 0 && (
-                <span className="absolute top-0 right-0.5 min-w-[14px] h-3 px-1 rounded-full bg-muted text-foreground/80 text-[10px] leading-3 flex items-center justify-center">
-                  {totalCount}
+          <div className="flex items-center gap-1">
+            <ContextTrigger
+              variant={variant}
+              label={label}
+              tooltip={tooltip}
+              totalCount={totalCount}
+              anyLoading={anyLoading}
+              conv={conv}
+              showModeNameInCompact={showModeNameInCompact}
+              modeName={getCurrentModeName()}
+            />
+            {/* Mode name display - similar to model selector */}
+            {(variant !== "compact" || showModeNameInCompact) && (
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {getCurrentModeName()}
                 </span>
-              )}
-              {/* Status dot at bottom-center for better proximity (slightly more inset) */}
-              <span
-                className={
-                  "absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full " +
-                  (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
-                }
-              />
-            </button>
-          ) : (
-            <button
-              type="button"
-              title={tooltip || label}
-              className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md bg-background/50 backdrop-blur-sm border border-border/30 shadow-xs hover:shadow-sm hover:border-border/50 hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all duration-200 ease-out"
-            >
-              {(() => {
-                const ctx = conv?.contexts;
-                if (!ctx || ctx.mode === ConversationContextMode.AUTO) return <Sparkles className="w-4 h-4 text-muted-foreground/70" />; // Auto
-                if (ctx.mode === ConversationContextMode.NONE) return <Ban className="w-4 h-4 text-muted-foreground/70" />;
-                if (ctx.mode === ConversationContextMode.ALL) return <Globe className="w-4 h-4 text-muted-foreground/70" />;
-                if (ctx.mode === ConversationContextMode.CHANNELS)
-                  return <Layers className="w-4 h-4 text-muted-foreground/70" />;
-                return <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />;
-              })()}
-              <span className="font-medium text-foreground/90 truncate max-w-[10rem]">{label}</span>
-              {otherCount > 0 && (
-                <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">
-                  +{otherCount}
-                </span>
-              )}
-              <span
-                className={
-                  "w-1.5 h-1.5 rounded-full " +
-                  (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
-                }
-              />
-              <ChevronDown className="w-4 h-4 text-muted-foreground/60" />
-            </button>
-          )}
+                <ChevronDown className="w-3 h-3 opacity-50" />
+              </div>
+            )}
+          </div>
         </RefinedPopover.Trigger>
         <RefinedPopover.Content width="w-80" align="center" side="bottom">
           <RefinedPopover.Header>

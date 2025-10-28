@@ -1,3 +1,4 @@
+import { useBreakpoint } from "@/common/components/breakpoint-provider";
 import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
 import {
   isTempConversation,
@@ -81,6 +82,7 @@ function AgentChatCoreWrapper({
   updateMessage,
   isFirstConversation,
 }: AgentChatCoreWrapperProps) {
+  const { isMobile } = useBreakpoint();
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => {
     return aiAgentFactory.getChannelTools();
@@ -221,9 +223,10 @@ function AgentChatCoreWrapper({
       createContextSelectorExtension({
         conversationId,
         fallbackChannelId: channelId,
+        showModeNameInCompact: !isMobile,
       }),
     ],
-    [conversationId, channelId]
+    [conversationId, channelId, isMobile]
   );
 
   const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);

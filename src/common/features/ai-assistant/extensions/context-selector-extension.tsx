@@ -8,6 +8,7 @@ export interface ContextSelectorExtensionProps {
   onActiveToolChannelChange?: (id: string | null) => void;
   activeToolChannelId?: string | null;
   className?: string;
+  showModeNameInCompact?: boolean;
 }
 
 interface ContextSelectorRendererProps {
@@ -25,6 +26,7 @@ const ContextSelectorRenderer = ({ props }: ContextSelectorRendererProps) => {
       activeToolChannelId={props.activeToolChannelId}
       variant="compact"
       className={props.className}
+      showModeNameInCompact={props.showModeNameInCompact}
     />
   );
 };
