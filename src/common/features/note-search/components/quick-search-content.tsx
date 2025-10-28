@@ -7,6 +7,10 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useValueFromObservable } from "@/common/features/note-search/hooks/use-value-from-observable";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { useKeyboardNavigation } from "@/common/hooks/use-keyboard-navigation";
+import { useSwipeGestures } from "@/common/hooks/use-swipe-gestures";
+import { useScrollToActive } from "@/common/hooks/use-scroll-to-active";
+import { useAsyncOperation } from "@/common/hooks/use-async-operation";
 import { SearchHeader } from "./search-header";
 import { SearchResults } from "./search-results";
 import { EmptyStates } from "./search-empty-states";
@@ -24,7 +28,6 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
   const [results, setResults] = useState<NoteSearchMatch[]>([]);
   const [indexing, setIndexing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   const channelIds = useMemo(
@@ -73,81 +76,26 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
     presenter.rxEventBus.requestJumpToMessage$.emit({ channelId, messageId: noteId });
   }, [onClose, presenter.rxEventBus.requestJumpToMessage$]);
 
-  // Keyboard navigation: ArrowUp/ArrowDown/Enter/Escape/Tab
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-        return;
-      }
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActiveIndex(i => Math.min(i + 1, Math.max(0, results.length - 1)));
-        return;
-      }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActiveIndex(i => Math.max(0, i - 1));
-        return;
-      }
-      if (e.key === "Tab") {
-        e.preventDefault();
-        setScope(s => (s === "current" ? "all" : "current"));
-        return;
-      }
-      if (e.key === "Enter") {
-        if (results[activeIndex]) {
-          e.preventDefault();
-          const r = results[activeIndex];
-          handlePick(r.id, r.channelId);
-        }
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [results, activeIndex, onClose, handlePick]);
+  // Use universal keyboard navigation hook
+  useKeyboardNavigation({
+    items: results,
+    activeIndex,
+    setActiveIndex,
+    onSelect: (item: NoteSearchMatch) => handlePick(item.id, item.channelId),
+    onEscape: onClose,
+    onTab: () => setScope(s => (s === "current" ? "all" : "current")),
+  });
 
-  // Mobile: Handle swipe gestures for scope switching
-  useEffect(() => {
-    let startY = 0;
-    let startX = 0;
-    let isSwipe = false;
+  // Use universal swipe gestures hook
+  useSwipeGestures({
+    onSwipeLeft: () => setScope("all"),
+    onSwipeRight: () => setScope("current"),
+  });
 
-    const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      startX = e.touches[0].clientX;
-      isSwipe = false;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isSwipe) {
-        const deltaY = Math.abs(e.touches[0].clientY - startY);
-        const deltaX = Math.abs(e.touches[0].clientX - startX);
-        isSwipe = deltaX > deltaY && deltaX > 10;
-      }
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isSwipe) {
-        const deltaX = e.changedTouches[0].clientX - startX;
-        if (Math.abs(deltaX) > 50) {
-          e.preventDefault();
-          setScope(s => (s === "current" ? "all" : "current"));
-        }
-      }
-    };
-
-    document.addEventListener("touchstart", handleTouchStart, { passive: true });
-    document.addEventListener("touchmove", handleTouchMove, { passive: true });
-    document.addEventListener("touchend", handleTouchEnd, { passive: false });
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
+  // Use universal scroll to active hook
+  useScrollToActive({
+    activeId: results[activeIndex]?.id || null,
+  });
 
   // Subscribe to index stats to show lightweight progress
   const indexStats = useValueFromObservable(noteSearchService.getIndexStats$(), {
@@ -173,25 +121,13 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
     }
   }, [obsResults, q, scope, channelIds]);
 
-  // Keep the active item in view when navigating
-  useEffect(() => {
-    const id = results[activeIndex]?.id;
-    if (!id) return;
-    const el = document.getElementById(id);
-    el?.scrollIntoView({ block: "nearest" });
-  }, [activeIndex, results]);
-
-  // Mobile: Handle pull-to-refresh for search results
-  const handleRefresh = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    try {
+  // Use universal async operation hook for refresh
+  const { execute: refreshSearch, isLoading: isRefreshing } = useAsyncOperation({
+    operation: async () => {
       await noteSearchService.updateAllData();
       await noteSearchService.preIndexData();
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+    },
+  });
 
   return (
     <div className="flex flex-col w-full h-full min-h-0">
@@ -219,7 +155,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
             q={q}
             scope={scope}
             isRefreshing={isRefreshing}
-            onRefresh={handleRefresh}
+            onRefresh={refreshSearch}
           />
         ) : (
           <SearchResults
