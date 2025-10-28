@@ -352,7 +352,7 @@ export function ConversationContextControl({
                 currentMode={draftMode}
                 icon={<Sparkles className="w-4 h-4 text-muted-foreground" />}
                 title="Auto"
-                description="Current space"
+                description="Current space only"
                 onClick={() => {
                   setDraftMode(ConversationContextMode.AUTO);
                   setIsCustomExpanded(false);
@@ -363,8 +363,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.NONE}
                 currentMode={draftMode}
                 icon={<Ban className="w-4 h-4 text-muted-foreground" />}
-                title="No Context"
-                description="Clean chat"
+                title="None"
+                description="No context access"
                 onClick={() => {
                   setDraftMode(ConversationContextMode.NONE);
                   setIsCustomExpanded(false);
@@ -375,8 +375,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.ALL}
                 currentMode={draftMode}
                 icon={<Globe className="w-4 h-4 text-muted-foreground" />}
-                title="All Spaces"
-                description="Full access"
+                title="All"
+                description="All spaces access"
                 onClick={() => {
                   setDraftMode(ConversationContextMode.ALL);
                   setIsCustomExpanded(false);
@@ -388,7 +388,7 @@ export function ConversationContextControl({
                 currentMode={draftMode}
                 icon={<Layers className="w-4 h-4 text-muted-foreground" />}
                 title="Custom"
-                description="Select specific"
+                description="Select specific spaces"
                 showChevron={true}
                 isExpanded={isCustomExpanded}
                 onClick={() => {
