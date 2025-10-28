@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Input } from "@/common/components/ui/input";
-import { Badge } from "@/common/components/ui/badge";
 import { Search as SearchIcon, X } from "lucide-react";
 import {
   noteSearchService,
@@ -71,6 +70,13 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
     };
   }, [scope, currentChannelId]);
 
+  const channelName = (id: string) => channels.find(c => c.id === id)?.name || id;
+
+  const handlePick = useCallback((noteId: string, channelId: string) => {
+    onClose();
+    presenter.rxEventBus.requestJumpToMessage$.emit({ channelId, messageId: noteId });
+  }, [onClose, presenter.rxEventBus.requestJumpToMessage$]);
+
   // Keyboard navigation: ArrowUp/ArrowDown/Enter/Escape/Tab
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -104,7 +110,7 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [results, activeIndex, onClose]);
+  }, [results, activeIndex, onClose, handlePick]);
 
   // Mobile: Handle swipe gestures for scope switching
   useEffect(() => {
@@ -179,13 +185,6 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
     el?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, results]);
 
-  const channelName = (id: string) => channels.find(c => c.id === id)?.name || id;
-
-  const handlePick = (noteId: string, channelId: string) => {
-    onClose();
-    presenter.rxEventBus.requestJumpToMessage$.emit({ channelId, messageId: noteId });
-  };
-
   // Mobile: Handle pull-to-refresh for search results
   const handleRefresh = async () => {
     if (isRefreshing) return;
@@ -201,51 +200,51 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
   return (
     <div className="flex flex-col w-full h-full min-h-0">
       {/* Mobile: Full-screen header with safe area */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b shrink-0">
+      <div className="sticky top-0 z-10 bg-background shrink-0">
         {/* Mobile: Status bar spacer */}
         <div className="h-[env(safe-area-inset-top)] sm:hidden" />
 
         {/* Search header */}
-        <div className="px-4 py-3 sm:px-6 sm:py-4">
+        <div className="px-6 py-5 sm:px-8 sm:py-6">
           {/* Row 1: Search input (left) + Exit (right) */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="relative flex-1">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 ref={inputRef}
                 placeholder={scope === "current" ? "Search current space…" : "Search all spaces…"}
                 value={q}
                 onChange={e => setQ(e.target.value)}
-                className="pl-10 pr-10 h-10 text-sm sm:h-9 sm:text-sm w-full"
+                className="pl-12 pr-12 h-12 text-base sm:h-11 sm:text-sm w-full bg-background border border-border transition-all duration-200 placeholder:text-muted-foreground/60"
               />
               {q && (
                 <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 inline-flex items-center justify-center rounded-md hover:bg-accent text-muted-foreground transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 h-7 w-7 inline-flex items-center justify-center rounded-full hover:bg-muted text-muted-foreground transition-all duration-200"
                   onClick={() => setQ("")}
                 >
                   <X className="h-4 w-4" />
                 </button>
               )}
             </div>
-            <button
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              onClick={onClose}
-            >
-              Exit
-            </button>
+              <button
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+                onClick={onClose}
+              >
+                Exit
+              </button>
           </div>
 
           {/* Row 2: Status (left) + Scope toggle (right) */}
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-xs text-muted-foreground text-center sm:text-left sm:flex-1 sm:min-w-0">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-muted-foreground text-center sm:text-left sm:flex-1 sm:min-w-0">
               {scope === "all" ? (
-                <span>
-                  <span className="inline-block w-2 h-2 mr-2 align-middle rounded-full bg-primary animate-pulse" />
+                <span className="flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
                   {indexing ? "Indexing all spaces… " : "Indexed: "}
                   {indexStats.totalDocs} docs in {indexStats.indexedChannelIds.length} spaces
                 </span>
               ) : (
-                <span className="text-muted-foreground/90">
+                <span className="text-muted-foreground/80">
                   Searching in{" "}
                   <span className="font-medium text-foreground">
                     {channelName(currentChannelId || "") || "current space"}
@@ -257,14 +256,14 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
               <div
                 role="radiogroup"
                 aria-label="Search scope"
-                className="inline-flex items-center rounded-md border bg-muted p-0.5"
+                className="inline-flex items-center rounded-lg bg-muted/50 p-0.5"
               >
                 <button
                   role="radio"
                   aria-checked={scope === "current"}
-                  className={`px-3 py-1.5 text-xs rounded-sm transition-all duration-200 ${
+                  className={`px-3 py-1.5 text-xs rounded-md transition-all duration-200 ${
                     scope === "current"
-                      ? "bg-background shadow-sm text-foreground font-medium"
+                      ? "bg-background text-foreground font-medium"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => setScope("current")}
@@ -274,9 +273,9 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
                 <button
                   role="radio"
                   aria-checked={scope === "all"}
-                  className={`px-3 py-1.5 text-xs rounded-sm transition-all duration-200 ${
+                  className={`px-3 py-1.5 text-xs rounded-md transition-all duration-200 ${
                     scope === "all"
-                      ? "bg-background shadow-sm text-foreground font-medium"
+                      ? "bg-background text-foreground font-medium"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => setScope("all")}
@@ -297,39 +296,39 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
         aria-activedescendant={results[activeIndex]?.id}
       >
         {!q ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-16 px-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <SearchIcon className="h-8 w-8 text-muted-foreground/60" />
+          <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
+            <div className="w-20 h-20 rounded-2xl bg-muted/40 flex items-center justify-center mb-6">
+              <SearchIcon className="h-10 w-10 text-muted-foreground/50" />
             </div>
-            <p className="text-base font-medium text-foreground mb-2">Search your notes</p>
-            <p className="text-sm text-muted-foreground mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-3">Search your notes</h3>
+            <p className="text-base text-muted-foreground/80 mb-6 max-w-sm">
               Type to search across {scope === "current" ? "current space" : "all spaces"}
             </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+            <div className="flex items-center gap-3 text-sm text-muted-foreground/60">
+              <div className="w-1 h-1 rounded-full bg-muted-foreground/40" />
               <span>Swipe left/right to switch scope</span>
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+              <div className="w-1 h-1 rounded-full bg-muted-foreground/40" />
             </div>
           </div>
         ) : results.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-16 px-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-              <SearchIcon className="h-8 w-8 text-muted-foreground/60" />
+          <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
+            <div className="w-20 h-20 rounded-2xl bg-muted/40 flex items-center justify-center mb-6">
+              <SearchIcon className="h-10 w-10 text-muted-foreground/50" />
             </div>
-            <p className="text-base font-medium text-foreground mb-2">No matches found</p>
-            <p className="text-sm text-muted-foreground mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-3">No matches found</h3>
+            <p className="text-base text-muted-foreground/80 mb-6 max-w-sm">
               Try different keywords or search in all spaces
             </p>
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="text-xs px-3 py-1.5 rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted/80 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 disabled:opacity-50"
             >
               {isRefreshing ? "Refreshing..." : "Refresh Search"}
             </button>
           </div>
         ) : (
-          <div className="flex-1 py-1">
+          <div className="flex-1 py-2">
             {results.map((r, idx) => (
               <button
                 key={r.id}
@@ -337,42 +336,39 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
                 type="button"
                 role="option"
                 aria-selected={idx === activeIndex}
-                className={`w-full text-left px-4 py-4 hover:bg-accent/50 focus:outline-none transition-all duration-200 border-b border-border/30 last:border-b-0 active:scale-[0.98] ${
-                  idx === activeIndex ? "bg-accent/60 shadow-sm" : ""
+                className={`w-full text-left px-6 py-5 hover:bg-muted/40 focus:outline-none transition-all duration-200 ${
+                  idx === activeIndex ? "bg-muted/50" : ""
                 }`}
                 onMouseEnter={() => setActiveIndex(idx)}
                 onClick={() => handlePick(r.id, r.channelId)}
               >
                 {/* Header with channel and time */}
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Badge
-                      variant="secondary"
-                      className={`shrink-0 text-xs transition-colors ${
-                        idx === activeIndex ? "bg-primary/10 text-primary border-primary/20" : ""
-                      }`}
-                    >
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`text-sm font-semibold transition-colors ${
+                      idx === activeIndex ? "text-primary" : "text-foreground"
+                    }`}>
                       {channelName(r.channelId)}
-                    </Badge>
+                    </span>
                     {r.matchedFields.length > 0 && (
-                      <span className="text-xs text-muted-foreground truncate">
+                      <span className="text-sm text-muted-foreground/70 truncate">
                         {r.matchedFields.join(", ")}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  <span className="text-sm text-muted-foreground/60 whitespace-nowrap">
                     {new Date(r.timestamp).toLocaleDateString()}
                   </span>
                 </div>
 
                 {/* Content preview */}
-                <div className="text-sm text-foreground/90 line-clamp-2 leading-relaxed">
+                <div className="text-base text-foreground/90 line-clamp-2 leading-relaxed">
                   {r.snippet ? <Highlight text={r.snippet} query={q} /> : "(no preview)"}
                 </div>
 
                 {/* Mobile: Add subtle indicator for active item */}
                 {idx === activeIndex && (
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-full opacity-60" />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-full opacity-60" />
                 )}
               </button>
             ))}
@@ -381,8 +377,8 @@ export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
       </div>
 
       {/* Footer with keyboard shortcuts */}
-      <div className="border-t bg-muted/30 px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-2 shrink-0">
-        <div className="text-xs text-muted-foreground text-center sm:text-left">
+      <div className="bg-muted/20 px-6 py-4 sm:px-8 sm:py-3 shrink-0">
+        <div className="text-sm text-muted-foreground/70 text-center sm:text-left">
           <span className="hidden sm:inline">↑/↓ Select • Enter Open • Esc Close</span>
           <span className="sm:hidden">↑/↓ Select • Enter Open</span>
         </div>
