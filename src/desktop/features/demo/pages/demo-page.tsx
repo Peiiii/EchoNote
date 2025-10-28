@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
 import { Button } from "@/common/components/ui/button";
 import { Badge } from "@/common/components/ui/badge";
-import { Bot, Clock, Brain, Sparkles } from "lucide-react";
+import { Bot, Clock, Brain, Sparkles, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const DemoPage: React.FC = () => {
@@ -40,6 +40,14 @@ export const DemoPage: React.FC = () => {
       icon: Clock,
       color: "bg-orange-500",
       path: "/demo/time-format",
+    },
+    {
+      id: "svg-homepage",
+      title: "SVG首页",
+      description: "完全用SVG绘制的精美首页设计",
+      icon: Home,
+      color: "bg-emerald-500",
+      path: "/demo/svg-homepage",
     },
   ];
 

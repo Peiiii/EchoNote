@@ -3,6 +3,7 @@ import { ModalRenderer } from "@/common/lib/imperative-modal";
 import { useMemo } from "react";
 import { DesktopSetupApp } from "./desktop-setup-app";
 import { notesExtension } from "./features/notes/extensions";
+import { demoExtension } from "./features/demo/extensions/demo-extension";
 import { DesktopPresenterContext } from "./hooks/use-desktop-presenter-context";
 import { DesktopPresenter } from "./services/desktop-presenter";
 
@@ -14,7 +15,7 @@ export const DesktopApp = () => {
       <div className="h-screen flex flex-col">
         <DesktopSetupApp
           extensions={[
-            // demoExtension,
+            demoExtension,
             notesExtension,
             // githubExtension,
           ]}

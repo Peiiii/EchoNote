@@ -21,6 +21,7 @@ import { SpaceChatDemoPage } from "../pages/space-chat-demo-page";
 import { AiObjectDemoPage } from "../pages/ai-object-demo-page";
 import { AiQuickTestDemoPage } from "../pages/ai-quick-test-demo-page";
 import { TimeFormatDemoPage } from "../pages/time-format-demo-page";
+import { SVGHomepageDemo } from "../pages/svg-homepage-demo";
 
 export const demoExtension = defineExtension({
   manifest: {
@@ -129,6 +130,12 @@ export const demoExtension = defineExtension({
             path: "/demo/time-format",
             element: <TimeFormatDemoPage />,
             order: 107,
+          },
+          {
+            id: "demo-svg-homepage-page",
+            path: "/demo/svg-homepage",
+            element: <SVGHomepageDemo />,
+            order: 108,
           },
         ])
       )

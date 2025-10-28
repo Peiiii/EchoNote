@@ -26,7 +26,9 @@ export function UpdateNoteToolRenderer({
       title="Update Note"
       loadingText="Preparing parameters..."
       callStatusText="Ready to update"
-      // Use default scrollable content and sticky footer, same as createNote
+      // Avoid double scroll: only inner content cards scroll
+      contentScrollable={false}
+      stickyFooter={false}
       preview={() => (
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-3">
