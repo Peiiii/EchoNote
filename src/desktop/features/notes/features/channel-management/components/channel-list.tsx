@@ -1,6 +1,7 @@
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
+import { sortChannelsByActivity } from "@/common/lib/channel-sorting";
 import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
@@ -25,18 +26,9 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
 
   useAutoSelectFirstChannel();
 
-  // Sort channels by activity:
-  // 1) lastMessageTime (desc) if exists
-  // 2) else updatedAt (desc)
-  // 3) else createdAt (desc)
+  // Sort channels by activity using unified sorting function
   const orderedChannels = useMemo(() => {
-    const getActivity = (c: (typeof channels)[number]) => {
-      const t1 = c.lastMessageTime?.getTime();
-      const t2 = c.updatedAt?.getTime();
-      const t3 = c.createdAt?.getTime?.() ? c.createdAt.getTime() : 0;
-      return t1 ?? t2 ?? t3 ?? 0;
-    };
-    return [...channels].sort((a, b) => getActivity(b) - getActivity(a));
+    return sortChannelsByActivity(channels);
   }, [channels]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
+import { sortChannelsWithCurrentFirst } from "@/common/lib/channel-sorting";
 import { cn } from "@/common/lib/utils";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
@@ -84,6 +85,7 @@ export const ChannelHeader = ({
   );
   const channels = useNotesDataStore(state => state.channels);
   const { setCurrentChannel } = useNotesViewStore();
+  const sortedChannels = sortChannelsWithCurrentFirst(channels, channel.id);
   const { background: backgroundStyle, isImage: hasBackgroundImage } =
     getChannelBackground(channel);
   const isGradient = backgroundStyle.includes("gradient");
@@ -191,7 +193,7 @@ export const ChannelHeader = ({
         <div className="flex flex-1 min-w-0 max-w-full items-center gap-1">
           <ChannelDropdownSelector
             currentChannel={channel}
-            channels={channels}
+            channels={sortedChannels}
             onChannelSelect={setCurrentChannel}
             className="min-w-0 max-w-full"
           />

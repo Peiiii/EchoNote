@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
+import { sortChannelsWithCurrentFirst } from "@/common/lib/channel-sorting";
 import { Channel } from "@/core/stores/notes-data.store";
 import { ChevronDown, Hash } from "lucide-react";
 
@@ -21,6 +22,8 @@ export const MobileChannelDropdownSelector = ({
   onChannelSelect,
   className = "",
 }: MobileChannelDropdownSelectorProps) => {
+  const sortedChannels = sortChannelsWithCurrentFirst(channels, currentChannel.id);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -43,7 +46,7 @@ export const MobileChannelDropdownSelector = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-64 max-h-72 overflow-y-auto" align="center" sideOffset={6}>
-        {channels.map(channel => (
+        {sortedChannels.map(channel => (
           <DropdownMenuItem
             key={channel.id}
             onClick={() => onChannelSelect(channel.id)}

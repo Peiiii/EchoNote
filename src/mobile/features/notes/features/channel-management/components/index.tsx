@@ -3,6 +3,7 @@ import { Sheet, SheetContent } from "@/common/components/ui/sheet";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { sortChannelsByActivity } from "@/common/lib/channel-sorting";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { Plus } from "lucide-react";
@@ -20,15 +21,9 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
 
   useAutoSelectFirstChannel();
 
-  // Sort channels by activity for consistent ordering
+  // Sort channels by activity using unified sorting function
   const orderedChannels = useMemo(() => {
-    const getActivity = (c: (typeof channels)[number]) => {
-      const t1 = c.lastMessageTime?.getTime();
-      const t2 = c.updatedAt?.getTime();
-      const t3 = c.createdAt?.getTime?.() ? c.createdAt.getTime() : 0;
-      return t1 ?? t2 ?? t3 ?? 0;
-    };
-    return [...channels].sort((a, b) => getActivity(b) - getActivity(a));
+    return sortChannelsByActivity(channels);
   }, [channels]);
 
   return (

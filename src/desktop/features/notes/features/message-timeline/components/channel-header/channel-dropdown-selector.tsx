@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
+import { sortChannelsWithCurrentFirst } from "@/common/lib/channel-sorting";
 import { Channel } from "@/core/stores/notes-data.store";
 import { ChevronDown } from "lucide-react";
 import { getChannelIcon } from "../../../channel-management/components/channel-icons";
@@ -22,6 +23,8 @@ export const ChannelDropdownSelector = ({
   onChannelSelect,
   className = "",
 }: ChannelDropdownSelectorProps) => {
+  const sortedChannels = sortChannelsWithCurrentFirst(channels, currentChannel.id);
+
   return (
     <div className={className}>
       <DropdownMenu>
@@ -41,7 +44,7 @@ export const ChannelDropdownSelector = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-72 max-h-80 overflow-y-auto" align="start" sideOffset={8}>
-          {channels.map(channel => (
+          {sortedChannels.map(channel => (
             <DropdownMenuItem
               key={channel.id}
               onClick={() => onChannelSelect(channel.id)}

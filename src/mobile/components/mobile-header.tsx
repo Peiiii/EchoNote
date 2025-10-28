@@ -1,5 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
+import { sortChannelsWithCurrentFirst } from "@/common/lib/channel-sorting";
 import { Channel, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
@@ -21,6 +22,10 @@ export const MobileHeader = ({
   const { openChannelList, openAIAssistant, openSettings } = useUIStateStore();
   const { setCurrentChannel } = useNotesViewStore();
   const { channels: allChannels } = useNotesDataStore();
+  
+  const sortedChannels = currentChannel 
+    ? sortChannelsWithCurrentFirst(allChannels, currentChannel.id)
+    : allChannels;
 
   const handleOpenAIAssistant = () => {
     openAIAssistant();
@@ -62,7 +67,7 @@ export const MobileHeader = ({
           {currentChannel && allChannels.length > 1 ? (
             <MobileChannelDropdownSelector
               currentChannel={currentChannel}
-              channels={allChannels}
+              channels={sortedChannels}
               onChannelSelect={setCurrentChannel}
               className="w-full"
             />
