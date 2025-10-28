@@ -3,17 +3,6 @@ import './styles.css'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
 import type { Editor } from '@tiptap/core'
-// TipTap v3 bundles pm under @tiptap/pm; if missing types, fall back to any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TextSelection: any = ((): any => {
-  try {
-    // dynamic import to avoid build-time type requirement
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return (require('@tiptap/pm/state') as { TextSelection: unknown }).TextSelection
-  } catch {
-    return undefined
-  }
-})()
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
