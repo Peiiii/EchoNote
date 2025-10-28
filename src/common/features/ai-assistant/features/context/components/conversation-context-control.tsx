@@ -33,14 +33,11 @@ interface ContextTriggerProps {
   modeName?: string;
 }
 
-function ContextTrigger({ variant, label, tooltip, totalCount, anyLoading, conv, showModeNameInCompact: _showModeNameInCompact = false, modeName: _modeName }: ContextTriggerProps) {
+function ContextTrigger({ variant, label, tooltip: _tooltip, totalCount, anyLoading, conv, showModeNameInCompact: _showModeNameInCompact = false, modeName: _modeName }: ContextTriggerProps) {
   if (variant === "compact") {
     return (
-      <button
-        type="button"
-        aria-label={`Context: ${label}`}
-        title={tooltip || label}
-        className="relative h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+      <div
+        className="relative h-8 w-8 inline-flex items-center justify-center"
       >
         {(() => {
           const ctx = conv?.contexts;
@@ -64,15 +61,13 @@ function ContextTrigger({ variant, label, tooltip, totalCount, anyLoading, conv,
             (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
           }
         />
-      </button>
+      </div>
     );
   }
 
   return (
-    <button
-      type="button"
-      title={tooltip || label}
-      className="relative inline-flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-md bg-background/50 backdrop-blur-sm border border-border/30 shadow-xs hover:shadow-sm hover:border-border/50 hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all duration-200 ease-out"
+    <div
+      className="relative inline-flex items-center gap-1.5 text-sm"
     >
       {(() => {
         const ctx = conv?.contexts;
@@ -97,7 +92,7 @@ function ContextTrigger({ variant, label, tooltip, totalCount, anyLoading, conv,
           (anyLoading ? "bg-primary animate-pulse" : "bg-emerald-500")
         }
       />
-    </button>
+    </div>
   );
 }
 
@@ -353,7 +348,7 @@ export function ConversationContextControl({
     <div className={containerClass}>
       <RefinedPopover open={isOpen} onOpenChange={setIsOpen} modal>
         <RefinedPopover.Trigger asChild>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 h-8 rounded-md bg-transparent hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors duration-200">
             <ContextTrigger
               variant={variant}
               label={label}
@@ -366,8 +361,8 @@ export function ConversationContextControl({
             />
             {/* Mode name display - similar to model selector */}
             {(variant !== "compact" || showModeNameInCompact) && (
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-0.5 pr-2">
+                <span className="text-sm font-medium">
                   {getCurrentModeName()}
                 </span>
                 <ChevronDown className="w-3 h-3 opacity-50" />
