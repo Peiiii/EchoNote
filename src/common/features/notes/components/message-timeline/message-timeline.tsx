@@ -79,8 +79,17 @@ export const MessageTimeline = ({
     collapseCurrent,
   } = useGlobalCollapse(containerRef);
 
+  // Auto-collapse/expand composer based on scroll position.
+  // The previous single-threshold approach (collapse when >40px, expand otherwise)
+  // caused oscillation when the content height was close to the viewport height,
+  // because collapsing the composer changes the viewport height, which in turn
+  // flips the condition back and forth during the transition.
+  // Use hysteresis (two thresholds) + a short lock to avoid rapid toggling.
   const lastAutoRef = useRef<"top" | "away" | null>(null);
-  const collapseThreshold = 40; // px from top to auto-collapse
+  const COLLAPSE_THRESHOLD = 100; // collapse when scrolled down more than this many px
+  const EXPAND_THRESHOLD = 8; // expand only when scrolled back to the very top
+  const TRANSITION_LOCK_MS = 320; // ignore toggles while the composer animates
+  const lockUntilRef = useRef<number>(0);
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -89,22 +98,33 @@ export const MessageTimeline = ({
       const el = containerRef.current;
       if (el) {
         setShowScrollToTopButton(el.scrollTop > threshold);
-        // Auto collapse/expand input based on distance from top
-        if (el.scrollTop > collapseThreshold) {
+        // Auto collapse/expand composer with hysteresis and a short transition lock
+        const now = Date.now();
+        if (now < lockUntilRef.current) return; // composer is mid-transition
+
+        // Collapse when well away from the top; expand only when nearly at the top
+        if (el.scrollTop > COLLAPSE_THRESHOLD) {
           if (lastAutoRef.current !== "away") {
             handleCollapseInput();
             lastAutoRef.current = "away";
+            lockUntilRef.current = now + TRANSITION_LOCK_MS;
           }
-        } else {
+        } else if (el.scrollTop <= EXPAND_THRESHOLD) {
           if (lastAutoRef.current !== "top") {
             handleExpandInput();
             lastAutoRef.current = "top";
+            lockUntilRef.current = now + TRANSITION_LOCK_MS;
           }
         }
       }
     },
     [onScroll, handleCollapseScroll, handleCollapseInput, handleExpandInput]
   );
+
+  // Keep our lastAutoRef in sync with the actual composer state
+  useEffect(() => {
+    lastAutoRef.current = inputCollapsed ? "away" : "top";
+  }, [inputCollapsed]);
 
   // Bind scroll listener to the Virtuoso scroller element (simplest usage)
   useEffect(() => {
