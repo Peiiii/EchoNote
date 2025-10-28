@@ -8,7 +8,7 @@ export function openQuickSearchModal() {
     className: [
       "w-screen max-w-none h-svh max-h-none rounded-none",
       "sm:w-full sm:rounded-lg",
-      "sm:max-w-xl",
+      "sm:max-w-2xl",
       "sm:h-[80vh] sm:max-h-[80vh]",
     ].join(" "),
     position: "top",

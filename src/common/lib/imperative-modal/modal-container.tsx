@@ -64,7 +64,7 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
 
   const contentAnimation = getContentAnimation();
   const baseContainerClasses = isTopPosition
-    ? "relative bg-background shadow-lg overflow-hidden pointer-events-auto w-full max-w-none max-h-none rounded-none sm:max-h-[90vh] sm:max-w-[90vw] sm:rounded-lg"
+    ? "relative bg-background shadow-lg overflow-hidden pointer-events-auto w-full max-w-none max-h-none rounded-none sm:max-h-[90vh] sm:rounded-lg"
     : "relative bg-background rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-hidden pointer-events-auto";
 
   return (
