@@ -215,15 +215,15 @@ function AgentChatCoreWrapper({
 
   const inputExtensions = useMemo(
     () => [
-      createModelSelectorExtension({
-        onModelChange: (modelId: string) => {
-          console.log("Model changed to:", modelId);
-        },
-      }),
       createContextSelectorExtension({
         conversationId,
         fallbackChannelId: channelId,
         showModeNameInCompact: !isMobile,
+      }),
+      createModelSelectorExtension({
+        onModelChange: (modelId: string) => {
+          console.log("Model changed to:", modelId);
+        },
       }),
     ],
     [conversationId, channelId, isMobile]
