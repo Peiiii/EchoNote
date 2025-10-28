@@ -1,10 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useCallback } from "react";
-import { Loader2 } from "lucide-react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useContainerMode } from "@/common/hooks/use-container-mode";
 import { AIConversationTwoPane } from "./ai-conversation-two-pane";
 import { AIConversationSinglePane, SinglePaneRef } from "./ai-conversation-single-pane";
+import { AIConversationSkeleton } from "@/common/features/ai-assistant/components/ai-conversation-skeleton";
 import {
   ConversationInterfaceProps,
   ConversationInterfaceRef,
@@ -58,7 +58,7 @@ export const AIConversationInterface = forwardRef<
   if (loading || !ready) {
     return (
       <div ref={containerRef} className={"h-full flex " + (ready ? "" : "invisible")}>
-        <LoaderPane />
+        <AIConversationSkeleton />
       </div>
     );
   }
@@ -85,11 +85,3 @@ export const AIConversationInterface = forwardRef<
     </div>
   );
 });
-
-function LoaderPane() {
-  return (
-    <div className="flex-1 flex items-center justify-center">
-      <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-    </div>
-  );
-}

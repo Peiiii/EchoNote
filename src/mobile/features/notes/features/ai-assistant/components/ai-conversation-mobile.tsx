@@ -2,9 +2,10 @@ import { Button } from "@/common/components/ui/button";
 import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
 import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
+import { AIConversationSkeleton, AIConversationListSkeleton } from "@/common/features/ai-assistant/components/ai-conversation-skeleton";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { AIConversation } from "@/common/types/ai-conversation";
-import { ArrowLeft, Loader2, History, Plus } from "lucide-react";
+import { ArrowLeft, History, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 
 export type MobileConversationRef = {
@@ -46,14 +47,19 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       [onCreate, showList, showChat, view]
     );
 
-    const renderListView = () => (
-      <AIConversationList
-        conversations={conversations}
-        currentConversationId={currentConversationId}
-        loading={loading}
-        withHeader={false}
-      />
-    );
+    const renderListView = () => {
+      if (loading) {
+        return <AIConversationListSkeleton count={5} />;
+      }
+      return (
+        <AIConversationList
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          loading={loading}
+          withHeader={false}
+        />
+      );
+    };
 
     const renderChatView = () => {
       if (currentConversationId) {
@@ -65,13 +71,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
           />
         );
       } else if (loading) {
-        return (
-          <div className="relative flex-1 flex flex-col">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-4 h-4 animate-spin" />
-            </div>
-          </div>
-        );
+        return <AIConversationSkeleton />;
       } else if (hasConversations) {
         return <div className="flex-1" />;
       } else {

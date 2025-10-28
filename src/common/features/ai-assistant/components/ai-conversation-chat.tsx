@@ -13,13 +13,13 @@ import {
 } from "@agent-labs/agent-chat";
 import { useMemoizedFn } from "ahooks";
 import { isEqual } from "lodash-es";
-import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
 import { createContextSelectorExtension } from "../extensions/context-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
 import { ConversationChatProps } from "../types/conversation.types";
+import { AIConversationSkeleton } from "./ai-conversation-skeleton";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
   const { messages, createMessage, updateMessage, loading } =
@@ -43,12 +43,7 @@ export function AIConversationChat({ conversationId, channelId }: ConversationCh
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
         {showLoading ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Loading conversation...</span>
-            </div>
-          </div>
+          <AIConversationSkeleton />
         ) : (
           <AgentChatCoreWrapper
             key={resetKey}
