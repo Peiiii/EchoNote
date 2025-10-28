@@ -77,9 +77,8 @@ export function MoreActionsMenu({
       id: "advanced",
       title: "Advanced",
       variant: "default",
-      items: [
-        ...(onReport
-          ? [
+      items: onReport
+        ? [
             {
               id: "report",
               icon: <Flag />,
@@ -89,8 +88,7 @@ export function MoreActionsMenu({
               variant: "warning" as const,
             },
           ]
-          : []),
-      ],
+        : [],
     },
     // {
     //   id: "danger",

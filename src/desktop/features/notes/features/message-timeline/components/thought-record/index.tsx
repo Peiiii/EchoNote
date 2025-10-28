@@ -2,6 +2,7 @@ import { MarkdownContent } from "@/common/components/markdown";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
 import { Clock } from "lucide-react";
@@ -30,6 +31,9 @@ export function ThoughtRecord({
   } = useEditNote(message);
   const { showAnalysis, aiAnalysis, hasSparks, handleToggleAnalysis } = useNoteAnalysis(message);
   const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
+  
+  // Get editor mode from store (for reading only)
+  const editorMode = useEditStateStore(s => s.editorMode);
 
   useEffect(() => {
     setEditingTags(message.tags || []);
@@ -75,12 +79,14 @@ export function ThoughtRecord({
             </div>
           </div>
 
-          <ActionButtons
-            onToggleAnalysis={handleToggleAnalysis}
-            onReply={onReply}
-            message={message}
-            isEditing={isEditing}
-          />
+            <ActionButtons
+              onToggleAnalysis={handleToggleAnalysis}
+              onReply={onReply}
+              message={message}
+              isEditing={isEditing}
+              editorMode={editorMode}
+              onEditorModeChange={presenter.noteEditManager.setEditorMode}
+            />
         </div>
 
         {/* Content Area - Show inline editor or read-only content */}
@@ -88,6 +94,8 @@ export function ThoughtRecord({
           <InlineEditor
             content={editContent}
             isSaving={isSaving}
+            editorMode={editorMode}
+            onEditorModeChange={presenter.noteEditManager.setEditorMode}
             className="px-6"
           />
         ) : (

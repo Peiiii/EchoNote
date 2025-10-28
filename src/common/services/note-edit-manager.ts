@@ -17,4 +17,12 @@ export class NoteEditManager {
   switchToInlineMode = () => {
     return useEditStateStore.getState().switchToInlineMode();
   };
+
+  setEditorMode = (mode: "markdown" | "wysiwyg") => {
+    return useEditStateStore.getState().setEditorMode(mode);
+  };
+
+  updateContent = (content: string) => {
+    return useEditStateStore.getState().updateContent(content);
+  };
 }

@@ -1,5 +1,6 @@
 import { MarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Check, Loader2, Minimize2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -23,14 +24,15 @@ export function ExpandedEditor({
   isSaving,
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
-  const [mode, setMode] = useState<"markdown" | "wysiwyg">("markdown");
   const [isLocalSaving, setIsLocalSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // Select only the updater to avoid subscribing to edit content changes here
-  const updateContent = useEditStateStore(s => s.updateContent);
+  const presenter = useCommonPresenterContext();
+  
+  // Get editor mode from store (for reading only)
+  const editorMode = useEditStateStore(s => s.editorMode);
 
   // Only bind textarea helpers when in markdown textarea mode
-  useEditor({ textareaRef, updateContent, content: mode === "markdown" ? content : "" });
+  useEditor({ textareaRef, updateContent: presenter.noteEditManager.updateContent, content: editorMode === "markdown" ? content : "" });
 
   // Auto-focus when component mounts
   useEffect(() => {
@@ -46,7 +48,7 @@ export function ExpandedEditor({
 
   const handleContentChange = (value: string) => {
     setLocalContent(value);
-    updateContent(value);
+    presenter.noteEditManager.updateContent(value);
   };
 
   const handleSave = async () => {
@@ -105,9 +107,9 @@ export function ExpandedEditor({
         {/* Editor panel (left) */}
         <div
           className={[
-            mode === "wysiwyg" ? "w-full" : "w-1/2",
+            editorMode === "wysiwyg" ? "w-full" : "w-1/2",
             "min-h-0",
-            mode === "markdown" ? "border-r border-slate-200 dark:border-slate-700" : "",
+            editorMode === "markdown" ? "border-r border-slate-200 dark:border-slate-700" : "",
             "flex flex-col overflow-hidden",
           ].join(" ")}
         >
@@ -117,17 +119,17 @@ export function ExpandedEditor({
                 <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
                 <div className="flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 p-0.5">
                   <Button
-                    variant={mode === "markdown" ? "secondary" : "ghost"}
+                    variant={editorMode === "markdown" ? "secondary" : "ghost"}
                     size="sm"
-                    onClick={() => setMode("markdown")}
+                    onClick={() => presenter.noteEditManager.setEditorMode("markdown")}
                     className="h-7 px-2"
                   >
                     Markdown
                   </Button>
                   <Button
-                    variant={mode === "wysiwyg" ? "secondary" : "ghost"}
+                    variant={editorMode === "wysiwyg" ? "secondary" : "ghost"}
                     size="sm"
-                    onClick={() => setMode("wysiwyg")}
+                    onClick={() => presenter.noteEditManager.setEditorMode("wysiwyg")}
                     className="h-7 px-2"
                   >
                     WYSIWYG
@@ -141,7 +143,7 @@ export function ExpandedEditor({
           </div>
 
           <div className="flex-1 min-h-0 p-6 overflow-hidden flex flex-col">
-            {mode === "markdown" ? (
+            {editorMode === "markdown" ? (
               <textarea
                 ref={textareaRef}
                 value={localContent}
@@ -168,7 +170,7 @@ export function ExpandedEditor({
           </div>
         </div>
         {/* Preview panel (right) - only in markdown mode */}
-        {mode === "markdown" && (
+        {editorMode === "markdown" && (
           <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
             <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
               <div className="flex items-center justify-between">

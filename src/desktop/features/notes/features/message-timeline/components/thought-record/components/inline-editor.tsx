@@ -6,16 +6,21 @@ import { cn } from "@/common/lib/utils";
 import { useEditor } from "@/common/hooks/use-editor";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { RichEditorLite } from "@/common/components/RichEditorLite";
 
 interface InlineEditorProps {
   content: string;
   isSaving: boolean;
+  editorMode: "markdown" | "wysiwyg";
+  onEditorModeChange: (mode: "markdown" | "wysiwyg") => void;
   className?: string;
 }
 
 export function InlineEditor({
   content,
   isSaving,
+  editorMode,
+  onEditorModeChange: _onEditorModeChange,
   className,
 }: InlineEditorProps) {
   const presenter = useCommonPresenterContext();
@@ -24,7 +29,8 @@ export function InlineEditor({
   // Select only the updater to avoid subscribing to edit content changes here
   const updateContent = useEditStateStore(s => s.updateContent);
 
-  useEditor({ textareaRef, updateContent, content });
+  // Only wire markdown helpers when in markdown mode
+  useEditor({ textareaRef, updateContent, content: editorMode === "markdown" ? content : "" });
 
   // Auto-focus when editing starts
   useEffect(() => {
@@ -75,18 +81,27 @@ export function InlineEditor({
     <div className={cn("space-y-4", className)}>
       {/* Editor area – white background to emphasize editability (dark mode keeps contrast) */}
       <div className="relative rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 shadow-sm">
-        <textarea
-          ref={textareaRef}
-          value={localContent}
-          onChange={e => handleContentChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Edit your thought..."
-          className="w-full min-h-[120px] max-h-[300px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
-          disabled={isSaving}
-          style={{
-            caretColor: "#3b82f6", // Blue cursor like message input
-          }}
-        />
+        {editorMode === "markdown" ? (
+          <textarea
+            ref={textareaRef}
+            value={localContent}
+            onChange={e => handleContentChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Edit your thought..."
+            className="w-full min-h-[120px] max-h-[300px] resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
+            disabled={isSaving}
+            style={{ caretColor: "#3b82f6" }}
+          />
+        ) : (
+          <div onKeyDown={handleKeyDown}>
+            <RichEditorLite
+              value={localContent}
+              onChange={handleContentChange}
+              editable={!isSaving}
+              placeholder="Edit your thought..."
+            />
+          </div>
+        )}
       </div>
 
       {/* Action Buttons - Elegant, minimal design */}

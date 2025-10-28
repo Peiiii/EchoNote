@@ -1,4 +1,4 @@
-import { Bookmark, Edit2, Eye, Lightbulb, MessageCircle } from "lucide-react";
+import { Bookmark, Edit2, Eye, Lightbulb, MessageCircle, FileText, Type } from "lucide-react";
 import { ActionButton } from "./action-button";
 import { MoreActionsMenu } from "./more-actions-menu";
 import { ActionButtonsProps } from "../types";
@@ -12,6 +12,8 @@ export function ActionButtons({
   onReply,
   message,
   isEditing,
+  editorMode,
+  onEditorModeChange,
 }: ActionButtonsProps) {
   const presenter = useCommonPresenterContext();
   const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
@@ -46,6 +48,25 @@ export function ActionButtons({
   };
 
   const actionButtons = [
+    // Editor mode toggle buttons (only show when editing)
+    ...(isEditing && editorMode && onEditorModeChange ? [
+      {
+        icon: Type,
+        onClick: () => onEditorModeChange("markdown"),
+        title: "Markdown mode",
+        disabled: false,
+        enabled: true,
+        active: editorMode === "markdown",
+      },
+      {
+        icon: FileText,
+        onClick: () => onEditorModeChange("wysiwyg"),
+        title: "WYSIWYG mode",
+        disabled: false,
+        enabled: true,
+        active: editorMode === "wysiwyg",
+      },
+    ] : []),
     {
       icon: Edit2,
       onClick: handleEdit,
@@ -85,8 +106,8 @@ export function ActionButtons({
 
   return (
     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-      {actionButtons.map(({ icon, onClick, title, disabled }) => (
-        <ActionButton key={title} icon={icon} onClick={onClick} title={title} disabled={disabled} />
+      {actionButtons.map(({ icon, onClick, title, disabled, active }) => (
+        <ActionButton key={title} icon={icon} onClick={onClick} title={title} disabled={disabled} active={active} />
       ))}
       <MoreActionsMenu
         message={message}

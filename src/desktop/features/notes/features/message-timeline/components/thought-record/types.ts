@@ -50,4 +50,6 @@ export interface ActionButtonsProps {
   onReply?: () => void;
   message: Message;
   isEditing: boolean;
+  editorMode?: "markdown" | "wysiwyg";
+  onEditorModeChange?: (mode: "markdown" | "wysiwyg") => void;
 }

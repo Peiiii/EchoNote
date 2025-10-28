@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from "@/common/components/ui/dialog";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
 import { Message } from "@/core/stores/notes-data.store";
+import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
 import { useEffect, useState } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";
@@ -27,6 +28,9 @@ export const MobileThoughtRecord = ({
   const { isEditing, editMode, isSaving, isExpandedEditing } = useEditNote(message);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
+  
+  // Get editor mode from store (for reading only)
+  const editorMode = useEditStateStore(s => s.editorMode);
 
   // 重置自动生成标志
   useEffect(() => {
@@ -119,6 +123,8 @@ export const MobileThoughtRecord = ({
             onGenerateSparks={handleGenerateSparks}
             onViewDetails={() => {}}
             onBookmark={() => {}}
+            editorMode={editorMode}
+            onEditorModeChange={presenter.noteEditManager.setEditorMode}
           />
         </div>
 
@@ -130,6 +136,8 @@ export const MobileThoughtRecord = ({
               onCancel={handleCancel}
               onExpand={handleExpand}
               isSaving={isSaving}
+              editorMode={editorMode}
+              onEditorModeChange={presenter.noteEditManager.setEditorMode}
             />
           ) : (
             <MobileReadMoreWrapper maxHeight={400} messageId={message.id}>

@@ -4,12 +4,15 @@ import { EditorToolbar } from "@/common/components/editor-toolbar";
 import { Save, X, Expand } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useEditor } from "@/common/hooks/use-editor";
+import { RichEditorLite } from "@/common/components/RichEditorLite";
 
 interface MobileInlineEditorProps {
   onSave: () => void;
   onCancel: () => void;
   onExpand: () => void;
   isSaving: boolean;
+  editorMode: "markdown" | "wysiwyg";
+  onEditorModeChange: (mode: "markdown" | "wysiwyg") => void;
 }
 
 export function MobileInlineEditor({
@@ -17,6 +20,8 @@ export function MobileInlineEditor({
   onCancel,
   onExpand,
   isSaving,
+  editorMode,
+  onEditorModeChange: _onEditorModeChange,
 }: MobileInlineEditorProps) {
   const editContent = useEditStateStore(s => s.editContent);
   const originalContent = useEditStateStore(s => s.originalContent);
@@ -24,7 +29,7 @@ export function MobileInlineEditor({
   const hasChanges = editContent !== originalContent;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEditor({ textareaRef, updateContent, content: editContent });
+  useEditor({ textareaRef, updateContent, content: editorMode === "markdown" ? editContent : "" });
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
@@ -50,17 +55,27 @@ export function MobileInlineEditor({
   return (
     <div className="space-y-3">
       {/* Editor */}
-      <Textarea
-        ref={textareaRef}
-        value={editContent}
-        onChange={handleContentChange}
-        placeholder="Edit your thought..."
-        className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
-        autoFocus
-        style={{
-          caretColor: "#3b82f6",
-        }}
-      />
+      <div className="relative">
+        {editorMode === "markdown" ? (
+          <Textarea
+            ref={textareaRef}
+            value={editContent}
+            onChange={handleContentChange}
+            placeholder="Edit your thought..."
+            className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
+            autoFocus
+            style={{ caretColor: "#3b82f6" }}
+          />
+        ) : (
+          <RichEditorLite
+            value={editContent}
+            onChange={(md) => updateContent(md)}
+            editable={!isSaving}
+            placeholder="Edit your thought..."
+            className="min-h-[140px]"
+          />
+        )}
+      </div>
 
       {/* Action Buttons */}
       <EditorToolbar

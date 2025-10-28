@@ -1,5 +1,5 @@
 import { Message } from "@/core/stores/notes-data.store";
-import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, Trash2 } from "lucide-react";
+import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, Trash2, Type, FileText } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 import { getFeaturesConfig } from "@/core/config/features.config";
 
@@ -13,6 +13,8 @@ interface MobileMoreActionsMenuProps {
   onGenerateSparks?: () => void;
   onViewDetails?: () => void;
   onBookmark?: () => void;
+  editorMode?: "markdown" | "wysiwyg";
+  onEditorModeChange?: (mode: "markdown" | "wysiwyg") => void;
 }
 
 export function MobileMoreActionsMenu({
@@ -25,6 +27,8 @@ export function MobileMoreActionsMenu({
   onGenerateSparks,
   onViewDetails,
   onBookmark,
+  editorMode,
+  onEditorModeChange,
 }: MobileMoreActionsMenuProps) {
   const handleCopy = () => {
     if (onCopy) {
@@ -74,23 +78,48 @@ export function MobileMoreActionsMenu({
           : []),
       ],
     },
+    // Editor mode toggle group (only show when editing)
+    ...(isEditing && editorMode && onEditorModeChange
+      ? [
+          {
+            id: "editor-mode",
+            showSeparator: true,
+            items: [
+              {
+                id: "markdown-mode",
+                icon: <Type className="w-4 h-4" />,
+                title: editorMode === "markdown" ? "✓ Markdown Mode" : "Markdown Mode",
+                onClick: () => onEditorModeChange("markdown"),
+                variant: "default" as const,
+                disabled: false,
+              },
+              {
+                id: "wysiwyg-mode",
+                icon: <FileText className="w-4 h-4" />,
+                title: editorMode === "wysiwyg" ? "✓ WYSIWYG Mode" : "WYSIWYG Mode",
+                onClick: () => onEditorModeChange("wysiwyg"),
+                variant: "default" as const,
+                disabled: false,
+              },
+            ],
+          },
+        ]
+      : []),
     {
       id: "ai",
       showSeparator: true,
-      items: [
-        ...(onGenerateSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled
-          ? [
-              {
-                id: "generate-sparks",
-                icon: <Lightbulb className="w-4 h-4" />,
-                title: "Generate Sparks",
-                onClick: onGenerateSparks,
-                variant: "default" as const,
-                disabled: isEditing,
-              },
-            ]
-          : []),
-      ],
+      items: onGenerateSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled
+        ? [
+            {
+              id: "generate-sparks",
+              icon: <Lightbulb className="w-4 h-4" />,
+              title: "Generate Sparks",
+              onClick: onGenerateSparks,
+              variant: "default" as const,
+              disabled: isEditing,
+            },
+          ]
+        : [],
     },
     {
       id: "secondary",

@@ -13,12 +13,16 @@ export interface EditState {
 
   // Edit mode: inline vs expanded
   editMode: "inline" | "expanded";
+  
+  // Editor mode: markdown vs wysiwyg
+  editorMode: "markdown" | "wysiwyg";
 
   // Editing actions
   startEditing: (messageId: string, content: string) => void;
   updateContent: (content: string) => void;
   switchToExpandedMode: () => void;
   switchToInlineMode: () => void;
+  setEditorMode: (mode: "markdown" | "wysiwyg") => void;
   save: (shouldCloseAfterSave?: boolean) => Promise<void>;
   cancel: () => void;
   reset: () => void;
@@ -32,6 +36,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   isDirty: false,
   isSaving: false,
   editMode: "inline",
+  editorMode: "markdown",
 
   // Start editing a message
   startEditing: (messageId: string, content: string) => {
@@ -42,6 +47,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       isDirty: false,
       isSaving: false,
       editMode: "inline", // Default to inline mode
+      editorMode: "markdown", // Default to markdown mode
     });
   },
 
@@ -62,6 +68,11 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   // Switch back to inline editing mode
   switchToInlineMode: () => {
     set({ editMode: "inline" });
+  },
+
+  // Set editor mode (markdown or wysiwyg)
+  setEditorMode: (mode: "markdown" | "wysiwyg") => {
+    set({ editorMode: mode });
   },
 
   // Save the edited message
@@ -121,6 +132,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       isDirty: false,
       isSaving: false,
       editMode: "inline",
+      editorMode: "markdown",
     });
   },
 }));
