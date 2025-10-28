@@ -184,15 +184,13 @@ export function CreateChannelPopover({
   if (instantCreate) {
     // Attach click handler to custom trigger if provided
     if (trigger) {
-      if (isValidElement(trigger)) {
-        const existing = (trigger.props as any)?.onClick as
-          | ((e: React.MouseEvent) => void)
-          | undefined;
+      if (isValidElement<{ onClick?: (e: React.MouseEvent) => void }>(trigger)) {
+        const existing = trigger.props.onClick;
         const mergedOnClick = async (e: React.MouseEvent) => {
           existing?.(e);
           await handleInstantCreate();
         };
-        return cloneElement(trigger as React.ReactElement<any>, { onClick: mergedOnClick } as any);
+        return cloneElement(trigger, { onClick: mergedOnClick } as Partial<typeof trigger.props>);
       }
       return <span onClick={handleInstantCreate}>{trigger}</span>;
     }

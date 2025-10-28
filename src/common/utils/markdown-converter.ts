@@ -17,6 +17,9 @@ const td = new TurndownService({
 // Enable GitHub-flavored Markdown conversion (tables, strikethrough, task list)
 td.use(gfm)
 
+type DebugGlobal = { __RICH_DEBUG__?: boolean; __RICH_LAST__?: Record<string, unknown> }
+const dbg = globalThis as DebugGlobal
+
 // Normalize GFM task list HTML (from marked) into TipTap's task HTML
 function normalizeGfmTasksToTiptap(html: string): string {
   if (typeof window === 'undefined' || !html || html.indexOf('type="checkbox"') === -1) return html
@@ -167,19 +170,17 @@ export function markdownToHtml(markdown: string): string {
     // marked.parse returns string in modern versions
     const raw = marked.parse(markdown) as string
     const normalized = normalizeGfmTasksToTiptap(raw)
-    ;(globalThis as any).__RICH_LAST__ = {
-      ...(globalThis as any).__RICH_LAST__,
-      markdownIn: markdown,
-      htmlRaw: raw,
-      htmlForTipTap: normalized,
+    if (dbg.__RICH_DEBUG__) {
+      dbg.__RICH_LAST__ = {
+        ...(dbg.__RICH_LAST__ || {}),
+        markdownIn: markdown,
+        htmlRaw: raw,
+        htmlForTipTap: normalized,
+      }
+      console.log('[RichConverter] markdown in', markdown)
+      console.log('[RichConverter] html raw', raw)
+      console.log('[RichConverter] html normalized (for TipTap)', normalized)
     }
-    // Always log for easier debugging
-    // eslint-disable-next-line no-console
-    console.warn('[RichConverter] markdown in', markdown)
-    // eslint-disable-next-line no-console
-    console.warn('[RichConverter] html raw', raw)
-    // eslint-disable-next-line no-console
-    console.warn('[RichConverter] html normalized (for TipTap)', normalized)
     return normalized
   } catch {
     return markdown
@@ -190,22 +191,22 @@ export function htmlToMarkdown(html: string): string {
   if (!html) return ''
   try {
     const normalized = normalizeTiptapTasksToGfm(html)
-    ;(globalThis as any).__RICH_LAST__ = {
-      ...(globalThis as any).__RICH_LAST__,
-      htmlIn: html,
-      htmlForTurndown: normalized,
+    if (dbg.__RICH_DEBUG__) {
+      dbg.__RICH_LAST__ = {
+        ...(dbg.__RICH_LAST__ || {}),
+        htmlIn: html,
+        htmlForTurndown: normalized,
+      }
+      console.log('[RichConverter] html -> normalized (for turndown)', { html, normalized })
     }
-    // Always log for easier debugging
-    // eslint-disable-next-line no-console
-    console.warn('[RichConverter] html -> normalized (for turndown)', { html, normalized })
     const md = td.turndown(normalized)
-    ;(globalThis as any).__RICH_LAST__ = {
-      ...(globalThis as any).__RICH_LAST__,
-      markdownOut: md,
+    if (dbg.__RICH_DEBUG__) {
+      dbg.__RICH_LAST__ = {
+        ...(dbg.__RICH_LAST__ || {}),
+        markdownOut: md,
+      }
+      console.log('[RichConverter] markdown out', md)
     }
-    // Always log for easier debugging
-    // eslint-disable-next-line no-console
-    console.warn('[RichConverter] markdown out', md)
     return md
   } catch {
     return html
@@ -221,7 +222,8 @@ export function markdownToPreviewText(markdown: string, maxLength = 120): string
     if (text.length <= maxLength) return text
     return text.slice(0, maxLength - 1) + '…'
   } catch {
-    const text = markdown.replace(/[#>*_`\-\[\]()>]+/g, ' ').replace(/\s+/g, ' ').trim()
+    // eslint-disable-next-line no-useless-escape
+    const text = markdown.replace(/[`*_>#\-\[\]()]+/g, ' ').replace(/\s+/g, ' ').trim()
     return text.length <= maxLength ? text : text.slice(0, maxLength - 1) + '…'
   }
 }
@@ -229,5 +231,5 @@ export function markdownToPreviewText(markdown: string, maxLength = 120): string
 export function isMarkdownContent(content: string): boolean {
   if (!content) return false
   // Heuristic: presence of common markdown syntax
-  return /(^|\s)([#>*\-\+]|\d+\.)\s|`{1,3}|\*{1,3}|_{1,3}|\[.+?\]\(.+?\)/.test(content)
+  return /(^|\s)([#>*\-+]|\d+\.)\s|`{1,3}|\*{1,3}|_{1,3}|\[.+?\]\(.+?\)/.test(content)
 }

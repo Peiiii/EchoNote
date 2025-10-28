@@ -6,7 +6,7 @@ import tseslint from "typescript-eslint";
 import { globalIgnores } from "eslint/config";
 
 export default tseslint.config([
-  globalIgnores(["dist", "dev-dist"]),
+  globalIgnores(["dist", "dev-dist", "src/common/components/RichEditor/**"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [

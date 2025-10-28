@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import './styles.css'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
+import type { Editor } from '@tiptap/core'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
@@ -42,8 +43,9 @@ function ToolbarButton({ disabled, active, onClick, children }: { disabled?: boo
 }
 
 export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '' }: RichEditorLiteProps) {
-  const initialHtml = useMemo(() => markdownToHtml(value || ''), [])
+  const initialHtml = useMemo(() => markdownToHtml(value || ''), [value])
   const lastMarkdownRef = useRef<string>(value || '')
+  const editorRef = useRef<Editor | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -66,7 +68,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         spellcheck: 'false',
         style: 'min-height: 240px; padding: 12px; outline: none;',
       },
-      handlePaste(_view, evt) {
+      handlePaste(_view, evt): boolean {
         const items = Array.from(evt.clipboardData?.items || [])
         const img = items.find(i => i.type.startsWith('image/'))
         if (img) {
@@ -75,7 +77,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             const reader = new FileReader()
             reader.onload = () => {
               if (typeof reader.result === 'string') {
-                editor?.chain().focus().setImage({ src: reader.result }).run()
+                editorRef.current?.chain().focus().setImage({ src: reader.result }).run()
               }
             }
             reader.readAsDataURL(f)
@@ -84,23 +86,28 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         }
         return false
       },
-      handleKeyDown(_view, event) {
+      handleKeyDown(_view, event): boolean {
         // Indent/outdent behaviors for task list (and fallback to bullet/ordered)
         if (event.key === 'Tab') {
           event.preventDefault()
           if (event.shiftKey) {
-            const ran =
-              editor?.chain().focus().liftListItem('taskItem').run() ||
-              editor?.chain().focus().liftListItem('listItem').run()
-            return !!ran
+            const ran = !!(
+              editorRef.current?.chain().focus().liftListItem('taskItem').run() ||
+              editorRef.current?.chain().focus().liftListItem('listItem').run()
+            )
+            return ran
           }
-          const ran =
-            editor?.chain().focus().sinkListItem('taskItem').run() ||
-            editor?.chain().focus().sinkListItem('listItem').run()
-          return !!ran
+          const ran = !!(
+            editorRef.current?.chain().focus().sinkListItem('taskItem').run() ||
+            editorRef.current?.chain().focus().sinkListItem('listItem').run()
+          )
+          return ran
         }
         return false
       },
+    },
+    onCreate: ({ editor }) => {
+      editorRef.current = editor
     },
     onUpdate({ editor }) {
       const html = editor.getHTML()
@@ -127,7 +134,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     if (editor) editor.setEditable(editable)
   }, [editable, editor])
 
-  const isActive = (name: string, attrs?: Record<string, any>) => editor?.isActive(name, attrs) ?? false
+  const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
 
   return (
