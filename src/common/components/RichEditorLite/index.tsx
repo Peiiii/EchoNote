@@ -1,8 +1,19 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './styles.css'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
 import type { Editor } from '@tiptap/core'
+// TipTap v3 bundles pm under @tiptap/pm; if missing types, fall back to any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TextSelection: any = ((): any => {
+  try {
+    // dynamic import to avoid build-time type requirement
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return (require('@tiptap/pm/state') as { TextSelection: unknown }).TextSelection
+  } catch {
+    return undefined
+  }
+})()
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
@@ -46,6 +57,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const initialHtml = useMemo(() => markdownToHtml(value || ''), [value])
   const lastMarkdownRef = useRef<string>(value || '')
   const editorRef = useRef<Editor | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; from: number; index: number }>({ open: false, x: 0, y: 0, from: -1, index: 0 })
 
   const editor = useEditor({
     extensions: [
@@ -103,7 +116,87 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           )
           return ran
         }
+        // Slash menu keyboard UX
+        if (slashMenu.open) {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault()
+            setSlashMenu((m) => ({ ...m, index: m.index + 1 }))
+            return true
+          }
+          if (event.key === 'ArrowUp') {
+            event.preventDefault()
+            setSlashMenu((m) => ({ ...m, index: Math.max(0, m.index - 1) }))
+            return true
+          }
+          if (event.key === 'Enter') {
+            event.preventDefault()
+            // run selected item if present
+            const runSelected = getSlashItems().at(slashMenu.index)
+            if (runSelected) {
+              runSelected.onSelect()
+              return true
+            }
+          }
+        }
+        // Open slash menu and anchor to caret
+        if (event.key === '/') {
+          const pos = editorRef.current?.state.selection.from ?? 0
+          setTimeout(() => {
+            // After slash inserted, caret moves forward by 1
+            const coords = editorRef.current?.view.coordsAtPos((editorRef.current?.state.selection.from ?? pos) as number)
+            const crect = containerRef.current?.getBoundingClientRect()
+            if (coords && crect && containerRef.current) {
+              const x = coords.left - crect.left + containerRef.current.scrollLeft
+              const y = coords.top - crect.top + containerRef.current.scrollTop + 20
+              setSlashMenu({ open: true, x, y, from: pos, index: 0 })
+            } else {
+              setSlashMenu({ open: true, x: 8, y: 8, from: pos, index: 0 })
+            }
+          }, 0)
+          return false
+        }
+        // Link edit hotkey
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+          event.preventDefault()
+          const current = editorRef.current?.getAttributes('link')?.href as string | undefined
+          const href = window.prompt('Link URL', current || '')
+          if (href === null) return true
+          if (href.trim()) {
+            editorRef.current?.chain().focus().setLink({ href: href.trim() }).run()
+          } else {
+            editorRef.current?.chain().focus().unsetLink().run()
+          }
+          return true
+        }
+        if (event.key === 'Escape' && slashMenu.open) {
+          setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
+          return true
+        }
         return false
+      },
+      handleDOMEvents: {
+        dblclick: (_view: unknown, event: Event) => {
+          const target = event.target as HTMLElement
+          if (target && target.tagName === 'IMG') {
+            const newUrl = window.prompt('Image URL (leave empty to remove)', (target as HTMLImageElement).src || '')
+            if (newUrl === null) return true
+            if (!newUrl.trim()) {
+              editorRef.current?.chain().focus().deleteSelection().run()
+              return true
+            }
+            editorRef.current?.chain().focus().setImage({ src: newUrl.trim(), alt: (target as HTMLImageElement).alt }).run()
+            return true
+          }
+          return false
+        },
+        click: (_view: unknown, event: Event) => {
+          const target = event.target as HTMLElement
+          // Close slash menu on any click outside
+          if (slashMenu.open && !containerRef.current?.contains(target)) {
+            setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
+          }
+          return false
+        },
       },
     },
     onCreate: ({ editor }) => {
@@ -136,6 +229,44 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
+
+  const execAndCleanupSlash = (fn: () => void) => {
+    const ed = editorRef.current
+    if (ed && slashMenu.from >= 0) {
+      const tr = ed.state.tr.delete(slashMenu.from, slashMenu.from + 1)
+      ed.view.dispatch(tr)
+    }
+    fn()
+    setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
+  }
+
+  const getSlashQuery = (): string => {
+    const ed = editorRef.current
+    if (!ed || slashMenu.from < 0) return ''
+    const cur = ed.state.selection.from
+    const from = Math.min(slashMenu.from + 1, cur)
+    const to = Math.max(slashMenu.from + 1, cur)
+    return ed.state.doc.textBetween(from, to).trim().toLowerCase()
+  }
+
+  const allSlashItems = [
+    { label: 'Heading 1', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleHeading({ level: 1 }).run()) },
+    { label: 'Heading 2', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleHeading({ level: 2 }).run()) },
+    { label: 'Bulleted list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleBulletList().run()) },
+    { label: 'Numbered list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleOrderedList().run()) },
+    { label: 'Task list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleTaskList().run()) },
+    { label: 'Quote', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleBlockquote().run()) },
+    { label: 'Code block', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleCodeBlock().run()) },
+    { label: 'Table', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()) },
+    { label: 'Image…', onSelect: () => execAndCleanupSlash(() => { const url = window.prompt('Image URL'); if (url) editorRef.current?.chain().focus().setImage({ src: url }).run() }) },
+    { label: 'Link…', onSelect: () => execAndCleanupSlash(() => { const current = editorRef.current?.getAttributes('link')?.href as string | undefined; const href = window.prompt('Link URL', current || ''); if (href === null) return; if (href.trim()) editorRef.current?.chain().focus().setLink({ href: href.trim() }).run(); else editorRef.current?.chain().focus().unsetLink().run(); }) },
+  ] as const
+
+  const getSlashItems = () => {
+    const q = getSlashQuery()
+    if (!q) return allSlashItems
+    return allSlashItems.filter((it) => it.label.toLowerCase().includes(q))
+  }
 
   return (
     <div className={["border rounded-md bg-background flex flex-col h-full", className].join(' ')}>
@@ -183,11 +314,29 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           <TableIcon className="w-4 h-4" />
         </ToolbarButton>
       </div>
-      <div className="relative min-h-0 flex-1 overflow-y-auto p-3">
+      <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto p-3">
         {!editor?.getText() && (
           <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
         )}
         <EditorContent editor={editor} className="tiptap prose dark:prose-invert max-w-none min-h-full outline-none focus:outline-none" />
+        {slashMenu.open && (
+          <div
+            style={{ position: 'absolute', left: slashMenu.x, top: slashMenu.y, zIndex: 1000, minWidth: 240 }}
+            className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-1 text-sm">
+            <div className="px-2 py-1.5 text-xs text-slate-500">Quick insert</div>
+            <div className="max-h-64 overflow-auto">
+              {getSlashItems().map((it, idx) => (
+                <button
+                  key={it.label}
+                  className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
+                    idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
+                  onClick={() => it.onSelect()}>
+                  {it.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

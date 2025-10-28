@@ -60,6 +60,27 @@
   color: inherit;
 }
 
+/* Link visibility */
+.tiptap a {
+  color: #2563eb; /* blue-600 */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dark .tiptap a {
+  color: #93c5fd; /* blue-300 */
+}
+
+/* Image defaults and selection */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.tiptap img.ProseMirror-selectednode {
+  outline: 2px solid rgba(59, 130, 246, 0.6); /* blue-500/60 */
+  outline-offset: 2px;
+}
+
 /* Table visibility */
 .tiptap table {
   width: 100%;
