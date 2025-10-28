@@ -51,7 +51,7 @@ export function NoteContent({
   }
 
   const cardVariant = variant === "detail" ? "success" : variant === "error" ? "error" : "default";
-  const cardMaxHeight = variant === "comparison" ? "max-h-48" : maxHeight;
+  const useComparisonClamp = variant === "comparison";
 
   return (
     <div className={className}>
@@ -61,7 +61,8 @@ export function NoteContent({
       <ContentCard
         content={content}
         variant={cardVariant}
-        maxHeight={cardMaxHeight}
+        className={useComparisonClamp ? "max-h-48" : undefined}
+        maxHeight={useComparisonClamp ? undefined : maxHeight}
         showScrollbar={variant === "comparison"}
         placeholder={placeholder}
       />

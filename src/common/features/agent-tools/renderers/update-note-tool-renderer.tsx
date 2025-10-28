@@ -26,8 +26,7 @@ export function UpdateNoteToolRenderer({
       title="Update Note"
       loadingText="Preparing parameters..."
       callStatusText="Ready to update"
-      contentScrollable={false}
-      stickyFooter={false}
+      // Use default scrollable content and sticky footer, same as createNote
       preview={() => (
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-3">

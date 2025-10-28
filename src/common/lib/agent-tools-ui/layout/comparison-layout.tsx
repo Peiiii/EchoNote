@@ -37,14 +37,14 @@ export function ComparisonLayout({
         <ContentCard
           content={original.content}
           variant="default"
-          maxHeight="max-h-48"
+          className="max-h-48"
           showScrollbar={true}
           placeholder={original.placeholder || "Loading original content..."}
         />
         <ContentCard
           content={updated.content}
           variant="success"
-          maxHeight="max-h-48"
+          className="max-h-48"
           showScrollbar={true}
           placeholder={updated.placeholder || "Loading updated content..."}
         />
