@@ -26,5 +26,9 @@
       "rx-nested-bean": ["./packages/rx-nested-bean/src"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    // Exclude heavy, unadapted RichEditor (full cherry-studio copy). We ship a Lite version instead.
+    "src/common/components/RichEditor/**"
+  ]
 }

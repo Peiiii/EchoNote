@@ -5,6 +5,7 @@ import { Check, Loader2, Minimize2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/common/hooks/use-editor";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
+import { RichEditorLite } from "@/common/components/RichEditorLite";
 
 interface ExpandedEditorProps {
   content: string;
@@ -22,12 +23,14 @@ export function ExpandedEditor({
   isSaving,
 }: ExpandedEditorProps) {
   const [localContent, setLocalContent] = useState(content);
+  const [mode, setMode] = useState<"markdown" | "wysiwyg">("markdown");
   const [isLocalSaving, setIsLocalSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Select only the updater to avoid subscribing to edit content changes here
   const updateContent = useEditStateStore(s => s.updateContent);
 
-  useEditor({ textareaRef, updateContent, content });
+  // Only bind textarea helpers when in markdown textarea mode
+  useEditor({ textareaRef, updateContent, content: mode === "markdown" ? content : "" });
 
   // Auto-focus when component mounts
   useEffect(() => {
@@ -100,53 +103,93 @@ export function ExpandedEditor({
       {/* Main editing area - Left Editor + Right Preview */}
       <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* Editor panel (left) */}
-        <div className="w-1/2 min-h-0 border-r border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+        <div
+          className={[
+            mode === "wysiwyg" ? "w-full" : "w-1/2",
+            "min-h-0",
+            mode === "markdown" ? "border-r border-slate-200 dark:border-slate-700" : "",
+            "flex flex-col overflow-hidden",
+          ].join(" ")}
+        >
           <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
+                <div className="flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 p-0.5">
+                  <Button
+                    variant={mode === "markdown" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setMode("markdown")}
+                    className="h-7 px-2"
+                  >
+                    Markdown
+                  </Button>
+                  <Button
+                    variant={mode === "wysiwyg" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setMode("wysiwyg")}
+                    className="h-7 px-2"
+                  >
+                    WYSIWYG
+                  </Button>
+                </div>
+              </div>
               <div className="text-xs text-slate-500 dark:text-slate-500">
                 {localContent.length} characters
               </div>
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 p-6 overflow-hidden flex items-start">
-            <textarea
-              ref={textareaRef}
-              value={localContent}
-              onChange={e => handleContentChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Write your thought in Markdown..."
-              className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
-              disabled={isSaving}
-              style={{
-                caretColor: "#3b82f6",
-              }}
-            />
+          <div className="flex-1 min-h-0 p-6 overflow-hidden flex flex-col">
+            {mode === "markdown" ? (
+              <textarea
+                ref={textareaRef}
+                value={localContent}
+                onChange={e => handleContentChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Write your thought in Markdown..."
+                className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
+                disabled={isSaving}
+                style={{
+                  caretColor: "#3b82f6",
+                }}
+              />
+            ) : (
+              <div className="w-full h-full" onKeyDown={handleKeyDown}>
+                <RichEditorLite
+                  value={localContent}
+                  onChange={handleContentChange}
+                  editable={!isSaving}
+                  placeholder="Write your thought..."
+                  className="h-full"
+                />
+              </div>
+            )}
           </div>
         </div>
+        {/* Preview panel (right) - only in markdown mode */}
+        {mode === "markdown" && (
+          <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Preview</h3>
+                <div className="text-xs text-slate-500 dark:text-slate-500">Live Preview</div>
+              </div>
+            </div>
 
-        {/* Preview panel (right) */}
-        <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Preview</h3>
-              <div className="text-xs text-slate-500 dark:text-slate-500">Live Preview</div>
+            <div className="flex-1 min-h-0 p-6 overflow-y-auto">
+              <div className="prose prose-slate dark:prose-invert max-w-none">
+                {localContent.trim() ? (
+                  <MarkdownContent content={localContent} />
+                ) : (
+                  <div className="text-slate-400 dark:text-slate-500 italic text-center py-8">
+                    Start typing to see preview...
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-
-          <div className="flex-1 min-h-0 p-6 overflow-y-auto">
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-              {localContent.trim() ? (
-                <MarkdownContent content={localContent} />
-              ) : (
-                <div className="text-slate-400 dark:text-slate-500 italic text-center py-8">
-                  Start typing to see preview...
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Footer - Action buttons and keyboard shortcuts */}

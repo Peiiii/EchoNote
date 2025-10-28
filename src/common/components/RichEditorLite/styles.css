@@ -1,0 +1,116 @@
+/* Minimal styles for TipTap task list and general readability */
+/* Task list base */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0.25rem;
+}
+
+/* TipTap v3 emits <li data-checked> without data-type; select by structure */
+.tiptap ul[data-type="taskList"] > li {
+  display: flex;
+  align-items: flex-start; /* align checkbox with first line of text */
+  margin: 0.25rem 0;
+}
+
+.tiptap ul[data-type="taskList"] > li > label {
+  margin-right: 0.5rem;
+  user-select: none;
+  line-height: 1; /* prevent label pushing content down */
+  /* Nudge checkbox down slightly to align optical baseline with first line */
+  margin-top: 0.125rem;
+}
+
+.tiptap ul[data-type="taskList"] > li input[type="checkbox"] {
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6; /* tailwind blue-500 */
+}
+
+.tiptap ul[data-type="taskList"] > li > div,
+.tiptap ul[data-type="taskList"] > li > div.content {
+  flex: 1;
+  display: inline-block; /* sit on same row with checkbox */
+  min-height: 1.25rem; /* keep caret visible on empty line */
+}
+
+/* Remove big paragraph margins inside task items (prose typography adds them) */
+.tiptap ul[data-type="taskList"] > li > div > p,
+.tiptap ul[data-type="taskList"] > li > div.content > p {
+  margin: 0;
+}
+
+.tiptap ul[data-type="taskList"] > li[data-checked="true"] > div {
+  opacity: 0.85;
+}
+
+/* Code block readability in editor */
+.tiptap pre {
+  background: rgba(148, 163, 184, 0.15); /* slate-400/15 */
+  color: inherit;
+  border-radius: 0.375rem;
+  padding: 0.75rem 0.875rem;
+  overflow-x: auto;
+}
+
+.tiptap blockquote {
+  border-left: 2px solid rgba(148, 163, 184, 0.5);
+  padding-left: 0.75rem;
+  color: inherit;
+}
+
+/* Table visibility */
+.tiptap table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tiptap th,
+.tiptap td {
+  border: 1px solid rgba(148, 163, 184, 0.35); /* slate-400/35 */
+  padding: 0.375rem 0.5rem;
+  vertical-align: top;
+}
+
+.tiptap th {
+  background: rgba(148, 163, 184, 0.12);
+  font-weight: 600;
+}
+
+/* Generic list styles (unordered/ordered) */
+.tiptap ul:not([data-type="taskList"]) {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0;
+}
+
+.tiptap ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0;
+}
+
+/* Nested list markers */
+.tiptap ul ul:not([data-type="taskList"]) {
+  list-style: circle;
+  padding-left: 1.25rem;
+}
+
+.tiptap ul ul ul:not([data-type="taskList"]) {
+  list-style: square;
+}
+
+.tiptap ol ol {
+  list-style: lower-alpha;
+  padding-left: 1.25rem;
+}
+
+.tiptap ol ol ol {
+  list-style: lower-roman;
+}
+
+.tiptap li {
+  margin: 0.125rem 0;
+}
