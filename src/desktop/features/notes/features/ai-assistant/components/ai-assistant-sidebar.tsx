@@ -5,8 +5,6 @@ import { Plus, History, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
 import { useRef } from "react";
-import { ConversationContextControl } from "@/common/features/ai-assistant/features/context";
-// removed: creation-time context dropdown; we now use in-chat context control
 
 interface AIAssistantSidebarProps {
   isOpen: boolean;
@@ -38,13 +36,6 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="font-semibold text-foreground truncate">{getTitle()}</h3>
-            {currentConversation && (
-              <ConversationContextControl
-                conversationId={currentConversation.id}
-                fallbackChannelId={channelId}
-                variant="inline"
-              />
-            )}
           </div>
           <div className="flex items-center gap-1">
             <Button

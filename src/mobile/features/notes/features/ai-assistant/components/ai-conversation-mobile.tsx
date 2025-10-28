@@ -6,8 +6,6 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { AIConversation } from "@/common/types/ai-conversation";
 import { ArrowLeft, Loader2, History, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
-import { ConversationContextControl } from "@/common/features/ai-assistant/features/context";
-// removed: creation-time context dropdown; we now use in-chat context control
 
 export type MobileConversationRef = {
   showList: () => void;
@@ -127,13 +125,6 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
             </h3>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            {view === "chat" && currentConversationId && (
-              <ConversationContextControl
-                conversationId={currentConversationId}
-                fallbackChannelId={channelId}
-                variant="compact"
-              />
-            )}
             <Button
               variant="ghost"
               size="icon"

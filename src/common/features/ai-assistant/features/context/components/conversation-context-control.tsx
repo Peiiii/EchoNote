@@ -199,6 +199,7 @@ interface Props {
   onActiveToolChannelChange?: (id: string | null) => void;
   activeToolChannelId?: string | null;
   variant?: "inline" | "banner" | "compact";
+  className?: string;
 }
 
 export function ConversationContextControl({
@@ -207,6 +208,7 @@ export function ConversationContextControl({
   onActiveToolChannelChange,
   activeToolChannelId,
   variant = "inline",
+  className,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
@@ -246,12 +248,14 @@ export function ConversationContextControl({
     draftMode === ConversationContextMode.CHANNELS
   );
 
-  const containerClass =
+  const containerClass = cn(
     variant === "banner"
       ? "flex items-center gap-2 px-3 py-2 border-b bg-background/60"
       : variant === "compact"
         ? "inline-flex items-center"
-        : "inline-flex items-center gap-1";
+        : "inline-flex items-center gap-1",
+    className
+  );
 
   return (
     <div className={containerClass}>

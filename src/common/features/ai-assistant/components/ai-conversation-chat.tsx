@@ -16,6 +16,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
+import { createContextSelectorExtension } from "../extensions/context-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
 import { ConversationChatProps } from "../types/conversation.types";
 
@@ -217,8 +218,12 @@ function AgentChatCoreWrapper({
           console.log("Model changed to:", modelId);
         },
       }),
+      createContextSelectorExtension({
+        conversationId,
+        fallbackChannelId: channelId,
+      }),
     ],
-    []
+    [conversationId, channelId]
   );
 
   const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);
