@@ -4,6 +4,7 @@ import { marked } from 'marked'
 import { unified } from 'unified'
 import rehypeParse from 'rehype-parse'
 import rehypeRemark from 'rehype-remark'
+import rehypeTableNormalize from '@/common/markdown/plugins/rehype-table-normalize'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import remarkStringify from 'remark-stringify'
@@ -184,12 +185,11 @@ export function htmlToMarkdown(html: string): string {
   try {
     // Step 1: TipTap tasks → GFM-friendly HTML
     const normalizedTasks = normalizeTiptapTasksToGfm(html)
-    // Step 2: Normalize tables (add thead/align, flatten cells); keep complex tables as-is (col/row span > 1)
-    const normalized = normalizeTablesForTurndown(normalizedTasks)
 
     // Step 3: HTML → Markdown via unified (rehype → remark → stringify)
     const file = unified()
       .use(rehypeParse, { fragment: true })
+      .use(rehypeTableNormalize)
       .use(rehypeRemark)
       .use(remarkGfm)
       .use(remarkMath)
@@ -201,115 +201,9 @@ export function htmlToMarkdown(html: string): string {
         // Keep tables tidy for readability while avoiding layout issues
         fencesMinGap: 1,
       } as any)
-      .processSync(normalized)
+      .processSync(normalizedTasks)
 
     return String(file.value)
-  } catch {
-    return html
-  }
-}
-
-/**
- * Normalize tables so turndown-plugin-gfm will emit markdown tables instead of keeping raw HTML.
- * The plugin only converts tables with a heading row (all TH cells or THEAD). Some editors produce
- * tables without header cells, which then get preserved as HTML. We convert the first row to a header.
- */
-function normalizeTablesForTurndown(html: string): string {
-  // Fast-path if no tables
-  if (!html || html.indexOf('<table') === -1) return html
-
-  try {
-    const doc = document.implementation.createHTMLDocument('')
-    const container = doc.createElement('div')
-    container.innerHTML = html
-
-    const tables = Array.from(container.querySelectorAll('table'))
-    for (const table of tables) {
-      // Skip only truly complex tables (col/row span > 1). Many editors emit colspan="1"/rowspan="1" by default.
-      const hasComplexSpan = Array.from(table.querySelectorAll('th,td')).some((cell) => {
-        const cs = (cell as HTMLElement).getAttribute('colspan')
-        const rs = (cell as HTMLElement).getAttribute('rowspan')
-        const csn = cs ? parseInt(cs, 10) : 1
-        const rsn = rs ? parseInt(rs, 10) : 1
-        return (isFinite(csn) ? csn : 1) > 1 || (isFinite(rsn) ? rsn : 1) > 1
-      })
-      if (hasComplexSpan) continue
-      // Find first row in thead/tbody/table
-      const hasThead = !!table.querySelector(':scope > thead > tr')
-      const firstRow = table.querySelector(':scope > thead > tr, :scope > tbody > tr, :scope > tr') as HTMLTableRowElement | null
-      if (!firstRow) continue
-
-      // Check if first row is considered a heading row by turndown-plugin-gfm
-      const allTh = Array.from(firstRow.children).every((c) => c.nodeName === 'TH')
-      const parent = firstRow.parentElement
-      const isFirstChild = parent ? parent.firstElementChild === firstRow : false
-      const parentName = parent?.nodeName || ''
-      const prevSiblingName = parent?.previousElementSibling?.nodeName || ''
-      const consideredHeading =
-        parentName === 'THEAD' ||
-        (isFirstChild && (
-          parentName === 'TABLE' || (parentName === 'TBODY' && (prevSiblingName === '' || prevSiblingName === 'THEAD'))
-        ) && allTh)
-
-      if (consideredHeading) continue
-
-      // Convert first row to header: turn TD into TH and wrap in THEAD
-      const thead = doc.createElement('thead')
-      const headerRow = firstRow.cloneNode(true) as HTMLTableRowElement
-      // Replace TDs with THs; also map text-align styles to legacy align attribute so turndown can detect alignment
-      Array.from(headerRow.children).forEach((cell) => {
-        if (cell.nodeName === 'TH') return
-        const th = doc.createElement('th')
-        // copy children
-        while (cell.firstChild) th.appendChild(cell.firstChild)
-        // map alignment
-        const style = (cell as HTMLElement).getAttribute('style') || ''
-        const match = /text-align\s*:\s*(left|center|right)/i.exec(style)
-        if (match) th.setAttribute('align', match[1].toLowerCase())
-        // replace cell
-        cell.replaceWith(th)
-      })
-      thead.appendChild(headerRow)
-
-      // Insert THEAD after CAPTION/COLGROUP and before TBODY/TR/TFOOT so that turndown's heading detection works
-      const ref = table.querySelector(':scope > tbody, :scope > tr, :scope > tfoot')
-      if (ref) table.insertBefore(thead, ref)
-      else table.appendChild(thead)
-
-      // Remove the original firstRow from its parent (it was cloned above)
-      firstRow.remove()
-
-      // Flatten cell content to avoid paragraph-induced newlines in GFM output
-      const flattenCell = (cellEl: Element) => {
-        const cell = cellEl as HTMLElement
-        try {
-          // Replace immediate <p> wrappers with their inline content
-          Array.from(cell.querySelectorAll(':scope > p')).forEach((p) => {
-            const span = doc.createElement('span')
-            while (p.firstChild) span.appendChild(p.firstChild)
-            p.replaceWith(span)
-          })
-          // Collapse stray newlines/extra spaces that will break pipe tables
-          cell.innerHTML = cell.innerHTML.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ')
-        } catch {}
-      }
-      const allCells = Array.from(table.querySelectorAll('th, td'))
-      allCells.forEach(flattenCell)
-
-      // Ensure remaining rows live in a TBODY for cleaner structure
-      if (!hasThead) {
-        let tbody = table.querySelector(':scope > tbody') as HTMLTableSectionElement | null
-        if (!tbody) {
-          tbody = doc.createElement('tbody')
-          // Move all non-thead rows into tbody
-          const leftoverRows = Array.from(table.querySelectorAll(':scope > tr'))
-          leftoverRows.forEach((r) => tbody!.appendChild(r))
-          table.appendChild(tbody)
-        }
-      }
-    }
-
-    return container.innerHTML
   } catch {
     return html
   }

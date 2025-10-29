@@ -242,6 +242,9 @@ importers:
       unified:
         specifier: ^11.0.5
         version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
@@ -255,6 +258,9 @@ importers:
       '@eslint/js':
         specifier: ^9.30.1
         version: 9.35.0
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
