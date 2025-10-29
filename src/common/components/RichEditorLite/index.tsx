@@ -426,7 +426,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (next === null) return
           const lang = next.trim()
           if (lang) editor?.chain().focus().updateAttributes('codeBlock', { language: lang }).run()
-          else editor?.chain().focus().updateAttributes('codeBlock', { language: null as unknown as string }).run()
+          else editor?.chain().focus().updateAttributes('codeBlock', { language: null }).run()
         }}>
           <Languages className="w-4 h-4" />
         </ToolbarButton>
