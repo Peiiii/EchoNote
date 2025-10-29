@@ -8,6 +8,7 @@ import rehypeTableNormalize from '@/common/markdown/plugins/rehype-table-normali
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import remarkStringify from 'remark-stringify'
+import type { Options as RemarkStringifyOptions } from 'remark-stringify'
 
 // Configure marked for basic GFM support
 marked.setOptions({
@@ -187,20 +188,20 @@ export function htmlToMarkdown(html: string): string {
     const normalizedTasks = normalizeTiptapTasksToGfm(html)
 
     // Step 3: HTML → Markdown via unified (rehype → remark → stringify)
+    const stringifyOptions: RemarkStringifyOptions = {
+      fences: true,
+      bullet: '-',
+      rule: '-',
+      listItemIndent: 'one',
+    }
+
     const file = unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeTableNormalize)
       .use(rehypeRemark)
       .use(remarkGfm)
       .use(remarkMath)
-      .use(remarkStringify, {
-        fences: true,
-        bullet: '-',
-        rule: '-',
-        listItemIndent: 'one',
-        // Keep tables tidy for readability while avoiding layout issues
-        fencesMinGap: 1,
-      } as any)
+      .use(remarkStringify, stringifyOptions)
       .processSync(normalizedTasks)
 
     return String(file.value)

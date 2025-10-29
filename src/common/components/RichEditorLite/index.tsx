@@ -89,21 +89,61 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         return false
       },
       handleKeyDown(_view, event): boolean {
-        // Indent/outdent behaviors for task list (and fallback to bullet/ordered)
+        // Indent / outdent for task list and bullet/ordered list
         if (event.key === 'Tab') {
           event.preventDefault()
+          const ed = editorRef.current
+          if (!ed) return true
+
+          // Shift+Tab → outdent (lift)
           if (event.shiftKey) {
-            const ran = !!(
-              editorRef.current?.chain().focus().liftListItem('taskItem').run() ||
-              editorRef.current?.chain().focus().liftListItem('listItem').run()
-            )
-            return ran
+            if (import.meta.env.DEV) {
+              const canLiftTask = ed.can().liftListItem('taskItem')
+              const canLiftList = ed.can().liftListItem('listItem')
+              const ctx = {
+                mode: 'outdent',
+                canLiftTask,
+                canLiftList,
+                isTask: ed.isActive('taskList'),
+                isBullet: ed.isActive('bulletList'),
+                isOrdered: ed.isActive('orderedList'),
+              }
+              console.debug('[RichEditorLite][Tab]', ctx)
+            }
+            if (ed.can().liftListItem('taskItem')) {
+              ed.chain().focus().liftListItem('taskItem').run()
+              return true
+            }
+            if (ed.can().liftListItem('listItem')) {
+              ed.chain().focus().liftListItem('listItem').run()
+              return true
+            }
+            return true
           }
-          const ran = !!(
-            editorRef.current?.chain().focus().sinkListItem('taskItem').run() ||
-            editorRef.current?.chain().focus().sinkListItem('listItem').run()
-          )
-          return ran
+
+          // Tab → indent (sink)
+          if (import.meta.env.DEV) {
+            const canSinkTask = ed.can().sinkListItem('taskItem')
+            const canSinkList = ed.can().sinkListItem('listItem')
+            const ctx = {
+              mode: 'indent',
+              canSinkTask,
+              canSinkList,
+              isTask: ed.isActive('taskList'),
+              isBullet: ed.isActive('bulletList'),
+              isOrdered: ed.isActive('orderedList'),
+            }
+            console.debug('[RichEditorLite][Tab]', ctx)
+          }
+          if (ed.can().sinkListItem('taskItem')) {
+            ed.chain().focus().sinkListItem('taskItem').run()
+            return true
+          }
+          if (ed.can().sinkListItem('listItem')) {
+            ed.chain().focus().sinkListItem('listItem').run()
+            return true
+          }
+          return true
         }
         // Slash menu keyboard UX
         if (slashMenu.open) {
