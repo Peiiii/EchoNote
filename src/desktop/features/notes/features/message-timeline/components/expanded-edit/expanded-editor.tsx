@@ -80,7 +80,7 @@ export function ExpandedEditor({
     // Use min-h-0 on flex wrappers to prevent children from forcing overflow
     <div className="w-full h-full min-h-0 flex flex-col">
       {/* Header - Edit mode indicator and actions */}
-      <div className="flex items-center justify-between px-8 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-800/30">
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -113,7 +113,7 @@ export function ExpandedEditor({
             "flex flex-col overflow-hidden",
           ].join(" ")}
         >
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
+          <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
@@ -142,7 +142,7 @@ export function ExpandedEditor({
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 p-6 overflow-hidden flex flex-col">
+          <div className="flex-1 min-h-0 p-3 overflow-hidden flex flex-col">
             {editorMode === "markdown" ? (
               <textarea
                 ref={textareaRef}
@@ -164,6 +164,7 @@ export function ExpandedEditor({
                   editable={!isSaving}
                   placeholder="Write your thought..."
                   className="h-full"
+                  variant="frameless"
                 />
               </div>
             )}
@@ -172,14 +173,14 @@ export function ExpandedEditor({
         {/* Preview panel (right) - only in markdown mode */}
         {editorMode === "markdown" && (
           <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
+            <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Preview</h3>
                 <div className="text-xs text-slate-500 dark:text-slate-500">Live Preview</div>
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 p-6 overflow-y-auto">
+            <div className="flex-1 min-h-0 p-3 overflow-y-auto">
               <div className="prose prose-slate dark:prose-invert max-w-none">
                 {localContent.trim() ? (
                   <MarkdownContent content={localContent} />
@@ -195,7 +196,7 @@ export function ExpandedEditor({
       </div>
 
       {/* Footer - Action buttons and keyboard shortcuts */}
-      <div className="px-8 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
+      <div className="px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-800/30">
         <div className="flex items-center justify-between">
           {/* Left side - Keyboard shortcuts hint */}
           <div className="text-xs text-slate-500 dark:text-slate-400">

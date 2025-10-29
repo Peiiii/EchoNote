@@ -30,6 +30,7 @@ interface RichEditorLiteProps {
   editable?: boolean
   placeholder?: string
   className?: string
+  variant?: 'default' | 'frameless'
 }
 
 function ToolbarButton({ disabled, active, onClick, children, size = 'md', className = '' }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode; size?: 'sm' | 'md'; className?: string }) {
@@ -53,10 +54,15 @@ function ToolbarButton({ disabled, active, onClick, children, size = 'md', class
   )
 }
 
-export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '' }: RichEditorLiteProps) {
+export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default' }: RichEditorLiteProps) {
   // Create bubble menu element before editor initialization so the extension can mount.
   const bubbleEl = useMemo<HTMLElement>(() => {
-    return document.createElement('div')
+    const el = document.createElement('div')
+    // Ensure BubbleMenu sits above editor content but below our modals
+    el.style.zIndex = '900' // link/slash/image popups use 1000
+    // plugin will set position/coords; keep pointer events enabled for hover
+    el.style.pointerEvents = 'auto'
+    return el
   }, [])
   const initialHtml = useMemo(() => markdownToHtml(value || ''), [value])
   const lastMarkdownRef = useRef<string>(value || '')
@@ -462,7 +468,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         const sel = ed.state.selection
         if (!sel.empty) text = ed.state.doc.textBetween(sel.from, sel.to)
       }
-    } catch {}
+    } catch (_err) { text = '' }
     setLinkMenu({ open: true, x, y, value: current, text })
   }
   const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '', text: '' })
@@ -651,8 +657,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   // No global capture needed; Suggestion plugin consumes ESC. This is left empty intentionally.
 
   return (
-    <div className={["border rounded-md bg-background flex flex-col h-full", className].join(' ')}>
-      <div className="flex items-center gap-1 px-2 py-1 border-b shrink-0">
+    <div className={[variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background", "flex flex-col h-full", className].join(' ')}>
+      <div className={["flex items-center gap-1 shrink-0",
+        variant === 'frameless' ? "px-1 py-0.5 border-0" : "px-2 py-1 border-b"].join(' ')}>
         <ToolbarButton active={isActive('bold')} disabled={!can(() => editor!.can().chain().focus().toggleBold().run())} onClick={() => editor?.chain().focus().toggleBold().run()}>
           <Bold className="w-4 h-4" />
         </ToolbarButton>
@@ -734,7 +741,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
       </div>
       <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto">
-        <div className="relative p-3">
+        <div className={["relative", variant === 'frameless' ? "p-0" : "p-3"].join(' ')}>
           {!editor?.getText() && (
             <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
           )}

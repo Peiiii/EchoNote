@@ -36,7 +36,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
   isDirty: false,
   isSaving: false,
   editMode: "inline",
-  editorMode: "markdown",
+  editorMode: "wysiwyg",
 
   // Start editing a message
   startEditing: (messageId: string, content: string) => {
@@ -47,7 +47,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       isDirty: false,
       isSaving: false,
       editMode: "inline", // Default to inline mode
-      editorMode: "markdown", // Default to markdown mode
+      editorMode: "wysiwyg", // Default to wysiwyg mode
     });
   },
 
@@ -132,7 +132,7 @@ export const useEditStateStore = create<EditState>()((set, get) => ({
       isDirty: false,
       isSaving: false,
       editMode: "inline",
-      editorMode: "markdown",
+      editorMode: "wysiwyg",
     });
   },
 }));
