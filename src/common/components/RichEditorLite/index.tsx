@@ -394,6 +394,27 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
           return false
         },
+        contextmenu: (_view: unknown, event: Event) => {
+          const me = event as MouseEvent
+          const target = me.target as HTMLElement
+          // If right-click inside a table, open table menu at pointer
+          const isInEditor = !!containerRef.current?.contains(target)
+          const tableEl = target.closest('table')
+          if (isInEditor && tableEl) {
+            // Move selection near pointer so commands act on that cell
+            const coords = editorRef.current?.view.posAtCoords({ left: me.clientX, top: me.clientY })
+            if (coords && typeof coords.pos === 'number') {
+              editorRef.current?.chain().focus().setTextSelection(coords.pos).run()
+            }
+            const crect = containerRef.current?.getBoundingClientRect()
+            const x = (crect ? me.clientX - crect.left + (containerRef.current?.scrollLeft || 0) : me.clientX)
+            const y = (crect ? me.clientY - crect.top + (containerRef.current?.scrollTop || 0) : me.clientY)
+            setTableMenu({ open: true, x, y })
+            me.preventDefault()
+            return true
+          }
+          return false
+        },
       },
     },
     onCreate: ({ editor }) => {
@@ -826,19 +847,19 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
             onMouseDown={(e) => e.preventDefault()}
           >
-            <ToolbarButton onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
             <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
             <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton onClick={() => editor?.chain().focus().mergeOrSplit().run()}>Merge</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().toggleHeaderRow().run()}>Hdr Row</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().toggleHeaderColumn().run()}>Hdr Col</ToolbarButton>
+            {/* Merge disabled by product policy (Markdown compatibility) */}
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().toggleHeaderRow().run())} onClick={() => editor?.chain().focus().toggleHeaderRow().run()}>Hdr Row</ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().toggleHeaderColumn().run())} onClick={() => editor?.chain().focus().toggleHeaderColumn().run()}>Hdr Col</ToolbarButton>
             <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteTable().run()}><TableIcon className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteTable().run())} onClick={() => editor?.chain().focus().deleteTable().run()}><TableIcon className="w-4 h-4" /></ToolbarButton>
           </div>
         )}
         {slashMenu.open && (
