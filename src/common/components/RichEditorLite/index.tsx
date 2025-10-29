@@ -14,7 +14,7 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus, Braces, Languages } from 'lucide-react'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus, Braces, Languages, Undo2, Redo2, Eraser } from 'lucide-react'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
@@ -144,6 +144,27 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               break
             case 'table':
               chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+              break
+            case 'table-row-above':
+              chain.addRowBefore().run()
+              break
+            case 'table-row-below':
+              chain.addRowAfter().run()
+              break
+            case 'table-row-delete':
+              chain.deleteRow().run()
+              break
+            case 'table-col-left':
+              chain.addColumnBefore().run()
+              break
+            case 'table-col-right':
+              chain.addColumnAfter().run()
+              break
+            case 'table-col-delete':
+              chain.deleteColumn().run()
+              break
+            case 'table-delete':
+              chain.deleteTable().run()
               break
             case 'image': {
               const url = window.prompt('Image URL')
@@ -363,6 +384,13 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     { label: 'Code block', id: 'code' },
     { label: 'Horizontal rule', id: 'hr' },
     { label: 'Table', id: 'table' },
+    { label: 'Table: add row above', id: 'table-row-above' },
+    { label: 'Table: add row below', id: 'table-row-below' },
+    { label: 'Table: delete row', id: 'table-row-delete' },
+    { label: 'Table: add column left', id: 'table-col-left' },
+    { label: 'Table: add column right', id: 'table-col-right' },
+    { label: 'Table: delete column', id: 'table-col-delete' },
+    { label: 'Table: delete table', id: 'table-delete' },
     { label: 'Image…', id: 'image' },
     { label: 'Link…', id: 'link' },
   ]
@@ -389,6 +417,16 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
         <ToolbarButton active={isActive('strike')} disabled={!can(() => editor!.can().chain().focus().toggleStrike().run())} onClick={() => editor?.chain().focus().toggleStrike().run()}>
           <Strikethrough className="w-4 h-4" />
+        </ToolbarButton>
+        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <ToolbarButton disabled={!can(() => editor!.can().chain().focus().undo().run())} onClick={() => editor?.chain().focus().undo().run()}>
+          <Undo2 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton disabled={!can(() => editor!.can().chain().focus().redo().run())} onClick={() => editor?.chain().focus().redo().run()}>
+          <Redo2 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}>
+          <Eraser className="w-4 h-4" />
         </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton active={isActive('heading', { level: 1 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}>

@@ -11,7 +11,15 @@ export type SlashAction =
   | 'quote'
   | 'code'
   | 'hr'
+  // table ops
   | 'table'
+  | 'table-row-above'
+  | 'table-row-below'
+  | 'table-row-delete'
+  | 'table-col-left'
+  | 'table-col-right'
+  | 'table-col-delete'
+  | 'table-delete'
   | 'image'
   | 'link'
 
