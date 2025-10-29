@@ -31,6 +31,9 @@ interface RichEditorLiteProps {
   placeholder?: string
   className?: string
   variant?: 'default' | 'frameless'
+  compactToolbar?: boolean
+  maxHeight?: number | string
+  minHeight?: number | string
 }
 
 function ToolbarButton({ disabled, active, onClick, children, size = 'md', className = '' }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode; size?: 'sm' | 'md'; className?: string }) {
@@ -54,7 +57,7 @@ function ToolbarButton({ disabled, active, onClick, children, size = 'md', class
   )
 }
 
-export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default' }: RichEditorLiteProps) {
+export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', compactToolbar = false, maxHeight, minHeight }: RichEditorLiteProps) {
   // Create bubble menu element before editor initialization so the extension can mount.
   const bubbleEl = useMemo<HTMLElement>(() => {
     const el = document.createElement('div')
@@ -656,10 +659,18 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   // No global capture needed; Suggestion plugin consumes ESC. This is left empty intentionally.
 
+  const outerStyle: React.CSSProperties = {
+    ...(maxHeight ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : String(maxHeight) } : {}),
+    ...(minHeight ? { minHeight: typeof minHeight === 'number' ? `${minHeight}px` : String(minHeight) } : {}),
+  }
+
   return (
-    <div className={[variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background", "flex flex-col h-full", className].join(' ')}>
-      <div className={["flex items-center gap-1 shrink-0",
-        variant === 'frameless' ? "px-1 py-0.5 border-0" : "px-2 py-1 border-b"].join(' ')}>
+    <div style={outerStyle} className={[variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background", "flex flex-col min-h-0", className].join(' ')}>
+      <div className={[
+          "flex items-center gap-1 shrink-0",
+          variant === 'frameless' ? "px-1 py-0.5 border-0" : "px-2 py-1 border-b",
+          compactToolbar ? "overflow-x-auto flex-nowrap gap-0.5" : ""
+        ].join(' ')}>
         <ToolbarButton active={isActive('bold')} disabled={!can(() => editor!.can().chain().focus().toggleBold().run())} onClick={() => editor?.chain().focus().toggleBold().run()}>
           <Bold className="w-4 h-4" />
         </ToolbarButton>

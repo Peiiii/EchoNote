@@ -99,6 +99,10 @@ export function InlineEditor({
               onChange={handleContentChange}
               editable={!isSaving}
               placeholder="Edit your thought..."
+              variant="frameless"
+              compactToolbar
+              minHeight={120}
+              maxHeight={300}
             />
           </div>
         )}
