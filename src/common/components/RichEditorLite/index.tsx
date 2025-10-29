@@ -882,8 +882,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               onMouseDown={(e) => e.preventDefault()}
             >
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
-              <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
             </div>
             <div
               style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000, transform: 'translateY(-100%) translateY(-1px) translateX(-50%)' }}
@@ -892,8 +892,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               onMouseDown={(e) => e.preventDefault()}
             >
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
-              <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
             </div>
           </>
         )}
