@@ -41,8 +41,8 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [copied, setCopied] = useState(false)
-  const [showLn, setShowLn] = useState(false)
-  const [lineCount, setLineCount] = useState(1)
+  const unmountedRef = useRef(false)
+  const timerRef = useRef<number | null>(null)
   const contentRef = useRef<HTMLPreElement | null>(null)
 
   type LowlightLike = { listLanguages?: () => string[] }
@@ -73,24 +73,22 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
       const text = el.textContent || ''
       await navigator.clipboard.writeText(text)
       setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
+      if (timerRef.current) window.clearTimeout(timerRef.current)
+      timerRef.current = window.setTimeout(() => { if (!unmountedRef.current) setCopied(false) }, 1200)
     } catch {
       // ignore
     }
   }
 
-  // Track line count for optional line numbers
   React.useEffect(() => {
-    const update = () => {
-      const text = contentRef.current?.textContent || ''
-      const count = text.length ? text.split('\n').length : 1
-      setLineCount(count)
+    unmountedRef.current = false
+    return () => {
+      unmountedRef.current = true
+      if (timerRef.current) window.clearTimeout(timerRef.current)
     }
-    update()
-    const mo = new MutationObserver(update)
-    if (contentRef.current) mo.observe(contentRef.current, { childList: true, characterData: true, subtree: true })
-    return () => mo.disconnect()
   }, [])
+
+  // Line-number UI removed per request; keep minimal refs for copy.
 
   return (
     <NodeViewWrapper as="div" className="relative group">
@@ -115,13 +113,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
         >
           {copied ? 'Copied' : 'Copy'}
         </button>
-        <button
-          type="button"
-          className="px-2 h-6 rounded text-xs bg-slate-800/80 text-white hover:bg-slate-800"
-          onClick={() => setShowLn((v) => !v)}
-        >
-          {showLn ? 'No Ln' : 'Ln'}
-        </button>
+        {/* Line number toggle removed */}
       </div>
 
       {open && (
@@ -173,16 +165,11 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
         </div>
       )}
 
-      {showLn && (
-        <ol className="codeblock-ln">
-          {Array.from({ length: lineCount }).map((_, i) => (
-            <li key={i}>{i + 1}</li>
-          ))}
-        </ol>
-      )}
-      <pre ref={contentRef} style={{ paddingLeft: showLn ? '2.5rem' as string : undefined }}>
-        <NodeViewContent className="hljs" />
-      </pre>
+      <div className="codeblock-grid">
+        <pre ref={contentRef} className="codeblock-pre">
+          <NodeViewContent className="hljs" />
+        </pre>
+      </div>
     </NodeViewWrapper>
   )
 }

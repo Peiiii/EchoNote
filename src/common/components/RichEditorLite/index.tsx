@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './styles.css'
 import { EditorContent, useEditor } from '@tiptap/react'
+import BubbleMenuExt, { type BubbleMenuOptions } from '@tiptap/extension-bubble-menu'
+import type { Extension as TiptapExtension } from '@tiptap/core'
+import { createPortal } from 'react-dom'
 import { StarterKit } from '@tiptap/starter-kit'
 // Custom code block with actions (language switcher, copy)
 import CodeBlockWithActions from './extensions/codeblock-with-actions'
@@ -47,6 +50,10 @@ function ToolbarButton({ disabled, active, onClick, children }: { disabled?: boo
 }
 
 export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '' }: RichEditorLiteProps) {
+  // Create bubble menu element before editor initialization so the extension can mount.
+  const bubbleEl = useMemo<HTMLElement>(() => {
+    return document.createElement('div')
+  }, [])
   const initialHtml = useMemo(() => markdownToHtml(value || ''), [value])
   const lastMarkdownRef = useRef<string>(value || '')
   const editorRef = useRef<Editor | null>(null)
@@ -78,6 +85,16 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       CodeBlockWithActions.configure({
         lowlight,
         defaultLanguage: null,
+      }),
+      // Official BubbleMenu extension (Tiptap)
+      BubbleMenuExt.configure({
+        element: bubbleEl,
+        options: { placement: 'top' },
+        // initial rule; will be kept in sync via effect below
+        shouldShow: ({ editor, state }) => {
+          if (!editor.isEditable) return false
+          return !state.selection.empty
+        }
       }),
       SlashCommand.configure({
         onOpen: (p: SlashOpenPayload) => {
@@ -356,8 +373,18 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (slashMenu.open && !containerRef.current?.contains(target)) {
             setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
           }
-          if (linkMenu.open && !containerRef.current?.contains(target)) {
-            closeLinkMenu()
+          // Close link menu if clicking anywhere outside the link menu panel
+          if (linkMenu.open) {
+            const insidePanel = !!linkMenuRef.current && linkMenuRef.current.contains(target)
+            if (!insidePanel) closeLinkMenu()
+          }
+          return false
+        },
+        mousedown: (_view: unknown, event: Event) => {
+          const target = event.target as HTMLElement
+          if (linkMenu.open) {
+            const insidePanel = !!linkMenuRef.current && linkMenuRef.current.contains(target)
+            if (!insidePanel) closeLinkMenu()
           }
           return false
         },
@@ -398,6 +425,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   // Inline link bubble (input + save/unlink)
   const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
+  const linkMenuRef = useRef<HTMLDivElement | null>(null)
   const computeSelectionXY = () => {
     const crect = containerRef.current?.getBoundingClientRect()
     const sel = window.getSelection()
@@ -415,10 +443,35 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   }
   const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '' })
 
+  // Formatting bubble switched to official BubbleMenu below.
+
+  // Keep BubbleMenu visibility synced with other popups (slash/link).
+  useEffect(() => {
+    if (!editor) return
+    const ext = editor.extensionManager.extensions.find((e) => e.name === 'bubbleMenu') as TiptapExtension<BubbleMenuOptions, unknown> | undefined
+    if (!ext) return
+    ext.options.shouldShow = ({ editor, state }) => {
+      if (!editor.isEditable) return false
+      if (slashMenu.open || linkMenu.open) return false
+      return !state.selection.empty
+    }
+    editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
+  }, [editor, slashMenu.open, linkMenu.open])
+
   const getSlashQuery = (): string => {
     const ed = editorRef.current
-    if (!ed || !slashMenu.range) return ''
-    return ed.state.doc.textBetween(slashMenu.range.from, slashMenu.range.to).trim().toLowerCase()
+    const range = slashMenu.range
+    if (!ed || !range) return ''
+    try {
+      const doc = ed.state.doc
+      const size = doc.content.size
+      const from = Math.max(0, Math.min(range.from, size))
+      const to = Math.max(from, Math.min(range.to, size))
+      return doc.textBetween(from, to).trim().toLowerCase()
+    } catch {
+      // On any out-of-bounds or transient error, fall back to empty query
+      return ''
+    }
   }
 
   type SlashItem = { label: string; id: SlashAction; group?: string; aliases?: string[] }
@@ -564,13 +617,16 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           <TableIcon className="w-4 h-4" />
         </ToolbarButton>
       </div>
-      <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto p-3">
-        {!editor?.getText() && (
-          <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
-        )}
-        <EditorContent editor={editor} className="tiptap prose dark:prose-invert max-w-none min-h-full outline-none focus:outline-none" />
+      <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto">
+        <div className="relative p-3">
+          {!editor?.getText() && (
+            <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
+          )}
+          <EditorContent editor={editor} className="tiptap prose dark:prose-invert max-w-none min-h-full outline-none focus:outline-none" />
+        </div>
         {linkMenu.open && (
           <div
+            ref={linkMenuRef}
             style={{ position: 'absolute', left: linkMenu.x, top: linkMenu.y, zIndex: 1000, minWidth: 280 }}
             className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-2 text-sm"
             onMouseDown={(e) => e.preventDefault()}
@@ -611,8 +667,31 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               >
                 Unlink
               </button>
+              <button
+                type="button"
+                className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
+                onClick={() => closeLinkMenu()}
+                aria-label="Close link editor"
+              >
+                Close
+              </button>
             </div>
           </div>
+        )}
+        {editor && bubbleEl && createPortal(
+          <div
+            className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <ToolbarButton active={isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()}><Bold className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton active={isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()}><Italic className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton active={isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()}><UnderlineIcon className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton active={isActive('strike')} onClick={() => editor?.chain().focus().toggleStrike().run()}><Strikethrough className="w-4 h-4" /></ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+            <ToolbarButton active={isActive('code')} onClick={() => editor?.chain().focus().toggleCode().run()}><Braces className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton active={isActive('link')} onClick={() => { openLinkMenu() }}><LinkIcon className="w-4 h-4" /></ToolbarButton>
+          </div>,
+          bubbleEl
         )}
         {slashMenu.open && (
           <div
@@ -622,13 +701,17 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             <div className="max-h-64 overflow-auto">
               {(() => {
                 const items = getSlashItems()
+                const rows: React.ReactNode[] = []
                 let lastGroup: string | undefined
-                return items.map((it, idx) => (
-                  <React.Fragment key={it.label}>
-                    {it.group && it.group !== lastGroup && (
-                      <div className="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400">{it.group}</div>
-                    )}
+                items.forEach((it, idx) => {
+                  if (it.group && it.group !== lastGroup) {
+                    rows.push(
+                      <div key={`group-${it.group}-${idx}`} className="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400">{it.group}</div>
+                    )
+                  }
+                  rows.push(
                     <button
+                      key={`item-${it.label}-${idx}`}
                       className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
                         idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
                       onMouseDown={(e) => { e.preventDefault() }}
@@ -637,9 +720,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                       <span className="shrink-0">{slashIcon(it.id)}</span>
                       <span>{it.label}</span>
                     </button>
-                    {(lastGroup = it.group)}
-                  </React.Fragment>
-                ))
+                  )
+                  lastGroup = it.group
+                })
+                return rows
               })()}
             </div>
           </div>

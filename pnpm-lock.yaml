@@ -80,6 +80,9 @@ importers:
       '@tiptap/core':
         specifier: ^3.8.0
         version: 3.8.0(@tiptap/pm@3.8.0)
+      '@tiptap/extension-bubble-menu':
+        specifier: ^3.9.1
+        version: 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       '@tiptap/extension-code-block-lowlight':
         specifier: ^3.9.1
         version: 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)
@@ -2420,11 +2423,11 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.8.0
 
-  '@tiptap/extension-bubble-menu@3.8.0':
-    resolution: {integrity: sha512-PmZZSAlR9o1zFwz2s/eF9DDI5iS1xsR3S4A47shExQmpF/+T8mTmK/ybnfyVL+Hkf9XxIuQ2Cga6VBhJ0mUc9g==}
+  '@tiptap/extension-bubble-menu@3.9.1':
+    resolution: {integrity: sha512-rUV7Q/dLxYX1CS0RqSYIYRXGZ4ePFbmzQlzYsCfGKmTVTMNinJXQnltq92iVXa2/dfgg/iWNS73azPaJ0NP1Bg==}
     peerDependencies:
-      '@tiptap/core': ^3.8.0
-      '@tiptap/pm': ^3.8.0
+      '@tiptap/core': ^3.9.1
+      '@tiptap/pm': ^3.9.1
 
   '@tiptap/extension-bullet-list@3.8.0':
     resolution: {integrity: sha512-xEmYrsQn85jjDuDHxTdyfyAoEW4zGFaHhkXCeOJmSR9Z4H5ZFIiIXKevrplXbZXVKqoWiDWyu1jFXu1CP+tIQQ==}
@@ -8674,12 +8677,11 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
 
-  '@tiptap/extension-bubble-menu@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)':
+  '@tiptap/extension-bubble-menu@3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)':
     dependencies:
       '@floating-ui/dom': 1.7.4
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
       '@tiptap/pm': 3.8.0
-    optional: true
 
   '@tiptap/extension-bullet-list@3.8.0(@tiptap/extension-list@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))':
     dependencies:
@@ -8890,7 +8892,7 @@ snapshots:
       react-dom: 19.1.1(react@19.1.1)
       use-sync-external-store: 1.5.0(react@19.1.1)
     optionalDependencies:
-      '@tiptap/extension-bubble-menu': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
+      '@tiptap/extension-bubble-menu': 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       '@tiptap/extension-floating-menu': 3.8.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
     transitivePeerDependencies:
       - '@floating-ui/dom'
