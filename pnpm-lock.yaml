@@ -80,6 +80,9 @@ importers:
       '@tiptap/core':
         specifier: ^3.8.0
         version: 3.8.0(@tiptap/pm@3.8.0)
+      '@tiptap/extension-code-block-lowlight':
+        specifier: ^3.9.1
+        version: 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)
       '@tiptap/extension-image':
         specifier: ^3.8.0
         version: 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))
@@ -253,7 +256,7 @@ importers:
         version: 11.1.0
       zenmark-editor:
         specifier: ^0.0.1
-        version: 0.0.1(76c7688e44df74ea0e0f76d611c73cf9)
+        version: 0.0.1(0366b46ba69a03f4caac13251a8cf627)
       zustand:
         specifier: ^5.0.7
         version: 5.0.8(@types/react@19.1.12)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1))
@@ -2434,12 +2437,12 @@ packages:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
 
-  '@tiptap/extension-code-block-lowlight@2.26.1':
-    resolution: {integrity: sha512-yptuTPYAzVMKHUTwNKYveuu0rYHYyFknPz3O2++PWeeBGxkNB+T6LhwZ/JhXceHcZxzlGyka9r2mXR7pslhugw==}
+  '@tiptap/extension-code-block-lowlight@3.9.1':
+    resolution: {integrity: sha512-dNtzAZuuYwEfKpMfS5e+vNzjFLiL7H5yAKPqr5Bh/r+Kw3B0H3qoD/Et6mE9f8WIg0yAmX/8FIOFowPWIdxj7Q==}
     peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/extension-code-block': ^2.7.0
-      '@tiptap/pm': ^2.7.0
+      '@tiptap/core': ^3.9.1
+      '@tiptap/extension-code-block': ^3.9.1
+      '@tiptap/pm': ^3.9.1
       highlight.js: ^11
       lowlight: ^2 || ^3
 
@@ -8687,7 +8690,7 @@ snapshots:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
       '@tiptap/pm': 3.8.0
 
-  '@tiptap/extension-code-block-lowlight@2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)':
+  '@tiptap/extension-code-block-lowlight@3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)':
     dependencies:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
       '@tiptap/extension-code-block': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
@@ -13492,7 +13495,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zenmark-editor@0.0.1(76c7688e44df74ea0e0f76d611c73cf9):
+  zenmark-editor@0.0.1(0366b46ba69a03f4caac13251a8cf627):
     dependencies:
       '@benrbray/prosemirror-math': 0.2.2(katex@0.16.23)(prosemirror-commands@1.7.1)(prosemirror-gapcursor@1.3.2)(prosemirror-history@1.4.1)(prosemirror-inputrules@1.5.0)(prosemirror-keymap@1.2.3)(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.41.0)
       '@emotion/css': 11.13.5
@@ -13503,7 +13506,7 @@ snapshots:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
       '@tiptap/extension-character-count': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       '@tiptap/extension-code': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))
-      '@tiptap/extension-code-block-lowlight': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)
+      '@tiptap/extension-code-block-lowlight': 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/extension-code-block@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(highlight.js@11.7.0)(lowlight@2.8.0)
       '@tiptap/extension-collaboration': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.41.0)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))
       '@tiptap/extension-collaboration-cursor': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(y-prosemirror@1.3.7(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-view@1.41.0)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))
       '@tiptap/extension-document': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))

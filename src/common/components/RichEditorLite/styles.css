@@ -54,6 +54,49 @@
   overflow-x: auto;
 }
 
+/* Lowlight/HLJS token styles (lightweight theme) */
+.tiptap pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.tiptap .hljs-comment,
+.tiptap .hljs-quote {
+  color: #64748b; /* slate-500 */
+  font-style: italic;
+}
+.tiptap .hljs-keyword,
+.tiptap .hljs-selector-tag,
+.tiptap .hljs-subst {
+  color: #2563eb; /* blue-600 */
+  font-weight: 600;
+}
+.tiptap .hljs-literal,
+.tiptap .hljs-number,
+.tiptap .hljs-symbol,
+.tiptap .hljs-bullet {
+  color: #059669; /* emerald-600 */
+}
+.tiptap .hljs-string,
+.tiptap .hljs-doctag,
+.tiptap .hljs-addition {
+  color: #16a34a; /* green-600 */
+}
+.tiptap .hljs-title,
+.tiptap .hljs-section,
+.tiptap .hljs-selector-id,
+.tiptap .hljs-selector-class {
+  color: #7c3aed; /* violet-600 */
+}
+.tiptap .hljs-attribute,
+.tiptap .hljs-attr,
+.tiptap .hljs-name {
+  color: #b45309; /* amber-700 */
+}
+.tiptap .hljs-deletion {
+  color: #dc2626; /* red-600 */
+}
+
 .tiptap blockquote {
   border-left: 2px solid rgba(148, 163, 184, 0.5);
   padding-left: 0.75rem;
