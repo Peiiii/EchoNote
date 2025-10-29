@@ -1,0 +1,1 @@
+const i=new Set(["pingback","prefetch","stylesheet"]);function n(e){if(e.type!=="element"||e.tagName!=="link")return!1;if(e.properties.itemProp)return!0;const t=e.properties.rel;let r=-1;if(!Array.isArray(t)||t.length===0)return!1;for(;++r<t.length;)if(!i.has(String(t[r])))return!1;return!0}export{n as i};

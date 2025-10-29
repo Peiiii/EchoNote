@@ -1,0 +1,1 @@
+import{f as i}from"./pkg-hast-util-from-html-Dr5jZ0zX.js";function h(s){const n=this,{emitParseErrors:o,...a}={...n.data("settings"),...s};n.parser=e;function e(p,r){return i(p,{...a,onerror:o?function(t){r.path&&(t.name=r.path+":"+t.name,t.file=r.path),r.messages.push(t)}:void 0})}}export{h as r};

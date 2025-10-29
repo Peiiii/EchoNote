@@ -1,0 +1,1 @@
+import{t as u}from"./pkg-hast-util-to-mdast-BPVClNk7.js";const n={document:!0};function f(r,e){return r&&"run"in r?async function(t,c){const o=u(t,{...n,...e});await r.run(o,c)}:function(t){return u(t,{...n,...r})}}export{f as r};

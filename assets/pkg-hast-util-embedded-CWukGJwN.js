@@ -1,0 +1,1 @@
+import{c as g}from"./pkg-hast-util-is-element-Bzxglnm2.js";const N=g(function(a){return a.tagName==="audio"||a.tagName==="canvas"||a.tagName==="embed"||a.tagName==="iframe"||a.tagName==="img"||a.tagName==="math"||a.tagName==="object"||a.tagName==="picture"||a.tagName==="svg"||a.tagName==="video"});export{N as e};
