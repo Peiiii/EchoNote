@@ -1,6 +1,12 @@
 import TurndownService from 'turndown'
 import { gfm } from 'turndown-plugin-gfm'
 import { marked } from 'marked'
+import { unified } from 'unified'
+import rehypeParse from 'rehype-parse'
+import rehypeRemark from 'rehype-remark'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import remarkStringify from 'remark-stringify'
 
 // Configure marked for basic GFM support
 marked.setOptions({
@@ -176,11 +182,28 @@ export function markdownToHtml(markdown: string): string {
 export function htmlToMarkdown(html: string): string {
   if (!html) return ''
   try {
+    // Step 1: TipTap tasks → GFM-friendly HTML
     const normalizedTasks = normalizeTiptapTasksToGfm(html)
-    // Ensure every table has a heading row so turndown-plugin-gfm converts it to GFM table
+    // Step 2: Normalize tables (add thead/align, flatten cells); keep complex tables as-is (col/row span > 1)
     const normalized = normalizeTablesForTurndown(normalizedTasks)
-    const md = td.turndown(normalized)
-    return md
+
+    // Step 3: HTML → Markdown via unified (rehype → remark → stringify)
+    const file = unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeRemark)
+      .use(remarkGfm)
+      .use(remarkMath)
+      .use(remarkStringify, {
+        fences: true,
+        bullet: '-',
+        rule: '-',
+        listItemIndent: 'one',
+        // Keep tables tidy for readability while avoiding layout issues
+        fencesMinGap: 1,
+      } as any)
+      .processSync(normalized)
+
+    return String(file.value)
   } catch {
     return html
   }
