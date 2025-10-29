@@ -534,10 +534,16 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         const rowRect = row.getBoundingClientRect()
         const firstRowCellRect = firstCellInRow.getBoundingClientRect()
         const topCellRect = topCellInCol.getBoundingClientRect()
-        const rowX = firstRowCellRect.left - (crect?.left || 0) + sl - 8
-        const rowY = (rowRect.top + rowRect.height / 2) - (crect?.top || 0) + st
-        const colX = (topCellRect.left + topCellRect.width / 2) - (crect?.left || 0) + sl
-        const colY = topCellRect.top - (crect?.top || 0) + st - 8
+        // Base anchors right at the cell borders (no overlap), then UI shifts itself entirely outside via CSS transforms.
+        const baseRowX = firstRowCellRect.left - (crect?.left || 0) + sl
+        const baseRowY = (rowRect.top + rowRect.height / 2) - (crect?.top || 0) + st
+        const baseColX = (topCellRect.left + topCellRect.width / 2) - (crect?.left || 0) + sl
+        const baseColY = topCellRect.top - (crect?.top || 0) + st
+        // Clamp to keep anchors inside container (handles shift outward by transform)
+        const rowX = Math.max(24, baseRowX)
+        const rowY = baseRowY
+        const colX = baseColX
+        const colY = Math.max(24, baseColY)
         setTableHandles({ open: true, rowX, rowY, colX, colY })
       } catch {
         setTableHandles((s) => (s.open ? { ...s, open: false } : s))
@@ -846,8 +852,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         {tableHandles.open && (
           <>
             <div
-              style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000 }}
-              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex items-center gap-1"
+              style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000, transform: 'translateX(-100%) translateX(-8px) translateY(-50%)' }}
+              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex flex-col items-center gap-1"
               onMouseDown={(e) => e.preventDefault()}
             >
               <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" /></ToolbarButton>
@@ -855,7 +861,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
             </div>
             <div
-              style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000 }}
+              style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000, transform: 'translateY(-100%) translateY(-8px) translateX(-50%)' }}
               className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex items-center gap-1"
               onMouseDown={(e) => e.preventDefault()}
             >
