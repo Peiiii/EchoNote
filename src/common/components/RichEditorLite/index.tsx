@@ -15,7 +15,7 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus, Braces, Undo2, Redo2, Eraser } from 'lucide-react'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Minus, Braces, Undo2, Redo2, Eraser } from 'lucide-react'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
@@ -69,7 +69,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       }),
       Image.configure({ allowBase64: true }),
       Typography,
-      Table.configure({ resizable: false }),
+      Table.configure({ resizable: true }),
       TableRow,
       TableHeader,
       TableCell,
@@ -207,6 +207,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         style: 'min-height: 240px; padding: 12px; outline: none;',
       },
       handlePaste(_view, evt): boolean {
+        // Smart paste fenced code blocks
+        const txt = evt.clipboardData?.getData('text/plain') || ''
+        if (txt.includes('```')) {
+          const html = markdownToHtml(txt)
+          if (html) {
+            editorRef.current?.chain().focus().insertContent(html).run()
+            return true
+          }
+        }
         const items = Array.from(evt.clipboardData?.items || [])
         const img = items.find(i => i.type.startsWith('image/'))
         if (img) {
@@ -300,17 +309,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
         }
         // '/' is handled by SlashCommand (Suggestion plugin)
-        // Link edit hotkey
+        // Link edit hotkey → open inline link bubble
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
           event.preventDefault()
-          const current = editorRef.current?.getAttributes('link')?.href as string | undefined
-          const href = window.prompt('Link URL', current || '')
-          if (href === null) return true
-          if (href.trim()) {
-            editorRef.current?.chain().focus().setLink({ href: href.trim() }).run()
-          } else {
-            editorRef.current?.chain().focus().unsetLink().run()
-          }
+          openLinkMenu()
           return true
         }
         // Heading shortcuts: Mod-Alt-1/2/3 to toggle H1/H2/H3, Mod-Alt-0 to paragraph
@@ -351,6 +353,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (slashMenu.open && !containerRef.current?.contains(target)) {
             setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
           }
+          if (linkMenu.open && !containerRef.current?.contains(target)) {
+            closeLinkMenu()
+          }
           return false
         },
       },
@@ -387,6 +392,25 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const can = (fn: () => boolean) => (editor ? fn() : false)
 
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
+
+  // Inline link bubble (input + save/unlink)
+  const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
+  const computeSelectionXY = () => {
+    const crect = containerRef.current?.getBoundingClientRect()
+    const sel = window.getSelection()
+    if (!crect || !sel || sel.rangeCount === 0) return { x: 8, y: 8 }
+    const rect = sel.getRangeAt(0).getBoundingClientRect()
+    return {
+      x: Math.max(8, rect.left - crect.left + (containerRef.current?.scrollLeft || 0)),
+      y: Math.max(8, rect.bottom - crect.top + (containerRef.current?.scrollTop || 0)),
+    }
+  }
+  const openLinkMenu = () => {
+    const { x, y } = computeSelectionXY()
+    const current = (editorRef.current?.getAttributes('link')?.href as string | undefined) || ''
+    setLinkMenu({ open: true, x, y, value: current })
+  }
+  const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '' })
 
   const getSlashQuery = (): string => {
     const ed = editorRef.current
@@ -464,6 +488,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <ToolbarButton active={isActive('heading', { level: 3 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}>
           <Heading3 className="w-4 h-4" />
         </ToolbarButton>
+        <ToolbarButton active={isActive('heading', { level: 4 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 4 }).run()}>
+          <Heading4 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton active={isActive('heading', { level: 5 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 5 }).run()}>
+          <Heading5 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton active={isActive('heading', { level: 6 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 6 }).run()}>
+          <Heading6 className="w-4 h-4" />
+        </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton active={isActive('bulletList')} onClick={() => editor?.chain().focus().toggleBulletList().run()}>
           <List className="w-4 h-4" />
@@ -489,8 +522,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton onClick={() => {
-          const href = window.prompt('Link URL')
-          if (href) editor?.chain().focus().setLink({ href }).run()
+          openLinkMenu()
         }}>
           <LinkIcon className="w-4 h-4" />
         </ToolbarButton>
@@ -509,6 +541,51 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
         )}
         <EditorContent editor={editor} className="tiptap prose dark:prose-invert max-w-none min-h-full outline-none focus:outline-none" />
+        {linkMenu.open && (
+          <div
+            style={{ position: 'absolute', left: linkMenu.x, top: linkMenu.y, zIndex: 1000, minWidth: 280 }}
+            className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-2 text-sm"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={linkMenu.value}
+                onChange={(e) => setLinkMenu((s) => ({ ...s, value: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const href = linkMenu.value.trim()
+                    if (href) editor?.chain().focus().setLink({ href }).run()
+                    else editor?.chain().focus().unsetLink().run()
+                    closeLinkMenu()
+                  }
+                  if (e.key === 'Escape') closeLinkMenu()
+                }}
+                placeholder="https://"
+                className="w-56 px-2 py-1 rounded border bg-transparent text-sm"
+              />
+              <button
+                type="button"
+                className="px-2 h-7 rounded text-xs bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
+                onClick={() => {
+                  const href = linkMenu.value.trim()
+                  if (href) editor?.chain().focus().setLink({ href }).run()
+                  else editor?.chain().focus().unsetLink().run()
+                  closeLinkMenu()
+                }}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
+                onClick={() => { editor?.chain().focus().unsetLink().run(); closeLinkMenu() }}
+              >
+                Unlink
+              </button>
+            </div>
+          </div>
+        )}
         {slashMenu.open && (
           <div
             style={{ position: 'absolute', left: slashMenu.x, top: slashMenu.y, zIndex: 1000, minWidth: 240 }}

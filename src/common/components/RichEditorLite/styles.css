@@ -137,11 +137,15 @@
   border: 1px solid rgba(148, 163, 184, 0.35); /* slate-400/35 */
   padding: 0.375rem 0.5rem;
   vertical-align: top;
+  position: relative; /* for column resize handle */
 }
 
 .tiptap th {
   background: rgba(148, 163, 184, 0.12);
   font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 /* Generic list styles (unordered/ordered) */
@@ -178,6 +182,20 @@
 
 .tiptap li {
   margin: 0.125rem 0;
+}
+
+/* Table column resize handle */
+.tiptap .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+}
+.tiptap .column-resize-handle:hover {
+  background: rgba(59, 130, 246, 0.35); /* blue-500/35 */
 }
 
 /* Headings: make them visually distinct inside the editor */
