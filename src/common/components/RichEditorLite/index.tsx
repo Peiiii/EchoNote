@@ -451,6 +451,30 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     return allSlashItems.filter((it) => it.label.toLowerCase().includes(q))
   }
 
+  const slashIcon = (id: SlashAction) => {
+    const cls = 'w-4 h-4 text-slate-500'
+    switch (id) {
+      case 'h1': return <Heading1 className={cls} />
+      case 'h2': return <Heading2 className={cls} />
+      case 'h3': return <Heading3 className={cls} />
+      case 'h4': return <Heading4 className={cls} />
+      case 'h5': return <Heading5 className={cls} />
+      case 'h6': return <Heading6 className={cls} />
+      case 'bullet': return <List className={cls} />
+      case 'ordered': return <ListOrdered className={cls} />
+      case 'task': return <CheckCircle className={cls} />
+      case 'quote': return <Quote className={cls} />
+      case 'code': return <Code className={cls} />
+      case 'icode': return <Braces className={cls} />
+      case 'hr': return <Minus className={cls} />
+      case 'table': return <TableIcon className={cls} />
+      case 'image': return <ImageIcon className={cls} />
+      case 'link': return <LinkIcon className={cls} />
+      case 'clear': return <Eraser className={cls} />
+      default: return null
+    }
+  }
+
   // No global capture needed; Suggestion plugin consumes ESC. This is left empty intentionally.
 
   return (
@@ -602,7 +626,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                     e.preventDefault()
                   }}
                   onClick={() => slashMenu.invoke?.({ action: it.id })}>
-                  {it.label}
+                  <span className="shrink-0">{slashIcon(it.id)}</span>
+                  <span>{it.label}</span>
                 </button>
               ))}
             </div>
