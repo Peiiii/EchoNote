@@ -59,6 +59,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const editorRef = useRef<Editor | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; range?: { from: number; to: number }; index: number; query: string; invoke?: (p: { action: SlashAction }) => void }>({ open: false, x: 0, y: 0, index: 0, query: '' })
+  const [tableMenu, setTableMenu] = useState<{ open: boolean; x: number; y: number }>({ open: false, x: 0, y: 0 })
 
   const editor = useEditor({
     extensions: [
@@ -194,17 +195,13 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               chain.deleteTable().run()
               break
             case 'image': {
-              const url = window.prompt('Image URL')
-              if (url) chain.setImage({ src: url }).run()
-              else chain.run()
+              chain.run()
+              openImageMenu()
               break
             }
             case 'link': {
-              const current = editor.getAttributes('link')?.href as string | undefined
-              const href = window.prompt('Link URL', current || '')
-              if (href === null) chain.run()
-              else if (href.trim()) chain.setLink({ href: href.trim() }).run()
-              else chain.unsetLink().run()
+              chain.run()
+              openLinkMenu()
               break
             }
             case 'clear':
@@ -378,6 +375,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             const insidePanel = !!linkMenuRef.current && linkMenuRef.current.contains(target)
             if (!insidePanel) closeLinkMenu()
           }
+          // Close image menu if clicking outside its panel
+          if (imageMenu.open) {
+            const insidePanel = !!imageMenuRef.current && imageMenuRef.current.contains(target)
+            if (!insidePanel) closeImageMenu()
+          }
           return false
         },
         mousedown: (_view: unknown, event: Event) => {
@@ -385,6 +387,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (linkMenu.open) {
             const insidePanel = !!linkMenuRef.current && linkMenuRef.current.contains(target)
             if (!insidePanel) closeLinkMenu()
+          }
+          if (imageMenu.open) {
+            const insidePanel = !!imageMenuRef.current && imageMenuRef.current.contains(target)
+            if (!insidePanel) closeImageMenu()
           }
           return false
         },
@@ -418,6 +424,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     if (editor) editor.setEditable(editable)
   }, [editable, editor])
 
+  // Table menu visibility + position moved below menu state declarations
+
   const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
 
@@ -443,20 +451,29 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   }
   const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '' })
 
+  // Image insert bubble
+  const [imageMenu, setImageMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
+  const imageMenuRef = useRef<HTMLDivElement | null>(null)
+  const openImageMenu = () => {
+    const { x, y } = computeSelectionXY()
+    setImageMenu({ open: true, x, y, value: '' })
+  }
+  const closeImageMenu = () => setImageMenu({ open: false, x: 0, y: 0, value: '' })
+
   // Formatting bubble switched to official BubbleMenu below.
 
-  // Keep BubbleMenu visibility synced with other popups (slash/link).
+  // Keep BubbleMenu visibility synced with other popups (slash/link/image/table).
   useEffect(() => {
     if (!editor) return
     const ext = editor.extensionManager.extensions.find((e) => e.name === 'bubbleMenu') as TiptapExtension<BubbleMenuOptions, unknown> | undefined
     if (!ext) return
     ext.options.shouldShow = ({ editor, state }) => {
       if (!editor.isEditable) return false
-      if (slashMenu.open || linkMenu.open) return false
+      if (slashMenu.open || linkMenu.open || imageMenu.open || tableMenu.open) return false
       return !state.selection.empty
     }
     editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
-  }, [editor, slashMenu.open, linkMenu.open])
+  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open, tableMenu.open])
 
   const getSlashQuery = (): string => {
     const ed = editorRef.current
@@ -473,6 +490,43 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       return ''
     }
   }
+
+  // Keep BubbleMenu visibility synced with other popups (slash/link/image/table)
+  useEffect(() => {
+    if (!editor) return
+    const ext = editor.extensionManager.extensions.find((e) => e.name === 'bubbleMenu') as TiptapExtension<BubbleMenuOptions, unknown> | undefined
+    if (!ext) return
+    ext.options.shouldShow = ({ editor, state }) => {
+      if (!editor.isEditable) return false
+      if (slashMenu.open || linkMenu.open || imageMenu.open || tableMenu.open) return false
+      return !state.selection.empty
+    }
+    editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
+  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open, tableMenu.open])
+
+  // Table menu visibility + position
+  useEffect(() => {
+    if (!editor) return
+    const update = () => {
+      if (slashMenu.open || linkMenu.open || imageMenu.open) {
+        setTableMenu((s) => (s.open ? { open: false, x: 0, y: 0 } : s))
+        return
+      }
+      const inTable = editor.isActive('table')
+      if (!inTable) {
+        setTableMenu((s) => (s.open ? { open: false, x: 0, y: 0 } : s))
+        return
+      }
+      const { x, y } = computeSelectionXY()
+      setTableMenu({ open: true, x, y: Math.max(0, y - 40) })
+    }
+    editor.on('selectionUpdate', update)
+    editor.on('transaction', update)
+    return () => {
+      editor.off('selectionUpdate', update)
+      editor.off('transaction', update)
+    }
+  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open])
 
   type SlashItem = { label: string; id: SlashAction; group?: string; aliases?: string[] }
   const allSlashItems: SlashItem[] = [
@@ -678,6 +732,51 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             </div>
           </div>
         )}
+        {imageMenu.open && (
+          <div
+            ref={imageMenuRef}
+            style={{ position: 'absolute', left: imageMenu.x, top: imageMenu.y, zIndex: 1000, minWidth: 280 }}
+            className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-2 text-sm"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={imageMenu.value}
+                onChange={(e) => setImageMenu((s) => ({ ...s, value: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const url = imageMenu.value.trim()
+                    if (url) editor?.chain().focus().setImage({ src: url }).run()
+                    closeImageMenu()
+                  }
+                  if (e.key === 'Escape') closeImageMenu()
+                }}
+                placeholder="Image URL or base64"
+                className="w-56 px-2 py-1 rounded border bg-transparent text-sm"
+              />
+              <button
+                type="button"
+                className="px-2 h-7 rounded text-xs bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
+                onClick={() => {
+                  const url = imageMenu.value.trim()
+                  if (url) editor?.chain().focus().setImage({ src: url }).run()
+                  closeImageMenu()
+                }}
+              >
+                Insert
+              </button>
+              <button
+                type="button"
+                className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
+                onClick={() => closeImageMenu()}
+                aria-label="Close image editor"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
         {editor && bubbleEl && createPortal(
           <div
             className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
@@ -692,6 +791,23 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             <ToolbarButton active={isActive('link')} onClick={() => { openLinkMenu() }}><LinkIcon className="w-4 h-4" /></ToolbarButton>
           </div>,
           bubbleEl
+        )}
+        {tableMenu.open && (
+          <div
+            style={{ position: 'absolute', left: tableMenu.x, top: tableMenu.y, zIndex: 1000 }}
+            className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <ToolbarButton onClick={() => editor?.chain().focus().addRowBefore().run()}>Row ↑</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addRowAfter().run()}>Row ↓</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteRow().run()}>Row ×</ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+            <ToolbarButton onClick={() => editor?.chain().focus().addColumnBefore().run()}>Col ←</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addColumnAfter().run()}>Col →</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteColumn().run()}>Col ×</ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteTable().run()}>Table ×</ToolbarButton>
+          </div>
         )}
         {slashMenu.open && (
           <div
