@@ -35,9 +35,12 @@ function normalizeLanguage(input: string, all: string[]): string | null {
   return v
 }
 
+let recentLangs: string[] = []
+
 const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) => {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [copied, setCopied] = useState(false)
   const contentRef = useRef<HTMLPreElement | null>(null)
 
   type LowlightLike = { listLanguages?: () => string[] }
@@ -54,6 +57,10 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
   const applyLanguage = (lang: string | null) => {
     updateAttributes({ language: lang })
     setOpen(false)
+    if (lang) {
+      // maintain a small recent list
+      recentLangs = [lang, ...recentLangs.filter((l) => l !== lang)].slice(0, 6)
+    }
   }
 
   const copyCode = async () => {
@@ -63,6 +70,8 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
       // Collect plain text from code block
       const text = el.textContent || ''
       await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1200)
     } catch {
       // ignore
     }
@@ -89,7 +98,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
           className="px-2 h-6 rounded text-xs bg-slate-800/80 text-white hover:bg-slate-800"
           onClick={copyCode}
         >
-          Copy
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
 
@@ -108,6 +117,21 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
             />
           </div>
           <div className="max-h-64 overflow-auto">
+            {recentLangs.length > 0 && (
+              <>
+                <div className="px-2 py-1 text-xs text-slate-500">Recent</div>
+                {recentLangs.map((lang) => (
+                  <button
+                    key={`recent-${lang}`}
+                    className={["w-full text-left px-2 py-1 rounded", current === lang ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
+                    onClick={() => applyLanguage(normalizeLanguage(lang, all))}
+                  >
+                    {lang}
+                  </button>
+                ))}
+                <div className="my-1 border-t border-slate-200 dark:border-slate-700" />
+              </>
+            )}
             <button
               className="w-full text-left px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"
               onClick={() => applyLanguage(null)}
@@ -117,7 +141,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
             {filtered.map((lang) => (
               <button
                 key={lang}
-                className="w-full text-left px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"
+                className={["w-full text-left px-2 py-1 rounded", current === lang ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
                 onClick={() => applyLanguage(normalizeLanguage(lang, all))}
               >
                 {lang}
