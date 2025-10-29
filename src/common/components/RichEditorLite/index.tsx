@@ -298,6 +298,14 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
           return true
         }
+        // Heading shortcuts: Mod-Alt-1/2/3 to toggle H1/H2/H3, Mod-Alt-0 to paragraph
+        if ((event.metaKey || event.ctrlKey) && event.altKey) {
+          const key = event.key
+          if (key === '1') { editorRef.current?.chain().focus().toggleHeading({ level: 1 }).run(); event.preventDefault(); return true }
+          if (key === '2') { editorRef.current?.chain().focus().toggleHeading({ level: 2 }).run(); event.preventDefault(); return true }
+          if (key === '3') { editorRef.current?.chain().focus().toggleHeading({ level: 3 }).run(); event.preventDefault(); return true }
+          if (key === '0') { editorRef.current?.chain().focus().setParagraph().run(); event.preventDefault(); return true }
+        }
         if (event.key === 'Escape' && slashMenu.open) {
           // Consume ESC locally to avoid parent (expanded editor) catching it
           event.preventDefault()
