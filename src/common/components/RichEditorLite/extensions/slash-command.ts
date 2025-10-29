@@ -5,11 +5,15 @@ export type SlashAction =
   | 'h1'
   | 'h2'
   | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
   | 'bullet'
   | 'ordered'
   | 'task'
   | 'quote'
   | 'code'
+  | 'icode'
   | 'hr'
   // table ops
   | 'table'
@@ -22,6 +26,7 @@ export type SlashAction =
   | 'table-delete'
   | 'image'
   | 'link'
+  | 'clear'
 
 export type SlashOpenPayload = {
   query: string

@@ -122,6 +122,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             case 'h3':
               chain.toggleHeading({ level: 3 }).run()
               break
+            case 'h4':
+              chain.toggleHeading({ level: 4 }).run()
+              break
+            case 'h5':
+              chain.toggleHeading({ level: 5 }).run()
+              break
+            case 'h6':
+              chain.toggleHeading({ level: 6 }).run()
+              break
             case 'bullet':
               chain.toggleBulletList().run()
               break
@@ -136,6 +145,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               break
             case 'code':
               chain.toggleCodeBlock().run()
+              break
+            case 'icode':
+              chain.toggleCode().run()
               break
             case 'hr':
               chain.setHorizontalRule().run()
@@ -178,6 +190,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
               else chain.unsetLink().run()
               break
             }
+            case 'clear':
+              chain.unsetAllMarks().clearNodes().run()
+              break
             default:
               chain.run()
           }
@@ -383,11 +398,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     { label: 'Heading 1', id: 'h1' },
     { label: 'Heading 2', id: 'h2' },
     { label: 'Heading 3', id: 'h3' },
+    { label: 'Heading 4', id: 'h4' },
+    { label: 'Heading 5', id: 'h5' },
+    { label: 'Heading 6', id: 'h6' },
     { label: 'Bulleted list', id: 'bullet' },
     { label: 'Numbered list', id: 'ordered' },
     { label: 'Task list', id: 'task' },
     { label: 'Quote', id: 'quote' },
     { label: 'Code block', id: 'code' },
+    { label: 'Inline code', id: 'icode' },
     { label: 'Horizontal rule', id: 'hr' },
     { label: 'Table', id: 'table' },
     { label: 'Table: add row above', id: 'table-row-above' },
@@ -399,6 +418,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     { label: 'Table: delete table', id: 'table-delete' },
     { label: 'Image…', id: 'image' },
     { label: 'Link…', id: 'link' },
+    { label: 'Clear formatting', id: 'clear' },
   ]
 
   const getSlashItems = () => {
