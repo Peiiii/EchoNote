@@ -32,16 +32,20 @@ interface RichEditorLiteProps {
   className?: string
 }
 
-function ToolbarButton({ disabled, active, onClick, children }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode }) {
+function ToolbarButton({ disabled, active, onClick, children, size = 'md', className = '' }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode; size?: 'sm' | 'md'; className?: string }) {
+  const sizeCls = size === 'sm' ? 'h-5 w-5 text-[11px]' : 'h-8 w-8 text-[13px]'
+  const hoverCls = size === 'sm' ? 'hover:bg-transparent' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
       className={[
-        'inline-flex h-8 w-8 items-center justify-center rounded',
-        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-200 dark:hover:bg-slate-700',
+        'inline-flex items-center justify-center rounded',
+        sizeCls,
+        disabled ? 'opacity-50 cursor-not-allowed' : hoverCls,
         active ? 'bg-slate-200 dark:bg-slate-700' : 'bg-transparent',
+        className,
       ].join(' ')}
     >
       {children}
@@ -540,10 +544,13 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         const baseColX = (topCellRect.left + topCellRect.width / 2) - (crect?.left || 0) + sl
         const baseColY = topCellRect.top - (crect?.top || 0) + st
         // Clamp to keep anchors inside container (handles shift outward by transform)
-        const rowX = Math.max(24, baseRowX)
-        const rowY = baseRowY
-        const colX = baseColX
-        const colY = Math.max(24, baseColY)
+        const cw = crect?.width || 0
+        const ch = crect?.height || 0
+        const margin = 16
+        const rowX = Math.max(margin, Math.min(baseRowX, cw - margin))
+        const rowY = Math.max(margin, Math.min(baseRowY, ch - margin))
+        const colX = Math.max(margin, Math.min(baseColX, cw - margin))
+        const colY = Math.max(margin, Math.min(baseColY, ch - margin))
         setTableHandles({ open: true, rowX, rowY, colX, colY })
       } catch {
         setTableHandles((s) => (s.open ? { ...s, open: false } : s))
@@ -852,22 +859,22 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         {tableHandles.open && (
           <>
             <div
-              style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000, transform: 'translateX(-100%) translateX(-8px) translateY(-50%)' }}
-              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex flex-col items-center gap-1"
+              style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000, transform: 'translateX(-100%) translateX(-4px) translateY(-50%)' }}
+              className="bg-transparent border-0 shadow-none p-0 flex flex-col items-center gap-0.5"
               onMouseDown={(e) => e.preventDefault()}
             >
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" /></ToolbarButton>
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-3 h-3" /></ToolbarButton>
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
             </div>
             <div
-              style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000, transform: 'translateY(-100%) translateY(-8px) translateX(-50%)' }}
-              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex items-center gap-1"
+              style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000, transform: 'translateY(-100%) translateY(-4px) translateX(-50%)' }}
+              className="bg-transparent border-0 shadow-none p-0 flex items-center gap-0.5"
               onMouseDown={(e) => e.preventDefault()}
             >
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-3 h-3" /></ToolbarButton>
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-3 h-3" /></ToolbarButton>
-              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton size="sm" className="hover:bg-transparent" disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
             </div>
           </>
         )}
