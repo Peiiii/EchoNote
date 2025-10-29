@@ -878,7 +878,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             <div
               style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000, transform: 'translateX(-100%) translateX(-1px) translateY(-50%)' }}
               className={["bg-transparent border-0 shadow-none p-0 flex flex-col items-center gap-0.5 transition-opacity",
-                near.row ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"].join(' ')}
+                near.row ? "opacity-100" : "opacity-30"].join(' ')}
               onMouseDown={(e) => e.preventDefault()}
             >
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
@@ -888,7 +888,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             <div
               style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000, transform: 'translateY(-100%) translateY(-1px) translateX(-50%)' }}
               className={["bg-transparent border-0 shadow-none p-0 flex items-center gap-0.5 transition-opacity",
-                near.col ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"].join(' ')}
+                near.col ? "opacity-100" : "opacity-30"].join(' ')}
               onMouseDown={(e) => e.preventDefault()}
             >
               <ToolbarButton size="sm" className="hover:bg-slate-900/10 dark:hover:bg-white/15" disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-3 h-3" strokeWidth={2} /></ToolbarButton>
