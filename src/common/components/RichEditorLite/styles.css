@@ -55,7 +55,8 @@
 }
 
 /* Lowlight/HLJS token styles (lightweight theme) */
-.tiptap pre code.hljs {
+.tiptap pre code.hljs,
+.tiptap pre .hljs {
   display: block;
   overflow-x: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

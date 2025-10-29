@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './styles.css'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+// Custom code block with actions (language switcher, copy)
+import CodeBlockWithActions from './extensions/codeblock-with-actions'
 import type { Editor } from '@tiptap/core'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
@@ -14,7 +15,7 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus, Braces, Languages, Undo2, Redo2, Eraser } from 'lucide-react'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus, Braces, Undo2, Redo2, Eraser } from 'lucide-react'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
@@ -74,7 +75,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       TableCell,
       TaskList,
       TaskItem.configure({ nested: true }),
-      CodeBlockLowlight.configure({
+      CodeBlockWithActions.configure({
         lowlight,
         defaultLanguage: null,
       }),
@@ -133,12 +134,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             case 'quote':
               chain.toggleBlockquote().run()
               break
-            case 'code': {
-              const lang = window.prompt('Code block language (optional, e.g. ts, js, bash)')?.trim()
-              if (lang) chain.toggleCodeBlock().updateAttributes('codeBlock', { language: lang }).run()
-              else chain.toggleCodeBlock().run()
+            case 'code':
+              chain.toggleCodeBlock().run()
               break
-            }
             case 'hr':
               chain.setHorizontalRule().run()
               break
@@ -457,16 +455,6 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
         <ToolbarButton active={isActive('codeBlock')} onClick={() => editor?.chain().focus().toggleCodeBlock().run()}>
           <Code className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton disabled={!isActive('codeBlock')} onClick={() => {
-          const current = (editor?.getAttributes('codeBlock')?.language as string | undefined) || ''
-          const next = window.prompt('Code block language (e.g. ts, js, json, bash). Leave empty to clear.', current)
-          if (next === null) return
-          const lang = next.trim()
-          if (lang) editor?.chain().focus().updateAttributes('codeBlock', { language: lang }).run()
-          else editor?.chain().focus().updateAttributes('codeBlock', { language: null }).run()
-        }}>
-          <Languages className="w-4 h-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => editor?.chain().focus().setHorizontalRule().run()}>
           <Minus className="w-4 h-4" />
