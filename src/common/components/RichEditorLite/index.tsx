@@ -315,12 +315,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           openLinkMenu()
           return true
         }
-        // Heading shortcuts: Mod-Alt-1/2/3 to toggle H1/H2/H3, Mod-Alt-0 to paragraph
+        // Heading shortcuts: Mod-Alt-1/2/3/4/5/6, Mod-Alt-0 to paragraph
         if ((event.metaKey || event.ctrlKey) && event.altKey) {
           const key = event.key
           if (key === '1') { editorRef.current?.chain().focus().toggleHeading({ level: 1 }).run(); event.preventDefault(); return true }
           if (key === '2') { editorRef.current?.chain().focus().toggleHeading({ level: 2 }).run(); event.preventDefault(); return true }
           if (key === '3') { editorRef.current?.chain().focus().toggleHeading({ level: 3 }).run(); event.preventDefault(); return true }
+          if (key === '4') { editorRef.current?.chain().focus().toggleHeading({ level: 4 }).run(); event.preventDefault(); return true }
+          if (key === '5') { editorRef.current?.chain().focus().toggleHeading({ level: 5 }).run(); event.preventDefault(); return true }
+          if (key === '6') { editorRef.current?.chain().focus().toggleHeading({ level: 6 }).run(); event.preventDefault(); return true }
           if (key === '0') { editorRef.current?.chain().focus().setParagraph().run(); event.preventDefault(); return true }
         }
         if (event.key === 'Escape' && slashMenu.open) {
@@ -418,37 +421,38 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     return ed.state.doc.textBetween(slashMenu.range.from, slashMenu.range.to).trim().toLowerCase()
   }
 
-  const allSlashItems: { label: string; id: SlashAction }[] = [
-    { label: 'Heading 1', id: 'h1' },
-    { label: 'Heading 2', id: 'h2' },
-    { label: 'Heading 3', id: 'h3' },
-    { label: 'Heading 4', id: 'h4' },
-    { label: 'Heading 5', id: 'h5' },
-    { label: 'Heading 6', id: 'h6' },
-    { label: 'Bulleted list', id: 'bullet' },
-    { label: 'Numbered list', id: 'ordered' },
-    { label: 'Task list', id: 'task' },
-    { label: 'Quote', id: 'quote' },
-    { label: 'Code block', id: 'code' },
-    { label: 'Inline code', id: 'icode' },
-    { label: 'Horizontal rule', id: 'hr' },
-    { label: 'Table', id: 'table' },
-    { label: 'Table: add row above', id: 'table-row-above' },
-    { label: 'Table: add row below', id: 'table-row-below' },
-    { label: 'Table: delete row', id: 'table-row-delete' },
-    { label: 'Table: add column left', id: 'table-col-left' },
-    { label: 'Table: add column right', id: 'table-col-right' },
-    { label: 'Table: delete column', id: 'table-col-delete' },
-    { label: 'Table: delete table', id: 'table-delete' },
-    { label: 'Image…', id: 'image' },
-    { label: 'Link…', id: 'link' },
-    { label: 'Clear formatting', id: 'clear' },
+  type SlashItem = { label: string; id: SlashAction; group?: string; aliases?: string[] }
+  const allSlashItems: SlashItem[] = [
+    { label: 'Heading 1', id: 'h1', group: 'Headings', aliases: ['h1', 'title'] },
+    { label: 'Heading 2', id: 'h2', group: 'Headings', aliases: ['h2'] },
+    { label: 'Heading 3', id: 'h3', group: 'Headings', aliases: ['h3'] },
+    { label: 'Heading 4', id: 'h4', group: 'Headings', aliases: ['h4'] },
+    { label: 'Heading 5', id: 'h5', group: 'Headings', aliases: ['h5'] },
+    { label: 'Heading 6', id: 'h6', group: 'Headings', aliases: ['h6'] },
+    { label: 'Bulleted list', id: 'bullet', group: 'Lists', aliases: ['ul', 'unordered'] },
+    { label: 'Numbered list', id: 'ordered', group: 'Lists', aliases: ['ol', 'ordered', 'number'] },
+    { label: 'Task list', id: 'task', group: 'Lists', aliases: ['todo', 'checkbox'] },
+    { label: 'Quote', id: 'quote', group: 'Blocks', aliases: ['blockquote'] },
+    { label: 'Code block', id: 'code', group: 'Blocks', aliases: ['fence', '```'] },
+    { label: 'Inline code', id: 'icode', group: 'Blocks', aliases: ['code inline'] },
+    { label: 'Horizontal rule', id: 'hr', group: 'Blocks', aliases: ['divider', 'line'] },
+    { label: 'Table', id: 'table', group: 'Table' },
+    { label: 'Table: add row above', id: 'table-row-above', group: 'Table' },
+    { label: 'Table: add row below', id: 'table-row-below', group: 'Table' },
+    { label: 'Table: delete row', id: 'table-row-delete', group: 'Table' },
+    { label: 'Table: add column left', id: 'table-col-left', group: 'Table' },
+    { label: 'Table: add column right', id: 'table-col-right', group: 'Table' },
+    { label: 'Table: delete column', id: 'table-col-delete', group: 'Table' },
+    { label: 'Table: delete table', id: 'table-delete', group: 'Table' },
+    { label: 'Image…', id: 'image', group: 'Media & Links', aliases: ['img', 'picture'] },
+    { label: 'Link…', id: 'link', group: 'Media & Links', aliases: ['url'] },
+    { label: 'Clear formatting', id: 'clear', group: 'Editing', aliases: ['reset', 'remove style'] },
   ]
 
   const getSlashItems = () => {
     const q = (slashMenu.query || getSlashQuery()).toLowerCase()
     if (!q) return allSlashItems
-    return allSlashItems.filter((it) => it.label.toLowerCase().includes(q))
+    return allSlashItems.filter((it) => (it.label.toLowerCase().includes(q) || (it.aliases || []).some(a => a.toLowerCase().includes(q))))
   }
 
   const slashIcon = (id: SlashAction) => {
@@ -616,20 +620,27 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-1 text-sm">
             <div className="px-2 py-1.5 text-xs text-slate-500">Quick insert</div>
             <div className="max-h-64 overflow-auto">
-              {getSlashItems().map((it, idx) => (
-                <button
-                  key={it.label}
-                  className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
-                    idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
-                  onMouseDown={(e) => {
-                    // Prevent editor blur so that commands can safely focus/dispatch
-                    e.preventDefault()
-                  }}
-                  onClick={() => slashMenu.invoke?.({ action: it.id })}>
-                  <span className="shrink-0">{slashIcon(it.id)}</span>
-                  <span>{it.label}</span>
-                </button>
-              ))}
+              {(() => {
+                const items = getSlashItems()
+                let lastGroup: string | undefined
+                return items.map((it, idx) => (
+                  <React.Fragment key={it.label}>
+                    {it.group && it.group !== lastGroup && (
+                      <div className="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-400">{it.group}</div>
+                    )}
+                    <button
+                      className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
+                        idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
+                      onMouseDown={(e) => { e.preventDefault() }}
+                      onClick={() => slashMenu.invoke?.({ action: it.id })}
+                    >
+                      <span className="shrink-0">{slashIcon(it.id)}</span>
+                      <span>{it.label}</span>
+                    </button>
+                    {(lastGroup = it.group)}
+                  </React.Fragment>
+                ))
+              })()}
             </div>
           </div>
         )}

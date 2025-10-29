@@ -141,11 +141,14 @@
 }
 
 .tiptap th {
-  background: rgba(148, 163, 184, 0.12);
+  background: #f8fafc; /* solid light background, no transparency */
   font-weight: 600;
   position: sticky;
   top: 0;
   z-index: 1;
+}
+.dark .tiptap th {
+  background: #1f2937; /* slate-800 solid in dark */
 }
 
 /* Generic list styles (unordered/ordered) */
@@ -196,6 +199,24 @@
 }
 .tiptap .column-resize-handle:hover {
   background: rgba(59, 130, 246, 0.35); /* blue-500/35 */
+}
+
+/* Code block line numbers overlay */
+.tiptap .codeblock-ln {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 2rem;
+  color: rgba(100, 116, 139, 0.9); /* slate-500 */
+  text-align: right;
+  user-select: none;
+  pointer-events: none;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+.dark .tiptap .codeblock-ln {
+  color: rgba(148, 163, 184, 0.9); /* slate-400 */
 }
 
 /* Headings: make them visually distinct inside the editor */
