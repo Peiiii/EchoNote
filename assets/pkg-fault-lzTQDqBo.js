@@ -1,0 +1,1 @@
+import{f as E}from"./pkg-format-Jkd_0D2M.js";const f=Object.assign(r(Error),{eval:r(EvalError),range:r(RangeError),reference:r(ReferenceError),syntax:r(SyntaxError),type:r(TypeError),uri:r(URIError)});function r(e){return n.displayName=e.displayName||e.name,n;function n(a,...o){const t=a&&E(a,...o);return new e(t)}}export{f};
