@@ -18,7 +18,7 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Minus, Braces, Undo2, Redo2, Eraser } from 'lucide-react'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Minus, Braces, Undo2, Redo2, Eraser, Trash2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
@@ -432,7 +432,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
 
   // Inline link bubble (input + save/unlink)
-  const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
+  const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string; text: string }>({ open: false, x: 0, y: 0, value: '', text: '' })
   const linkMenuRef = useRef<HTMLDivElement | null>(null)
   const computeSelectionXY = () => {
     const crect = containerRef.current?.getBoundingClientRect()
@@ -446,10 +446,19 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   }
   const openLinkMenu = () => {
     const { x, y } = computeSelectionXY()
-    const current = (editorRef.current?.getAttributes('link')?.href as string | undefined) || ''
-    setLinkMenu({ open: true, x, y, value: current })
+    const ed = editorRef.current
+    const current = (ed?.getAttributes('link')?.href as string | undefined) || ''
+    // Try to read selected text from ProseMirror selection
+    let text = ''
+    try {
+      if (ed) {
+        const sel = ed.state.selection
+        if (!sel.empty) text = ed.state.doc.textBetween(sel.from, sel.to)
+      }
+    } catch {}
+    setLinkMenu({ open: true, x, y, value: current, text })
   }
-  const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '' })
+  const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '', text: '' })
 
   // Image insert bubble
   const [imageMenu, setImageMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
@@ -681,7 +690,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         {linkMenu.open && (
           <div
             ref={linkMenuRef}
-            style={{ position: 'absolute', left: linkMenu.x, top: linkMenu.y, zIndex: 1000, minWidth: 280 }}
+            style={{ position: 'absolute', left: linkMenu.x, top: linkMenu.y, zIndex: 1000, minWidth: 320 }}
             className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-2 text-sm"
             onMouseDown={(e) => e.preventDefault()}
           >
@@ -690,25 +699,44 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                 autoFocus
                 value={linkMenu.value}
                 onChange={(e) => setLinkMenu((s) => ({ ...s, value: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    const href = linkMenu.value.trim()
-                    if (href) editor?.chain().focus().setLink({ href }).run()
-                    else editor?.chain().focus().unsetLink().run()
-                    closeLinkMenu()
-                  }
-                  if (e.key === 'Escape') closeLinkMenu()
-                }}
                 placeholder="https://"
                 className="w-56 px-2 py-1 rounded border bg-transparent text-sm"
+              />
+              <input
+                value={linkMenu.text}
+                onChange={(e) => setLinkMenu((s) => ({ ...s, text: e.target.value }))}
+                placeholder="Link text"
+                className="w-40 px-2 py-1 rounded border bg-transparent text-sm"
               />
               <button
                 type="button"
                 className="px-2 h-7 rounded text-xs bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
                 onClick={() => {
                   const href = linkMenu.value.trim()
-                  if (href) editor?.chain().focus().setLink({ href }).run()
-                  else editor?.chain().focus().unsetLink().run()
+                  const txt = (linkMenu.text || '').trim()
+                  const ed = editor
+                  if (!ed) return
+                  if (!href) {
+                    ed.chain().focus().unsetLink().run()
+                    closeLinkMenu()
+                    return
+                  }
+                  if (txt) {
+                    // Replace or insert with explicit text wrapped in link
+                    const escapedHref = href.replace(/"/g, '&quot;')
+                    const escapedText = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    ed.chain().focus().insertContent(`<a href="${escapedHref}">${escapedText}</a>`).run()
+                    closeLinkMenu()
+                    return
+                  }
+                  // No text provided
+                  if (!ed.state.selection.empty) {
+                    ed.chain().focus().setLink({ href }).run()
+                  } else {
+                    const escapedHref = href.replace(/"/g, '&quot;')
+                    const escapedText = href.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    ed.chain().focus().insertContent(`<a href="${escapedHref}">${escapedText}</a>`).run()
+                  }
                   closeLinkMenu()
                 }}
               >
@@ -798,15 +826,19 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
             onMouseDown={(e) => e.preventDefault()}
           >
-            <ToolbarButton onClick={() => editor?.chain().focus().addRowBefore().run()}>Row ↑</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().addRowAfter().run()}>Row ↓</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteRow().run()}>Row ×</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
             <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton onClick={() => editor?.chain().focus().addColumnBefore().run()}>Col ←</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().addColumnAfter().run()}>Col →</ToolbarButton>
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteColumn().run()}>Col ×</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-4 h-4" /></ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
             <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton onClick={() => editor?.chain().focus().deleteTable().run()}>Table ×</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().mergeOrSplit().run()}>Merge</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().toggleHeaderRow().run()}>Hdr Row</ToolbarButton>
+            <ToolbarButton onClick={() => editor?.chain().focus().toggleHeaderColumn().run()}>Hdr Col</ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+            <ToolbarButton onClick={() => editor?.chain().focus().deleteTable().run()}><TableIcon className="w-4 h-4" /></ToolbarButton>
           </div>
         )}
         {slashMenu.open && (
