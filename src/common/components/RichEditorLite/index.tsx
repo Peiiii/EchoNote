@@ -59,7 +59,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const editorRef = useRef<Editor | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; range?: { from: number; to: number }; index: number; query: string; invoke?: (p: { action: SlashAction }) => void }>({ open: false, x: 0, y: 0, index: 0, query: '' })
-  const [tableMenu, setTableMenu] = useState<{ open: boolean; x: number; y: number }>({ open: false, x: 0, y: 0 })
+  const [tableHandles, setTableHandles] = useState<{ open: boolean; rowX: number; rowY: number; colX: number; colY: number }>({ open: false, rowX: 0, rowY: 0, colX: 0, colY: 0 })
 
   const editor = useEditor({
     extensions: [
@@ -394,27 +394,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
           return false
         },
-        contextmenu: (_view: unknown, event: Event) => {
-          const me = event as MouseEvent
-          const target = me.target as HTMLElement
-          // If right-click inside a table, open table menu at pointer
-          const isInEditor = !!containerRef.current?.contains(target)
-          const tableEl = target.closest('table')
-          if (isInEditor && tableEl) {
-            // Move selection near pointer so commands act on that cell
-            const coords = editorRef.current?.view.posAtCoords({ left: me.clientX, top: me.clientY })
-            if (coords && typeof coords.pos === 'number') {
-              editorRef.current?.chain().focus().setTextSelection(coords.pos).run()
-            }
-            const crect = containerRef.current?.getBoundingClientRect()
-            const x = (crect ? me.clientX - crect.left + (containerRef.current?.scrollLeft || 0) : me.clientX)
-            const y = (crect ? me.clientY - crect.top + (containerRef.current?.scrollTop || 0) : me.clientY)
-            setTableMenu({ open: true, x, y })
-            me.preventDefault()
-            return true
-          }
-          return false
-        },
+        // contextmenu: keep default; table has dedicated handles
       },
     },
     onCreate: ({ editor }) => {
@@ -492,18 +472,18 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   // Formatting bubble switched to official BubbleMenu below.
 
-  // Keep BubbleMenu visibility synced with other popups (slash/link/image/table).
+  // Keep BubbleMenu visibility synced with other popups (slash/link/image).
   useEffect(() => {
     if (!editor) return
     const ext = editor.extensionManager.extensions.find((e) => e.name === 'bubbleMenu') as TiptapExtension<BubbleMenuOptions, unknown> | undefined
     if (!ext) return
     ext.options.shouldShow = ({ editor, state }) => {
       if (!editor.isEditable) return false
-      if (slashMenu.open || linkMenu.open || imageMenu.open || tableMenu.open) return false
+      if (slashMenu.open || linkMenu.open || imageMenu.open) return false
       return !state.selection.empty
     }
     editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
-  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open, tableMenu.open])
+  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open])
 
   const getSlashQuery = (): string => {
     const ed = editorRef.current
@@ -521,42 +501,64 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     }
   }
 
-  // Keep BubbleMenu visibility synced with other popups (slash/link/image/table)
-  useEffect(() => {
-    if (!editor) return
-    const ext = editor.extensionManager.extensions.find((e) => e.name === 'bubbleMenu') as TiptapExtension<BubbleMenuOptions, unknown> | undefined
-    if (!ext) return
-    ext.options.shouldShow = ({ editor, state }) => {
-      if (!editor.isEditable) return false
-      if (slashMenu.open || linkMenu.open || imageMenu.open || tableMenu.open) return false
-      return !state.selection.empty
-    }
-    editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
-  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open, tableMenu.open])
+  // remove duplicate BubbleMenu syncing effect
 
-  // Table menu visibility + position
+  // Table handles: compute row/col entry positions at row first-cell left boundary and first-row top boundary for selected col
   useEffect(() => {
     if (!editor) return
+    let raf = 0
     const update = () => {
-      if (slashMenu.open || linkMenu.open || imageMenu.open) {
-        setTableMenu((s) => (s.open ? { open: false, x: 0, y: 0 } : s))
-        return
+      try {
+        const view = editor.view
+        const { from } = editor.state.selection
+        const dom = view.domAtPos(from)
+        const n: Node | null = dom.node as Node
+        const el: Element | null = (n && n.nodeType === 3 ? (n.parentElement) : (n as Element))
+        const cell = el?.closest('td,th') as HTMLTableCellElement | null
+        const row = cell?.closest('tr') as HTMLTableRowElement | null
+        const table = cell?.closest('table') as HTMLTableElement | null
+        if (!cell || !row || !table) {
+          setTableHandles((s) => (s.open ? { ...s, open: false } : s))
+          return
+        }
+        const firstCellInRow = (row.cells && row.cells.length > 0) ? row.cells[0] : (row.querySelector('th,td') as HTMLTableCellElement | null)
+        const firstRow = table.querySelector('tr') as HTMLTableRowElement | null
+        const topCellInCol = firstRow ? firstRow.cells[cell.cellIndex] : null
+        if (!firstCellInRow || !topCellInCol) {
+          setTableHandles((s) => (s.open ? { ...s, open: false } : s))
+          return
+        }
+        const crect = containerRef.current?.getBoundingClientRect()
+        const sl = containerRef.current?.scrollLeft || 0
+        const st = containerRef.current?.scrollTop || 0
+        const rowRect = row.getBoundingClientRect()
+        const firstRowCellRect = firstCellInRow.getBoundingClientRect()
+        const topCellRect = topCellInCol.getBoundingClientRect()
+        const rowX = firstRowCellRect.left - (crect?.left || 0) + sl - 8
+        const rowY = (rowRect.top + rowRect.height / 2) - (crect?.top || 0) + st
+        const colX = (topCellRect.left + topCellRect.width / 2) - (crect?.left || 0) + sl
+        const colY = topCellRect.top - (crect?.top || 0) + st - 8
+        setTableHandles({ open: true, rowX, rowY, colX, colY })
+      } catch {
+        setTableHandles((s) => (s.open ? { ...s, open: false } : s))
       }
-      const inTable = editor.isActive('table')
-      if (!inTable) {
-        setTableMenu((s) => (s.open ? { open: false, x: 0, y: 0 } : s))
-        return
-      }
-      const { x, y } = computeSelectionXY()
-      setTableMenu({ open: true, x, y: Math.max(0, y - 40) })
     }
-    editor.on('selectionUpdate', update)
-    editor.on('transaction', update)
+    const trigger = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update) }
+    editor.on('selectionUpdate', trigger)
+    editor.on('transaction', trigger)
+    const onScroll = () => trigger()
+    const onResize = () => trigger()
+    containerRef.current?.addEventListener('scroll', onScroll)
+    window.addEventListener('resize', onResize)
+    trigger()
     return () => {
-      editor.off('selectionUpdate', update)
-      editor.off('transaction', update)
+      editor.off('selectionUpdate', trigger)
+      editor.off('transaction', trigger)
+      containerRef.current?.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+      cancelAnimationFrame(raf)
     }
-  }, [editor, slashMenu.open, linkMenu.open, imageMenu.open])
+  }, [editor])
 
   type SlashItem = { label: string; id: SlashAction; group?: string; aliases?: string[] }
   const allSlashItems: SlashItem[] = [
@@ -841,26 +843,27 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           </div>,
           bubbleEl
         )}
-        {tableMenu.open && (
-          <div
-            style={{ position: 'absolute', left: tableMenu.x, top: tableMenu.y, zIndex: 1000 }}
-            className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
-            onMouseDown={(e) => e.preventDefault()}
-          >
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
-            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-4 h-4" /></ToolbarButton>
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-4 h-4" /></ToolbarButton>
-            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            {/* Merge disabled by product policy (Markdown compatibility) */}
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().toggleHeaderRow().run())} onClick={() => editor?.chain().focus().toggleHeaderRow().run()}>Hdr Row</ToolbarButton>
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().toggleHeaderColumn().run())} onClick={() => editor?.chain().focus().toggleHeaderColumn().run()}>Hdr Col</ToolbarButton>
-            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-            <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteTable().run())} onClick={() => editor?.chain().focus().deleteTable().run()}><TableIcon className="w-4 h-4" /></ToolbarButton>
-          </div>
+        {tableHandles.open && (
+          <>
+            <div
+              style={{ position: 'absolute', left: tableHandles.rowX, top: tableHandles.rowY, zIndex: 1000 }}
+              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex items-center gap-1"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowBefore().run())} onClick={() => editor?.chain().focus().addRowBefore().run()}><ChevronUp className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addRowAfter().run())} onClick={() => editor?.chain().focus().addRowAfter().run()}><ChevronDown className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteRow().run())} onClick={() => editor?.chain().focus().deleteRow().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
+            </div>
+            <div
+              style={{ position: 'absolute', left: tableHandles.colX, top: tableHandles.colY, zIndex: 1000 }}
+              className="rounded-md border bg-white dark:bg-slate-800 shadow p-0.5 flex items-center gap-1"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnBefore().run())} onClick={() => editor?.chain().focus().addColumnBefore().run()}><ChevronLeft className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().addColumnAfter().run())} onClick={() => editor?.chain().focus().addColumnAfter().run()}><ChevronRight className="w-3 h-3" /></ToolbarButton>
+              <ToolbarButton disabled={!can(() => editor!.can().chain().focus().deleteColumn().run())} onClick={() => editor?.chain().focus().deleteColumn().run()}><Trash2 className="w-3 h-3" /></ToolbarButton>
+            </div>
+          </>
         )}
         {slashMenu.open && (
           <div
