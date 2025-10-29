@@ -135,3 +135,58 @@
 .tiptap li {
   margin: 0.125rem 0;
 }
+
+/* Headings: make them visually distinct inside the editor */
+.tiptap h1 {
+  font-size: 1.5rem; /* text-2xl */
+  line-height: 2rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+.tiptap h2 {
+  font-size: 1.25rem; /* text-xl */
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin: 0.875rem 0 0.375rem;
+}
+.tiptap h3 {
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.75rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+}
+.tiptap h4 {
+  font-size: 1rem; /* text-base */
+  line-height: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+}
+.tiptap h5 {
+  font-size: 0.95rem;
+  line-height: 1.4rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+}
+.tiptap h6 {
+  font-size: 0.9rem;
+  line-height: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* Horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.35); /* slate-400/35 */
+  margin: 0.75rem 0;
+}
+
+/* Inline code */
+.tiptap code:not(pre code) {
+  background: rgba(148, 163, 184, 0.15); /* slate-400/15 */
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
+  font-size: 0.95em;
+}

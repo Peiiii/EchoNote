@@ -50,6 +50,7 @@
     "@tiptap/extension-underline": "^3.8.0",
     "@tiptap/react": "^3.8.0",
     "@tiptap/starter-kit": "^3.8.0",
+    "@tiptap/suggestion": "^3.9.1",
     "ahooks": "^3.9.4",
     "ai": "^5.0.8",
     "app-toolkit": "workspace:*",

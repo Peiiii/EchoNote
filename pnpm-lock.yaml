@@ -116,6 +116,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.8.0
         version: 3.8.0
+      '@tiptap/suggestion':
+        specifier: ^3.9.1
+        version: 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       ahooks:
         specifier: ^3.9.4
         version: 3.9.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -250,7 +253,7 @@ importers:
         version: 11.1.0
       zenmark-editor:
         specifier: ^0.0.1
-        version: 0.0.1(73448f8bc2ed17d4bf79e13b481c0c60)
+        version: 0.0.1(76c7688e44df74ea0e0f76d611c73cf9)
       zustand:
         specifier: ^5.0.7
         version: 5.0.8(@types/react@19.1.12)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1))
@@ -2649,11 +2652,11 @@ packages:
   '@tiptap/starter-kit@3.8.0':
     resolution: {integrity: sha512-v79kOzGdbn9ZPJts97+/+mF6AHr4P/ivUl4FviC16hBMuP8hub2cOyECUYVn3mxoAKUpELZwppFRWB/+A90H+g==}
 
-  '@tiptap/suggestion@2.26.1':
-    resolution: {integrity: sha512-iNWJdQN7h01keNoVwyCsdI7ZX11YkrexZjCnutWK17Dd72s3NYVTmQXu7saftwddT4nDdlczNxAFosrt0zMhcg==}
+  '@tiptap/suggestion@3.9.1':
+    resolution: {integrity: sha512-+fB91280PI11vWlEAY9ny0W05r+MCQKWq2FhhZzPq1no92V2G9PC7HH7VX8rpkHaipdh1j++4v3UNnH37JmEAQ==}
     peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
+      '@tiptap/core': ^3.9.1
+      '@tiptap/pm': ^3.9.1
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -8916,7 +8919,7 @@ snapshots:
       '@tiptap/extensions': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       '@tiptap/pm': 3.8.0
 
-  '@tiptap/suggestion@2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)':
+  '@tiptap/suggestion@3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)':
     dependencies:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
       '@tiptap/pm': 3.8.0
@@ -13489,7 +13492,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zenmark-editor@0.0.1(73448f8bc2ed17d4bf79e13b481c0c60):
+  zenmark-editor@0.0.1(76c7688e44df74ea0e0f76d611c73cf9):
     dependencies:
       '@benrbray/prosemirror-math': 0.2.2(katex@0.16.23)(prosemirror-commands@1.7.1)(prosemirror-gapcursor@1.3.2)(prosemirror-history@1.4.1)(prosemirror-inputrules@1.5.0)(prosemirror-keymap@1.2.3)(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.41.0)
       '@emotion/css': 11.13.5
@@ -13528,7 +13531,7 @@ snapshots:
       '@tiptap/pm': 3.8.0
       '@tiptap/react': 3.8.0(@floating-ui/dom@1.7.4)(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@tiptap/starter-kit': 3.8.0
-      '@tiptap/suggestion': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
+      '@tiptap/suggestion': 3.9.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       class-variance-authority: 0.7.1
       classnames: 2.5.1
       clsx: 2.1.1

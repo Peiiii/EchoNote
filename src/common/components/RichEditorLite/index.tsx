@@ -13,9 +13,10 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle } from 'lucide-react'
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Minus } from 'lucide-react'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
+import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
 
 interface RichEditorLiteProps {
   value: string
@@ -47,13 +48,21 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const lastMarkdownRef = useRef<string>(value || '')
   const editorRef = useRef<Editor | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; from: number; index: number }>({ open: false, x: 0, y: 0, from: -1, index: 0 })
+  const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; range?: { from: number; to: number }; index: number; query: string; invoke?: (p: { action: SlashAction }) => void }>({ open: false, x: 0, y: 0, index: 0, query: '' })
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({}),
       Underline,
-      Link.configure({ openOnClick: true }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: {
+          rel: 'noopener noreferrer nofollow',
+          target: '_blank',
+        },
+      }),
       Image.configure({ allowBase64: true }),
       Typography,
       Table.configure({ resizable: false }),
@@ -62,6 +71,89 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       TableCell,
       TaskList,
       TaskItem.configure({ nested: true }),
+      SlashCommand.configure({
+        onOpen: (p: SlashOpenPayload) => {
+          // Position relative to editor container
+          const crect = containerRef.current?.getBoundingClientRect()
+          let x = 8
+          let y = 8
+          if (p.clientRect && crect && containerRef.current) {
+            x = p.clientRect.left - crect.left + containerRef.current.scrollLeft
+            y = p.clientRect.bottom - crect.top + containerRef.current.scrollTop
+          }
+          setSlashMenu({ open: true, x, y, range: p.range, index: 0, query: p.query, invoke: p.invoke })
+        },
+        onUpdate: (p: SlashOpenPayload) => {
+          const crect = containerRef.current?.getBoundingClientRect()
+          let x = 8
+          let y = 8
+          if (p.clientRect && crect && containerRef.current) {
+            x = p.clientRect.left - crect.left + containerRef.current.scrollLeft
+            y = p.clientRect.bottom - crect.top + containerRef.current.scrollTop
+          }
+          setSlashMenu((s) => ({ ...(s || { open: true, index: 0 }), open: true, x, y, range: p.range, query: p.query, invoke: p.invoke }))
+        },
+        onClose: () => setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' }),
+        onMoveIndex: (delta: number) => setSlashMenu((s) => ({ ...s, index: Math.max(0, s.index + delta) })),
+        onEnter: () => {
+          const item = getSlashItems().at(slashMenu.index)
+          if (item && slashMenu.invoke) {
+            slashMenu.invoke({ action: (item as { id: SlashAction }).id })
+          }
+        },
+        onCommand: (editor, range, action) => {
+          // Replace trigger and apply action with official command flow
+          const chain = editor.chain().focus().deleteRange(range).setTextSelection(range.from)
+          switch (action) {
+            case 'h1':
+              chain.toggleHeading({ level: 1 }).run()
+              break
+            case 'h2':
+              chain.toggleHeading({ level: 2 }).run()
+              break
+            case 'h3':
+              chain.toggleHeading({ level: 3 }).run()
+              break
+            case 'bullet':
+              chain.toggleBulletList().run()
+              break
+            case 'ordered':
+              chain.toggleOrderedList().run()
+              break
+            case 'task':
+              chain.toggleTaskList().run()
+              break
+            case 'quote':
+              chain.toggleBlockquote().run()
+              break
+            case 'code':
+              chain.toggleCodeBlock().run()
+              break
+            case 'hr':
+              chain.setHorizontalRule().run()
+              break
+            case 'table':
+              chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+              break
+            case 'image': {
+              const url = window.prompt('Image URL')
+              if (url) chain.setImage({ src: url }).run()
+              else chain.run()
+              break
+            }
+            case 'link': {
+              const current = editor.getAttributes('link')?.href as string | undefined
+              const href = window.prompt('Link URL', current || '')
+              if (href === null) chain.run()
+              else if (href.trim()) chain.setLink({ href: href.trim() }).run()
+              else chain.unsetLink().run()
+              break
+            }
+            default:
+              chain.run()
+          }
+        }
+      })
     ],
     content: initialHtml,
     editable,
@@ -91,59 +183,56 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       handleKeyDown(_view, event): boolean {
         // Indent / outdent for task list and bullet/ordered list
         if (event.key === 'Tab') {
-          event.preventDefault()
           const ed = editorRef.current
           if (!ed) return true
 
           // Shift+Tab → outdent (lift)
           if (event.shiftKey) {
-            if (import.meta.env.DEV) {
-              const canLiftTask = ed.can().liftListItem('taskItem')
-              const canLiftList = ed.can().liftListItem('listItem')
-              const ctx = {
-                mode: 'outdent',
-                canLiftTask,
-                canLiftList,
-                isTask: ed.isActive('taskList'),
-                isBullet: ed.isActive('bulletList'),
-                isOrdered: ed.isActive('orderedList'),
-              }
-              console.debug('[RichEditorLite][Tab]', ctx)
-            }
             if (ed.can().liftListItem('taskItem')) {
               ed.chain().focus().liftListItem('taskItem').run()
+              event.preventDefault()
               return true
             }
             if (ed.can().liftListItem('listItem')) {
               ed.chain().focus().liftListItem('listItem').run()
+              event.preventDefault()
               return true
             }
-            return true
+            // Not handled - let browser default
+            return false
           }
 
           // Tab → indent (sink)
-          if (import.meta.env.DEV) {
-            const canSinkTask = ed.can().sinkListItem('taskItem')
-            const canSinkList = ed.can().sinkListItem('listItem')
-            const ctx = {
-              mode: 'indent',
-              canSinkTask,
-              canSinkList,
-              isTask: ed.isActive('taskList'),
-              isBullet: ed.isActive('bulletList'),
-              isOrdered: ed.isActive('orderedList'),
-            }
-            console.debug('[RichEditorLite][Tab]', ctx)
-          }
           if (ed.can().sinkListItem('taskItem')) {
             ed.chain().focus().sinkListItem('taskItem').run()
+            event.preventDefault()
             return true
           }
           if (ed.can().sinkListItem('listItem')) {
             ed.chain().focus().sinkListItem('listItem').run()
+            event.preventDefault()
             return true
           }
-          return true
+
+          // Not in a list; try to detect "- ", "* ", "+ ", "1. " markers to convert to list
+          const { $from } = ed.state.selection
+          const parent = $from.parent
+          const text = parent?.textContent ?? ''
+          const bullet = /^\s*([-*+])\s+/.exec(text)
+          const ordered = /^\s*(\d+)[.)]\s+/.exec(text)
+          if (bullet) {
+            ed.chain().focus().toggleBulletList().run()
+            event.preventDefault()
+            return true
+          }
+          if (ordered) {
+            ed.chain().focus().toggleOrderedList().run()
+            event.preventDefault()
+            return true
+          }
+
+          // otherwise, allow default tab behavior
+          return false
         }
         // Slash menu keyboard UX
         if (slashMenu.open) {
@@ -159,31 +248,14 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
           if (event.key === 'Enter') {
             event.preventDefault()
-            // run selected item if present
-            const runSelected = getSlashItems().at(slashMenu.index)
-            if (runSelected) {
-              runSelected.onSelect()
+            const item = getSlashItems().at(slashMenu.index)
+            if (item && slashMenu.invoke) {
+              slashMenu.invoke({ action: item.id })
               return true
             }
           }
         }
-        // Open slash menu and anchor to caret
-        if (event.key === '/') {
-          const pos = editorRef.current?.state.selection.from ?? 0
-          setTimeout(() => {
-            // After slash inserted, caret moves forward by 1
-            const coords = editorRef.current?.view.coordsAtPos((editorRef.current?.state.selection.from ?? pos) as number)
-            const crect = containerRef.current?.getBoundingClientRect()
-            if (coords && crect && containerRef.current) {
-              const x = coords.left - crect.left + containerRef.current.scrollLeft
-              const y = coords.top - crect.top + containerRef.current.scrollTop + 20
-              setSlashMenu({ open: true, x, y, from: pos, index: 0 })
-            } else {
-              setSlashMenu({ open: true, x: 8, y: 8, from: pos, index: 0 })
-            }
-          }, 0)
-          return false
-        }
+        // '/' is handled by SlashCommand (Suggestion plugin)
         // Link edit hotkey
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
           event.preventDefault()
@@ -198,7 +270,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           return true
         }
         if (event.key === 'Escape' && slashMenu.open) {
-          setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
+          // Consume ESC locally to avoid parent (expanded editor) catching it
+          event.preventDefault()
+          event.stopPropagation()
+          setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
           return true
         }
         return false
@@ -222,7 +297,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           const target = event.target as HTMLElement
           // Close slash menu on any click outside
           if (slashMenu.open && !containerRef.current?.contains(target)) {
-            setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
+            setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
           }
           return false
         },
@@ -259,43 +334,36 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
 
-  const execAndCleanupSlash = (fn: () => void) => {
-    const ed = editorRef.current
-    if (ed && slashMenu.from >= 0) {
-      const tr = ed.state.tr.delete(slashMenu.from, slashMenu.from + 1)
-      ed.view.dispatch(tr)
-    }
-    fn()
-    setSlashMenu({ open: false, x: 0, y: 0, from: -1, index: 0 })
-  }
+  // execAndCleanupSlash no longer used (Suggestion handles command execution)
 
   const getSlashQuery = (): string => {
     const ed = editorRef.current
-    if (!ed || slashMenu.from < 0) return ''
-    const cur = ed.state.selection.from
-    const from = Math.min(slashMenu.from + 1, cur)
-    const to = Math.max(slashMenu.from + 1, cur)
-    return ed.state.doc.textBetween(from, to).trim().toLowerCase()
+    if (!ed || !slashMenu.range) return ''
+    return ed.state.doc.textBetween(slashMenu.range.from, slashMenu.range.to).trim().toLowerCase()
   }
 
-  const allSlashItems = [
-    { label: 'Heading 1', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleHeading({ level: 1 }).run()) },
-    { label: 'Heading 2', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleHeading({ level: 2 }).run()) },
-    { label: 'Bulleted list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleBulletList().run()) },
-    { label: 'Numbered list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleOrderedList().run()) },
-    { label: 'Task list', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleTaskList().run()) },
-    { label: 'Quote', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleBlockquote().run()) },
-    { label: 'Code block', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().toggleCodeBlock().run()) },
-    { label: 'Table', onSelect: () => execAndCleanupSlash(() => editorRef.current?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()) },
-    { label: 'Image…', onSelect: () => execAndCleanupSlash(() => { const url = window.prompt('Image URL'); if (url) editorRef.current?.chain().focus().setImage({ src: url }).run() }) },
-    { label: 'Link…', onSelect: () => execAndCleanupSlash(() => { const current = editorRef.current?.getAttributes('link')?.href as string | undefined; const href = window.prompt('Link URL', current || ''); if (href === null) return; if (href.trim()) editorRef.current?.chain().focus().setLink({ href: href.trim() }).run(); else editorRef.current?.chain().focus().unsetLink().run(); }) },
-  ] as const
+  const allSlashItems: { label: string; id: SlashAction }[] = [
+    { label: 'Heading 1', id: 'h1' },
+    { label: 'Heading 2', id: 'h2' },
+    { label: 'Heading 3', id: 'h3' },
+    { label: 'Bulleted list', id: 'bullet' },
+    { label: 'Numbered list', id: 'ordered' },
+    { label: 'Task list', id: 'task' },
+    { label: 'Quote', id: 'quote' },
+    { label: 'Code block', id: 'code' },
+    { label: 'Horizontal rule', id: 'hr' },
+    { label: 'Table', id: 'table' },
+    { label: 'Image…', id: 'image' },
+    { label: 'Link…', id: 'link' },
+  ]
 
   const getSlashItems = () => {
-    const q = getSlashQuery()
+    const q = (slashMenu.query || getSlashQuery()).toLowerCase()
     if (!q) return allSlashItems
     return allSlashItems.filter((it) => it.label.toLowerCase().includes(q))
   }
+
+  // No global capture needed; Suggestion plugin consumes ESC. This is left empty intentionally.
 
   return (
     <div className={["border rounded-md bg-background flex flex-col h-full", className].join(' ')}>
@@ -308,6 +376,19 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
         <ToolbarButton active={isActive('underline')} disabled={!can(() => editor!.can().chain().focus().toggleUnderline().run())} onClick={() => editor?.chain().focus().toggleUnderline().run()}>
           <UnderlineIcon className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton active={isActive('strike')} disabled={!can(() => editor!.can().chain().focus().toggleStrike().run())} onClick={() => editor?.chain().focus().toggleStrike().run()}>
+          <Strikethrough className="w-4 h-4" />
+        </ToolbarButton>
+        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <ToolbarButton active={isActive('heading', { level: 1 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}>
+          <Heading1 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton active={isActive('heading', { level: 2 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>
+          <Heading2 className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton active={isActive('heading', { level: 3 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}>
+          <Heading3 className="w-4 h-4" />
         </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton active={isActive('bulletList')} onClick={() => editor?.chain().focus().toggleBulletList().run()}>
@@ -325,6 +406,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         </ToolbarButton>
         <ToolbarButton active={isActive('codeBlock')} onClick={() => editor?.chain().focus().toggleCodeBlock().run()}>
           <Code className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => editor?.chain().focus().setHorizontalRule().run()}>
+          <Minus className="w-4 h-4" />
         </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton onClick={() => {
@@ -359,7 +443,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                   key={it.label}
                   className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
                     idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
-                  onClick={() => it.onSelect()}>
+                  onMouseDown={(e) => {
+                    // Prevent editor blur so that commands can safely focus/dispatch
+                    e.preventDefault()
+                  }}
+                  onClick={() => slashMenu.invoke?.({ action: it.id })}>
                   {it.label}
                 </button>
               ))}
