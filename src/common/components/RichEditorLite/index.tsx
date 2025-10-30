@@ -544,21 +544,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     editor.view.dispatch(editor.state.tr.setMeta('bubbleMenu', 'updatePosition'))
   }, [editor, slashMenu.open, linkMenu.open, imageMenu.open])
 
-  const getSlashQuery = (): string => {
-    const ed = editorRef.current
-    const range = slashMenu.range
-    if (!ed || !range) return ''
-    try {
-      const doc = ed.state.doc
-      const size = doc.content.size
-      const from = Math.max(0, Math.min(range.from, size))
-      const to = Math.max(from, Math.min(range.to, size))
-      return doc.textBetween(from, to).trim().toLowerCase()
-    } catch {
-      // On any out-of-bounds or transient error, fall back to empty query
-      return ''
-    }
-  }
+  // getSlashQuery removed; we rely solely on Suggestion's provided query
 
   // remove duplicate BubbleMenu syncing effect
 
@@ -672,7 +658,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   ]
 
   const getSlashItems = () => {
-    const q = (slashMenu.query || getSlashQuery()).toLowerCase()
+    // Use Suggestion plugin's query only; when it's empty string we should show all items.
+    const q = (slashMenu.query ?? '').toLowerCase()
     if (!q) return allSlashItems
     return allSlashItems.filter((it) => (it.label.toLowerCase().includes(q) || (it.aliases || []).some(a => a.toLowerCase().includes(q))))
   }
