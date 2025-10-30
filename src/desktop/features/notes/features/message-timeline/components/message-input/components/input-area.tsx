@@ -1,5 +1,8 @@
 import { InputAreaProps } from "../types";
 import { useInputCollapse } from "../../../hooks/use-input-collapse";
+import { RichEditorLite } from "@/common/components/RichEditorLite";
+import { useComposerStateStore } from "@/core/stores/composer-state.store";
+// Revert to simple textarea input (no WYSIWYG) per request
 
 export function InputArea({
   message,
@@ -7,23 +10,29 @@ export function InputArea({
   onKeyDown,
   placeholder,
   disabled,
-  textareaRef,
 }: InputAreaProps) {
-  const { handleExpandInput } = useInputCollapse();
+  const { handleExpandInput, inputCollapsed } = useInputCollapse();
+  const composerExpanded = useComposerStateStore(s => s.expanded);
   return (
     <div className="w-full">
-      <div className="relative min-h-[48px]">
-        <textarea
-          ref={textareaRef}
+      {/* Increase the clickable/minimum area height to 120px */}
+      <div className="relative min-h-[120px]" onMouseDown={handleExpandInput}>
+        <RichEditorLite
           value={message}
-          onChange={e => onMessageChange(e.target.value)}
-          onKeyDown={onKeyDown}
-          onFocus={handleExpandInput}
+          onChange={onMessageChange}
+          editable={!disabled}
           placeholder={placeholder}
-          className="w-full min-h-[48px] max-h-[200px] resize-none px-4 py-2.5 bg-transparent border-0 text-sm leading-relaxed placeholder:text-muted-foreground/70 focus:outline-none focus:ring-0 outline-none shadow-none"
-          disabled={disabled}
-          style={{
-            caretColor: "#3b82f6",
+          variant="frameless"
+          hideToolbar
+          // Requested: raise input area minHeight from 40 to 120
+          minHeight={120}
+          maxHeight={160}
+          enterSends
+          suspended={inputCollapsed || composerExpanded}
+          onSubmitEnter={() => {
+            // Simulate Shift+Enter send via parent keydown handler
+            const e = { key: 'Enter', shiftKey: true } as unknown as React.KeyboardEvent
+            onKeyDown(e)
           }}
         />
       </div>

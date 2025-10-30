@@ -1,7 +1,8 @@
-import { ArrowDown, ArrowUp, FileText, Image, Mic, MoreHorizontal, PanelBottomClose } from "lucide-react";
+import { ArrowDown, ArrowUp, FileText, Image, Mic, MoreHorizontal, PanelBottomClose, Maximize2 } from "lucide-react";
 import { ToolbarButton } from "./toolbar-button";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { useInputCollapse } from "../../../hooks/use-input-collapse";
+import { useComposerStateStore } from "@/core/stores/composer-state.store";
 
 interface BottomActionsProps {
   onSend: () => void;
@@ -10,6 +11,7 @@ interface BottomActionsProps {
 
 export function BottomActions({ onSend, canSend }: BottomActionsProps) {
   const { inputCollapsed, handleCollapseInput, handleExpandInput } = useInputCollapse();
+  const setExpanded = useComposerStateStore(s => s.setExpanded);
 
   const leftButtons: Array<{
     icon: React.ComponentType<{ className?: string }>;
@@ -29,6 +31,8 @@ export function BottomActions({ onSend, canSend }: BottomActionsProps) {
         {leftButtons.map((b, i) => (
           <ToolbarButton key={i} icon={b.icon} onClick={b.onClick} title={b.title} />
         ))}
+        {/* Expand composer to occupy the timeline content area */}
+        <ToolbarButton icon={Maximize2} onClick={() => setExpanded(true)} title="Expand composer" />
         {inputCollapsed ? (
           <ToolbarButton icon={ArrowDown} onClick={handleExpandInput} title="Show composer" />
         ) : (

@@ -8,6 +8,8 @@ interface TimelineLayoutProps {
   actions?: ReactNode;
   channel?: Channel;
   className?: string;
+  // Optional overlay that covers the entire timeline area (header + content + actions)
+  overlay?: ReactNode;
 }
 
 export const TimelineLayout = ({
@@ -15,6 +17,7 @@ export const TimelineLayout = ({
   actions,
   channel,
   className = "",
+  overlay,
 }: TimelineLayoutProps) => {
   // Classic Focus Mode: when no right sidebar (AI Assistant/Thread) is open,
   // keep the reading width comfortable and centered.
@@ -39,6 +42,13 @@ export const TimelineLayout = ({
         {actions && (
           <div className={`${sectionWidthClass} shrink-0`}>
             {actions}
+          </div>
+        )}
+
+        {/* Optional overlay to cover header + content + actions */}
+        {overlay && (
+          <div className="absolute inset-0 z-30">
+            {overlay}
           </div>
         )}
       </div>

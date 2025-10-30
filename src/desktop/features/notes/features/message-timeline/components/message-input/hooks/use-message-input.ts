@@ -3,11 +3,11 @@ import { useChatReply } from "@/common/features/notes/hooks/use-chat-reply";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useComposerStateStore } from "@/core/stores/composer-state.store";
 
 export function useMessageInput() {
   const presenter = useCommonPresenterContext();
-  const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { currentChannelId, isAddingMessage } = useNotesViewStore();
   const { messages: channelMessages = [] } = useChannelMessages({});
@@ -24,6 +24,12 @@ export function useMessageInput() {
         : null,
     [replyToMessageId, channelMessages]
   );
+
+  const draft = useComposerStateStore(s => (currentChannelId ? (s.drafts[currentChannelId] ?? "") : ""));
+  const setDraft = useComposerStateStore(s => s.setDraft);
+  const clearDraft = useComposerStateStore(s => s.clearDraft);
+
+  const message = draft;
 
   const handleSend = async () => {
     if (!message.trim() || !currentChannelId) return;
@@ -60,24 +66,20 @@ export function useMessageInput() {
 
     clearReplyToMessageId();
     presenter.rxEventBus.requestTimelineScrollToLatest$.emit();
-    setMessage("");
+    clearDraft(currentChannelId);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      if (e.shiftKey) {
-        // Shift+Enter: Allow new line (default behavior)
-        return;
-      } else {
-        // Enter: Send message
-        e.preventDefault();
-        handleSend();
-      }
+    // Shift+Enter: Send; Enter: newline (default)
+    if (e.key === "Enter" && e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
   const handleMessageChange = (newMessage: string) => {
-    setMessage(newMessage);
+    if (!currentChannelId) return;
+    setDraft(currentChannelId, newMessage);
   };
 
   useEffect(() => {

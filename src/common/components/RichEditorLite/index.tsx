@@ -34,6 +34,10 @@ interface RichEditorLiteProps {
   compactToolbar?: boolean
   maxHeight?: number | string
   minHeight?: number | string
+  hideToolbar?: boolean
+  enterSends?: boolean
+  onSubmitEnter?: () => void
+  suspended?: boolean
 }
 
 function ToolbarButton({ disabled, active, onClick, children, size = 'md', className = '' }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode; size?: 'sm' | 'md'; className?: string }) {
@@ -57,12 +61,12 @@ function ToolbarButton({ disabled, active, onClick, children, size = 'md', class
   )
 }
 
-export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', compactToolbar = false, maxHeight, minHeight }: RichEditorLiteProps) {
+export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', maxHeight, minHeight, enterSends = false, onSubmitEnter, hideToolbar, suspended = false }: RichEditorLiteProps) {
   // Create bubble menu element before editor initialization so the extension can mount.
   const bubbleEl = useMemo<HTMLElement>(() => {
     const el = document.createElement('div')
     // Ensure BubbleMenu sits above editor content but below our modals
-    el.style.zIndex = '900' // link/slash/image popups use 1000
+    el.style.zIndex = '1100' // above editor content; our menus use ~1000
     // plugin will set position/coords; keep pointer events enabled for hover
     el.style.pointerEvents = 'auto'
     return el
@@ -71,7 +75,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const lastMarkdownRef = useRef<string>(value || '')
   const editorRef = useRef<Editor | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; range?: { from: number; to: number }; index: number; query: string; invoke?: (p: { action: SlashAction }) => void }>({ open: false, x: 0, y: 0, index: 0, query: '' })
+  const [slashMenu, setSlashMenu] = useState<{ open: boolean; x: number; y: number; fixed?: boolean; place?: 'up' | 'down'; range?: { from: number; to: number }; index: number; query: string; invoke?: (p: { action: SlashAction }) => void }>({ open: false, x: 0, y: 0, index: 0, query: '' })
+  // Keep a live ref of slashMenu so extension callbacks (which are created once) read fresh state
+  const slashMenuRef = useRef(slashMenu)
+  useEffect(() => { slashMenuRef.current = slashMenu }, [slashMenu])
+  const slashListRef = useRef<HTMLDivElement | null>(null)
   const [tableHandles, setTableHandles] = useState<{ open: boolean; rowX: number; rowY: number; colX: number; colY: number }>({ open: false, rowX: 0, rowY: 0, colX: 0, colY: 0 })
   const [pointer, setPointer] = useState<{ x: number; y: number }>({ x: -9999, y: -9999 })
   const [near, setNear] = useState<{ row: boolean; col: boolean }>({ row: false, col: false })
@@ -106,6 +114,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       BubbleMenuExt.configure({
         element: bubbleEl,
         options: { placement: 'top' },
+        appendTo: () => document.body,
         // initial rule; will be kept in sync via effect below
         shouldShow: ({ editor, state }) => {
           if (!editor.isEditable) return false
@@ -114,32 +123,48 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       }),
       SlashCommand.configure({
         onOpen: (p: SlashOpenPayload) => {
-          // Position relative to editor container
-          const crect = containerRef.current?.getBoundingClientRect()
-          let x = 8
-          let y = 8
-          if (p.clientRect && crect && containerRef.current) {
-            x = p.clientRect.left - crect.left + containerRef.current.scrollLeft
-            y = p.clientRect.bottom - crect.top + containerRef.current.scrollTop
-          }
-          setSlashMenu({ open: true, x, y, range: p.range, index: 0, query: p.query, invoke: p.invoke })
+          // Smart placement: choose up or down based on available viewport space
+          type RectLike = DOMRect | { left: number; top: number; bottom?: number }
+          const raw: RectLike = p.clientRect || { left: 8, top: 8, bottom: 16 }
+          const vw = typeof window !== 'undefined' ? window.innerWidth : 1024
+          const vh = typeof window !== 'undefined' ? window.innerHeight : 768
+          const top = raw.top
+          const left = raw.left
+          const bottom = 'bottom' in raw && typeof raw.bottom === 'number' ? raw.bottom : top + 16
+          const spaceAbove = Math.max(0, top)
+          const spaceBelow = Math.max(0, vh - bottom)
+          const preferred: 'up' | 'down' = spaceBelow >= spaceAbove ? 'down' : 'up'
+          const x = Math.max(8, Math.min(left, vw - 260))
+          const y = preferred === 'up' ? top : bottom
+          setSlashMenu({ open: true, x, y, fixed: true, place: preferred, range: p.range, index: 0, query: p.query, invoke: p.invoke })
         },
         onUpdate: (p: SlashOpenPayload) => {
-          const crect = containerRef.current?.getBoundingClientRect()
-          let x = 8
-          let y = 8
-          if (p.clientRect && crect && containerRef.current) {
-            x = p.clientRect.left - crect.left + containerRef.current.scrollLeft
-            y = p.clientRect.bottom - crect.top + containerRef.current.scrollTop
-          }
-          setSlashMenu((s) => ({ ...(s || { open: true, index: 0 }), open: true, x, y, range: p.range, query: p.query, invoke: p.invoke }))
+          type RectLike = DOMRect | { left: number; top: number; bottom?: number }
+          const raw: RectLike = p.clientRect || { left: 8, top: 8, bottom: 16 }
+          const vw = typeof window !== 'undefined' ? window.innerWidth : 1024
+          const vh = typeof window !== 'undefined' ? window.innerHeight : 768
+          const top = raw.top
+          const left = raw.left
+          const bottom = 'bottom' in raw && typeof raw.bottom === 'number' ? raw.bottom : top + 16
+          const spaceAbove = Math.max(0, top)
+          const spaceBelow = Math.max(0, vh - bottom)
+          const preferred: 'up' | 'down' = spaceBelow >= spaceAbove ? 'down' : 'up'
+          const x = Math.max(8, Math.min(left, vw - 260))
+          const y = preferred === 'up' ? top : bottom
+          setSlashMenu((s) => ({ ...(s || { open: true, index: 0 }), open: true, x, y, fixed: true, place: preferred, range: p.range, query: p.query, invoke: p.invoke }))
         },
         onClose: () => setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' }),
-        onMoveIndex: (delta: number) => setSlashMenu((s) => ({ ...s, index: Math.max(0, s.index + delta) })),
+        onMoveIndex: (delta: number) => setSlashMenu((s) => {
+          const items = getSlashItems()
+          const next = Math.max(0, Math.min(items.length - 1, s.index + delta))
+          return { ...s, index: next }
+        }),
         onEnter: () => {
-          const item = getSlashItems().at(slashMenu.index)
-          if (item && slashMenu.invoke) {
-            slashMenu.invoke({ action: (item as { id: SlashAction }).id })
+          // Read latest menu state from ref to avoid stale closure inside extension callback
+          const menu = slashMenuRef.current
+          const item = getSlashItems().at(menu.index)
+          if (item && menu.invoke) {
+            menu.invoke({ action: (item as { id: SlashAction }).id })
           }
         },
         onCommand: (editor, range, action) => {
@@ -233,7 +258,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     editorProps: {
       attributes: {
         spellcheck: 'false',
-        style: 'min-height: 240px; padding: 12px; outline: none;',
+        // Default editor has comfortable min-height; frameless (compact) removes it and fills parent
+        style: variant === 'frameless'
+          ? 'padding: 4px 6px; outline: none; height: 100%;'
+          : 'min-height: 240px; padding: 12px; outline: none;',
       },
       handlePaste(_view, evt): boolean {
         // Smart paste fenced code blocks
@@ -263,6 +291,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         return false
       },
       handleKeyDown(_view, event): boolean {
+        // Inline send mode: Shift+Enter to send, Enter behaves normally (newline)
+        if (enterSends && event.key === 'Enter') {
+          if (event.shiftKey) {
+            event.preventDefault()
+            onSubmitEnter?.()
+            return true
+          }
+          return false
+        }
         // Indent / outdent for task list and bullet/ordered list
         if (event.key === 'Tab') {
           const ed = editorRef.current
@@ -316,27 +353,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           // otherwise, allow default tab behavior
           return false
         }
-        // Slash menu keyboard UX
-        if (slashMenu.open) {
-          if (event.key === 'ArrowDown') {
-            event.preventDefault()
-            setSlashMenu((m) => ({ ...m, index: m.index + 1 }))
-            return true
-          }
-          if (event.key === 'ArrowUp') {
-            event.preventDefault()
-            setSlashMenu((m) => ({ ...m, index: Math.max(0, m.index - 1) }))
-            return true
-          }
-          if (event.key === 'Enter') {
-            event.preventDefault()
-            const item = getSlashItems().at(slashMenu.index)
-            if (item && slashMenu.invoke) {
-              slashMenu.invoke({ action: item.id })
-              return true
-            }
-          }
-        }
+        // Slash menu navigation is handled by Suggestion plugin's onKeyDown
         // '/' is handled by SlashCommand (Suggestion plugin)
         // Link edit hotkey → open inline link bubble
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -355,13 +372,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (key === '6') { editorRef.current?.chain().focus().toggleHeading({ level: 6 }).run(); event.preventDefault(); return true }
           if (key === '0') { editorRef.current?.chain().focus().setParagraph().run(); event.preventDefault(); return true }
         }
-        if (event.key === 'Escape' && slashMenu.open) {
-          // Consume ESC locally to avoid parent (expanded editor) catching it
-          event.preventDefault()
-          event.stopPropagation()
-          setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
-          return true
-        }
+        // Escape is handled by Suggestion and BubbleMenu extensions; do not consume here
         return false
       },
       handleDOMEvents: {
@@ -440,10 +451,43 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     if (editor) editor.setEditable(editable)
   }, [editable, editor])
 
+  // When parent collapses/suspends the editor (e.g., composer hidden), close all popups and blur
+  useEffect(() => {
+    if (!editorRef.current) return
+    if (suspended) {
+      try { editorRef.current.commands.blur() } catch { /* ignore */ }
+      setSlashMenu({ open: false, x: 0, y: 0, index: 0, query: '' })
+      setLinkMenu({ open: false, x: 0, y: 0, value: '', text: '' })
+      setImageMenu({ open: false, x: 0, y: 0, value: '' })
+    }
+  }, [suspended])
+
+  // Keep the highlighted slash item in view when navigating via keyboard
+  useEffect(() => {
+    if (!slashMenu.open) return
+    const list = slashListRef.current
+    if (!list) return
+    const active = list.querySelector(`[data-slash-index="${slashMenu.index}"]`) as HTMLElement | null
+    if (active) {
+      // If not fully visible, scroll it into view without jumping the list too much
+      const { offsetTop } = active
+      const itemBottom = offsetTop + active.offsetHeight
+      const viewTop = list.scrollTop
+      const viewBottom = viewTop + list.clientHeight
+      if (offsetTop < viewTop) {
+        list.scrollTo({ top: offsetTop, behavior: 'auto' })
+      } else if (itemBottom > viewBottom) {
+        const delta = itemBottom - viewBottom
+        list.scrollTo({ top: viewTop + delta, behavior: 'auto' })
+      }
+    }
+  }, [slashMenu.index, slashMenu.open])
+
   // Table menu visibility + position moved below menu state declarations
 
   const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
+
 
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
 
@@ -666,11 +710,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   return (
     <div style={outerStyle} className={[variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background", "flex flex-col min-h-0", className].join(' ')}>
-      <div className={[
-          "flex items-center gap-1 shrink-0",
-          variant === 'frameless' ? "px-1 py-0.5 border-0" : "px-2 py-1 border-b",
-          compactToolbar ? "overflow-x-auto flex-nowrap gap-0.5" : ""
-        ].join(' ')}>
+      {!hideToolbar && (
+      <div className={'flex items-center gap-1 px-2 py-1 border-b shrink-0'}>
         <ToolbarButton active={isActive('bold')} disabled={!can(() => editor!.can().chain().focus().toggleBold().run())} onClick={() => editor?.chain().focus().toggleBold().run()}>
           <Bold className="w-4 h-4" />
         </ToolbarButton>
@@ -751,12 +792,20 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           <TableIcon className="w-4 h-4" />
         </ToolbarButton>
       </div>
+      )}
       <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto">
-        <div className={["relative", variant === 'frameless' ? "p-0" : "p-3"].join(' ')}>
+        <div className={["relative h-full", variant === 'frameless' ? "p-0" : "p-3"].join(' ')}>
           {!editor?.getText() && (
             <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
           )}
-          <EditorContent editor={editor} className="tiptap prose dark:prose-invert max-w-none min-h-full outline-none focus:outline-none" />
+          <EditorContent
+            editor={editor}
+            className={[
+              variant === 'frameless'
+                ? 'tiptap max-w-none h-full outline-none focus:outline-none'
+                : 'tiptap prose dark:prose-invert max-w-none h-full outline-none focus:outline-none'
+            ].join(' ')}
+          />
         </div>
         {linkMenu.open && (
           <div
@@ -915,12 +964,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             </div>
           </>
         )}
-        {slashMenu.open && (
+        {slashMenu.open && createPortal(
           <div
-            style={{ position: 'absolute', left: slashMenu.x, top: slashMenu.y, zIndex: 1000, minWidth: 240 }}
+            style={{ position: 'fixed', left: slashMenu.x, top: slashMenu.y, zIndex: 1100, minWidth: 240, transform: slashMenu.place === 'up' ? 'translateY(-100%) translateY(-8px)' : 'translateY(8px)' }}
             className="rounded-md border bg-white dark:bg-slate-800 shadow-lg p-1 text-sm">
-            <div className="px-2 py-1.5 text-xs text-slate-500">Quick insert</div>
-            <div className="max-h-64 overflow-auto">
+            <div ref={slashListRef} className="max-h-64 overflow-auto">
               {(() => {
                 const items = getSlashItems()
                 const rows: React.ReactNode[] = []
@@ -934,6 +982,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                   rows.push(
                     <button
                       key={`item-${it.label}-${idx}`}
+                      data-slash-index={idx}
                       className={["w-full text-left px-2 py-1 rounded flex items-center gap-2",
                         idx === slashMenu.index ? "bg-slate-100 dark:bg-slate-700" : "hover:bg-slate-100 dark:hover:bg-slate-700"].join(' ')}
                       onMouseDown={(e) => { e.preventDefault() }}
@@ -948,7 +997,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                 return rows
               })()}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
