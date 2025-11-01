@@ -10,38 +10,31 @@ interface EmptyStatesProps {
 export function EmptyStates({ q, scope, isRefreshing, onRefresh }: EmptyStatesProps) {
   if (q.trim() === "") {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
-        <div className="w-20 h-20 rounded-2xl bg-muted/40 flex items-center justify-center mb-6">
-          <SearchIcon className="h-10 w-10 text-muted-foreground/50" />
+      <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 text-center">
+        <div className="w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center mb-4">
+          <SearchIcon className="h-6 w-6 text-muted-foreground/50" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground mb-3">Search your notes</h3>
-        <p className="text-base text-muted-foreground/80 mb-6 max-w-sm">
-          Type to search across {scope === "current" ? "current space" : "all spaces"}
+        <p className="text-sm text-muted-foreground/70">
+          Search {scope === "current" ? "current space" : "all spaces"}
         </p>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground/60">
-          <div className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-          <span>Swipe left/right to switch scope</span>
-          <div className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-muted/40 flex items-center justify-center mb-6">
-        <SearchIcon className="h-10 w-10 text-muted-foreground/50" />
+    <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center mb-4">
+        <SearchIcon className="h-6 w-6 text-muted-foreground/50" />
       </div>
-      <h3 className="text-xl font-semibold text-foreground mb-3">No matches found</h3>
-      <p className="text-base text-muted-foreground/80 mb-6 max-w-sm">
-        Try different keywords or search in all spaces
+      <p className="text-sm text-muted-foreground/70 mb-4">
+        No results found
       </p>
       <button
         onClick={onRefresh}
         disabled={isRefreshing}
-        className="px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted/80 text-sm text-muted-foreground hover:text-foreground transition-all duration-200 disabled:opacity-50"
+        className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
       >
-        {isRefreshing ? "Refreshing..." : "Refresh Search"}
+        {isRefreshing ? "Refreshing..." : "Refresh index"}
       </button>
     </div>
   );

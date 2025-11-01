@@ -1,5 +1,6 @@
 import { type NoteSearchMatch } from "@/common/features/note-search/services/note-search.service";
 import { Highlight } from "./search-highlight";
+import { formatDistanceToNow } from "date-fns";
 
 interface SearchResultsProps {
   results: NoteSearchMatch[];
@@ -20,49 +21,42 @@ export function SearchResults({
 }: SearchResultsProps) {
   return (
     <div className="flex-1 py-2">
-      {results.map((r, idx) => (
+      {results.map((r, idx) => {
+        const isActive = idx === activeIndex;
+        const timeAgo = formatDistanceToNow(new Date(r.timestamp), { addSuffix: true });
+
+        return (
         <button
           key={r.id}
           id={r.id}
           type="button"
           role="option"
-          aria-selected={idx === activeIndex}
-          className={`w-full text-left px-6 py-5 hover:bg-muted/40 focus:outline-none transition-all duration-200 ${
-            idx === activeIndex ? "bg-muted/50" : ""
+            aria-selected={isActive}
+            className={`relative w-full text-left px-4 py-2.5 rounded transition-colors duration-150 ${
+              isActive
+                ? "bg-muted/50"
+                : "hover:bg-muted/30"
           }`}
           onMouseEnter={() => setActiveIndex(idx)}
           onClick={() => onPick(r.id, r.channelId)}
         >
-          {/* Header with channel and time */}
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className={`text-sm font-semibold transition-colors ${
-                idx === activeIndex ? "text-primary" : "text-foreground"
-              }`}>
-                {channelName(r.channelId)}
-              </span>
-              {r.matchedFields.length > 0 && (
-                <span className="text-sm text-muted-foreground/70 truncate">
-                  {r.matchedFields.join(", ")}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-semibold text-foreground/80">
+                  {channelName(r.channelId)}
                 </span>
-              )}
+                <span className="text-xs text-foreground/50">·</span>
+                <span className="text-xs text-foreground/50">
+                  {timeAgo}
+                </span>
+              </div>
+              <div className="text-sm text-foreground/70 leading-relaxed">
+                {r.snippet ? <Highlight text={r.snippet} query={q} /> : "(no preview)"}
+              </div>
             </div>
-            <span className="text-sm text-muted-foreground/60 whitespace-nowrap">
-              {new Date(r.timestamp).toLocaleDateString()}
-            </span>
-          </div>
-
-          {/* Content preview */}
-          <div className="text-base text-foreground/90 line-clamp-2 leading-relaxed">
-            {r.snippet ? <Highlight text={r.snippet} query={q} /> : "(no preview)"}
-          </div>
-
-          {/* Mobile: Active indicator */}
-          {idx === activeIndex && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-full sm:hidden" />
-          )}
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 }

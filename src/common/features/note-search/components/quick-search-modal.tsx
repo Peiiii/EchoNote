@@ -17,12 +17,12 @@ export function openQuickSearchModal(options?: OpenQuickSearchModalOptions) {
     ),
     className: [
       "w-screen max-w-none h-svh max-h-none rounded-none",
-      "sm:w-full sm:rounded-lg",
+      "sm:w-full sm:rounded-xl",
       "sm:max-w-2xl",
-      "sm:h-[80vh] sm:max-h-[80vh]",
+      "sm:h-[70vh] sm:max-h-[70vh]",
     ].join(" "),
     position: "top",
-    topOffset: 12,
+    topOffset: 96,
   });
 
   return modalController;

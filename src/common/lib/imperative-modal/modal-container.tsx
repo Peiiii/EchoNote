@@ -33,11 +33,12 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
   const position = instance.options.position || "center";
   const isTopPosition = position === "top";
 
+  const topOffset = instance.options.topOffset ?? 12;
+  
   const getPositionClasses = () => {
-    
     switch (position) {
       case 'top':
-        return 'fixed inset-x-0 top-0 sm:top-12 pointer-events-none flex justify-center items-start';
+        return `fixed inset-x-0 top-0 pointer-events-none flex justify-center items-start`;
       case 'center':
       default:
         return 'fixed inset-0 flex items-center justify-center pointer-events-none';
@@ -64,7 +65,7 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
 
   const contentAnimation = getContentAnimation();
   const baseContainerClasses = isTopPosition
-    ? "relative bg-background shadow-lg overflow-hidden pointer-events-auto w-full max-w-none max-h-none rounded-none sm:max-h-[90vh] sm:rounded-lg"
+    ? "relative bg-background shadow-lg overflow-hidden pointer-events-auto w-full"
     : "relative bg-background rounded-lg shadow-lg max-w-[90vw] max-h-[90vh] overflow-hidden pointer-events-auto";
 
   return (
@@ -87,7 +88,10 @@ export function ModalContainer({ instance, onClose }: ModalContainerProps) {
           className={`${getPositionClasses()}`}
           {...swipeHandlers}
         >
-          <div className={`${baseContainerClasses} ${instance.options.className || ""}`}>
+          <div 
+            className={`${baseContainerClasses} ${instance.options.className || ""}`}
+            style={isTopPosition ? { marginTop: `${topOffset}px` } : undefined}
+          >
             {instance.options.content}
           </div>
         </motion.div>

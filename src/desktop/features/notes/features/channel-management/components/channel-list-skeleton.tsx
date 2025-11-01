@@ -22,7 +22,7 @@ export function ChannelListSkeleton({ count = 12 }: ChannelListSkeletonProps) {
         <div className="flex items-center gap-2">
           <Skeleton className="h-8 w-8 rounded-md" />
           <Skeleton className="h-8 w-8 rounded-md" />
-          <CollapsibleSidebar.ToggleButton />
+        <CollapsibleSidebar.ToggleButton />
         </div>
       </div>
 

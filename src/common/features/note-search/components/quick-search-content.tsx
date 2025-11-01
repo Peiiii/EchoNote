@@ -141,10 +141,6 @@ export function QuickSearchContent({
         scope={scope}
         setScope={setScope}
         indexing={indexing}
-        indexStats={indexStats}
-        currentChannelId={currentChannelId || undefined}
-        channelName={channelName}
-        onClose={onClose}
       />
 
       {/* Results area - Always fill remaining space */}
@@ -174,10 +170,21 @@ export function QuickSearchContent({
       </div>
 
       {/* Footer with keyboard shortcuts */}
-      <div className="bg-muted/20 px-6 py-4 sm:px-8 sm:py-3 shrink-0">
-        <div className="text-sm text-muted-foreground/70 text-center sm:text-left">
-          <span className="hidden sm:inline">↑/↓ Select • Enter Open • Esc Close</span>
-          <span className="sm:hidden">↑/↓ Select • Enter Open</span>
+      <div className="px-4 py-2 sm:px-6 sm:py-3 shrink-0 border-t border-border/40">
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground/60">
+          <div className="flex items-center gap-1.5">
+            <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">↑</kbd>
+            <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">↓</kbd>
+            <span>Navigate</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">Enter</kbd>
+            <span>Open</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">Esc</kbd>
+            <span>Close</span>
+          </div>
         </div>
       </div>
     </div>
