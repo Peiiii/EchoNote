@@ -16,7 +16,7 @@ interface MarkdownContentProps {
 export function MarkdownContent({ content, className = "" }: MarkdownContentProps) {
   return (
     <div
-      className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-6 [&_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul_ul]:ml-6 [&_ol_ol]:ml-6 [&_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol_ol]:ml-6 [&_ul_ol]:ml-6 [&_ol_ul]:ml-6 ${className}`}
+      className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-6 [&_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul]:ml-6 [&_ul_ul_ul_ul_ul]:ml-6 [&_ol_ol]:ml-6 [&_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol]:ml-6 [&_ol_ol_ol_ol_ol]:ml-6 [&_ul_ol]:ml-6 [&_ol_ul]:ml-6 [&_ul_p]:mb-0 [&_ol_p]:mb-0 ${className}`}
     >
       <ReactMarkdown
         // Enable GFM and math. Order matters: math first so GFM doesn't eat underscores, etc.
@@ -75,7 +75,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
           blockquote({ children, ...props }) {
             return (
               <blockquote
-                className="my-4 pl-4 py-2 italic text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 border-l-4 border-gray-300 dark:border-gray-600 [&>p:last-child]:mb-0"
+                className="my-4 pl-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/30 border-l-4 border-gray-300 dark:border-gray-600 [&>p:last-child]:mb-0"
                 {...props}
               >
                 {children}
@@ -92,7 +92,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
           },
           li({ children, ...props }) {
             return (
-              <li className="text-gray-800 dark:text-gray-200 leading-relaxed" {...props}>
+              <li className="text-gray-800 dark:text-gray-200 mb-0 leading-relaxed" {...props}>
                 {children}
               </li>
             );
@@ -184,7 +184,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
           p({ children, ...props }) {
             return (
               <p
-                className="text-base leading-6 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words font-normal mb-2"
+                className="text-base leading-6 text-gray-800 dark:text-gray-200 break-words font-normal mb-2"
                 {...props}
               >
                 {children}
