@@ -49,23 +49,23 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
   return (
     <div
       data-component="channel-list"
-      className="flex flex-col h-full overflow-hidden bg-card shadow-sm"
+      className="flex flex-col h-full overflow-hidden bg-card"
     >
       {/* Header */}
       <div
         data-component="channel-list-header"
-        className="h-12 px-4 flex items-center justify-between"
+        className="h-11 px-4 flex items-center justify-between border-b border-slate-200/50 dark:border-slate-700/50"
       >
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
             Spaces
           </h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => openQuickSearchModal({ defaultScope: "all" })}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+            className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             aria-label="Search all notes"
             title="Search all notes (Cmd/Ctrl+K)"
           >
@@ -76,7 +76,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
             trigger={
               <button
                 type="button"
-                className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+                className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="New space"
                 title="New space"
               >
@@ -92,7 +92,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
       <div
         ref={scrollContainerRef}
         data-component="channel-list-content"
-        className="flex-1 overflow-y-auto p-3 space-y-1 min-h-0 channel-list-content"
+        className="flex-1 overflow-y-auto px-2.5 py-2 space-y-1 min-h-0 channel-list-content"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
