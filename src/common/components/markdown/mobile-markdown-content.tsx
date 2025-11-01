@@ -16,7 +16,7 @@ interface MobileMarkdownContentProps {
 export function MobileMarkdownContent({ content, className = "" }: MobileMarkdownContentProps) {
   return (
     <div
-      className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-4 [&_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul_ul]:ml-4 [&_ol_ol]:ml-4 [&_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol_ol]:ml-4 [&_ul_ol]:ml-4 [&_ol_ul]:ml-4 ${className}`}
+      className={`prose prose-slate dark:prose-invert max-w-none [&_ul_ul]:ml-4 [&_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul]:ml-4 [&_ul_ul_ul_ul_ul]:ml-4 [&_ol_ol]:ml-4 [&_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol]:ml-4 [&_ol_ol_ol_ol_ol]:ml-4 [&_ul_ol]:ml-4 [&_ol_ul]:ml-4 [&_ul_p]:mb-0 [&_ol_p]:mb-0 ${className}`}
     >
       <ReactMarkdown
         // Enable GFM and math. Order matters: math first so GFM doesn't eat underscores, etc.
@@ -76,7 +76,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
           blockquote({ children, ...props }) {
             return (
               <blockquote
-                className="border-l-4 border-blue-400 dark:border-blue-500 pl-3 italic text-slate-600 dark:text-slate-400 bg-blue-50/30 dark:bg-blue-900/20 py-2 rounded-r-lg my-3"
+                className="border-l-4 border-blue-400 dark:border-blue-500 pl-3 text-slate-600 dark:text-slate-400 bg-blue-50/30 dark:bg-blue-900/20 py-2 rounded-r-lg my-3"
                 {...props}
               >
                 {children}
@@ -102,6 +102,13 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
               >
                 {children}
               </ol>
+            );
+          },
+          li({ children, ...props }) {
+            return (
+              <li className="text-slate-800 dark:text-slate-200 mb-2 leading-relaxed" {...props}>
+                {children}
+              </li>
             );
           },
           input({ type, checked, ...props }) {
@@ -181,7 +188,7 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
           p({ children, ...props }) {
             return (
               <p
-                className="text-sm leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words font-normal mb-3"
+                className="text-sm leading-relaxed text-slate-800 dark:text-slate-200 break-words font-normal mb-3"
                 {...props}
               >
                 {children}
