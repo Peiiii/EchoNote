@@ -15,12 +15,12 @@ export function InputArea({
   const { handleExpandInput, inputCollapsed } = useInputCollapse();
   const composerExpanded = useComposerStateStore(s => s.expanded);
   
-  const minHeight = isFocusMode ? 80 : 120;
-  const maxHeight = isFocusMode ? 120 : 160;
+  const minHeight = 80;
+  const maxHeight = 120;
   
   return (
     <div className="w-full">
-      <div className={`relative ${isFocusMode ? "min-h-[80px]" : "min-h-[120px]"}`} onMouseDown={handleExpandInput}>
+      <div className="relative min-h-[80px]" onMouseDown={handleExpandInput}>
         <RichEditorLite
           value={message}
           onChange={onMessageChange}
