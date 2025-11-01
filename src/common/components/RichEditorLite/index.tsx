@@ -4,8 +4,8 @@ import { EditorContent, useEditor } from '@tiptap/react'
 import BubbleMenuExt, { type BubbleMenuOptions } from '@tiptap/extension-bubble-menu'
 import type { Extension as TiptapExtension } from '@tiptap/core'
 import { createPortal } from 'react-dom'
-import { StarterKit } from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import { StarterKit } from '@tiptap/starter-kit'
 // Custom code block with actions (language switcher, copy)
 import CodeBlockWithActions from './extensions/codeblock-with-actions'
 import type { Editor } from '@tiptap/core'
@@ -25,6 +25,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
 import { lowlight } from 'lowlight/lib/common'
+import HeadingToggle from './extensions/heading-toggle'
 
 interface RichEditorLiteProps {
   value: string
@@ -99,7 +100,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const editor = useEditor({
     extensions: [
       // Disable default codeBlock from StarterKit; we'll use Lowlight version
-      StarterKit.configure({ codeBlock: false }),
+      StarterKit.configure({ codeBlock: false, heading: false }),
+      HeadingToggle,
       Underline,
       Link.configure({
         openOnClick: true,
