@@ -30,9 +30,14 @@ export function InputArea({
           enterSends
           suspended={inputCollapsed || composerExpanded}
           onSubmitEnter={() => {
-            // Simulate Shift+Enter send via parent keydown handler
-            const e = { key: 'Enter', shiftKey: true } as unknown as React.KeyboardEvent
-            onKeyDown(e)
+            // Simulate Ctrl/Cmd+Enter send via parent keydown handler
+            const syntheticEvent = {
+              key: 'Enter',
+              metaKey: true,
+              ctrlKey: true,
+              preventDefault: () => undefined,
+            } as unknown as React.KeyboardEvent
+            onKeyDown(syntheticEvent)
           }}
         />
       </div>

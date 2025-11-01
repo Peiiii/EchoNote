@@ -25,6 +25,7 @@ export function useMessageInput() {
     [replyToMessageId, channelMessages]
   );
 
+  const composerExpanded = useComposerStateStore(s => s.expanded);
   const draft = useComposerStateStore(s => (currentChannelId ? (s.drafts[currentChannelId] ?? "") : ""));
   const setDraft = useComposerStateStore(s => s.setDraft);
   const clearDraft = useComposerStateStore(s => s.clearDraft);
@@ -70,8 +71,8 @@ export function useMessageInput() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Shift+Enter: Send; Enter: newline (default)
-    if (e.key === "Enter" && e.shiftKey) {
+    // Ctrl/Cmd+Enter sends while Enter alone keeps adding new lines
+    if (!composerExpanded && e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       handleSend();
     }
@@ -90,8 +91,8 @@ export function useMessageInput() {
   }, [message]);
 
   const placeholder = replyToMessage
-    ? `Reply to this message... (Enter to add, Shift+Enter for new line)`
-    : `What's on your mind... (Enter to add, Shift+Enter for new line)`;
+    ? `Reply to this message... (Ctrl/Cmd+Enter to send)`
+    : `What's on your mind... (Ctrl/Cmd+Enter to send)`;
 
   return {
     message,

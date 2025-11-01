@@ -291,9 +291,9 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         return false
       },
       handleKeyDown(_view, event): boolean {
-        // Inline send mode: Shift+Enter to send, Enter behaves normally (newline)
+        // Inline send mode: Ctrl/Cmd+Enter sends; Enter keeps adding new lines
         if (enterSends && event.key === 'Enter') {
-          if (event.shiftKey) {
+          if (event.metaKey || event.ctrlKey) {
             event.preventDefault()
             onSubmitEnter?.()
             return true
