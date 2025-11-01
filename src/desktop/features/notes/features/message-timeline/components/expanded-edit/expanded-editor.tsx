@@ -202,7 +202,7 @@ export function ExpandedEditor({
                   editable={!isSaving}
                   placeholder="Write your thought..."
                   variant="frameless"
-                  className="h-full px-4 pt-3"
+                  className="h-full px-4 pt-2"
                 />
               </div>
             )}

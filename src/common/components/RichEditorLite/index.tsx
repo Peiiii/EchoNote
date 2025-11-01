@@ -50,8 +50,8 @@ type ToolbarButtonProps = React.ComponentPropsWithoutRef<'button'> & {
 
 const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
   ({ disabled, active, onClick, children, size = 'md', className = '', ...rest }, ref) => {
-    const sizeCls = size === 'sm' ? 'h-5 w-5 text-[11px]' : 'h-8 w-8 text-[13px]'
-    const hoverCls = size === 'sm' ? 'hover:bg-slate-900/10 dark:hover:bg-white/15' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
+    const sizeCls = size === 'sm' ? 'h-5 w-5 text-[11px]' : 'h-7 w-7 text-[13px]'
+    const hoverCls = size === 'sm' ? 'hover:bg-slate-100 dark:hover:bg-slate-800' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
     return (
       <button
         ref={ref}
@@ -61,8 +61,8 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         className={[
           'inline-flex items-center justify-center rounded transition-colors',
           sizeCls,
-          disabled ? 'opacity-50 cursor-not-allowed' : hoverCls,
-          active ? 'bg-slate-200 dark:bg-slate-700' : 'bg-transparent',
+          disabled ? 'opacity-40 cursor-not-allowed' : hoverCls,
+          active ? 'bg-slate-100 dark:bg-slate-800' : 'bg-transparent',
           className,
         ].join(' ')}
         {...rest}
@@ -739,12 +739,12 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       style={outerStyle}
       className={[
         variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background",
-        "flex flex-col min-h-0 gap-y-2",
+        "flex flex-col min-h-0 gap-y-0",
         className,
       ].join(' ')}
     >
       {!hideToolbar && (
-      <div className={'flex items-center gap-1 px-2 py-1 border-b shrink-0'}>
+      <div className={'flex items-center gap-0.5 px-1 pb-2 shrink-0'}>
         <ToolbarButton active={isActive('bold')} disabled={!can(() => editor!.can().chain().focus().toggleBold().run())} onClick={() => editor?.chain().focus().toggleBold().run()}>
           <Bold className="w-4 h-4" />
         </ToolbarButton>
@@ -757,7 +757,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <ToolbarButton active={isActive('strike')} disabled={!can(() => editor!.can().chain().focus().toggleStrike().run())} onClick={() => editor?.chain().focus().toggleStrike().run()}>
           <Strikethrough className="w-4 h-4" />
         </ToolbarButton>
-        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
         <ToolbarButton disabled={!can(() => editor!.can().chain().focus().undo().run())} onClick={() => editor?.chain().focus().undo().run()}>
           <Undo2 className="w-4 h-4" />
         </ToolbarButton>
@@ -767,16 +767,16 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <ToolbarButton onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}>
           <Eraser className="w-4 h-4" />
         </ToolbarButton>
-        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <ToolbarButton
               active={!!activeHeadingLevel}
               onClick={() => {}}
-              className="px-2 min-w-[48px] justify-between gap-1 text-xs"
+              className="px-1.5 min-w-[44px] justify-between gap-1 text-xs"
             >
-              <span className="font-medium">{headingLabel}</span>
-              <ChevronDown className="h-3 w-3 opacity-70" />
+              <span className="font-medium text-xs">{headingLabel}</span>
+              <ChevronDown className="h-3 w-3 opacity-60" />
             </ToolbarButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-36 p-1 text-xs">
@@ -804,7 +804,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
         <ToolbarButton active={isActive('bulletList')} onClick={() => editor?.chain().focus().toggleBulletList().run()}>
           <List className="w-4 h-4" />
         </ToolbarButton>
@@ -814,7 +814,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <ToolbarButton active={isActive('taskList')} onClick={() => editor?.chain().focus().toggleTaskList().run()}>
           <CheckCircle className="w-4 h-4" />
         </ToolbarButton>
-        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
         <ToolbarButton active={isActive('blockquote')} onClick={() => editor?.chain().focus().toggleBlockquote().run()}>
           <Quote className="w-4 h-4" />
         </ToolbarButton>
@@ -827,7 +827,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <ToolbarButton onClick={() => editor?.chain().focus().setHorizontalRule().run()}>
           <Minus className="w-4 h-4" />
         </ToolbarButton>
-        <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
         <ToolbarButton onClick={() => {
           openLinkMenu()
         }}>
@@ -848,7 +848,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         <div
           className={[
             "relative h-full",
-            hideToolbar ? "" : "mt-2",
+            hideToolbar ? "" : "mt-0.5",
             variant === 'frameless' ? "px-3 pb-0" : "px-3 pb-3",
           ].join(' ')}
         >
@@ -981,14 +981,14 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         )}
         {editor && bubbleEl && createPortal(
           <div
-            className="rounded-md border bg-white dark:bg-slate-800 shadow p-1 flex items-center gap-1"
+            className="rounded-lg bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 p-1 flex items-center gap-0.5"
             onMouseDown={(e) => e.preventDefault()}
           >
             <ToolbarButton active={isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()}><Bold className="w-4 h-4" /></ToolbarButton>
             <ToolbarButton active={isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()}><Italic className="w-4 h-4" /></ToolbarButton>
             <ToolbarButton active={isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()}><UnderlineIcon className="w-4 h-4" /></ToolbarButton>
             <ToolbarButton active={isActive('strike')} onClick={() => editor?.chain().focus().toggleStrike().run()}><Strikethrough className="w-4 h-4" /></ToolbarButton>
-            <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+            <div className="mx-0.5 h-4 w-px bg-slate-200/60 dark:bg-slate-700/60" />
             <ToolbarButton active={isActive('code')} onClick={() => editor?.chain().focus().toggleCode().run()}><Braces className="w-4 h-4" /></ToolbarButton>
             <ToolbarButton active={isActive('link')} onClick={() => { openLinkMenu() }}><LinkIcon className="w-4 h-4" /></ToolbarButton>
           </div>,

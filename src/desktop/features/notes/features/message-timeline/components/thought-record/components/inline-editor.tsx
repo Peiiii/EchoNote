@@ -118,7 +118,7 @@ export function InlineEditor({
         </div>
       )}
       {/* Editor area – white background to emphasize editability (dark mode keeps contrast) */}
-      <div className="relative rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 shadow-sm">
+      <div className="relative rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         {editorMode === "markdown" ? (
           <textarea
             ref={textareaRef}
