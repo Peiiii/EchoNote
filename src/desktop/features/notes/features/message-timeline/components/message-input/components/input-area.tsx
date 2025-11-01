@@ -10,13 +10,17 @@ export function InputArea({
   onKeyDown,
   placeholder,
   disabled,
-}: InputAreaProps) {
+  isFocusMode,
+}: InputAreaProps & { isFocusMode?: boolean }) {
   const { handleExpandInput, inputCollapsed } = useInputCollapse();
   const composerExpanded = useComposerStateStore(s => s.expanded);
+  
+  const minHeight = isFocusMode ? 80 : 120;
+  const maxHeight = isFocusMode ? 120 : 160;
+  
   return (
     <div className="w-full">
-      {/* Increase the clickable/minimum area height to 120px */}
-      <div className="relative min-h-[120px]" onMouseDown={handleExpandInput}>
+      <div className={`relative ${isFocusMode ? "min-h-[80px]" : "min-h-[120px]"}`} onMouseDown={handleExpandInput}>
         <RichEditorLite
           value={message}
           onChange={onMessageChange}
@@ -24,13 +28,11 @@ export function InputArea({
           placeholder={placeholder}
           variant="frameless"
           hideToolbar
-          // Requested: raise input area minHeight from 40 to 120
-          minHeight={120}
-          maxHeight={160}
+          minHeight={minHeight}
+          maxHeight={maxHeight}
           enterSends
           suspended={inputCollapsed || composerExpanded}
           onSubmitEnter={() => {
-            // Simulate Ctrl/Cmd+Enter send via parent keydown handler
             const syntheticEvent = {
               key: 'Enter',
               metaKey: true,

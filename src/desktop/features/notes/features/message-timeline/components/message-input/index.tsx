@@ -26,7 +26,9 @@ export function MessageInput() {
   const containerClass = `sticky bottom-0 z-10 shrink-0 ${isFocusMode ? "pb-4" : ""}`;
   const panelBase =
     "overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out will-change-[max-height,opacity,transform] origin-bottom";
-  const panelOpen = "max-h-[240px] opacity-100 translate-y-0";
+  const panelOpen = isFocusMode 
+    ? "max-h-[180px] opacity-100 translate-y-0"
+    : "max-h-[240px] opacity-100 translate-y-0";
   const panelClosed = "max-h-0 opacity-0 translate-y-1 py-0";
   const panelDecorOpen = isFocusMode
     ? "rounded-xl border border-border/60 shadow-xs"
@@ -49,7 +51,7 @@ export function MessageInput() {
 
           <HeaderActions />
 
-          <div className="relative px-2 pt-0">
+          <div className={`relative px-2 ${isFocusMode ? "pt-1" : "pt-0"}`}>
             <InputArea
               message={message}
               onMessageChange={handleMessageChange}
@@ -57,10 +59,11 @@ export function MessageInput() {
               placeholder={placeholder}
               disabled={isAddingMessage}
               textareaRef={textareaRef}
+              isFocusMode={isFocusMode}
             />
           </div>
 
-          <div className="px-2 pb-1">
+          <div className={`px-2 ${isFocusMode ? "pb-1" : "pb-1"}`}>
             <BottomActions onSend={handleSend} canSend={!!message.trim() && !isAddingMessage} />
           </div>
         </div>
