@@ -22,7 +22,17 @@ export class NoteEditManager {
   };
   cancel = () => {
     const store = useEditStateStore.getState();
-    if (store.isDirty) {
+    
+    if (!store.editingMessageId) {
+      store.cancel();
+      return;
+    }
+
+    const normalizedEditContent = store.editContent.trim();
+    const normalizedOriginalContent = store.originalContent.trim();
+    const hasActualChanges = normalizedEditContent !== normalizedOriginalContent;
+
+    if (hasActualChanges) {
       modal.confirm({
         title: "Discard changes?",
         description: "You have unsaved edits. Are you sure you want to discard them?",
@@ -39,6 +49,7 @@ export class NoteEditManager {
       });
       return;
     }
+    
     store.cancel();
   };
   switchToExpandedMode = () => {

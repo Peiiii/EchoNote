@@ -22,7 +22,7 @@ export const MobileExpandedEditor = ({
 }: MobileExpandedEditorProps) => {
   const editContent = useEditStateStore(s => s.editContent);
   const updateContent = useEditStateStore(s => s.updateContent);
-  const hasChanges = editContent !== originalContent;
+  const hasChanges = editContent.trim() !== originalContent.trim();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEditor({ textareaRef, updateContent, content: editContent });
