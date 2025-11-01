@@ -1,6 +1,7 @@
 import { InputArea } from "./components/input-area";
 import { ReplyIndicator } from "./components/reply-indicator";
 import { BottomActions } from "./components/bottom-actions";
+import { HeaderActions } from "./components/header-actions";
 import { useMessageInput } from "./hooks/use-message-input";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "../../hooks/use-input-collapse";
@@ -46,7 +47,9 @@ export function MessageInput() {
             <ReplyIndicator replyToMessage={replyToMessage} onCancelReply={handleCancelReply} />
           )}
 
-          <div className="relative px-2 pt-3">
+          <HeaderActions />
+
+          <div className="relative px-2 pt-0">
             <InputArea
               message={message}
               onMessageChange={handleMessageChange}
