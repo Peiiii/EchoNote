@@ -31,4 +31,16 @@ export class NoteManager {
   sendMessage = async (message: Omit<Message, "id" | "timestamp">) => {
     return await channelMessageService.sendMessage(message);
   };
+
+  moveMessage = async ({
+    messageId,
+    fromChannelId,
+    toChannelId,
+  }: {
+    messageId: string;
+    fromChannelId: string;
+    toChannelId: string;
+  }) => {
+    return await channelMessageService.moveMessage({ messageId, fromChannelId, toChannelId });
+  };
 }

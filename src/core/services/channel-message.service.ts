@@ -359,6 +359,62 @@ export class ChannelMessageService {
       }
     );
   };
+
+  moveMessage = async ({
+    messageId,
+    fromChannelId,
+    toChannelId,
+  }: {
+    messageId: string;
+    fromChannelId: string;
+    toChannelId: string;
+  }) => {
+    if (fromChannelId === toChannelId) {
+      return;
+    }
+
+    const { userId } = useNotesDataStore.getState();
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+
+    const fromControl = this.getChannelStateControl(fromChannelId);
+    const toControl = this.getChannelStateControl(toChannelId);
+
+    const fromState = fromControl.getChannelState();
+    const toState = toControl.getChannelState();
+
+    const sourceMessages = fromState?.messages ?? [];
+    const targetMessages = toState?.messages ?? [];
+
+    const messageToMove = sourceMessages.find(m => m.id === messageId);
+    if (!messageToMove) {
+      throw new Error("Message not found in source channel");
+    }
+
+    const updatedMessage = { ...messageToMove, channelId: toChannelId };
+
+    await withOptimisticUpdate(
+      () => {
+        fromControl.setMessages(sourceMessages.filter(m => m.id !== messageId));
+        if (toState?.messages) {
+          const merged = [...targetMessages.filter(m => m.id !== messageId), updatedMessage].sort(
+            (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+          );
+          toControl.setMessages(merged);
+        }
+      },
+      async () => {
+        await useNotesDataStore.getState().moveMessage(messageId, fromChannelId, toChannelId);
+      },
+      () => {
+        fromControl.setMessages(sourceMessages);
+        if (toState?.messages) {
+          toControl.setMessages(targetMessages);
+        }
+      }
+    );
+  };
 }
 
 export const channelMessageService = new ChannelMessageService();

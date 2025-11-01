@@ -8,6 +8,7 @@ import {
   limit,
   startAfter,
   getDocs,
+  getDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -17,6 +18,7 @@ import {
   DocumentSnapshot,
   increment,
   FieldValue,
+  writeBatch,
 } from "firebase/firestore";
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/notes-data.store";
@@ -499,6 +501,62 @@ export class FirebaseNotesService {
   ): Promise<void> => {
     const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, updates);
+  };
+
+  moveMessage = async (
+    userId: string,
+    messageId: string,
+    fromChannelId: string,
+    toChannelId: string
+  ): Promise<void> => {
+    if (fromChannelId === toChannelId) {
+      return;
+    }
+
+    const db = firebaseConfig.getDb();
+    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageSnap = await getDoc(messageRef);
+
+    if (!messageSnap.exists()) {
+      throw new Error("Message not found");
+    }
+
+    const currentChannelId = messageSnap.data()?.channelId;
+    if (currentChannelId === toChannelId) {
+      return;
+    }
+
+    const threadMessagesSnapshot = await getDocs(
+      query(
+        getMessagesCollectionRef(userId),
+        where("threadId", "==", messageId)
+      )
+    );
+
+    const batch = writeBatch(db);
+    batch.update(messageRef, { channelId: toChannelId });
+
+    threadMessagesSnapshot.docs.forEach(threadDoc => {
+      batch.update(threadDoc.ref, { channelId: toChannelId });
+    });
+
+    const movedMessagesCount = 1 + threadMessagesSnapshot.docs.length;
+
+    const fromChannelRef = doc(getChannelsCollectionRef(userId), fromChannelId);
+    const toChannelRef = doc(getChannelsCollectionRef(userId), toChannelId);
+
+    batch.update(fromChannelRef, {
+      messageCount: increment(-movedMessagesCount),
+      updatedAt: serverTimestamp(),
+    });
+
+    batch.update(toChannelRef, {
+      messageCount: increment(movedMessagesCount),
+      lastMessageTime: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    await batch.commit();
   };
 
   deleteMessage = async (userId: string, messageId: string): Promise<void> => {

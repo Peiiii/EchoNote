@@ -52,7 +52,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
                     {options.okLoadingText ?? options.okText ?? "Processing..."}
                   </div>
                 ) : (
-                  options.okText ?? "Confirm"
+                  (options.okText ?? "Confirm")
                 )}
               </Button>
             </DialogFooter>

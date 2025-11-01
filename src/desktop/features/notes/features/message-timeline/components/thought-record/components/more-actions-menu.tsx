@@ -1,5 +1,5 @@
 import { Message } from "@/core/stores/notes-data.store";
-import { Copy, Edit, Flag, Share2, Trash2 } from "lucide-react";
+import { Copy, Edit, Flag, FolderSymlink, Share2, Trash2 } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 
 interface MoreActionsMenuProps {
@@ -9,6 +9,7 @@ interface MoreActionsMenuProps {
   onCopy?: () => void;
   onShare?: () => void;
   onReport?: () => void;
+  onMove?: () => void;
 }
 
 export function MoreActionsMenu({
@@ -18,6 +19,7 @@ export function MoreActionsMenu({
   onCopy,
   onShare,
   onReport,
+  onMove,
 }: MoreActionsMenuProps) {
   const handleCopy = () => {
     if (onCopy) {
@@ -60,6 +62,17 @@ export function MoreActionsMenu({
               title: "Share thought",
               description: "Share with others",
               onClick: onShare,
+              variant: "default" as const,
+            },
+          ]
+          : []),
+        ...(onMove
+          ? [
+            {
+              id: "move",
+              icon: <FolderSymlink />,
+              title: "Move to space",
+              onClick: onMove,
               variant: "default" as const,
             },
           ]

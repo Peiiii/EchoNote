@@ -12,6 +12,8 @@ import { MobileMoreActionsMenu } from "./mobile-more-actions-menu";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
+import { MoveNoteModal } from "@/common/features/notes/components/move-note-modal";
+import { modal } from "@/common/components/modal";
 
 interface MobileThoughtRecordProps {
   message: Message;
@@ -86,6 +88,25 @@ export const MobileThoughtRecord = ({
     onReply?.();
   };
 
+  const handleMove = () => {
+    modal.show({
+      content: (
+        <MoveNoteModal
+          fromChannelId={message.channelId}
+          onMove={async toChannelId => {
+            await presenter.noteManager.moveMessage({
+              messageId: message.id,
+              fromChannelId: message.channelId,
+              toChannelId,
+            });
+          }}
+        />
+      ),
+      showFooter: false,
+      className: "max-w-md",
+    });
+  };
+
   // Edit handlers
   const handleSave = async () => {
     await presenter.noteEditManager.save();
@@ -125,6 +146,7 @@ export const MobileThoughtRecord = ({
             onBookmark={() => {}}
             editorMode={editorMode}
             onEditorModeChange={presenter.noteEditManager.setEditorMode}
+            onMove={handleMove}
           />
         </div>
 

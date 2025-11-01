@@ -40,10 +40,16 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onWheel,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
 }) {
+  const handleWheel: React.WheelEventHandler<HTMLDivElement> = event => {
+    event.stopPropagation();
+    onWheel?.(event);
+  };
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -54,6 +60,7 @@ function DialogContent({
           className
         )}
         {...props}
+        onWheel={handleWheel}
       >
         {children}
         {showCloseButton && (

@@ -9,6 +9,7 @@ import { modal } from "@/common/components/modal";
 import { MarkdownContent } from "@/common/components/markdown";
 import { Button } from "@/common/components/ui/button";
 import { formatRelativeTime } from "@/common/lib/time-utils";
+import { MoveNoteModal } from "@/common/features/notes/components/move-note-modal";
 
 export function ActionButtons({
   onToggleAnalysis,
@@ -45,6 +46,26 @@ export function ActionButtons({
           alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
         }
       },
+    });
+  };
+
+  const handleMove = () => {
+    if (!currentChannelId) return;
+    modal.show({
+      content: (
+        <MoveNoteModal
+          fromChannelId={currentChannelId}
+          onMove={async toChannelId => {
+            await presenter.noteManager.moveMessage({
+              messageId: message.id,
+              fromChannelId: currentChannelId,
+              toChannelId,
+            });
+          }}
+        />
+      ),
+      showFooter: false,
+      className: "max-w-md",
     });
   };
 
@@ -167,12 +188,21 @@ export function ActionButtons({
   return (
     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
       {actionButtons.map(({ icon, onClick, title, disabled, active, indicator }) => (
-        <ActionButton key={title} icon={icon} onClick={onClick} title={title} disabled={disabled} active={active} indicator={indicator} />
+        <ActionButton
+          key={title}
+          icon={icon}
+          onClick={onClick}
+          title={title}
+          disabled={disabled}
+          active={active}
+          indicator={indicator}
+        />
       ))}
       <MoreActionsMenu
         message={message}
         onDelete={handleDelete}
         onCopy={() => navigator.clipboard.writeText(message.content)}
+        onMove={currentChannelId ? handleMove : undefined}
       />
     </div>
   );

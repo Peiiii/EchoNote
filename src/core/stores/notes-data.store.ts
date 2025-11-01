@@ -79,6 +79,11 @@ export interface NotesDataState {
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
   deleteMessage: (messageId: string, hardDelete?: boolean) => Promise<void>;
   updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
+  moveMessage: (
+    messageId: string,
+    fromChannelId: string,
+    toChannelId: string
+  ) => Promise<void>;
   addThreadMessage: (
     parentMessageId: string,
     message: Omit<Message, "id" | "timestamp" | "parentId" | "threadId">
@@ -248,6 +253,56 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       () => firebaseNotesService.updateMessage(userId, messageId, updates),
       "updateMessage"
     );
+  }),
+
+  moveMessage: withUserValidation(async (userId, messageId, fromChannelId, toChannelId) => {
+    try {
+      await firebaseNotesService.moveMessage(userId, messageId, fromChannelId, toChannelId);
+    } catch (error) {
+      console.error("Failed to move message:", { messageId, fromChannelId, toChannelId, error });
+      throw error;
+    }
+
+    set(state => {
+      const sourceChannel = state.messagesByChannel[fromChannelId];
+      const targetChannel = state.messagesByChannel[toChannelId];
+      if (!sourceChannel) {
+        return state;
+      }
+
+      const messageToMove = sourceChannel.messages.find(msg => msg.id === messageId);
+      if (!messageToMove) {
+        return state;
+      }
+
+      const updatedSourceChannel = {
+        ...sourceChannel,
+        messages: sourceChannel.messages.filter(msg => msg.id !== messageId),
+      };
+
+      let updatedMessagesByChannel: Record<string, ChannelMessageState> = {
+        ...state.messagesByChannel,
+        [fromChannelId]: updatedSourceChannel,
+      };
+
+      if (targetChannel) {
+        const updatedMessage = { ...messageToMove, channelId: toChannelId };
+        const mergedMessages = [...targetChannel.messages.filter(msg => msg.id !== messageId), updatedMessage].sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+        updatedMessagesByChannel = {
+          ...updatedMessagesByChannel,
+          [toChannelId]: {
+            ...targetChannel,
+            messages: mergedMessages,
+          },
+        };
+      }
+
+      return {
+        messagesByChannel: updatedMessagesByChannel,
+      };
+    });
   }),
 
   addThreadMessage: withUserValidation(async (userId, parentMessageId, message) => {

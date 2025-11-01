@@ -1,5 +1,16 @@
 import { Message } from "@/core/stores/notes-data.store";
-import { Bookmark, Copy, Edit2, Eye, Lightbulb, MessageCircle, Trash2, Type, FileText } from "lucide-react";
+import {
+  Bookmark,
+  Copy,
+  Edit2,
+  Eye,
+  Lightbulb,
+  MessageCircle,
+  Trash2,
+  Type,
+  FileText,
+  FolderSymlink,
+} from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 import { getFeaturesConfig } from "@/core/config/features.config";
 
@@ -15,6 +26,7 @@ interface MobileMoreActionsMenuProps {
   onBookmark?: () => void;
   editorMode?: "markdown" | "wysiwyg";
   onEditorModeChange?: (mode: "markdown" | "wysiwyg") => void;
+  onMove?: () => void;
 }
 
 export function MobileMoreActionsMenu({
@@ -29,6 +41,7 @@ export function MobileMoreActionsMenu({
   onBookmark,
   editorMode,
   onEditorModeChange,
+  onMove,
 }: MobileMoreActionsMenuProps) {
   const handleCopy = () => {
     if (onCopy) {
@@ -71,6 +84,18 @@ export function MobileMoreActionsMenu({
                 icon: <MessageCircle className="w-4 h-4" />,
                 title: "Reply",
                 onClick: onReply,
+                variant: "default" as const,
+                disabled: isEditing,
+              },
+            ]
+          : []),
+        ...(onMove
+          ? [
+              {
+                id: "move",
+                icon: <FolderSymlink className="w-4 h-4" />,
+                title: "Move to space",
+                onClick: onMove,
                 variant: "default" as const,
                 disabled: isEditing,
               },
