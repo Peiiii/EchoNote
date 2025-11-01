@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { Message } from "./notes-data.store";
 import { useNotesDataStore } from "./notes-data.store";
 import { User } from "firebase/auth";
+import { addRecentChannel } from "@/common/lib/recent-channels";
 
 export interface NotesViewState {
   // View state
@@ -50,6 +51,9 @@ export const useNotesViewStore = create<NotesViewState>()(
       // View actions
       setCurrentChannel: channelId => {
         set({ currentChannelId: channelId });
+        if (channelId) {
+          addRecentChannel(channelId);
+        }
       },
       setIsAddingMessage: isLoading => {
         set({ isAddingMessage: isLoading });

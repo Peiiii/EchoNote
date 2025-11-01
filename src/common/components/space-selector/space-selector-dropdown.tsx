@@ -6,12 +6,17 @@ import {
 } from "@/common/components/ui/dropdown-menu";
 import { Input } from "@/common/components/ui/input";
 import { sortChannelsWithCurrentFirst } from "@/common/lib/channel-sorting";
+import { getRecentChannelIds } from "@/common/lib/recent-channels";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Check, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { cn } from "@/common/lib/utils";
 import { getChannelIcon } from "@/desktop/features/notes/features/channel-management/components/channel-icons";
+
+type DisplayItem = 
+  | { type: "channel"; channel: Channel }
+  | { type: "separator"; label: string };
 
 interface SpaceSelectorItemProps {
   channel: Channel;
@@ -132,15 +137,35 @@ export const SpaceSelectorDropdown = ({
     return sortChannelsWithCurrentFirst(channels, currentChannel.id);
   }, [channels, currentChannel.id]);
 
-  const filteredChannels = useMemo(() => {
-    if (!searchQuery.trim()) return sortedChannels;
-    
-    const query = searchQuery.toLowerCase().trim();
-    return sortedChannels.filter(channel => 
-      channel.name.toLowerCase().includes(query) ||
-      channel.description?.toLowerCase().includes(query)
-    );
-  }, [sortedChannels, searchQuery]);
+  const { recentChannels, otherChannels, allChannels } = useMemo(() => {
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const filtered = sortedChannels.filter(channel => 
+        channel.name.toLowerCase().includes(query) ||
+        channel.description?.toLowerCase().includes(query)
+      );
+      return { recentChannels: [], otherChannels: [], allChannels: filtered };
+    }
+
+    const recentIds = getRecentChannelIds();
+    const recentChannelsMap = new Map<string, Channel>();
+    const otherChannelsList: Channel[] = [];
+
+    for (const channel of sortedChannels) {
+      if (recentIds.includes(channel.id) && channel.id !== currentChannel.id) {
+        recentChannelsMap.set(channel.id, channel);
+      } else if (channel.id !== currentChannel.id) {
+        otherChannelsList.push(channel);
+      }
+    }
+
+    const recentChannels = recentIds
+      .map(id => recentChannelsMap.get(id))
+      .filter((channel): channel is Channel => channel !== undefined)
+      .slice(0, 8);
+
+    return { recentChannels, otherChannels: otherChannelsList, allChannels: [] };
+  }, [sortedChannels, currentChannel.id, searchQuery]);
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -150,6 +175,30 @@ export const SpaceSelectorDropdown = ({
     }
   }, [isOpen]);
 
+  const displayChannels = useMemo(() => {
+    if (searchQuery.trim() || allChannels.length > 0) {
+      return allChannels.map(channel => ({ type: "channel" as const, channel }));
+    }
+    
+    const result: DisplayItem[] = [];
+    
+    if (recentChannels.length > 0) {
+      recentChannels.forEach(channel => {
+        result.push({ type: "channel", channel });
+      });
+      
+      if (otherChannels.length > 0) {
+        result.push({ type: "separator", label: "All spaces" });
+      }
+    }
+    
+    otherChannels.forEach(channel => {
+      result.push({ type: "channel", channel });
+    });
+    
+    return result;
+  }, [recentChannels, otherChannels, allChannels, searchQuery]);
+
   useEffect(() => {
     if (!isOpen) {
       setSearchQuery("");
@@ -157,19 +206,23 @@ export const SpaceSelectorDropdown = ({
     } else {
       setSelectedIndex(0);
     }
-  }, [isOpen, filteredChannels.length]);
+  }, [isOpen, displayChannels.length]);
 
   const handleSelect = useCallback((channelId: string) => {
     onChannelSelect(channelId);
     setIsOpen(false);
   }, [onChannelSelect]);
 
+  const channelList = useMemo(() => {
+    return displayChannels.filter(item => item.type === "channel") as Array<{ type: "channel"; channel: Channel }>;
+  }, [displayChannels]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      const newIndex = Math.min(selectedIndex + 1, filteredChannels.length - 1);
+      const newIndex = Math.min(selectedIndex + 1, channelList.length - 1);
       setSelectedIndex(newIndex);
-      if (virtuosoRef.current && newIndex < filteredChannels.length) {
+      if (virtuosoRef.current && newIndex < channelList.length) {
         virtuosoRef.current.scrollToIndex({
           index: newIndex,
           align: "center",
@@ -187,13 +240,13 @@ export const SpaceSelectorDropdown = ({
           behavior: "smooth",
         });
       }
-    } else if (e.key === "Enter" && filteredChannels[selectedIndex]) {
+    } else if (e.key === "Enter" && channelList[selectedIndex]) {
       e.preventDefault();
-      handleSelect(filteredChannels[selectedIndex].id);
+      handleSelect(channelList[selectedIndex].channel.id);
     } else if (e.key === "Escape") {
       setIsOpen(false);
     }
-  }, [selectedIndex, filteredChannels, handleSelect]);
+  }, [selectedIndex, channelList, handleSelect]);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -252,7 +305,7 @@ export const SpaceSelectorDropdown = ({
             className="overflow-hidden py-1"
             style={{ maxHeight: `${maxHeight}px` }}
           >
-            {filteredChannels.length === 0 ? (
+            {channelList.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <div className="text-muted-foreground/50 mb-2 text-2xl">
                   {searchQuery ? "🔍" : "📁"}
@@ -267,25 +320,43 @@ export const SpaceSelectorDropdown = ({
                 )}
               </div>
             ) : (
-              <Virtuoso
+              <Virtuoso<DisplayItem>
                 ref={virtuosoRef}
-                data={filteredChannels}
-                totalCount={filteredChannels.length}
-                itemContent={(index, channel) => (
-                  <div className="px-2 py-0.5">
-                    <SpaceSelectorItem
-                      channel={channel}
-                      isSelected={index === selectedIndex}
-                      isCurrent={channel.id === currentChannel.id}
-                      onSelect={handleSelect}
-                      highlightQuery={searchQuery || undefined}
-                    />
-                  </div>
-                )}
+                data={displayChannels}
+                totalCount={displayChannels.length}
+                itemContent={(index, item) => {
+                  if (item.type === "separator") {
+                    return (
+                      <div className="px-3 py-1.5 h-8 flex items-center">
+                        <div className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wide">
+                          {item.label}
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  const channelIndex = displayChannels
+                    .slice(0, index + 1)
+                    .filter((i): i is { type: "channel"; channel: Channel } => i.type === "channel").length - 1;
+                  
+                  return (
+                    <div className="px-2 py-0.5">
+                      <SpaceSelectorItem
+                        channel={item.channel}
+                        isSelected={channelIndex === selectedIndex}
+                        isCurrent={item.channel.id === currentChannel.id}
+                        onSelect={handleSelect}
+                        highlightQuery={searchQuery || undefined}
+                      />
+                    </div>
+                  );
+                }}
                 defaultItemHeight={itemHeight + 4}
                 style={{ 
                   height: `${Math.min(
-                    filteredChannels.length * (itemHeight + 4), 
+                    displayChannels.reduce((sum, item) => 
+                      sum + (item.type === "separator" ? 32 : itemHeight + 4), 0
+                    ), 
                     maxHeight - 72
                   )}px`,
                   maxHeight: `${maxHeight - 72}px`
