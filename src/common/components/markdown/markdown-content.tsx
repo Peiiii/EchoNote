@@ -92,7 +92,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
           },
           li({ children, ...props }) {
             return (
-              <li className="text-gray-800 dark:text-gray-200 mb-0 leading-relaxed" {...props}>
+              <li className="text-gray-800 dark:text-gray-200 mb-2 leading-relaxed" {...props}>
                 {children}
               </li>
             );
