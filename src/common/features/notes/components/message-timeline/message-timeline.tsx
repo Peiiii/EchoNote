@@ -6,7 +6,11 @@ import { useGlobalCollapse } from "@/common/features/read-more/hooks/use-global-
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useHandleRxEvent } from "@/common/hooks/use-handle-rx-event";
 import { AITrigger, logService } from "@/core/services/log.service";
-import type { TimelineScrollAlign, TimelineScrollBehavior, TimelineVirtualScrollApi } from "@/common/services/scroll.manager";
+import type {
+  TimelineScrollAlign,
+  TimelineScrollBehavior,
+  TimelineVirtualScrollApi,
+} from "@/common/services/scroll.manager";
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
@@ -14,6 +18,7 @@ import { Bot, ChevronUp, Pencil } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { DateDivider } from "./date-divider";
+import { useNotesViewStore } from "@/core/stores/notes-view.store";
 // removed global collapse bus usage
 
 interface MessageTimelineProps {
@@ -38,6 +43,7 @@ export const MessageTimeline = ({
 }: MessageTimelineProps) => {
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
+  const channelId = useNotesViewStore(s => s.currentChannelId);
   const { inputCollapsed, handleExpandInput, handleCollapseInput } = useInputCollapse();
   // Delay showing the bottom FAB until the input collapse animation finishes,
   // to avoid the visual "sliding down" caused by the content area resizing.
@@ -148,6 +154,10 @@ export const MessageTimeline = ({
     scrollToTop({ behavior: "instant" });
   }, [scrollToTop]);
 
+  useEffect(() => {
+    handleExpandInput();
+  }, [channelId]);
+
   // Build a cache of thread counts once per messages change to avoid O(n^2) work on render
   const threadCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -184,7 +194,10 @@ export const MessageTimeline = ({
 
   useEffect(() => {
     const api: TimelineVirtualScrollApi = {
-      scrollToMessageId: (messageId: string, options?: { align?: TimelineScrollAlign; behavior?: TimelineScrollBehavior }) => {
+      scrollToMessageId: (
+        messageId: string,
+        options?: { align?: TimelineScrollAlign; behavior?: TimelineScrollBehavior }
+      ) => {
         const index = indexMapRef.current.get(messageId);
         const virtuoso = virtuosoRef.current;
         if (index === undefined || !virtuoso) {
@@ -219,7 +232,7 @@ export const MessageTimeline = ({
         {renderThoughtRecord(message, threadCount)}
       </div>
       // </div>
-    )
+    );
   };
 
   const renderDateDivider = (date: string) => {
@@ -294,13 +307,15 @@ export const MessageTimeline = ({
           bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
         }}
       >
-        <div className={`transition-opacity duration-150 ${showComposerFab ? "opacity-100" : "opacity-0"}`}>
+        <div
+          className={`transition-opacity duration-150 ${showComposerFab ? "opacity-100" : "opacity-0"}`}
+        >
           {showComposerFab && (
             <div className="pointer-events-auto">
-            <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
-              <Pencil className="h-4 w-4" />
-            </FloatingActionButton>
-          </div>
+              <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
+                <Pencil className="h-4 w-4" />
+              </FloatingActionButton>
+            </div>
           )}
         </div>
       </div>
