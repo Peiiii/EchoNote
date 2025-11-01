@@ -70,14 +70,14 @@ export function ThoughtRecord({
   return (
     <div className="w-full" data-component="thought-record">
       <div
-        className={`group relative w-full py-4 transition-all duration-300 ease-out ${
+        className={`group relative w-full py-2 transition-all duration-300 ease-out ${
           isEditing
             ? "bg-gray-100/60 dark:bg-gray-800/30"
             : "hover:bg-gray-100/80 dark:hover:bg-gray-800/20"
         } ${message.isNew ? "animate-in slide-in-from-bottom-5 fade-in duration-400" : ""}`}
       >
         {/* Record Header */}
-        <div className="flex items-center justify-between mb-4 px-6">
+        <div className="flex items-center justify-between mb-2 px-6">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <Clock className="w-3 h-3" />

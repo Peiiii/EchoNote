@@ -19,7 +19,7 @@ export function ReadMoreWrapper({
     <ReadMoreBaseWrapper
       messageId={messageId}
       maxHeight={maxHeight}
-      className={cn("relative overflow-hidden pb-3", className)}
+      className={cn("relative overflow-hidden pb-2", className)}
     >
       {children}
     </ReadMoreBaseWrapper>
