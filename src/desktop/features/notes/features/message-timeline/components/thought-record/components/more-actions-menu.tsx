@@ -35,14 +35,6 @@ export function MoreActionsMenu({
       id: "primary",
       showSeparator: false,
       items: [
-        {
-          id: "word-count",
-          icon: <FileText />,
-          title: `${message.content.length} characters`,
-          description: "Word count",
-          onClick: () => {},
-          disabled: true,
-        },
         ...(onEdit
           ? [
             {
@@ -91,6 +83,20 @@ export function MoreActionsMenu({
           title: "Delete thought",
           onClick: onDelete,
           variant: "destructive" as const,
+        },
+      ],
+    },
+    {
+      id: "secondary",
+      title: "Statistics",
+      variant: "default",
+      items: [
+        {
+          id: "word-count",
+          icon: <FileText />,
+          title: `${message.content.length} characters`,
+          onClick: () => {},
+          disabled: true,
         },
       ],
     },
