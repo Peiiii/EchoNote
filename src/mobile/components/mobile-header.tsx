@@ -83,7 +83,7 @@ export const MobileHeader = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={openQuickSearchModal}
+            onClick={() => openQuickSearchModal()}
             className="h-9 w-9 dark:text-primary"
             title="Search"
           >
