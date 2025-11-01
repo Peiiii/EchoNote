@@ -67,5 +67,10 @@ export const getFeaturesConfig = () => {
         },
       },
     },
+    data: {
+      migrations: {
+        enabled: false,
+      },
+    },
   };
 };

@@ -456,28 +456,34 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     set({ userId, channelsLoading: true });
 
     // Global process overlay: workspace initialization
+    const featuresConfig = getFeaturesConfig();
+    const migrationsEnabled = featuresConfig.data?.migrations?.enabled !== false;
     const globalProcess = useGlobalProcessStore.getState();
-    const displayMode = getFeaturesConfig().ui?.globalProcess?.workspaceInit?.displayMode ?? "dialog";
+    const displayMode = featuresConfig.ui?.globalProcess?.workspaceInit?.displayMode ?? "dialog";
     globalProcess.show({
       id: "workspace-init",
       title: "Setting up your workspace",
       message: "Preparing your spaces and notes...",
       displayMode,
       steps: [
-        { id: "migrations", title: "Applying migrations", status: "pending" },
-        { id: "subscribe", title: "Connecting to spaces", status: "pending" },
+        ...(migrationsEnabled
+          ? [{ id: "migrations", title: "Applying migrations", status: "pending" as const }]
+          : []),
+        { id: "subscribe", title: "Connecting to spaces", status: "pending" as const },
       ],
     });
 
     // Ensure migrations (e.g., default General) are applied before subscribe
-    try {
-      globalProcess.setStepStatus("migrations", "running");
-      await firebaseMigrateService.runAllMigrations(userId);
-      globalProcess.setStepStatus("migrations", "success");
-    } catch (e) {
-      globalProcess.setStepStatus("migrations", "error");
-      globalProcess.fail("Failed to apply migrations");
-      throw e;
+    if (migrationsEnabled) {
+      try {
+        globalProcess.setStepStatus("migrations", "running");
+        await firebaseMigrateService.runAllMigrations(userId);
+        globalProcess.setStepStatus("migrations", "success");
+      } catch (e) {
+        globalProcess.setStepStatus("migrations", "error");
+        globalProcess.fail("Failed to apply migrations");
+        throw e;
+      }
     }
 
     const unsubscribeChannels = firebaseNotesService.subscribeToChannels(userId, channels => {
