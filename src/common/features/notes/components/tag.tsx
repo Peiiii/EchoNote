@@ -19,7 +19,7 @@ const tagVariants = {
   secondary: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
   outline: "border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300",
   destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  footer: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+  footer: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
 
 const tagSizes = {

@@ -1,5 +1,5 @@
 import { Message } from "@/core/stores/notes-data.store";
-import { Copy, Edit, Flag, FolderSymlink, Share2, Trash2 } from "lucide-react";
+import { Copy, Edit, FileText, Flag, FolderSymlink, Share2, Trash2 } from "lucide-react";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 
 interface MoreActionsMenuProps {
@@ -35,6 +35,14 @@ export function MoreActionsMenu({
       id: "primary",
       showSeparator: false,
       items: [
+        {
+          id: "word-count",
+          icon: <FileText />,
+          title: `${message.content.length} characters`,
+          description: "Word count",
+          onClick: () => {},
+          disabled: true,
+        },
         ...(onEdit
           ? [
             {

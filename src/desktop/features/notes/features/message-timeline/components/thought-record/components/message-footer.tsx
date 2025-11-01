@@ -1,13 +1,10 @@
 import { FooterItem } from "./footer-item";
 import { ThreadIndicator } from "./thread-indicator";
-import { TagSection } from "./tag-section";
 import { MessageFooterProps } from "../types";
 import { getFeaturesConfig } from "@/core/config/features.config";
 
 export function MessageFooter({
   message,
-  editingTags,
-  onTagsChange,
   hasSparks,
   aiAnalysis,
   onToggleAnalysis,
@@ -16,17 +13,8 @@ export function MessageFooter({
   return (
     <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 px-6">
       <div className="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-        <FooterItem>{message.content.length} characters</FooterItem>
-
         {hasSparks && getFeaturesConfig().channel.thoughtRecord.sparks.enabled && (
-          <>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <FooterItem onClick={onToggleAnalysis}>{aiAnalysis!.insights.length} sparks</FooterItem>
-          </>
-        )}
-
-        {getFeaturesConfig().channel.thoughtRecord.tags.enabled && (
-          <TagSection tags={editingTags} onTagsChange={onTagsChange} maxTags={10} />
+          <FooterItem onClick={onToggleAnalysis}>{aiAnalysis!.insights.length} sparks</FooterItem>
         )}
       </div>
 

@@ -38,8 +38,6 @@ export interface TagSectionProps {
 
 export interface MessageFooterProps {
   message: Message;
-  editingTags: string[];
-  onTagsChange: (tags: string[]) => void;
   hasSparks: boolean;
   aiAnalysis: { insights: { length: number } } | null;
   onToggleAnalysis: () => void;

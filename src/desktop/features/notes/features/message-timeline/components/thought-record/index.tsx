@@ -15,6 +15,8 @@ import { ThoughtRecordSparks } from "./components/thought-record-sparks";
 import { useNoteAnalysis } from "./hooks/use-note-analysis";
 import { ThoughtRecordProps } from "./types";
 import { computeNoteHash } from "@/common/utils/note-hash";
+import { TagSection } from "./components/tag-section";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 export function ThoughtRecord({
   message,
@@ -67,6 +69,8 @@ export function ThoughtRecord({
     return null;
   }
 
+  const tagsEnabled = getFeaturesConfig().channel.thoughtRecord.tags.enabled;
+
   return (
     <div className="w-full" data-component="thought-record">
       <div
@@ -78,23 +82,28 @@ export function ThoughtRecord({
       >
         {/* Record Header */}
         <div className="flex items-center justify-between mb-2 px-6">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <Clock className="w-3 h-3" />
               <span>{formatTimeForSocial(message.timestamp)}</span>
             </div>
+            {!isEditing && tagsEnabled && (
+              <div className="opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 ease-out">
+                <TagSection tags={editingTags} onTagsChange={handleTagsChange} maxTags={10} />
+              </div>
+            )}
           </div>
 
-            <ActionButtons
-              onToggleAnalysis={handleToggleAnalysis}
-              onReply={onReply}
-              message={message}
-              isEditing={isEditing}
-              editorMode={editorMode}
-              onEditorModeChange={presenter.noteEditManager.setEditorMode}
-              hasDraft={!isEditing && hasRestorableDraft}
-              draftEntry={draftEntry ?? null}
-            />
+          <ActionButtons
+            onToggleAnalysis={handleToggleAnalysis}
+            onReply={onReply}
+            message={message}
+            isEditing={isEditing}
+            editorMode={editorMode}
+            onEditorModeChange={presenter.noteEditManager.setEditorMode}
+            hasDraft={!isEditing && hasRestorableDraft}
+            draftEntry={draftEntry ?? null}
+          />
         </div>
 
         {/* Content Area - Show inline editor or read-only content */}
@@ -128,8 +137,6 @@ export function ThoughtRecord({
         {!isEditing && (
           <MessageFooter
             message={message}
-            editingTags={editingTags}
-            onTagsChange={handleTagsChange}
             hasSparks={hasSparks}
             aiAnalysis={aiAnalysis || null}
             onToggleAnalysis={handleToggleAnalysis}
