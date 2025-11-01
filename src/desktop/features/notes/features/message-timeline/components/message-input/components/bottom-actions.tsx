@@ -5,9 +5,10 @@ import { getFeaturesConfig } from "@/core/config/features.config";
 interface BottomActionsProps {
   onSend: () => void;
   canSend: boolean;
+  shortcutHint?: string;
 }
 
-export function BottomActions({ onSend, canSend }: BottomActionsProps) {
+export function BottomActions({ onSend, canSend, shortcutHint }: BottomActionsProps) {
   const leftButtons: Array<{
     icon: React.ComponentType<{ className?: string }>;
     title: string;
@@ -27,7 +28,10 @@ export function BottomActions({ onSend, canSend }: BottomActionsProps) {
           <ToolbarButton key={i} icon={b.icon} onClick={b.onClick} title={b.title} />
         ))}
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        {shortcutHint && (
+          <span className="text-xs text-slate-500 dark:text-slate-400">{shortcutHint} to send</span>
+        )}
         <button
           onClick={onSend}
           disabled={!canSend}

@@ -97,8 +97,42 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const [pointer, setPointer] = useState<{ x: number; y: number }>({ x: -9999, y: -9999 })
   const [near, setNear] = useState<{ row: boolean; col: boolean }>({ row: false, col: false })
 
-  const editor = useEditor({
-    extensions: [
+  const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string; text: string }>({ open: false, x: 0, y: 0, value: '', text: '' })
+  const linkMenuRef = useRef<HTMLDivElement | null>(null)
+  const [imageMenu, setImageMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
+  const imageMenuRef = useRef<HTMLDivElement | null>(null)
+
+  const computeSelectionXY = () => {
+    const crect = containerRef.current?.getBoundingClientRect()
+    const sel = window.getSelection()
+    if (!crect || !sel || sel.rangeCount === 0) return { x: 8, y: 8 }
+    const rect = sel.getRangeAt(0).getBoundingClientRect()
+    return {
+      x: Math.max(8, rect.left - crect.left + (containerRef.current?.scrollLeft || 0)),
+      y: Math.max(8, rect.bottom - crect.top + (containerRef.current?.scrollTop || 0)),
+    }
+  }
+
+  const openLinkMenu = () => {
+    const { x, y } = computeSelectionXY()
+    const ed = editorRef.current
+    const current = (ed?.getAttributes('link')?.href as string | undefined) || ''
+    let text = ''
+    try {
+      if (ed) {
+        const sel = ed.state.selection
+        if (!sel.empty) text = ed.state.doc.textBetween(sel.from, sel.to)
+      }
+    } catch (_err) { text = '' }
+    setLinkMenu({ open: true, x, y, value: current, text })
+  }
+
+  const openImageMenu = () => {
+    const { x, y } = computeSelectionXY()
+    setImageMenu({ open: true, x, y, value: '' })
+  }
+
+  const extensions = useMemo(() => [
       // Disable default codeBlock from StarterKit; we'll use Lowlight version
       StarterKit.configure({ codeBlock: false, heading: false }),
       HeadingToggle,
@@ -271,7 +305,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           }
         }
       })
-    ],
+    ], [placeholder, bubbleEl, setSlashMenu, openImageMenu, openLinkMenu])
+
+  const editor = useEditor({
+    extensions,
     content: initialHtml,
     editable,
     editorProps: {
@@ -470,6 +507,19 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
     if (editor) editor.setEditable(editable)
   }, [editable, editor])
 
+  useEffect(() => {
+    if (!editor) return
+    const placeholderExtension = editor.extensionManager.extensions.find(ext => ext.name === 'placeholder')
+    if (placeholderExtension && placeholderExtension.options) {
+      placeholderExtension.options.placeholder = placeholder
+      const editorElement = editor.view.dom
+      const placeholderElements = editorElement.querySelectorAll('[data-placeholder]')
+      placeholderElements.forEach((el: Element) => {
+        ;(el as HTMLElement).setAttribute('data-placeholder', placeholder)
+      })
+    }
+  }, [placeholder, editor])
+
   // When parent collapses/suspends the editor (e.g., composer hidden), close all popups and blur
   useEffect(() => {
     if (!editorRef.current) return
@@ -515,42 +565,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
 
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
 
-  // Inline link bubble (input + save/unlink)
-  const [linkMenu, setLinkMenu] = useState<{ open: boolean; x: number; y: number; value: string; text: string }>({ open: false, x: 0, y: 0, value: '', text: '' })
-  const linkMenuRef = useRef<HTMLDivElement | null>(null)
-  const computeSelectionXY = () => {
-    const crect = containerRef.current?.getBoundingClientRect()
-    const sel = window.getSelection()
-    if (!crect || !sel || sel.rangeCount === 0) return { x: 8, y: 8 }
-    const rect = sel.getRangeAt(0).getBoundingClientRect()
-    return {
-      x: Math.max(8, rect.left - crect.left + (containerRef.current?.scrollLeft || 0)),
-      y: Math.max(8, rect.bottom - crect.top + (containerRef.current?.scrollTop || 0)),
-    }
-  }
-  const openLinkMenu = () => {
-    const { x, y } = computeSelectionXY()
-    const ed = editorRef.current
-    const current = (ed?.getAttributes('link')?.href as string | undefined) || ''
-    // Try to read selected text from ProseMirror selection
-    let text = ''
-    try {
-      if (ed) {
-        const sel = ed.state.selection
-        if (!sel.empty) text = ed.state.doc.textBetween(sel.from, sel.to)
-      }
-    } catch (_err) { text = '' }
-    setLinkMenu({ open: true, x, y, value: current, text })
-  }
   const closeLinkMenu = () => setLinkMenu({ open: false, x: 0, y: 0, value: '', text: '' })
-
-  // Image insert bubble
-  const [imageMenu, setImageMenu] = useState<{ open: boolean; x: number; y: number; value: string }>({ open: false, x: 0, y: 0, value: '' })
-  const imageMenuRef = useRef<HTMLDivElement | null>(null)
-  const openImageMenu = () => {
-    const { x, y } = computeSelectionXY()
-    setImageMenu({ open: true, x, y, value: '' })
-  }
   const closeImageMenu = () => setImageMenu({ open: false, x: 0, y: 0, value: '' })
 
   // Formatting bubble switched to official BubbleMenu below.

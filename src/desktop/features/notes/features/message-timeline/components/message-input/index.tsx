@@ -5,7 +5,7 @@ import { HeaderActions } from "./components/header-actions";
 import { useMessageInput } from "./hooks/use-message-input";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "../../hooks/use-input-collapse";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export function MessageInput() {
   const {
@@ -17,11 +17,15 @@ export function MessageInput() {
     handleKeyDown,
     handleMessageChange,
     placeholder,
+    shortcutHint,
     handleCancelReply,
   } = useMessageInput();
   const { sideView } = useUIStateStore();
   const isFocusMode = !sideView;
   const { inputCollapsed } = useInputCollapse();
+  const [isFocused, setIsFocused] = useState(false);
+  const showShortcutHint = isFocused;
+  
   // Outer container stays borderless so when collapsed nothing is visible
   const containerClass = `sticky bottom-0 z-10 shrink-0 ${isFocusMode ? "pb-4" : ""}`;
   const panelBase =
@@ -34,6 +38,26 @@ export function MessageInput() {
     ? "rounded-xl border border-border/60 shadow-xs"
     : "border-t border-border/60";
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const handleFocusIn = () => setIsFocused(true);
+    const handleFocusOut = (e: FocusEvent) => {
+      if (!panel.contains(e.relatedTarget as Node)) {
+        setIsFocused(false);
+      }
+    };
+
+    panel.addEventListener('focusin', handleFocusIn);
+    panel.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      panel.removeEventListener('focusin', handleFocusIn);
+      panel.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
   return (
     <div className={containerClass}>
       <div
@@ -64,7 +88,11 @@ export function MessageInput() {
           </div>
 
           <div className={`px-2 ${isFocusMode ? "pb-1" : "pb-1"}`}>
-            <BottomActions onSend={handleSend} canSend={!!message.trim() && !isAddingMessage} />
+            <BottomActions 
+              onSend={handleSend} 
+              canSend={!!message.trim() && !isAddingMessage} 
+              shortcutHint={showShortcutHint ? shortcutHint : undefined} 
+            />
           </div>
         </div>
       </div>

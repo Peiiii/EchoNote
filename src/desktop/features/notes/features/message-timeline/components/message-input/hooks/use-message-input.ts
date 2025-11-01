@@ -5,6 +5,7 @@ import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect, useMemo, useRef } from "react";
 import { useComposerStateStore } from "@/core/stores/composer-state.store";
+import { isMac } from "@/common/lib/keyboard-shortcuts";
 
 export function useMessageInput() {
   const presenter = useCommonPresenterContext();
@@ -90,9 +91,18 @@ export function useMessageInput() {
     }
   }, [message]);
 
-  const placeholder = replyToMessage
-    ? `Reply to this message... (Ctrl/Cmd+Enter to send)`
-    : `What's on your mind... (Ctrl/Cmd+Enter to send)`;
+  const placeholder = useMemo(
+    () =>
+      replyToMessage
+        ? "Reply to this message..."
+        : "What's on your mind...",
+    [replyToMessage]
+  );
+
+  const shortcutHint = useMemo(() => {
+    const modifierKey = isMac() ? "Command" : "Ctrl";
+    return `${modifierKey}+Enter`;
+  }, []);
 
   return {
     message,
@@ -103,6 +113,7 @@ export function useMessageInput() {
     handleKeyDown,
     handleMessageChange,
     placeholder,
+    shortcutHint,
     currentChannelId,
     handleCancelReply,
   };
