@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
-import { ArrowDown } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 
 interface MobileMessageInputProps {
@@ -58,7 +58,7 @@ export const MobileMessageInput = ({
   const isReplyMode = !!replyToMessageId;
 
   return (
-    <div className={cn("bg-background px-3 sm:px-4 py-2 space-y-2 border-b border-border/60", className)}>
+    <div className={cn("bg-background px-3 sm:px-4 py-2 space-y-2 border-t border-border/60", className)}>
       {/* Reply indicator */}
       {isReplyMode && (
         <div className="flex items-center justify-between bg-muted/50 rounded-xl px-3 py-2">
@@ -101,7 +101,7 @@ export const MobileMessageInput = ({
               {isSending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
               ) : (
-                <ArrowDown className="h-4 w-4" />
+                <ArrowUp className="h-4 w-4" />
               )}
             </button>
           </div>

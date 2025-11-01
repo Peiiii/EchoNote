@@ -77,12 +77,15 @@ export const MobileNotesLayout = ({
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Input area - only show when there's a current channel; move to top */}
+        {/* Timeline content */}
+        <MobileTimelineContent onReply={timelineState.handleReply} />
+
+        {/* Input area - only show when there's a current channel; positioned at bottom */}
         {currentChannel && (
           <div
             ref={panelRef}
-            className={`flex-shrink-0 bg-transparent overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out origin-top ${
-              inputCollapsed ? "max-h-0 opacity-0 -translate-y-1 py-0" : "max-h-[220px] opacity-100 translate-y-0"
+            className={`flex-shrink-0 bg-transparent overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out origin-bottom ${
+              inputCollapsed ? "max-h-0 opacity-0 translate-y-1 py-0" : "max-h-[220px] opacity-100 translate-y-0"
             }`}
             aria-hidden={inputCollapsed}
           >
@@ -94,9 +97,6 @@ export const MobileNotesLayout = ({
             />
           </div>
         )}
-
-        {/* Timeline content */}
-        <MobileTimelineContent onReply={timelineState.handleReply} />
       </div>
     </div>
   );
