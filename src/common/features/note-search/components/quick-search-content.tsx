@@ -102,10 +102,10 @@ export function QuickSearchContent({
   });
 
   // Subscribe to index stats to show lightweight progress
-  const indexStats = useValueFromObservable(noteSearchService.getIndexStats$(), {
-    totalDocs: 0,
-    indexedChannelIds: [],
-  });
+  // const indexStats = useValueFromObservable(noteSearchService.getIndexStats$(), {
+  //   totalDocs: 0,
+  //   indexedChannelIds: [],
+  // });
 
   const searchResults$ = useMemo(
     () => noteSearchService.search(q, { channelIds }),
