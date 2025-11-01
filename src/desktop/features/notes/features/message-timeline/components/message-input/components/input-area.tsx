@@ -10,8 +10,7 @@ export function InputArea({
   onKeyDown,
   placeholder,
   disabled,
-  isFocusMode,
-}: InputAreaProps & { isFocusMode?: boolean }) {
+}: InputAreaProps) {
   const { handleExpandInput, inputCollapsed } = useInputCollapse();
   const composerExpanded = useComposerStateStore(s => s.expanded);
   

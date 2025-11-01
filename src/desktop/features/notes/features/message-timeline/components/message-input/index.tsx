@@ -81,7 +81,6 @@ export function MessageInput() {
               placeholder={placeholder}
               disabled={isAddingMessage}
               textareaRef={textareaRef}
-              isFocusMode={isFocusMode}
             />
           </div>
 
