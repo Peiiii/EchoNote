@@ -11,6 +11,8 @@ import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
+import { Search } from "lucide-react";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
@@ -60,6 +62,15 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
           </h3>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => openQuickSearchModal({ defaultScope: "all" })}
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-accent"
+            aria-label="Search all notes"
+            title="Search all notes (Cmd/Ctrl+K)"
+          >
+            <Search className="w-4 h-4" />
+          </button>
           <CreateChannelPopover
             instantCreate
             trigger={

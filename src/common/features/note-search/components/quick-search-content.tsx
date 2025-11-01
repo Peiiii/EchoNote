@@ -17,14 +17,18 @@ import { EmptyStates } from "./search-empty-states";
 
 interface QuickSearchContentProps {
   onClose: () => void;
+  defaultScope?: "all" | "current";
 }
 
-export function QuickSearchContent({ onClose }: QuickSearchContentProps) {
+export function QuickSearchContent({
+  onClose,
+  defaultScope = "current",
+}: QuickSearchContentProps) {
   const { currentChannelId } = useNotesViewStore();
   const channels = useNotesDataStore(s => s.channels);
   const presenter = useCommonPresenterContext();
   const [q, setQ] = useState("");
-  const [scope, setScope] = useState<"all" | "current">("current");
+  const [scope, setScope] = useState<"all" | "current">(defaultScope);
   const [results, setResults] = useState<NoteSearchMatch[]>([]);
   const [indexing, setIndexing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

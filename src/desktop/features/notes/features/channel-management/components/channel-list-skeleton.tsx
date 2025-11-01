@@ -17,11 +17,13 @@ export function ChannelListSkeleton({ count = 12 }: ChannelListSkeletonProps) {
         className="h-12 px-4 flex items-center justify-between"
       >
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
-            Spaces
-          </h3>
+          <Skeleton className="h-5 w-16" />
         </div>
-        <CollapsibleSidebar.ToggleButton />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-8 rounded-md" />
+          <Skeleton className="h-8 w-8 rounded-md" />
+          <CollapsibleSidebar.ToggleButton />
+        </div>
       </div>
 
       {/* Channel List */}
