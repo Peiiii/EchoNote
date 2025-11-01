@@ -6,7 +6,7 @@ import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
 import { Clock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActionButtons } from "./components/action-buttons";
 import { InlineEditor } from "./components/inline-editor";
 import { MessageFooter } from "./components/message-footer";
@@ -14,6 +14,7 @@ import { ReadMoreWrapper } from "./components/read-more-wrapper";
 import { ThoughtRecordSparks } from "./components/thought-record-sparks";
 import { useNoteAnalysis } from "./hooks/use-note-analysis";
 import { ThoughtRecordProps } from "./types";
+import { computeNoteHash } from "@/common/utils/note-hash";
 
 export function ThoughtRecord({
   message,
@@ -31,7 +32,12 @@ export function ThoughtRecord({
   } = useEditNote(message);
   const { showAnalysis, aiAnalysis, hasSparks, handleToggleAnalysis } = useNoteAnalysis(message);
   const [editingTags, setEditingTags] = useState<string[]>(message.tags || []);
-  
+  const draftEntry = useEditStateStore(
+    useCallback(state => state.drafts[message.id] ?? null, [message.id])
+  );
+  const messageHash = useMemo(() => computeNoteHash(message.content), [message.content]);
+  const hasRestorableDraft = !!draftEntry && draftEntry.baseHash === messageHash;
+
   // Get editor mode from store (for reading only)
   const editorMode = useEditStateStore(s => s.editorMode);
 
@@ -86,6 +92,8 @@ export function ThoughtRecord({
               isEditing={isEditing}
               editorMode={editorMode}
               onEditorModeChange={presenter.noteEditManager.setEditorMode}
+              hasDraft={!isEditing && hasRestorableDraft}
+              draftEntry={draftEntry ?? null}
             />
         </div>
 

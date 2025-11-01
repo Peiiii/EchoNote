@@ -46,7 +46,7 @@ export function MessageInput() {
             <ReplyIndicator replyToMessage={replyToMessage} onCancelReply={handleCancelReply} />
           )}
 
-          <div className="relative px-2 pt-1">
+          <div className="relative px-2 pt-3">
             <InputArea
               message={message}
               onMessageChange={handleMessageChange}

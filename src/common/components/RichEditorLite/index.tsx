@@ -5,6 +5,7 @@ import BubbleMenuExt, { type BubbleMenuOptions } from '@tiptap/extension-bubble-
 import type { Extension as TiptapExtension } from '@tiptap/core'
 import { createPortal } from 'react-dom'
 import { StarterKit } from '@tiptap/starter-kit'
+import Placeholder from '@tiptap/extension-placeholder'
 // Custom code block with actions (language switcher, copy)
 import CodeBlockWithActions from './extensions/codeblock-with-actions'
 import type { Editor } from '@tiptap/core'
@@ -19,6 +20,7 @@ import TableCell from '@tiptap/extension-table-cell'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon, Table as TableIcon, CheckCircle, Strikethrough, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Minus, Braces, Undo2, Redo2, Eraser, Trash2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/common/components/ui/dropdown-menu'
 
 import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converter'
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
@@ -40,26 +42,36 @@ interface RichEditorLiteProps {
   suspended?: boolean
 }
 
-function ToolbarButton({ disabled, active, onClick, children, size = 'md', className = '' }: { disabled?: boolean; active?: boolean; onClick: () => void; children: React.ReactNode; size?: 'sm' | 'md'; className?: string }) {
-  const sizeCls = size === 'sm' ? 'h-5 w-5 text-[11px]' : 'h-8 w-8 text-[13px]'
-  const hoverCls = size === 'sm' ? 'hover:bg-slate-900/10 dark:hover:bg-white/15' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={[
-        'inline-flex items-center justify-center rounded transition-colors',
-        sizeCls,
-        disabled ? 'opacity-50 cursor-not-allowed' : hoverCls,
-        active ? 'bg-slate-200 dark:bg-slate-700' : 'bg-transparent',
-        className,
-      ].join(' ')}
-    >
-      {children}
-    </button>
-  )
+type ToolbarButtonProps = React.ComponentPropsWithoutRef<'button'> & {
+  active?: boolean
+  size?: 'sm' | 'md'
 }
+
+const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
+  ({ disabled, active, onClick, children, size = 'md', className = '', ...rest }, ref) => {
+    const sizeCls = size === 'sm' ? 'h-5 w-5 text-[11px]' : 'h-8 w-8 text-[13px]'
+    const hoverCls = size === 'sm' ? 'hover:bg-slate-900/10 dark:hover:bg-white/15' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className={[
+          'inline-flex items-center justify-center rounded transition-colors',
+          sizeCls,
+          disabled ? 'opacity-50 cursor-not-allowed' : hoverCls,
+          active ? 'bg-slate-200 dark:bg-slate-700' : 'bg-transparent',
+          className,
+        ].join(' ')}
+        {...rest}
+      >
+        {children}
+      </button>
+    )
+  }
+)
+ToolbarButton.displayName = 'ToolbarButton'
 
 export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', maxHeight, minHeight, enterSends = false, onSubmitEnter, hideToolbar, suspended = false }: RichEditorLiteProps) {
   // Create bubble menu element before editor initialization so the extension can mount.
@@ -120,6 +132,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           if (!editor.isEditable) return false
           return !state.selection.empty
         }
+      }),
+      Placeholder.configure({
+        placeholder,
+        showOnlyWhenEditable: true,
+        showOnlyCurrent: false,
       }),
       SlashCommand.configure({
         onOpen: (p: SlashOpenPayload) => {
@@ -488,6 +505,11 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   const isActive = (name: string, attrs?: Record<string, unknown>) => editor?.isActive(name, attrs) ?? false
   const can = (fn: () => boolean) => (editor ? fn() : false)
 
+  type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
+  const headingLevels: HeadingLevel[] = [1, 2, 3, 4, 5, 6]
+  const activeHeadingLevel = editor ? headingLevels.find(level => editor.isActive('heading', { level })) : undefined
+  const headingLabel = activeHeadingLevel ? `H${activeHeadingLevel}` : 'Text'
+
 
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
 
@@ -696,7 +718,14 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
   }
 
   return (
-    <div style={outerStyle} className={[variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background", "flex flex-col min-h-0", className].join(' ')}>
+    <div
+      style={outerStyle}
+      className={[
+        variant === 'frameless' ? "border-0 rounded-none bg-transparent" : "border rounded-md bg-background",
+        "flex flex-col min-h-0 gap-y-2",
+        className,
+      ].join(' ')}
+    >
       {!hideToolbar && (
       <div className={'flex items-center gap-1 px-2 py-1 border-b shrink-0'}>
         <ToolbarButton active={isActive('bold')} disabled={!can(() => editor!.can().chain().focus().toggleBold().run())} onClick={() => editor?.chain().focus().toggleBold().run()}>
@@ -722,24 +751,42 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
           <Eraser className="w-4 h-4" />
         </ToolbarButton>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
-        <ToolbarButton active={isActive('heading', { level: 1 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}>
-          <Heading1 className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton active={isActive('heading', { level: 2 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>
-          <Heading2 className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton active={isActive('heading', { level: 3 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}>
-          <Heading3 className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton active={isActive('heading', { level: 4 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 4 }).run()}>
-          <Heading4 className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton active={isActive('heading', { level: 5 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 5 }).run()}>
-          <Heading5 className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton active={isActive('heading', { level: 6 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 6 }).run()}>
-          <Heading6 className="w-4 h-4" />
-        </ToolbarButton>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <ToolbarButton
+              active={!!activeHeadingLevel}
+              onClick={() => {}}
+              className="px-2 min-w-[48px] justify-between gap-1 text-xs"
+            >
+              <span className="font-medium">{headingLabel}</span>
+              <ChevronDown className="h-3 w-3 opacity-70" />
+            </ToolbarButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-36 p-1 text-xs">
+            <DropdownMenuItem
+              onSelect={() => editor?.chain().focus().setParagraph().run()}
+              className="flex items-center gap-2"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                ¶
+              </span>
+              <span className="font-medium">Text</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1" />
+            {headingLevels.map(level => (
+              <DropdownMenuItem
+                key={level}
+                onSelect={() => editor?.chain().focus().toggleHeading({ level }).run()}
+                className="flex items-center gap-2"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                  H{level}
+                </span>
+                <span className="font-medium">Heading {level}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
         <ToolbarButton active={isActive('bulletList')} onClick={() => editor?.chain().focus().toggleBulletList().run()}>
           <List className="w-4 h-4" />
@@ -781,10 +828,13 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
       </div>
       )}
       <div ref={containerRef} className="relative min-h-0 flex-1 overflow-y-auto">
-        <div className={["relative h-full", variant === 'frameless' ? "p-0" : "p-3"].join(' ')}>
-          {!editor?.getText() && (
-            <div className="pointer-events-none absolute left-3 top-3 text-sm text-slate-400 select-none">{placeholder}</div>
-          )}
+        <div
+          className={[
+            "relative h-full",
+            hideToolbar ? "" : "mt-2",
+            variant === 'frameless' ? "px-3 pb-0" : "px-3 pb-3",
+          ].join(' ')}
+        >
           <EditorContent
             editor={editor}
             className={[

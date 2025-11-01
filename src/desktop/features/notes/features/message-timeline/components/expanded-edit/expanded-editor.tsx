@@ -3,10 +3,11 @@ import { Button } from "@/common/components/ui/button";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { Check, Loader2, Minimize2, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useEditor } from "@/common/hooks/use-editor";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 import { RichEditorLite } from "@/common/components/RichEditorLite";
+import { formatRelativeTime } from "@/common/lib/time-utils";
 
 interface ExpandedEditorProps {
   content: string;
@@ -27,9 +28,16 @@ export function ExpandedEditor({
   const [isLocalSaving, setIsLocalSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const presenter = useCommonPresenterContext();
-  
-  // Get editor mode from store (for reading only)
+
+  // Get editor mode and draft prompt state from store (for reading only)
   const editorMode = useEditStateStore(s => s.editorMode);
+  const editingMessageId = useEditStateStore(s => s.editingMessageId);
+  const showDraftPromptFlag = useEditStateStore(s => s.showDraftPrompt);
+  const draftEntry = useEditStateStore(
+    useCallback(state => (editingMessageId ? state.drafts[editingMessageId] : undefined), [editingMessageId])
+  );
+  const showDraftPrompt = useMemo(() => showDraftPromptFlag && !!draftEntry, [showDraftPromptFlag, draftEntry]);
+  const draftUpdatedAt = draftEntry?.updatedAt;
 
   // Only bind textarea helpers when in markdown textarea mode
   useEditor({ textareaRef, updateContent: presenter.noteEditManager.updateContent, content: editorMode === "markdown" ? content : "" });
@@ -143,6 +151,36 @@ export function ExpandedEditor({
           </div>
 
           <div className="flex-1 min-h-0 p-3 overflow-hidden flex flex-col">
+            {showDraftPrompt && (
+              <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <span className="font-medium">Unsaved draft available.</span>
+                    {draftUpdatedAt && (
+                      <span className="ml-2 text-xs text-amber-700/80 dark:text-amber-100/80">
+                        Saved {formatRelativeTime(new Date(draftUpdatedAt))}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      className="h-8 rounded-md bg-amber-500 px-3 text-xs font-medium text-white transition-colors hover:bg-amber-600"
+                      onClick={() => presenter.noteEditManager.applyDraft()}
+                    >
+                      Restore draft
+                    </button>
+                    <button
+                      type="button"
+                      className="h-8 rounded-md px-3 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 hover:text-amber-900 dark:text-amber-100 dark:hover:bg-amber-500/20"
+                      onClick={() => presenter.noteEditManager.dismissDraftPrompt()}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {editorMode === "markdown" ? (
               <textarea
                 ref={textareaRef}
@@ -163,8 +201,8 @@ export function ExpandedEditor({
                   onChange={handleContentChange}
                   editable={!isSaving}
                   placeholder="Write your thought..."
-                  className="h-full"
                   variant="frameless"
+                  className="h-full px-4 pt-3"
                 />
               </div>
             )}

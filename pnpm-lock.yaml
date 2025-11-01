@@ -92,6 +92,9 @@ importers:
       '@tiptap/extension-link':
         specifier: ^3.8.0
         version: 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
+      '@tiptap/extension-placeholder':
+        specifier: ^3.9.1
+        version: 3.10.1(@tiptap/extensions@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))
       '@tiptap/extension-table':
         specifier: ^3.8.0
         version: 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
@@ -259,7 +262,7 @@ importers:
         version: 11.1.0
       zenmark-editor:
         specifier: ^0.0.1
-        version: 0.0.1(0366b46ba69a03f4caac13251a8cf627)
+        version: 0.0.1(vkk5oy6es2fik3pxkkey2fkts4)
       zustand:
         specifier: ^5.0.7
         version: 5.0.8(@types/react@19.1.12)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1))
@@ -2564,11 +2567,10 @@ packages:
     peerDependencies:
       '@tiptap/core': ^3.8.0
 
-  '@tiptap/extension-placeholder@2.26.1':
-    resolution: {integrity: sha512-MBlqbkd+63btY7Qu+SqrXvWjPwooGZDsLTtl7jp52BczBl61cq9yygglt9XpM11TFMBdySgdLHBrLtQ0B7fBlw==}
+  '@tiptap/extension-placeholder@3.10.1':
+    resolution: {integrity: sha512-7R31ytEtyYKNrj3g610sHiUvseRnNyzxMlYtwXEQIZ8w3St5QduwJm+AMOygS4Nmdg88C1zsu1VIiRZCKFutbw==}
     peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
+      '@tiptap/extensions': ^3.10.1
 
   '@tiptap/extension-strike@3.8.0':
     resolution: {integrity: sha512-LRj6HOzol9NqK5Zo7DjdbOasIbNtU1ur2tiZcPybcJT3kBuV6tfH8DetxoZKOOlsL6VWrH8KFHnRG+ISDsd5Cw==}
@@ -8796,10 +8798,9 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
 
-  '@tiptap/extension-placeholder@2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)':
+  '@tiptap/extension-placeholder@3.10.1(@tiptap/extensions@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))':
     dependencies:
-      '@tiptap/core': 3.8.0(@tiptap/pm@3.8.0)
-      '@tiptap/pm': 3.8.0
+      '@tiptap/extensions': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
 
   '@tiptap/extension-strike@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))':
     dependencies:
@@ -13497,7 +13498,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zenmark-editor@0.0.1(0366b46ba69a03f4caac13251a8cf627):
+  zenmark-editor@0.0.1(vkk5oy6es2fik3pxkkey2fkts4):
     dependencies:
       '@benrbray/prosemirror-math': 0.2.2(katex@0.16.23)(prosemirror-commands@1.7.1)(prosemirror-gapcursor@1.3.2)(prosemirror-history@1.4.1)(prosemirror-inputrules@1.5.0)(prosemirror-keymap@1.2.3)(prosemirror-model@1.25.3)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.41.0)
       '@emotion/css': 11.13.5
@@ -13521,7 +13522,7 @@ snapshots:
       '@tiptap/extension-link': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
       '@tiptap/extension-list-keymap': 3.8.0(@tiptap/extension-list@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))
       '@tiptap/extension-paragraph': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))
-      '@tiptap/extension-placeholder': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)
+      '@tiptap/extension-placeholder': 3.10.1(@tiptap/extensions@3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0))
       '@tiptap/extension-subscript': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))
       '@tiptap/extension-superscript': 2.26.1(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))
       '@tiptap/extension-table': 3.8.0(@tiptap/core@3.8.0(@tiptap/pm@3.8.0))(@tiptap/pm@3.8.0)

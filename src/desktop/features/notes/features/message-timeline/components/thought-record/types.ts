@@ -1,4 +1,5 @@
 import { Message } from "@/core/stores/notes-data.store";
+import type { EditDraftEntry } from "@/core/stores/edit-state.store";
 
 export interface ThoughtRecordProps {
   message: Message;
@@ -14,6 +15,7 @@ export interface ActionButtonProps {
   title: string;
   disabled?: boolean;
   active?: boolean;
+  indicator?: boolean;
 }
 
 export interface ThreadIndicatorProps {
@@ -52,4 +54,6 @@ export interface ActionButtonsProps {
   isEditing: boolean;
   editorMode?: "markdown" | "wysiwyg";
   onEditorModeChange?: (mode: "markdown" | "wysiwyg") => void;
+  hasDraft?: boolean;
+  draftEntry?: EditDraftEntry | null;
 }
