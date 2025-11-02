@@ -1,4 +1,4 @@
-import { CodeBlock } from "./code-block";
+import { MarkdownCodeBlock, MarkdownInlineCode } from "./code-block";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 // Math support: parse $...$ / $$...$$ and render via KaTeX
@@ -23,7 +23,8 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}
         components={{
-          code: CodeBlock,
+          pre: MarkdownCodeBlock,
+          code: MarkdownInlineCode,
 
           a({ children, href, ...props }) {
             return (

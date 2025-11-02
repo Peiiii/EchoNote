@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; // KaTeX styles for math rendering
-import { CodeBlock } from "./code-block";
+import { MarkdownCodeBlock, MarkdownInlineCode } from "./code-block";
 import { ZoomableImage } from "./zoomable-image";
 import { Checkbox } from "@/common/components/ui/checkbox";
 
@@ -23,7 +23,8 @@ export function MobileMarkdownContent({ content, className = "" }: MobileMarkdow
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}
         components={{
-          code: CodeBlock,
+          pre: MarkdownCodeBlock,
+          code: MarkdownInlineCode,
 
           a({ children, href, ...props }) {
             return (

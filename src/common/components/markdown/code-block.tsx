@@ -1,13 +1,23 @@
 import { Copy, Check } from "lucide-react";
-import { Children, useEffect, useMemo, useState } from "react";
+import {
+  Children,
+  isValidElement,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { MermaidBlock } from "./mermaid-block";
 
-interface CodeBlockProps {
-  className?: string;
-  children?: React.ReactNode;
-}
+type PreProps = DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTMLPreElement> & {
+  node?: unknown;
+};
+
+type CodeProps = DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & {
+  node?: unknown;
+};
 
 // Map common language ids to Prism loader imports (dynamic). Keep this list lean.
 const languageImporters: Record<string, () => Promise<unknown>> = {
@@ -53,43 +63,72 @@ async function ensurePrismLanguage(lang?: string) {
   const importer = languageImporters[key];
   if (!importer) return;
   if (!loadingLangs[key]) {
-    loadingLangs[key] = importer().then(mod => {
-      // Some modules export default, some named, but for prism it should be default
-      const m = mod as { default?: unknown } | unknown;
-      const def = (m as { default?: unknown }).default ?? (mod as unknown);
-      SyntaxHighlighter.registerLanguage(key, def);
-      loadedLangs.add(key);
-    }).catch(err => {
-      console.warn("Failed to load prism language:", key, err);
-    });
+    loadingLangs[key] = importer()
+      .then(mod => {
+        // Some modules export default, some named, but for prism it should be default
+        const m = mod as { default?: unknown } | unknown;
+        const def = (m as { default?: unknown }).default ?? (mod as unknown);
+        SyntaxHighlighter.registerLanguage(key, def);
+        loadedLangs.add(key);
+      })
+      .catch(err => {
+        console.warn("Failed to load prism language:", key, err);
+      });
   }
   await loadingLangs[key];
 }
-export function CodeBlock({ className, children }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false);
-  const match = /language-(\w+)/.exec(className || "");
-  const language = match ? match[1] : "";
-  const isInline = !className || !match;
+
+const getLanguageFromClassName = (className?: string) => {
+  const match = /language-([a-z0-9]+)/i.exec(className || "");
+  return match ? match[1] : "";
+};
+
+const flattenText = (node: ReactNode): string => {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (Array.isArray(node)) {
+    return node.map(flattenText).join("");
+  }
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return flattenText(node.props.children);
+  }
+  return "";
+};
+
+const normalizeCodeText = (children: ReactNode): string =>
+  flattenText(children).replace(/\n$/, "");
+
+interface CodeBlockRendererProps {
+  code: string;
+  languageHint: string;
+  containerClassName?: string;
+}
+
+const CodeBlockRenderer = ({
+  code,
+  languageHint,
+  containerClassName,
+}: CodeBlockRendererProps) => {
+  const normalizedLanguage = languageHint.toLowerCase();
   const [hlVersion, setHlVersion] = useState(0);
   const [isDark, setIsDark] = useState<boolean>(() =>
-    typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : false
+    typeof document !== "undefined"
+      ? document.documentElement.classList.contains("dark")
+      : false
   );
-  const raw = useMemo(() => {
-    // Join all child text nodes into a single string and trim a single trailing newline
-    return Children.toArray(children)
-      .map(chunk => (typeof chunk === "string" ? chunk : ""))
-      .join("")
-      .replace(/\n$/, "");
-  }, [children]);
+  const [copied, setCopied] = useState(false);
+  const canHighlight = Boolean(normalizedLanguage && loadedLangs.has(normalizedLanguage));
 
-  // Load language definition on demand
   useMemo(() => {
-    // useMemo instead of useEffect to avoid hydration mismatch; we only bump a version after promise
+    if (!normalizedLanguage || normalizedLanguage === "mermaid") {
+      return;
+    }
     (async () => {
-      await ensurePrismLanguage(language);
+      await ensurePrismLanguage(normalizedLanguage);
       setHlVersion(v => v + 1);
     })();
-  }, [language]);
+  }, [normalizedLanguage]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -103,7 +142,7 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(raw);
+      await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -111,28 +150,13 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
     }
   };
 
-  if (isInline) {
-    return (
-      <code className="inline-block bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-300 dark:border-gray-600">
-        {children}
-      </code>
-    );
-  }
-
-  // Mermaid fenced code block: render diagram
-  if (language === "mermaid") {
-    return <MermaidBlock code={raw} />;
-  }
-
   return (
-    <div className="group/code relative my-4">
+    <div className={["group/code relative my-4", containerClassName].filter(Boolean).join(" ")}>
       <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
         <div className="flex items-center space-x-2">
-          {language && (
-            <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">
-              {language}
-            </span>
-          )}
+          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">
+            {languageHint || "text"}
+          </span>
         </div>
         <button
           onClick={copyToClipboard}
@@ -142,11 +166,11 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
           {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
         </button>
       </div>
-      {language && loadedLangs.has(language.toLowerCase()) ? (
+      {canHighlight ? (
         <SyntaxHighlighter
           key={hlVersion}
           style={isDark ? vscDarkPlus : oneLight}
-          language={language}
+          language={normalizedLanguage}
           PreTag="div"
           className="rounded-b overflow-auto w-full max-w-full min-w-0 border border-slate-200 dark:border-gray-700 border-t-0"
           wrapLongLines
@@ -159,15 +183,73 @@ export function CodeBlock({ className, children }: CodeBlockProps) {
             padding: "0.75rem",
           }}
         >
-          {raw}
+          {code}
         </SyntaxHighlighter>
       ) : (
         <pre className="bg-slate-50 dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700 border-t-0">
           <code className="text-sm leading-relaxed font-mono text-slate-800 dark:text-gray-200">
-            {raw}
+            {code}
           </code>
         </pre>
       )}
     </div>
   );
-}
+};
+
+export const MarkdownCodeBlock = ({
+  children,
+  className,
+}: PreProps) => {
+  const childArray = Children.toArray(children);
+  const languageHint =
+    getLanguageFromClassName(className) ||
+    childArray.reduce<string>((lang, child) => {
+      if (lang) return lang;
+      if (
+        isValidElement<{ className?: string }>(child) &&
+        typeof child.props.className === "string"
+      ) {
+        return getLanguageFromClassName(child.props.className) || lang;
+      }
+      return lang;
+    }, "");
+
+  const codeText = normalizeCodeText(children);
+
+  if (!codeText) {
+    return (
+      <pre className={className}>
+        {children}
+      </pre>
+    );
+  }
+
+  if (languageHint.toLowerCase() === "mermaid") {
+    return <MermaidBlock code={codeText} />;
+  }
+
+  return (
+    <CodeBlockRenderer
+      code={codeText}
+      languageHint={languageHint}
+      containerClassName={className}
+    />
+  );
+};
+
+export const MarkdownInlineCode = ({
+  className,
+  children,
+  ...props
+}: CodeProps) => {
+  return (
+    <code
+      className={`inline-block bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-300 dark:border-gray-600${
+        className ? ` ${className}` : ""
+      }`}
+      {...props}
+    >
+      {children}
+    </code>
+  );
+};
