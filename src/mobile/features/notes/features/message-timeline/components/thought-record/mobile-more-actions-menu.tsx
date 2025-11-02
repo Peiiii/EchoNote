@@ -185,7 +185,7 @@ export function MobileMoreActionsMenu({
           icon: <Trash2 className="w-4 h-4" />,
           title: "Delete",
           onClick: onDelete,
-          variant: "destructive" as const,
+          variant: "default" as const,
           disabled: isEditing,
         },
       ],

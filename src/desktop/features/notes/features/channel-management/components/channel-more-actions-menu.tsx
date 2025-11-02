@@ -57,7 +57,7 @@ export function ChannelMoreActionsMenu({ channel }: ChannelMoreActionsMenuProps)
                           await presenter.channelManager.deleteChannel(channel.id);
                         },
                       }),
-                    variant: "destructive",
+                    variant: "default",
                   },
                 ],
               },
