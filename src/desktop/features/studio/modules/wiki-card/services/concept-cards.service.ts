@@ -6,6 +6,10 @@ import { channelMessageService } from "@/core/services/channel-message.service";
 const conceptCardSchema = {
   type: "object",
   properties: {
+    title: {
+      type: "string",
+      description: "A concise, descriptive title summarizing the collection of concept cards (2-5 words, same language as the notes)",
+    },
     cards: {
       type: "array",
       items: {
@@ -31,7 +35,7 @@ const conceptCardSchema = {
       },
     },
   },
-  required: ["cards"],
+  required: ["title", "cards"],
 };
 
 function detectLanguage(text: string): string {
@@ -99,7 +103,9 @@ export async function generateConceptCards(
 
   const systemPrompt = `You are an expert knowledge organizer. Your task is to extract and organize key concepts from the user's notes into structured concept cards (like Wikipedia entries).
 
-Each concept card should:
+First, generate a concise title (2-5 words) that summarizes the overall theme or domain of these concept cards. This title should capture the essence of the knowledge collection.
+
+Then, create concept cards where each card should:
 1. Have a clear, concise title
 2. Include a comprehensive definition
 3. List 3-5 key points about the concept
@@ -112,7 +118,7 @@ Focus on concepts that are:
 - Concepts that would help someone understand the domain covered in these notes
 - Ideas that connect multiple notes together
 
-IMPORTANT: Generate concept cards in ${detectedLanguage} language. All titles, definitions, key points, related concepts, and examples must be in ${detectedLanguage}.
+IMPORTANT: Generate everything in ${detectedLanguage} language. The overall title, all card titles, definitions, key points, related concepts, and examples must be in ${detectedLanguage}.
 
 Generate 5-10 concept cards that best represent the knowledge in these notes.`;
 
@@ -122,7 +128,7 @@ ${notesText}
 
 Generate concept cards that organize the key concepts from these notes. All content must be in ${detectedLanguage} language. Make sure each card is well-structured and provides value to someone trying to understand the domain.`;
 
-  const result = await generateObject<{ cards: Omit<ConceptCard, "references">[] }>({
+  const result = await generateObject<{ title: string; cards: Omit<ConceptCard, "references">[] }>({
     schema: conceptCardSchema,
     prompt: userPrompt,
     system: systemPrompt,
@@ -135,6 +141,7 @@ Generate concept cards that organize the key concepts from these notes. All cont
   }));
 
   return {
+    title: result.title,
     cards,
     generatedAt: Date.now(),
     contextChannelIds: channelIds,

@@ -9,6 +9,7 @@ export interface ConceptCard {
 }
 
 export interface ConceptCardsData {
+  title: string;
   cards: ConceptCard[];
   generatedAt: number;
   contextChannelIds: string[];

@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Card } from "@/common/components/ui/card";
 import { StudioModuleConfig } from "../types";
 import { cn } from "@/common/lib/utils";
 import { motion } from "framer-motion";
@@ -44,24 +43,22 @@ export const StudioModuleCard = memo(function StudioModuleCard({
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       className="relative"
     >
-      <Card
+      <div
         className={cn(
-          "relative overflow-hidden p-0 transition-all duration-300 border group cursor-pointer",
+          "relative overflow-hidden p-0 transition-all duration-300 group cursor-pointer rounded-lg",
           "backdrop-blur-sm bg-card/80",
           module.colorClass,
-          "shadow-sm hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20",
-          "hover:border-border/80",
           "before:absolute before:inset-0 before:rounded-xl before:opacity-0 before:transition-opacity before:duration-300",
           "before:bg-gradient-to-br before:from-white/40 before:to-transparent dark:before:from-white/5",
           "hover:before:opacity-100",
-          "active:scale-[0.98] active:shadow-sm"
+          "active:scale-[0.98]"
         )}
         onClick={onClick}
       >
-        <div className="relative flex items-start">
+        <div className="relative flex items-center">
           <div
             className={cn(
-              "flex-shrink-0 w-16 flex items-center justify-center py-3.5 transition-all duration-300",
+              "flex-shrink-0 w-14 flex items-center justify-center py-2.5 transition-all duration-300",
               "rounded-l-lg",
               iconBgClass
             )}
@@ -69,8 +66,6 @@ export const StudioModuleCard = memo(function StudioModuleCard({
             <div
               className={cn(
                 "relative flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-300",
-                "shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)]",
-                "group-hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.6)]",
                 "group-hover:scale-110"
               )}
             >
@@ -84,24 +79,19 @@ export const StudioModuleCard = memo(function StudioModuleCard({
               />
             </div>
           </div>
-          <div className="flex-1 min-w-0 px-4 py-3.5">
+          <div className="flex-1 min-w-0 px-3 py-2.5 flex items-center">
             <div
               className={cn(
-                "text-sm font-semibold truncate transition-all duration-300",
+                "text-sm font-semibold transition-all duration-300",
                 "text-foreground group-hover:text-foreground/90 drop-shadow-sm"
               )}
             >
               {module.title}
             </div>
-            {module.description && (
-              <div className="text-xs truncate mt-1 transition-colors duration-300 text-muted-foreground/70 group-hover:text-muted-foreground/90">
-                {module.description}
-              </div>
-            )}
           </div>
         </div>
         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/0 via-white/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-      </Card>
+      </div>
     </motion.div>
   );
 });

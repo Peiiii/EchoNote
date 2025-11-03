@@ -71,8 +71,8 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
   return (
     <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
       <RefinedPopover.Trigger asChild>
-        <div className="flex items-center gap-1.5 h-7 px-2 rounded-md hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-xs">
-          <span className="truncate">{getLabel()}</span>
+        <div className="flex items-center gap-1.5 h-8 px-3 rounded-md bg-transparent hover:bg-accent/50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          <span className="text-sm font-medium truncate">{getLabel()}</span>
           <ChevronDown className="w-3 h-3 opacity-50 flex-shrink-0" />
         </div>
       </RefinedPopover.Trigger>

@@ -5,7 +5,7 @@ import { StudioModuleId } from "@/core/stores/studio.store";
 export const studioModules: StudioModuleConfig[] = [
   {
     id: "audio-summary",
-    title: "Audio Overview",
+    title: "Audio",
     description: "Generate audio summaries from your notes",
     icon: AudioLines,
     colorClass: "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-100/60 dark:border-blue-900/40",
@@ -25,7 +25,7 @@ export const studioModules: StudioModuleConfig[] = [
   },
   {
     id: "wiki-card",
-    title: "Concept Cards",
+    title: "Concept",
     description: "Create wiki-style concept cards",
     icon: BookOpen,
     colorClass: "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-100/60 dark:border-amber-900/40",

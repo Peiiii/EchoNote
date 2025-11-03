@@ -19,6 +19,7 @@ export function useConceptCards() {
 
       const itemId = `wiki-card-${Date.now()}`;
       const tempData: ConceptCardsData = {
+        title: "Concept",
         cards: [],
         generatedAt: Date.now(),
         contextChannelIds: channelIds,
@@ -26,7 +27,7 @@ export function useConceptCards() {
       const tempItem: StudioContentItem = {
         id: itemId,
         moduleId: "wiki-card",
-        title: "Concept Cards",
+        title: "Concept",
         contextChannelIds: channelIds,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -42,7 +43,7 @@ export function useConceptCards() {
         updateContentItem(itemId, {
           status: "completed",
           data,
-          title: `Concept Cards (${data.cards.length} cards)`,
+          title: data.title,
         });
 
         return itemId;

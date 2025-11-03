@@ -1,7 +1,6 @@
 import { memo } from "react";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { Card } from "@/common/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { ConceptCardsData } from "../types";
@@ -27,7 +26,9 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div className="text-sm font-medium flex-1 truncate">{item.title}</div>
+        <div className="text-sm font-medium flex-1 truncate">
+          {cards.length > 0 ? `${item.title} (${cards.length})` : item.title}
+        </div>
       </div>
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-4 space-y-4">
@@ -38,19 +39,19 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
           ) : (
             cards.map((card, cardIndex) => {
               const colorVariants = [
-                "bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 dark:from-amber-950/40 dark:via-yellow-950/40 dark:to-orange-950/40 border-amber-200/80 dark:border-amber-800/50",
-                "bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-950/40 dark:via-amber-950/40 dark:to-yellow-950/40 border-orange-200/80 dark:border-orange-800/50",
-                "bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-yellow-950/40 dark:via-orange-950/40 dark:to-amber-950/40 border-yellow-200/80 dark:border-yellow-800/50",
-                "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border-amber-200/80 dark:border-amber-800/50",
-                "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40 border-orange-200/80 dark:border-orange-800/50",
+                "bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 dark:from-amber-950/40 dark:via-yellow-950/40 dark:to-orange-950/40",
+                "bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-950/40 dark:via-amber-950/40 dark:to-yellow-950/40",
+                "bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-yellow-950/40 dark:via-orange-950/40 dark:to-amber-950/40",
+                "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40",
+                "bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40",
               ];
               const colorVariant = colorVariants[cardIndex % colorVariants.length];
               
               return (
-                <Card
+                <div
                   key={card.id}
                   className={cn(
-                    "p-5 border shadow-sm transition-all duration-300 hover:shadow-md",
+                    "p-5 rounded-xl transition-all duration-300",
                     colorVariant
                   )}
                 >
@@ -120,7 +121,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                       </div>
                     </div>
                   )}
-                </Card>
+                </div>
               );
             })
           )}

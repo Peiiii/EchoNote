@@ -53,7 +53,6 @@ export const StudioSidebar = memo(function StudioSidebar() {
     currentContext,
     deleteContentItem,
     togglePin,
-    renameItem,
   } = useStudioStore();
   const { currentChannelId } = useNotesViewStore();
   const { channels } = useNotesDataStore();
@@ -143,7 +142,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
   }, [contentItems]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
       <AnimatePresence mode="wait" initial={false}>
         {detailView ? (
           <motion.div
@@ -194,7 +193,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 border-t border-border/40 bg-card/20">
+              <div className="flex-1 min-h-0 border-t border-border/40">
                 {recentItems.length === 0 ? (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
@@ -221,7 +220,6 @@ export const StudioSidebar = memo(function StudioSidebar() {
                           }}
                           onDelete={(it) => deleteContentItem(it.id)}
                           onTogglePin={(it) => togglePin(it.id)}
-                          onRename={(it, title) => renameItem(it.id, title)}
                         />
                       ))}
                     </div>

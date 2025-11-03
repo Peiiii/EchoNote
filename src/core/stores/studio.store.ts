@@ -37,7 +37,6 @@ export interface StudioState {
   setActiveItem: (itemId: string | null) => void;
   setGenerating: (isGenerating: boolean) => void;
   togglePin: (itemId: string) => void;
-  renameItem: (itemId: string, title: string) => void;
 }
 
 export const useStudioStore = create<StudioState>()(
@@ -100,19 +99,6 @@ export const useStudioStore = create<StudioState>()(
             if (idx >= 0) {
               const current = items[idx];
               items[idx] = { ...current, pinned: !current.pinned };
-              break;
-            }
-          }
-          return { contentItems: updated };
-        }),
-      renameItem: (itemId, title) =>
-        set((state) => {
-          const updated = { ...state.contentItems };
-          for (const moduleId in updated) {
-            const items = updated[moduleId as StudioModuleId];
-            const idx = items.findIndex((i) => i.id === itemId);
-            if (idx >= 0) {
-              items[idx] = { ...items[idx], title, updatedAt: Date.now() };
               break;
             }
           }
