@@ -14,6 +14,7 @@ import { MindmapDetail } from "../modules/mindmap/components/mindmap-detail";
 import { WikiCardDetail } from "../modules/wiki-card/components/wiki-card-detail";
 import { ReportDetail } from "../modules/report/components/report-detail";
 import { useConceptCards } from "../modules/wiki-card/hooks/use-concept-cards";
+import { useMindmap } from "../modules/mindmap/hooks/use-mindmap";
 import { StudioRecentItem } from "./studio-recent-item";
 import { StudioEmptyState } from "./studio-empty-state";
 import { AnimatePresence, motion } from "framer-motion";
@@ -59,10 +60,11 @@ export const StudioSidebar = memo(function StudioSidebar() {
 
   const modules = getEnabledModules();
   const { generate: generateConceptCards } = useConceptCards();
+  const { generate: generateMindmap } = useMindmap();
 
   const handleModuleClick = useCallback(
     async (moduleId: string) => {
-      if (moduleId === "wiki-card") {
+      if (moduleId === "wiki-card" || moduleId === "mindmap") {
         let channelIds: string[] = [];
 
         if (currentContext?.mode === "all") {
@@ -82,10 +84,18 @@ export const StudioSidebar = memo(function StudioSidebar() {
 
         try {
           setCurrentModule(moduleId as typeof currentModule);
-          const itemId = await generateConceptCards(channelIds);
+          const itemId =
+            moduleId === "wiki-card"
+              ? await generateConceptCards(channelIds)
+              : await generateMindmap(channelIds);
           setActiveItem(itemId);
         } catch (error) {
-          console.error("Failed to generate concept cards:", error);
+          console.error(
+            moduleId === "wiki-card"
+              ? "Failed to generate concept cards:"
+              : "Failed to generate mindmap:",
+            error
+          );
         }
       } else {
         console.warn(`Module ${moduleId} generation not yet implemented`);
