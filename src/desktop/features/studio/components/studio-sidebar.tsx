@@ -194,7 +194,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 border-t border-border/40 bg-card/30">
+              <div className="flex-1 min-h-0 border-t border-border/40 bg-card/20">
                 {recentItems.length === 0 ? (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
@@ -210,7 +210,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
                   </motion.div>
                 ) : (
                   <ScrollArea className="h-full">
-                    <div className="px-4 py-2">
+                    <div className="py-3">
                       {recentItems.map((item) => (
                         <StudioRecentItem
                           key={item.id}
