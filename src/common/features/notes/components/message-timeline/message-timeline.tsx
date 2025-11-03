@@ -275,7 +275,7 @@ export const MessageTimeline = ({
           style={{ height: "100%", width: "100%" }}
         />
       </div>
-      <div className="absolute top-4 right-4 z-20 pointer-events-none">
+      <div className="absolute top-8 right-4 z-20 pointer-events-none">
         <div className="flex flex-col items-end gap-2">
           <div className="pointer-events-auto">
             <FloatingActionButton

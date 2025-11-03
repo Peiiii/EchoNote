@@ -207,4 +207,20 @@
   .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: rgba(71, 85, 105, 0.7);
   }
+
+  /* Studio subtle animations */
+  @keyframes breath {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  @keyframes expand-ring {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.8); }
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.3); }
+  }
 }

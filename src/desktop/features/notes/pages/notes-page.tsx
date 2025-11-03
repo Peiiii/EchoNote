@@ -6,6 +6,7 @@ import { AIAssistantSidebar } from "@/desktop/features/notes/features/ai-assista
 import { ChannelList } from "@/desktop/features/notes/features/channel-management/components/channel-list";
 import { MessageTimelineFeature } from "@/desktop/features/notes/features/message-timeline";
 import { ThreadSidebar } from "@/desktop/features/notes/features/thread-management/components/thread-sidebar";
+import { StudioSidebar } from "@/desktop/features/studio/components/studio-sidebar";
 import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useJumpToNote } from "../hooks/use-jump-to-note";
 
@@ -14,6 +15,7 @@ export function NotesPage() {
   // Use UI state store
   const sideView = useUIStateStore(s => s.sideView);
   const currentThreadId = useUIStateStore(s => s.currentThreadId);
+  const isStudioOpen = useUIStateStore(s => s.isStudioOpen);
   const { currentChannelId } = useNotesViewStore();
   const { jumpToNote } = useJumpToNote();
   useHandleRxEvent(presenter.rxEventBus.requestJumpToMessage$, jumpToNote);
@@ -40,11 +42,17 @@ export function NotesPage() {
     return null;
   };
 
+  const renderFarRightSidebar = () => {
+    if (!isStudioOpen) return null;
+    return <StudioSidebar />;
+  };
+
   return (
     <NotesLayout
       sidebar={<ChannelList />}
       content={<MessageTimelineFeature />}
       rightSidebar={renderSidebar()}
+      farRightSidebar={renderFarRightSidebar()}
     />
   );
 }

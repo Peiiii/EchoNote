@@ -20,6 +20,9 @@ export interface UIState {
   // Mobile specific states
   isChannelListOpen: boolean;
 
+  // Studio panel visibility (independent from sideView)
+  isStudioOpen: boolean;
+
   // Actions for AI Assistant
   openAIAssistant: () => void;
   closeAIAssistant: () => void;
@@ -31,6 +34,10 @@ export interface UIState {
   // Actions for Settings
   openSettings: () => void;
   closeSettings: () => void;
+
+  // Actions for Studio
+  openStudio: () => void;
+  closeStudio: () => void;
 
   // Actions for Mobile
   openChannelList: () => void;
@@ -44,6 +51,7 @@ export const useUIStateStore = create<UIState>()(
       sideView: !isMobile() ? SideViewEnum.AI_ASSISTANT : undefined,
       currentThreadId: null,
       isChannelListOpen: false,
+      isStudioOpen: !isMobile(),
 
       // AI Assistant actions (mutually exclusive with thread sidebar)
       openAIAssistant: () => {
@@ -85,6 +93,15 @@ export const useUIStateStore = create<UIState>()(
         }
       },
 
+      // Studio actions
+      openStudio: () => {
+        set({ isStudioOpen: true });
+      },
+
+      closeStudio: () => {
+        set({ isStudioOpen: false });
+      },
+
       // Mobile actions
       openChannelList: () => {
         set({ isChannelListOpen: true });
@@ -96,7 +113,7 @@ export const useUIStateStore = create<UIState>()(
     }),
     {
       name: "echonote-ui-state",
-      partialize: state => ({ sideView: state.sideView }),
+      partialize: state => ({ sideView: state.sideView, isStudioOpen: state.isStudioOpen }),
     }
   )
 );

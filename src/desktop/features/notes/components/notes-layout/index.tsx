@@ -6,6 +6,7 @@ export const NotesLayout = ({
   sidebar,
   content,
   rightSidebar,
+  farRightSidebar,
   className = "",
 }: NotesLayoutProps) => {
   return (
@@ -15,7 +16,7 @@ export const NotesLayout = ({
         <LeftSidebar className="bg-card dark:bg-sidebar">{sidebar}</LeftSidebar>
 
         {/* Content area with optional right sidebar */}
-        <ContentArea rightSidebar={rightSidebar}>{content}</ContentArea>
+        <ContentArea rightSidebar={rightSidebar} farRightSidebar={farRightSidebar}>{content}</ContentArea>
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ import {
   Plus,
   Search,
   Settings,
+  Sparkles,
   Users,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
@@ -417,6 +418,15 @@ export const ChannelHeader = ({
               onClick={() => presenter.openAIAssistant()}
             > 
               <Bot className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+              onClick={() => presenter.openStudio()}
+              title="Studio"
+            >
+              <Sparkles className="h-4 w-4" />
             </Button>
             {getFeaturesConfig().channel.settings.enabled && (
               <Button

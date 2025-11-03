@@ -47,6 +47,13 @@ export class CommonPresenter {
     useUIStateStore.getState().closeChannelList();
   };
 
+  openStudio = () => {
+    useUIStateStore.getState().openStudio();
+  };
+
+  closeStudio = () => {
+    useUIStateStore.getState().closeStudio();
+  };
 
   jumpToNote = (options: { channelId: string; messageId: string }) => {
     this.rxEventBus.requestJumpToMessage$.emit(options);
