@@ -6,8 +6,8 @@ import { StudioContentItem } from "@/core/stores/studio.store";
 import { MindmapData, MindmapEdge, MindmapNode } from "../types";
 import { select } from "d3-selection";
 import { zoom, zoomIdentity, D3ZoomEvent } from "d3-zoom";
-import { drag } from "d3-drag";
-import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, SimulationNodeDatum } from "d3-force";
+import { drag, type D3DragEvent } from "d3-drag";
+import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, SimulationNodeDatum, SimulationLinkDatum } from "d3-force";
 import { ZoomIn, ZoomOut, Maximize2, Minimize2, RefreshCw, Focus } from "lucide-react";
 import type { MindmapTreeNode } from "../types";
 import { useStudioStore } from "@/core/stores/studio.store";
@@ -94,31 +94,35 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
 
     // Offline force layout
     // Create shallow copies to avoid mutating source data
-    const simNodes = data.nodes.map((n) => ({ ...n })) as (MindmapNode & { x?: number; y?: number })[];
-    const simLinks = data.edges.map((e) => ({ ...e }));
+    type ForceNode = MindmapNode & SimulationNodeDatum;
+    const simNodes: ForceNode[] = data.nodes.map((n) => ({ ...n }));
+    const simLinks: SimulationLinkDatum<ForceNode>[] = data.edges.map((e) => ({ source: e.source, target: e.target, weight: e.weight }));
 
     const degree = computeDegree(data.nodes, data.edges);
 
-    const simulation = forceSimulation(simNodes as unknown as SimulationNodeDatum[])
+    const simulation = forceSimulation<ForceNode>(simNodes)
       .force(
         "link",
-        forceLink(simLinks as any)
-          .id((d: any) => d.id)
-          .distance((l: any) => 40 + Math.min(100, 12 * Math.max(1, degree.get(l.source.id || l.source) || 1)))
+        forceLink<ForceNode, SimulationLinkDatum<ForceNode>>(simLinks)
+          .id((d: ForceNode) => d.id)
+          .distance((l) => {
+            const sid = typeof l.source === "object" ? (l.source as ForceNode).id : (l.source as string);
+            return 40 + Math.min(100, 12 * Math.max(1, degree.get(sid) || 1));
+          })
           .strength(0.12)
       )
       .force("charge", forceManyBody().strength(-120))
-      .force("collide", forceCollide().radius((d: any) => 18 + Math.min(12, degree.get(d.id) || 0)))
+      .force("collide", forceCollide<ForceNode>().radius((d) => 18 + Math.min(12, degree.get(d.id) || 0)))
       .force("center", forceCenter(W / 2, H / 2))
       .stop();
 
     // Run N ticks synchronously for stable initial positions
     for (let i = 0; i < 200; i++) simulation.tick();
 
-    const positioned: PositionedNode[] = simNodes.map((n: any) => ({
+    const positioned: PositionedNode[] = simNodes.map((n) => ({
       ...(n as MindmapNode),
-      x: n.x ?? W / 2,
-      y: n.y ?? H / 2,
+      x: (n.x as number | undefined) ?? W / 2,
+      y: (n.y as number | undefined) ?? H / 2,
       r: 6 + Math.min(10, (degree.get((n as MindmapNode).id) || 0) * 0.6 + ((n as MindmapNode).importance || 0)),
     }));
     setNodes(positioned);
@@ -138,10 +142,9 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
     };
 
     const zoomBehavior = zoom<SVGSVGElement, unknown>().scaleExtent([0.25, 3]).on("zoom", zoomed);
-    svg.call(zoomBehavior as any);
-
+    svg.call(zoomBehavior);
     // Fit to view initially
-    svg.call((zoomBehavior.transform as any), zoomIdentity.translate(0, 0).scale(1));
+    zoomBehavior.transform(svg, zoomIdentity.translate(0, 0).scale(1));
 
     return () => {
       svg.on("wheel.zoom", null);
@@ -153,19 +156,17 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
   // Drag behavior for nodes
   const onDragBehavior = useMemo(() => {
     const dragBehavior = drag<SVGGElement, PositionedNode>()
-      .on("start", function (this: SVGGElement, event: any, _d: PositionedNode) {
+      .on("start", (event: D3DragEvent<SVGGElement, PositionedNode, unknown>) => {
         event.sourceEvent?.stopPropagation?.();
-        select(this).classed("dragging", true);
       })
-      .on("drag", function (this: SVGGElement, event: any, d: PositionedNode) {
-        const nx = (event as { x: number }).x;
-        const ny = (event as { y: number }).y;
+      .on("drag", (event: D3DragEvent<SVGGElement, PositionedNode, unknown>, d: PositionedNode) => {
+        const nx = event.x;
+        const ny = event.y;
         d.x = nx;
         d.y = ny;
         setNodes((prev) => prev.map((n) => (n.id === d.id ? { ...n, x: nx, y: ny } : n)));
       })
-      .on("end", function (this: SVGGElement, _event: any, _d: PositionedNode) {
-        select(this).classed("dragging", false);
+      .on("end", () => {
         onPersist(nodes.map(({ r, ...rest }) => rest));
       });
     return dragBehavior;
@@ -175,7 +176,7 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
   useEffect(() => {
     if (!gRef.current) return;
     const g = select(gRef.current);
-    g.selectAll<SVGGElement, PositionedNode>("g.node").call(onDragBehavior as any);
+    g.selectAll<SVGGElement, PositionedNode>("g.node").call(onDragBehavior);
   }, [nodes, onDragBehavior]);
 
   const nodeMap = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
@@ -657,10 +658,11 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
 
   const resetLayout = useCallback(() => {
     // Clear persisted positions and let graph recompute
+    const clearedNodes: MindmapNode[] = data.nodes.map(({ x, y, ...rest }): MindmapNode => ({ ...rest }));
     const cleared: MindmapData = {
       ...data,
-      nodes: data.nodes.map(({ x, y, ...rest }) => rest),
-    } as any;
+      nodes: clearedNodes,
+    };
     updateContentItem(item.id, { data: cleared, updatedAt: Date.now() });
   }, [data, item.id, updateContentItem]);
 

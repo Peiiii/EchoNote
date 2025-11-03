@@ -1,5 +1,5 @@
 import { generateObject } from "@/common/services/ai/generate-object";
-import { MindmapData } from "../types";
+import { MindmapData, MindmapTreeNode } from "../types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 
@@ -141,7 +141,7 @@ Return a JSON object with title, nodes, and edges. All labels must be in ${detec
     title: string;
     nodes: { id: string; label: string; importance?: number; group?: string }[];
     edges: { source: string; target: string; weight?: number }[];
-    tree?: { id: string; label: string; children?: any[] };
+    tree?: MindmapTreeNode;
   }>({
     schema: mindmapSchema,
     prompt: userPrompt,
