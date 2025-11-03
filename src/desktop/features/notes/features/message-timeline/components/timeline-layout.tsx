@@ -61,7 +61,7 @@ export const TimelineLayout = ({
 
 const HIDE_SCROLL_THRESHOLD_PX = 120;
 const SHOW_SCROLL_THRESHOLD_PX = 60;
-const HOVER_REVEAL_DISTANCE_PX = 56;
+const HOVER_REVEAL_DISTANCE_PX = 20;
 const REVEAL_ON_SCROLL_UP_PX = 80;
 
 interface AutoHideChannelHeaderProps {
