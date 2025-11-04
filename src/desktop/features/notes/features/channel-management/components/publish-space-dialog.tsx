@@ -84,8 +84,10 @@ export function PublishSpaceDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
-            Publish Space
+            <div className={`p-2 rounded-lg ${channel.shareToken ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+              <Globe className="h-5 w-5" />
+            </div>
+            <span>Publish Space</span>
           </DialogTitle>
           <DialogDescription>
             {channel.shareToken
@@ -97,20 +99,28 @@ export function PublishSpaceDialog({
         {channel.shareToken ? (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Share Link</Label>
+              <Label className="text-sm font-medium">Share Link</Label>
               <div className="flex items-center gap-2">
-                <Input
-                  value={shareUrl}
-                  readOnly
-                  className="flex-1 font-mono text-sm"
-                  onClick={(e) => (e.target as HTMLInputElement).select()}
-                />
+                <div className="relative flex-1">
+                  <Input
+                    value={shareUrl}
+                    readOnly
+                    className="flex-1 font-mono text-sm pr-10 bg-muted/50 border-border/50"
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  {isCopied && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-primary font-medium">
+                      <Check className="h-3.5 w-3.5" />
+                      <span>Copied</span>
+                    </div>
+                  )}
+                </div>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant={isCopied ? "default" : "outline"}
                   size="icon"
                   onClick={handleCopyLink}
-                  className="shrink-0"
+                  className={`shrink-0 transition-all ${isCopied ? 'bg-primary text-primary-foreground' : ''}`}
                 >
                   {isCopied ? (
                     <Check className="h-4 w-4" />
@@ -119,13 +129,20 @@ export function PublishSpaceDialog({
                   )}
                 </Button>
               </div>
+              {isCopied && (
+                <p className="text-xs text-primary font-medium animate-in fade-in slide-in-from-top-1">
+                  Link copied to clipboard!
+                </p>
+              )}
             </div>
           </div>
         ) : (
-          <div className="py-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Link2 className="h-4 w-4" />
-              <span>Once published, you'll get a shareable link</span>
+          <div className="py-6">
+            <div className="flex flex-col items-center gap-3 text-center p-6 rounded-lg bg-muted/30 border border-dashed border-border">
+              <div className="p-3 rounded-full bg-muted">
+                <Link2 className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground">Once published, you'll get a shareable link that anyone can use to view this space.</p>
             </div>
           </div>
         )}
@@ -137,6 +154,7 @@ export function PublishSpaceDialog({
               variant="destructive"
               onClick={handleUnpublish}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               {isLoading ? "Unpublishing..." : "Unpublish"}
             </Button>
@@ -145,6 +163,7 @@ export function PublishSpaceDialog({
               type="button"
               onClick={handlePublish}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               {isLoading ? "Publishing..." : "Publish"}
             </Button>

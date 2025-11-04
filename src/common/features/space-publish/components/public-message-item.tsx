@@ -13,13 +13,17 @@ export function PublicMessageItem({ message }: PublicMessageItemProps) {
   }
 
   return (
-    <div className="w-full py-4 border-b border-border/50 last:border-b-0">
-      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-        <Clock className="w-3 h-3" />
-        <span>{formatTimeForSocial(message.timestamp)}</span>
-      </div>
-      <div className="prose prose-sm dark:prose-invert max-w-none">
-        <MarkdownContent content={message.content} />
+    <div className="group relative w-full">
+      <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border">
+        <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="font-medium">{formatTimeForSocial(message.timestamp)}</span>
+          </div>
+        </div>
+        <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
+          <MarkdownContent content={message.content} />
+        </div>
       </div>
     </div>
   );
