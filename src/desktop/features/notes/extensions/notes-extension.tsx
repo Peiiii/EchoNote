@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Hash, MessageSquare, Plus, Notebook } from "lucide-react";
 import { NotesPage } from "../pages/notes-page";
 import { Navigate } from "react-router-dom";
+import { PublicSpacePage } from "@/common/features/space-publish/pages/public-space-page";
 
 export const notesExtension = defineExtension({
   manifest: {
@@ -53,6 +54,12 @@ export const notesExtension = defineExtension({
             path: "/notes",
             element: <NotesPage />,
             order: 1,
+          },
+          {
+            id: "public-space",
+            path: "/space/:shareToken",
+            element: <PublicSpacePage />,
+            order: 2,
           },
           // default route to notes
           {

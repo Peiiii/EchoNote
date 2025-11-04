@@ -48,6 +48,7 @@ export interface Channel {
   lastMessageTime?: Date;
   backgroundImage?: string;
   backgroundColor?: string;
+  shareToken?: string;
 }
 
 // 新增：Channel级别的消息状态类型
@@ -105,6 +106,10 @@ export interface NotesDataState {
   cleanupListeners: () => void;
   fetchInitialData: (userId: string) => Promise<void>;
   validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
+
+  // Space publishing
+  publishSpace: (channelId: string) => Promise<string>;
+  unpublishSpace: (channelId: string) => Promise<void>;
 }
 
 // Utility functions to reduce code duplication
@@ -544,4 +549,33 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       get().clearChannelMessages(currentChannelId);
     }
   },
+
+  publishSpace: async (channelId: string): Promise<string> => {
+    const { userId } = get();
+    if (!userId) return "";
+    const shareToken = await withErrorHandling(
+      () => firebaseNotesService.publishSpace(userId, channelId),
+      "publishSpace"
+    );
+    if (shareToken) {
+      const { channels } = get();
+      const updatedChannels = channels.map(channel =>
+        channel.id === channelId ? { ...channel, shareToken } : channel
+      );
+      set({ channels: updatedChannels });
+    }
+    return shareToken || "";
+  },
+
+  unpublishSpace: withUserValidation(async (userId, channelId) => {
+    await withErrorHandling(
+      () => firebaseNotesService.unpublishSpace(userId, channelId),
+      "unpublishSpace"
+    );
+    const { channels } = get();
+    const updatedChannels = channels.map(channel =>
+      channel.id === channelId ? { ...channel, shareToken: undefined } : channel
+    );
+    set({ channels: updatedChannels });
+  }),
 }));

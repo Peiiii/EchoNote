@@ -12,12 +12,16 @@ import { MobileApp } from "@/mobile/mobile-app";
 import { logService, Platform } from "@/core/services/log.service";
 import { useEffect, useRef } from "react";
 import { GlobalProcessOverlay } from "@/common/components/global-process/global-process-overlay";
+import { useLocation } from "react-router-dom";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user, isInitializing } = useFirebaseAuth();
+  const location = useLocation();
   const sessionStartTime = useRef<number>(Date.now());
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
+
+  const isPublicSpaceRoute = location.pathname.startsWith("/space/");
 
   useEffect(() => {
     setNotesViewAuth(user);
@@ -33,8 +37,7 @@ export const App = () => {
     };
   }, [currentBreakpoint]);
 
-  // Only show a skeleton during session refresh, not for a fresh (logged-out) visit
-  if (isInitializing) {
+  if (isInitializing && !isPublicSpaceRoute) {
     return (
       <>
         <GlobalProcessOverlay />
@@ -44,12 +47,21 @@ export const App = () => {
     );
   }
 
-  if (!user) {
-    // Keep overlay mounted on auth screens as well (e.g., refresh, email link, etc.)
+  if (!user && !isPublicSpaceRoute) {
     return (
       <>
         {/* <GlobalProcessOverlay /> */}
         <LoginPage />
+        <Toaster />
+      </>
+    );
+  }
+
+  if (!user && isPublicSpaceRoute) {
+    return (
+      <>
+        <GlobalProcessOverlay />
+        {currentBreakpoint === "sm" ? <MobileApp /> : <DesktopApp />}
         <Toaster />
       </>
     );

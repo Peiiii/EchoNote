@@ -250,6 +250,8 @@ export const MessageTimeline = ({
     return renderMessageItem(item.message as Message);
   };
 
+  console.log("🔔 [MessageTimeline][items]:", { items });
+
   return (
     <>
       {/**

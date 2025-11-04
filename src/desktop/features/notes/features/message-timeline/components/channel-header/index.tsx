@@ -21,12 +21,14 @@ import {
   Settings,
   Sparkles,
   Users,
+  Globe,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { EditChannelPopover } from "../../../channel-management/components/edit-channel-popover";
 import { Edit2 } from "lucide-react";
+import { PublishSpaceDialog } from "../../../channel-management/components/publish-space-dialog";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -68,6 +70,7 @@ export const ChannelHeader = ({
   className = "",
   defaultCollapsed = false,
 }: ChannelHeaderProps) => {
+  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const presenter = useDesktopPresenterContext();
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -311,6 +314,18 @@ export const ChannelHeader = ({
           >
             <Search className="h-4 w-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "text-white hover:bg-white/20 transition-all duration-200 hover:scale-105",
+              channel.shareToken && "text-white/90"
+            )}
+            onClick={() => setIsPublishDialogOpen(true)}
+            title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
+          >
+            <Globe className={cn("h-4 w-4", channel.shareToken && "fill-white/20")} />
+          </Button>
           {getFeaturesConfig().channel.settings.enabled && (
             <Button
               variant="ghost"
@@ -414,6 +429,18 @@ export const ChannelHeader = ({
             <Button
               variant="ghost"
               size="sm"
+              className={cn(
+                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105",
+                channel.shareToken && "text-foreground"
+              )}
+              onClick={() => setIsPublishDialogOpen(true)}
+              title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
+            >
+              <Globe className={cn("h-4 w-4", channel.shareToken && "fill-current")} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={() => presenter.openAIAssistant()}
             > 
@@ -455,6 +482,11 @@ export const ChannelHeader = ({
           {expandedContent}
         </div>
       )}
+      <PublishSpaceDialog
+        channel={channel}
+        isOpen={isPublishDialogOpen}
+        onOpenChange={setIsPublishDialogOpen}
+      />
     </div>
   );
 };

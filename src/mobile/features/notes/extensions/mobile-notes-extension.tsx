@@ -6,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Notebook, Hash, Plus, Menu } from "lucide-react";
 import { MobileNotesPage } from "../pages/mobile-notes-page";
 import { Navigate } from "react-router-dom";
+import { PublicSpacePage } from "@/common/features/space-publish/pages/public-space-page";
 
 export const mobileNotesExtension = defineExtension({
   manifest: {
@@ -53,6 +54,12 @@ export const mobileNotesExtension = defineExtension({
             path: "/notes",
             element: <MobileNotesPage />,
             order: 1,
+          },
+          {
+            id: "mobile-public-space",
+            path: "/space/:shareToken",
+            element: <PublicSpacePage />,
+            order: 2,
           },
           // default route to notes
           {

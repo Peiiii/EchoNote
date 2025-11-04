@@ -19,7 +19,9 @@ import {
   increment,
   FieldValue,
   writeBatch,
+  collectionGroup,
 } from "firebase/firestore";
+import { v4 } from "uuid";
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/notes-data.store";
 
@@ -64,6 +66,7 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),
     backgroundImage: data.backgroundImage,
     backgroundColor: data.backgroundColor,
+    shareToken: data.shareToken,
   };
 };
 
@@ -609,6 +612,49 @@ export class FirebaseNotesService {
     } catch (error) {
       console.error("🔔 [Firebase] [getDeletedMessages]: Error fetching deleted messages:", error);
       return [];
+    }
+  };
+
+  publishSpace = async (userId: string, channelId: string): Promise<string> => {
+    const shareToken = v4();
+    await this.updateChannel(userId, channelId, { shareToken });
+    return shareToken;
+  };
+
+  unpublishSpace = async (userId: string, channelId: string): Promise<void> => {
+    await this.updateChannel(userId, channelId, { shareToken: undefined });
+  };
+
+  findChannelByShareToken = async (shareToken: string): Promise<{ channel: Channel; userId: string } | null> => {
+    try {
+      const db = firebaseConfig.getDb();
+      const q = query(
+        collectionGroup(db, "channels"),
+        where("shareToken", "==", shareToken),
+        where("isDeleted", "==", false),
+        limit(1)
+      );
+
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const docSnap = snapshot.docs[0];
+      const channel = docToChannel(docSnap);
+      
+      const pathParts = docSnap.ref.path.split("/");
+      const userIdIndex = pathParts.indexOf("users");
+      if (userIdIndex === -1 || userIdIndex + 1 >= pathParts.length) {
+        console.warn("[firebaseNotesService.findChannelByShareToken] Invalid document path:", docSnap.ref.path);
+        return null;
+      }
+      const userId = pathParts[userIdIndex + 1];
+
+      return { channel, userId };
+    } catch (error) {
+      console.error("[firebaseNotesService.findChannelByShareToken] failed", error);
+      return null;
     }
   };
 }
