@@ -66,7 +66,7 @@ export function PublicSpacePage() {
 
   if (error || !channel) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
         <div className="text-center max-w-md px-4">
           <h1 className="text-2xl font-bold mb-2">Space Not Found</h1>
           <p className="text-muted-foreground">{error || "This space is not available."}</p>

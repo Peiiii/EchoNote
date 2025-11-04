@@ -9,6 +9,7 @@ import {
 } from "@/common/components/ui/dialog";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
+import { modal } from "@/common/components/modal/modal.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Check, Copy, Globe, Link2 } from "lucide-react";
@@ -45,15 +46,26 @@ export function PublishSpaceDialog({
   };
 
   const handleUnpublish = async () => {
-    setIsLoading(true);
-    try {
-      await unpublishSpace(channel.id);
-      setIsCopied(false);
-    } catch (error) {
-      console.error("Error unpublishing space:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    modal.confirm({
+      title: "Unpublish Space",
+      description: `This will make the space "${channel.name}" private. Anyone with the share link will no longer be able to access it.`,
+      okText: "Unpublish",
+      okLoadingText: "Unpublishing...",
+      okVariant: "destructive",
+      cancelText: "Cancel",
+      onOk: async () => {
+        setIsLoading(true);
+        try {
+          await unpublishSpace(channel.id);
+          setIsCopied(false);
+          onOpenChange(false);
+        } catch (error) {
+          console.error("Error unpublishing space:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+    });
   };
 
   const handleCopyLink = async () => {
