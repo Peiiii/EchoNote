@@ -22,6 +22,7 @@ import {
   Sparkles,
   Users,
   Globe,
+  Share2,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
@@ -317,14 +318,15 @@ export const ChannelHeader = ({
           <Button
             variant="ghost"
             size="sm"
-            className={cn(
-              "text-white hover:bg-white/20 transition-all duration-200 hover:scale-105",
-              channel.shareToken && "text-white/90"
-            )}
+            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
             onClick={() => setIsPublishDialogOpen(true)}
             title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
           >
-            <Globe className={cn("h-4 w-4", channel.shareToken && "fill-white/20")} />
+            {channel.shareToken ? (
+              <Share2 className="h-4 w-4" />
+            ) : (
+              <Globe className="h-4 w-4" />
+            )}
           </Button>
           {getFeaturesConfig().channel.settings.enabled && (
             <Button
@@ -429,14 +431,15 @@ export const ChannelHeader = ({
             <Button
               variant="ghost"
               size="sm"
-              className={cn(
-                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105",
-                channel.shareToken && "text-foreground"
-              )}
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={() => setIsPublishDialogOpen(true)}
               title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
             >
-              <Globe className={cn("h-4 w-4", channel.shareToken && "fill-current")} />
+              {channel.shareToken ? (
+                <Share2 className="h-4 w-4" />
+              ) : (
+                <Globe className="h-4 w-4" />
+              )}
             </Button>
             <Button
               variant="ghost"
