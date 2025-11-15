@@ -5,12 +5,12 @@ This directory contains versioned Firestore security rules for the EchoNote appl
 ## Version History
 
 ### v2.0.0 (2025-01-27)
-**Current Version** - Enhanced with write-only collaborative mode support
+**Current Version** - Enhanced with append-only collaborative mode support
 
 - **Features**:
   - All features from v1.0.0
-  - **New**: Write-only mode support (`shareMode: "write-only"`)
-  - **New**: Anonymous users can create messages in write-only spaces
+  - **New**: Write-only mode support (`shareMode: "append-only"`)
+  - **New**: Anonymous users can create messages in append-only spaces
   - **New**: Anonymous users can update channel stats (messageCount, lastMessageTime)
   - **New**: Proper separation of create/update/delete permissions
   - Removed temporary development rule
@@ -36,13 +36,13 @@ This directory contains versioned Firestore security rules for the EchoNote appl
 2. **Update rules**: Copy the content from `firestore-security-v2.0.0.rules` to your Firestore console
 3. **Test**: Verify that:
    - Existing read-only published spaces still work
-   - New write-only spaces allow anonymous message creation
+   - New append-only spaces allow anonymous message creation
    - Owner permissions remain intact
 
 ### Key Changes in v2.0.0
 
-1. **Channel Update Rule**: Added support for anonymous users to update `lastMessageTime` and `messageCount` in write-only mode
-2. **Message Create Rule**: Added support for anonymous users to create messages in write-only published channels
+1. **Channel Update Rule**: Added support for anonymous users to update `lastMessageTime` and `messageCount` in append-only mode
+2. **Message Create Rule**: Added support for anonymous users to create messages in append-only published channels
 3. **Helper Functions**: Added `getChannel()` and `getChannelForCreate()` functions for better code organization
 4. **Removed Development Rule**: Removed the temporary `match /{document=**}` rule
 

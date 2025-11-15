@@ -26,10 +26,10 @@ service cloud.firestore {
       // Allow owner to create and delete
       allow create, delete: if request.auth != null && request.auth.uid == userId;
       
-      // Allow owner to update, OR anonymous users to update only message stats in write-only mode
+      // Allow owner to update, OR anonymous users to update only message stats in append-only mode
       allow update: if request.auth != null && request.auth.uid == userId
-                 || (resource.data.shareToken != null 
-                     && resource.data.shareMode == "write-only"
+                 || (resource.data.shareToken != null
+                     && resource.data.shareMode == "append-only"
                      && request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['lastMessageTime', 'messageCount']));
     }	
@@ -43,10 +43,10 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == userId
                || get(/databases/$(database)/documents/users/$(userId)/channels/$(resource.data.channelId)).data.shareToken != null;
       
-      // Allow owner to create, OR anonymous users to create in write-only published channels
+      // Allow owner to create, OR anonymous users to create in append-only published channels
       allow create: if request.auth != null && request.auth.uid == userId
-                 || (getChannelForCreate().data.shareToken != null 
-                     && getChannelForCreate().data.shareMode == "write-only"
+                 || (getChannelForCreate().data.shareToken != null
+                     && getChannelForCreate().data.shareMode == "append-only"
                      && request.resource.data.sender == "user"
                      && !request.resource.data.isDeleted);
       

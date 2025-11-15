@@ -616,7 +616,7 @@ export class FirebaseNotesService {
     }
   };
 
-  publishSpace = async (userId: string, channelId: string, shareMode: "read-only" | "write-only" = "read-only"): Promise<string> => {
+  publishSpace = async (userId: string, channelId: string, shareMode: "read-only" | "append-only" = "read-only"): Promise<string> => {
     const shareToken = v4();
     await this.updateChannel(userId, channelId, { shareToken, shareMode });
     return shareToken;
@@ -668,7 +668,7 @@ export class FirebaseNotesService {
       throw new Error("Channel not found or not published");
     }
 
-    if (channelInfo.channel.shareMode !== "write-only") {
+    if (channelInfo.channel.shareMode !== "append-only") {
       throw new Error("This space is read-only. Messages cannot be added.");
     }
 

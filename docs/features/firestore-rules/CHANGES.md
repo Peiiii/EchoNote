@@ -1,6 +1,6 @@
 # Changes from v1.0.0 to v2.0.0 (Minimal Changes)
 
-This document shows the minimal changes made to support write-only collaborative mode.
+This document shows the minimal changes made to support append-only collaborative mode.
 
 ## Original Rules (v1.0.0)
 
@@ -31,17 +31,17 @@ allow write: if request.auth != null && request.auth.uid == userId;
 // Allow owner to create and delete
 allow create, delete: if request.auth != null && request.auth.uid == userId;
 
-// Allow owner to update, OR anonymous users to update only message stats in write-only mode
+// Allow owner to update, OR anonymous users to update only message stats in append-only mode
 allow update: if request.auth != null && request.auth.uid == userId
            || (resource.data.shareToken != null 
-               && resource.data.shareMode == "write-only"
+               && resource.data.shareMode == "append-only"
                && request.resource.data.diff(resource.data).affectedKeys()
                    .hasOnly(['lastMessageTime', 'messageCount']));
 ```
 
 **What changed:**
 - Split `allow write` into `create`, `delete`, and `update`
-- Added condition for anonymous users to update channel stats in write-only mode
+- Added condition for anonymous users to update channel stats in append-only mode
 
 ### Change 2: Messages - Split write into create/update/delete
 
@@ -57,10 +57,10 @@ function getChannelForCreate() {
   return get(/databases/$(database)/documents/users/$(userId)/channels/$(request.resource.data.channelId));
 }
 
-// Allow owner to create, OR anonymous users to create in write-only published channels
+// Allow owner to create, OR anonymous users to create in append-only published channels
 allow create: if request.auth != null && request.auth.uid == userId
            || (getChannelForCreate().data.shareToken != null 
-               && getChannelForCreate().data.shareMode == "write-only"
+               && getChannelForCreate().data.shareMode == "append-only"
                && request.resource.data.sender == "user"
                && !request.resource.data.isDeleted);
 
@@ -71,7 +71,7 @@ allow update, delete: if request.auth != null && request.auth.uid == userId;
 **What changed:**
 - Split `allow write` into `create`, `update`, and `delete`
 - Added helper function `getChannelForCreate()` for create operations
-- Added condition for anonymous users to create messages in write-only mode
+- Added condition for anonymous users to create messages in append-only mode
 - Kept update/delete restricted to owner only
 
 ## Summary
@@ -94,5 +94,5 @@ After applying these rules, test:
 - [ ] Write-only published spaces allow anonymous message creation
 - [ ] Owner can still do everything (create, update, delete)
 - [ ] Anonymous users cannot modify or delete messages
-- [ ] Anonymous users cannot modify channels (except stats in write-only mode)
+- [ ] Anonymous users cannot modify channels (except stats in append-only mode)
 

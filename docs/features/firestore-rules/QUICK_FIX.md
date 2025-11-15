@@ -23,13 +23,13 @@ The error occurs because:
 
 After publishing, the rules should allow:
 - Anonymous users to read channels with `shareToken`
-- Anonymous users to create messages in `write-only` mode spaces
-- Anonymous users to update channel stats (`lastMessageTime`, `messageCount`) in `write-only` mode
+- Anonymous users to create messages in `append-only` mode spaces
+- Anonymous users to update channel stats (`lastMessageTime`, `messageCount`) in `append-only` mode
 
 ### Step 3: Test
 
 1. Try accessing a shared space link again
-2. If it's a `write-only` space, you should be able to:
+2. If it's a `append-only` space, you should be able to:
    - View all messages
    - Add new messages
    - See the message input box
@@ -38,7 +38,7 @@ After publishing, the rules should allow:
 
 Check which version you're using:
 - **v1.0.0**: Only supports read-only publishing
-- **v2.0.0**: Supports both read-only and write-only (collaborative) publishing
+- **v2.0.0**: Supports both read-only and append-only (collaborative) publishing
 
 ## Still Having Issues?
 

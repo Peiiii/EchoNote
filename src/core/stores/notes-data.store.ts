@@ -37,7 +37,7 @@ export interface Message {
   isNew?: boolean;
 }
 
-export type ShareMode = "read-only" | "write-only";
+export type ShareMode = "read-only" | "append-only";
 
 export interface Channel {
   id: string;
@@ -111,7 +111,7 @@ export interface NotesDataState {
   validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
 
   // Space publishing
-  publishSpace: (channelId: string, shareMode?: "read-only" | "write-only") => Promise<string>;
+  publishSpace: (channelId: string, shareMode?: "read-only" | "append-only") => Promise<string>;
   unpublishSpace: (channelId: string) => Promise<void>;
 }
 
@@ -553,7 +553,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }
   },
 
-  publishSpace: async (channelId: string, shareMode: "read-only" | "write-only" = "read-only"): Promise<string> => {
+  publishSpace: async (channelId: string, shareMode: "read-only" | "append-only" = "read-only"): Promise<string> => {
     const { userId } = get();
     if (!userId) return "";
     const shareToken = await withErrorHandling(

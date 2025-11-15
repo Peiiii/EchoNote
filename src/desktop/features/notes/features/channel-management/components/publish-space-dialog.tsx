@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
 import { modal } from "@/common/components/modal/modal.store";
 import { useNotesDataStore, ShareMode } from "@/core/stores/notes-data.store";
 import { Channel } from "@/core/stores/notes-data.store";
-import { Check, Copy, Globe, Link2, Lock, MessageSquare } from "lucide-react";
+import { Check, Copy, Globe, Lock, MessageSquare } from "lucide-react";
 import { useState } from "react";
 
 interface PublishSpaceDialogProps {
@@ -93,7 +93,7 @@ export function PublishSpaceDialog({
           </DialogTitle>
           <DialogDescription>
             {channel.shareToken
-              ? channel.shareMode === "write-only"
+              ? channel.shareMode === "append-only"
                 ? "Your space is published as a collaborative space. Anyone with the link can add messages (but cannot modify or delete)."
                 : "Your space is published. Share the link below to allow others to view it."
               : "Publish this space to make it accessible via a shareable link."}
@@ -105,7 +105,7 @@ export function PublishSpaceDialog({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Publish Mode</Label>
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-                {channel.shareMode === "write-only" ? (
+                {channel.shareMode === "append-only" ? (
                   <>
                     <MessageSquare className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium">Collaborative Mode</span>
@@ -176,11 +176,11 @@ export function PublishSpaceDialog({
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 space-y-0 rounded-lg border border-border bg-card p-4 hover:bg-accent/50 transition-colors">
-                  <RadioGroupItem value="write-only" id="write-only" className="mt-0.5" />
+                  <RadioGroupItem value="append-only" id="append-only" className="mt-0.5" />
                   <div className="flex-1 space-y-1">
-                    <Label htmlFor="write-only" className="flex items-center gap-2 cursor-pointer">
+                    <Label htmlFor="append-only" className="flex items-center gap-2 cursor-pointer">
                       <MessageSquare className="h-4 w-4 text-primary" />
-                      <span className="font-medium">Collaborative (Write-Only)</span>
+                      <span className="font-medium">Collaborative (Append-Only)</span>
                     </Label>
                     <p className="text-sm text-muted-foreground">
                       Anyone with the link can add new messages, but cannot modify or delete existing messages. Perfect for group discussions.

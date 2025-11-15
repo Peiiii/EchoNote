@@ -113,7 +113,7 @@ export function PublicSpacePage() {
   }, [messageContent]);
 
   const groupedMessages = useGroupedMessages(messages, { latestFirst: true });
-  const isWriteOnly = channel?.channel.shareMode === "write-only";
+  const isAppendOnly = channel?.channel.shareMode === "append-only";
 
   if (loading) {
     return (
@@ -178,7 +178,7 @@ export function PublicSpacePage() {
           </div>
         </div>
 
-        {isWriteOnly && (
+        {isAppendOnly && (
           <div className="sticky bottom-0 bg-background border-t border-border/60 mt-8 w-full max-w-full overflow-x-hidden">
             <div className="w-full max-w-full py-3">
               <div className="relative w-full max-w-full">
