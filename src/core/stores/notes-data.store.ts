@@ -37,6 +37,8 @@ export interface Message {
   isNew?: boolean;
 }
 
+export type ShareMode = "read-only" | "write-only";
+
 export interface Channel {
   id: string;
   name: string;
@@ -49,6 +51,7 @@ export interface Channel {
   backgroundImage?: string;
   backgroundColor?: string;
   shareToken?: string;
+  shareMode?: ShareMode;
 }
 
 // 新增：Channel级别的消息状态类型
@@ -108,7 +111,7 @@ export interface NotesDataState {
   validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
 
   // Space publishing
-  publishSpace: (channelId: string) => Promise<string>;
+  publishSpace: (channelId: string, shareMode?: "read-only" | "write-only") => Promise<string>;
   unpublishSpace: (channelId: string) => Promise<void>;
 }
 
@@ -550,17 +553,17 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }
   },
 
-  publishSpace: async (channelId: string): Promise<string> => {
+  publishSpace: async (channelId: string, shareMode: "read-only" | "write-only" = "read-only"): Promise<string> => {
     const { userId } = get();
     if (!userId) return "";
     const shareToken = await withErrorHandling(
-      () => firebaseNotesService.publishSpace(userId, channelId),
+      () => firebaseNotesService.publishSpace(userId, channelId, shareMode),
       "publishSpace"
     );
     if (shareToken) {
       const { channels } = get();
       const updatedChannels = channels.map(channel =>
-        channel.id === channelId ? { ...channel, shareToken } : channel
+        channel.id === channelId ? { ...channel, shareToken, shareMode } : channel
       );
       set({ channels: updatedChannels });
     }
@@ -574,7 +577,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     );
     const { channels } = get();
     const updatedChannels = channels.map(channel =>
-      channel.id === channelId ? { ...channel, shareToken: undefined } : channel
+      channel.id === channelId ? { ...channel, shareToken: undefined, shareMode: undefined } : channel
     );
     set({ channels: updatedChannels });
   }),

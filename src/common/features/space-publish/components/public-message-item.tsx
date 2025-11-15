@@ -13,15 +13,15 @@ export function PublicMessageItem({ message }: PublicMessageItemProps) {
   }
 
   return (
-    <div className="group relative w-full">
-      <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border">
+    <div className="group relative w-full max-w-full overflow-hidden">
+      <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border w-full max-w-full overflow-hidden">
         <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="font-medium">{formatTimeForSocial(message.timestamp)}</span>
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span className="font-medium truncate">{formatTimeForSocial(message.timestamp)}</span>
           </div>
         </div>
-        <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-foreground prose-a:text-primary hover:prose-a:text-primary/80">
+        <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 break-words overflow-wrap-anywhere">
           <MarkdownContent content={message.content} />
         </div>
       </div>

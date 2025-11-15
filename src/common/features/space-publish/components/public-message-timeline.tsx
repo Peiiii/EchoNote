@@ -48,17 +48,17 @@ export function PublicMessageTimeline({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full max-w-full overflow-x-hidden">
       {items.map((item, index) => {
         if (item.type === "date-divider") {
           return (
-            <div key={`date-${item.date}-${index}`} className="py-4">
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-border" />
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-1 bg-card rounded-full border border-border/50 shadow-sm">
+            <div key={`date-${item.date}-${index}`} className="py-4 w-full max-w-full overflow-x-hidden">
+              <div className="flex items-center gap-4 w-full max-w-full">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-border min-w-0" />
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-1 bg-card rounded-full border border-border/50 shadow-sm shrink-0">
                   {item.date}
                 </span>
-                <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-border" />
+                <div className="flex-1 h-px bg-gradient-to-l from-transparent via-border to-border min-w-0" />
               </div>
             </div>
           );

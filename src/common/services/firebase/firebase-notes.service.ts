@@ -67,6 +67,7 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     backgroundImage: data.backgroundImage,
     backgroundColor: data.backgroundColor,
     shareToken: data.shareToken,
+    shareMode: data.shareMode || (data.shareToken ? "read-only" : undefined),
   };
 };
 
@@ -615,14 +616,14 @@ export class FirebaseNotesService {
     }
   };
 
-  publishSpace = async (userId: string, channelId: string): Promise<string> => {
+  publishSpace = async (userId: string, channelId: string, shareMode: "read-only" | "write-only" = "read-only"): Promise<string> => {
     const shareToken = v4();
-    await this.updateChannel(userId, channelId, { shareToken });
+    await this.updateChannel(userId, channelId, { shareToken, shareMode });
     return shareToken;
   };
 
   unpublishSpace = async (userId: string, channelId: string): Promise<void> => {
-    await this.updateChannel(userId, channelId, { shareToken: undefined });
+    await this.updateChannel(userId, channelId, { shareToken: undefined, shareMode: undefined });
   };
 
   findChannelByShareToken = async (shareToken: string): Promise<{ channel: Channel; userId: string } | null> => {
@@ -656,6 +657,38 @@ export class FirebaseNotesService {
       console.error("[firebaseNotesService.findChannelByShareToken] failed", error);
       return null;
     }
+  };
+
+  createMessageForPublicSpace = async (
+    shareToken: string,
+    messageData: Omit<Message, "id" | "timestamp">
+  ): Promise<string> => {
+    const channelInfo = await this.findChannelByShareToken(shareToken);
+    if (!channelInfo) {
+      throw new Error("Channel not found or not published");
+    }
+
+    if (channelInfo.channel.shareMode !== "write-only") {
+      throw new Error("This space is read-only. Messages cannot be added.");
+    }
+
+    const filteredMessageData = Object.fromEntries(
+      Object.entries(messageData).filter(([, value]) => value !== undefined)
+    );
+
+    const docRef = await addDoc(getMessagesCollectionRef(channelInfo.userId), {
+      ...filteredMessageData,
+      timestamp: serverTimestamp(),
+      isDeleted: false,
+    });
+
+    const channelRef = doc(getChannelsCollectionRef(channelInfo.userId), channelInfo.channel.id);
+    await updateDoc(channelRef, {
+      lastMessageTime: serverTimestamp(),
+      messageCount: increment(1),
+    });
+
+    return docRef.id;
   };
 }
 
