@@ -152,7 +152,7 @@ export function PublicSpacePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 w-full overflow-x-hidden">
-      <div className="max-w-4xl mx-auto px-8 py-8 w-full flex flex-col min-h-screen">
+      <div className="max-w-4xl mx-auto px-8 pt-8 w-full flex flex-col min-h-screen">
         <div className="flex-1 space-y-8 w-full max-w-full overflow-x-hidden">
           <div className="relative w-full max-w-full">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl" />
