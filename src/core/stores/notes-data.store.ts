@@ -113,6 +113,7 @@ export interface NotesDataState {
   // Space publishing
   publishSpace: (channelId: string, shareMode?: "read-only" | "append-only") => Promise<string>;
   unpublishSpace: (channelId: string) => Promise<void>;
+  updatePublishMode: (channelId: string, shareMode: "read-only" | "append-only") => Promise<void>;
 }
 
 // Utility functions to reduce code duplication
@@ -578,6 +579,18 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     const { channels } = get();
     const updatedChannels = channels.map(channel =>
       channel.id === channelId ? { ...channel, shareToken: undefined, shareMode: undefined } : channel
+    );
+    set({ channels: updatedChannels });
+  }),
+
+  updatePublishMode: withUserValidation(async (userId, channelId, shareMode) => {
+    await withErrorHandling(
+      () => firebaseNotesService.updateChannel(userId, channelId, { shareMode }),
+      "updatePublishMode"
+    );
+    const { channels } = get();
+    const updatedChannels = channels.map(channel =>
+      channel.id === channelId ? { ...channel, shareMode } : channel
     );
     set({ channels: updatedChannels });
   }),

@@ -9,12 +9,12 @@ import {
 } from "@/common/components/ui/dialog";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
 import { modal } from "@/common/components/modal/modal.store";
 import { useNotesDataStore, ShareMode } from "@/core/stores/notes-data.store";
 import { Channel } from "@/core/stores/notes-data.store";
-import { Check, Copy, Globe, Lock, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { Check, Copy, Lock, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { cn } from "@/common/lib/utils";
 
 interface PublishSpaceDialogProps {
   channel: Channel;
@@ -27,10 +27,19 @@ export function PublishSpaceDialog({
   isOpen,
   onOpenChange,
 }: PublishSpaceDialogProps) {
-  const { publishSpace, unpublishSpace } = useNotesDataStore();
+  const { publishSpace, unpublishSpace, updatePublishMode } = useNotesDataStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<ShareMode>("read-only");
+  const [selectedMode, setSelectedMode] = useState<ShareMode>(
+    channel.shareMode || "read-only"
+  );
+
+  useEffect(() => {
+    setSelectedMode(channel.shareMode || "read-only");
+  }, [channel.shareMode]);
+
+  const hasModeChanged = channel.shareToken && selectedMode !== channel.shareMode;
+  const shouldShowLink = channel.shareToken && !hasModeChanged;
 
   const shareUrl = channel.shareToken
     ? `${window.location.origin}/#/space/${channel.shareToken}`
@@ -81,139 +90,165 @@ export function PublishSpaceDialog({
     }
   };
 
+  const handleModeSelect = (newMode: ShareMode) => {
+    if (newMode === selectedMode) return;
+    setSelectedMode(newMode);
+  };
+
+  const handleConfirmModeChange = async () => {
+    if (!channel.shareToken || !hasModeChanged) return;
+
+    setIsLoading(true);
+    try {
+      await updatePublishMode(channel.id, selectedMode);
+    } catch (error) {
+      console.error("Error updating publish mode:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelModeChange = () => {
+    setSelectedMode(channel.shareMode || "read-only");
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <div className={`p-2 rounded-lg ${channel.shareToken ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-              <Globe className="h-5 w-5" />
-            </div>
-            <span>Publish Space</span>
-          </DialogTitle>
+          <DialogTitle>Publish Space</DialogTitle>
           <DialogDescription>
             {channel.shareToken
               ? channel.shareMode === "append-only"
-                ? "Your space is published as a collaborative space. Anyone with the link can add messages (but cannot modify or delete)."
-                : "Your space is published. Share the link below to allow others to view it."
-              : "Publish this space to make it accessible via a shareable link."}
+                ? "Your space is published. Anyone with the link can view and add messages."
+                : "Your space is published. Anyone with the link can view messages."
+              : "Make this space accessible via a shareable link."}
           </DialogDescription>
         </DialogHeader>
 
-        {channel.shareToken ? (
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Publish Mode</Label>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-                {channel.shareMode === "append-only" ? (
-                  <>
-                    <MessageSquare className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Collaborative Mode</span>
-                    <span className="text-xs text-muted-foreground ml-auto">Anyone can add messages</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Read-Only Mode</span>
-                    <span className="text-xs text-muted-foreground ml-auto">View only</span>
-                  </>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Mode</Label>
+            <div className="space-y-1">
+              <div
+                onClick={() => handleModeSelect("read-only")}
+                className={cn(
+                  "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200",
+                  selectedMode === "read-only" ? "bg-primary/8 text-primary" : "hover:bg-accent/30 text-foreground"
                 )}
+              >
+                <div className="flex items-center gap-2 flex-1">
+                  <div
+                    className={cn("transition-colors", selectedMode === "read-only" ? "text-primary" : "text-muted-foreground")}
+                  >
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-medium">Read-Only</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground/70">View only</span>
+                </div>
+              </div>
+              <div
+                onClick={() => handleModeSelect("append-only")}
+                className={cn(
+                  "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200",
+                  selectedMode === "append-only" ? "bg-primary/8 text-primary" : "hover:bg-accent/30 text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2 flex-1">
+                  <div
+                    className={cn("transition-colors", selectedMode === "append-only" ? "text-primary" : "text-muted-foreground")}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-medium">Collaborative</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground/70">Anyone can add</span>
+                </div>
               </div>
             </div>
+            <div className="mt-3 pt-3 border-t border-border/60">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {selectedMode === "read-only" 
+                  ? "Anyone with the link can view messages, but cannot add, modify, or delete them."
+                  : "Anyone with the link can view and add messages. Existing messages cannot be modified or deleted."}
+              </p>
+            </div>
+          </div>
+          {shouldShowLink && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Share Link</Label>
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Share Link</Label>
               <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    value={shareUrl}
-                    readOnly
-                    className="flex-1 font-mono text-sm pr-10 bg-muted/50 border-border/50"
-                    onClick={(e) => (e.target as HTMLInputElement).select()}
-                  />
-                  {isCopied && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-primary font-medium">
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Copied</span>
-                    </div>
-                  )}
-                </div>
+                <Input
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 font-mono text-xs bg-muted/30 border-border/60"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
                 <Button
                   type="button"
-                  variant={isCopied ? "default" : "outline"}
+                  variant="outline"
                   size="icon"
                   onClick={handleCopyLink}
-                  className={`shrink-0 transition-all ${isCopied ? 'bg-primary text-primary-foreground' : ''}`}
+                  className="shrink-0 h-9 w-9"
                 >
                   {isCopied ? (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-4 w-4 text-primary" />
                   ) : (
                     <Copy className="h-4 w-4" />
                   )}
                 </Button>
               </div>
-              {isCopied && (
-                <p className="text-xs text-primary font-medium animate-in fade-in slide-in-from-top-1">
-                  Link copied to clipboard!
-                </p>
-              )}
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4 py-4">
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Publish Mode</Label>
-              <RadioGroup value={selectedMode} onValueChange={(value) => setSelectedMode(value as ShareMode)}>
-                <div className="flex items-start space-x-3 space-y-0 rounded-lg border border-border bg-card p-4 hover:bg-accent/50 transition-colors">
-                  <RadioGroupItem value="read-only" id="read-only" className="mt-0.5" />
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="read-only" className="flex items-center gap-2 cursor-pointer">
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Read-Only</span>
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Anyone with the link can view messages, but cannot add, modify, or delete them.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3 space-y-0 rounded-lg border border-border bg-card p-4 hover:bg-accent/50 transition-colors">
-                  <RadioGroupItem value="append-only" id="append-only" className="mt-0.5" />
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="append-only" className="flex items-center gap-2 cursor-pointer">
-                      <MessageSquare className="h-4 w-4 text-primary" />
-                      <span className="font-medium">Collaborative (Append-Only)</span>
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Anyone with the link can add new messages, but cannot modify or delete existing messages. Perfect for group discussions.
-                    </p>
-                  </div>
-              </div>
-              </RadioGroup>
-            </div>
-          </div>
-        )}
-
-        <DialogFooter>
-          {channel.shareToken ? (
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleUnpublish}
-              disabled={isLoading}
-              className="w-full sm:w-auto"
-            >
-              {isLoading ? "Unpublishing..." : "Unpublish"}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={handlePublish}
-              disabled={isLoading}
-              className="w-full sm:w-auto"
-            >
-              {isLoading ? "Publishing..." : "Publish"}
-            </Button>
           )}
-        </DialogFooter>
+        </div>
+
+            <DialogFooter>
+              {channel.shareToken ? (
+                hasModeChanged ? (
+                  <div className="flex items-center gap-2 w-full">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCancelModeChange}
+                      disabled={isLoading}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleConfirmModeChange}
+                      disabled={isLoading}
+                      className="flex-1"
+                    >
+                      {isLoading ? "Changing..." : "Confirm Change"}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleUnpublish}
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    {isLoading ? "Unpublishing..." : "Unpublish"}
+                  </Button>
+                )
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Publishing..." : "Publish"}
+                </Button>
+              )}
+            </DialogFooter>
       </DialogContent>
     </Dialog>
   );
