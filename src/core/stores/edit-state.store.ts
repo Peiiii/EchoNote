@@ -80,6 +80,7 @@ export const useEditStateStore = create<EditState>()(
         const shouldRestore = !!options?.restoreDraft && hasMatchingDraft;
         const restoredContent = shouldRestore && draftEntry ? draftEntry.content : content;
 
+        const currentEditorMode = get().editorMode;
         set({
           editingMessageId: messageId,
           editContent: restoredContent,
@@ -90,7 +91,8 @@ export const useEditStateStore = create<EditState>()(
           showDraftPrompt: hasMatchingDraft && !shouldRestore,
           restoredFromDraft: shouldRestore,
           editMode: "inline",
-          editorMode: "wysiwyg",
+          // Preserve user's last chosen editor mode for better UX
+          editorMode: currentEditorMode,
         });
       },
 
@@ -135,6 +137,17 @@ export const useEditStateStore = create<EditState>()(
             // Remove the stale draft only when it actually exists
             const { [messageId]: _removed, ...rest } = prev.drafts;
             nextDrafts = rest;
+          }
+
+          // Keep drafts bounded to avoid localStorage bloat
+          const DRAFT_LIMIT = 50;
+          if (Object.keys(nextDrafts).length > DRAFT_LIMIT) {
+            // drop the oldest drafts by updatedAt
+            const entries = Object.entries(nextDrafts).sort(
+              (a, b) => (b[1].updatedAt || 0) - (a[1].updatedAt || 0)
+            );
+            const trimmed = entries.slice(0, DRAFT_LIMIT);
+            nextDrafts = Object.fromEntries(trimmed);
           }
 
           return {
@@ -269,7 +282,8 @@ export const useEditStateStore = create<EditState>()(
     }),
     {
       name: "echonote-edit-state-storage",
-      partialize: state => ({ drafts: state.drafts }),
+      // Persist drafts and last chosen editor mode for consistency across sessions
+      partialize: state => ({ drafts: state.drafts, editorMode: state.editorMode }),
     }
   )
 );

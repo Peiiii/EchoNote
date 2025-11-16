@@ -1,9 +1,6 @@
 import { Button } from "@/common/components/ui/button";
-import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
-import { generateSparksForText } from "@/desktop/features/notes/features/ai-assistant/services/insights.service";
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { buildTaggedPrompt } from "@/common/lib/tag-analysis.service";
-import { useState } from "react";
+import { Message } from "@/core/stores/notes-data.store";
+import { useSparks } from "@/common/features/notes/hooks/use-sparks";
 import { cn } from "@/common/lib/utils";
 import { X } from "lucide-react";
 
@@ -13,6 +10,7 @@ interface ThoughtRecordSparksProps {
   className?: string;
   onClose?: () => void;
   enableContextEnhancement?: boolean;
+  mode?: "batch" | "stream";
 }
 
 export function ThoughtRecordSparks({
@@ -21,63 +19,21 @@ export function ThoughtRecordSparks({
   className,
   onClose,
   enableContextEnhancement = true,
+  mode = "stream",
 }: ThoughtRecordSparksProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-
   const aiAnalysis = message.aiAnalysis;
-  const hasSparks = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
+  const hasSparksPersisted = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
+  const {
+    isGenerating,
+    error,
+    hasTagContext,
+    sparks,
+    generate,
+    regenerate,
+  } = useSparks(message, { enableContextEnhancement, mode });
 
-  // Check if tags provide context for analysis
-  const { hasTagContext } = buildTaggedPrompt(message.content, message.tags || []);
-  async function handleGenerateSparks() {
-    try {
-      setIsGenerating(true);
-
-      // Build enhanced instructions based on tags
-      const { enhancedPrompt, hasTagContext } = buildTaggedPrompt(
-        message.content,
-        message.tags || []
-      );
-
-      const sparks = await generateSparksForText({
-        content: message.content, // Use original content
-        channelId: message.channelId,
-        messageId: message.id,
-        options: {
-          includeChannelContext: enableContextEnhancement,
-          additionalInstructions: hasTagContext ? enhancedPrompt : undefined,
-        },
-      });
-
-      const { userId } = useNotesDataStore.getState();
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
-
-      await channelMessageService.updateMessage({
-        messageId: message.id,
-        channelId: message.channelId,
-        updates: {
-          aiAnalysis: {
-            ...aiAnalysis,
-            insights: sparks,
-            keywords: aiAnalysis?.keywords ?? [],
-            topics: aiAnalysis?.topics ?? [],
-            sentiment: aiAnalysis?.sentiment ?? "neutral",
-            summary: aiAnalysis?.summary ?? "",
-            tags: aiAnalysis?.tags ?? [],
-            relatedTopics: aiAnalysis?.relatedTopics ?? [],
-          },
-        },
-        userId,
-      });
-
-      // Remove this line to keep the panel open after generating sparks
-      // onToggleAnalysis();
-    } finally {
-      setIsGenerating(false);
-    }
-  }
+  const hasSparks = Boolean((sparks && sparks.length) || hasSparksPersisted);
+  const renderSparks = sparks ?? aiAnalysis?.insights ?? [];
 
   if (!showAnalysis) {
     return null;
@@ -105,7 +61,7 @@ export function ThoughtRecordSparks({
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleGenerateSparks} disabled={isGenerating}>
+              <Button variant="outline" onClick={generate} disabled={isGenerating}>
                 {isGenerating ? "Generating..." : "Generate Sparks"}
               </Button>
               {onClose && (
@@ -133,7 +89,7 @@ export function ThoughtRecordSparks({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button onClick={handleGenerateSparks} variant="outline" disabled={isGenerating}>
+                <Button onClick={regenerate} variant="outline" disabled={isGenerating}>
                   {isGenerating ? "Generating..." : "Regenerate"}
                 </Button>
                 {onClose && (
@@ -148,7 +104,7 @@ export function ThoughtRecordSparks({
               </div>
             </div>
             <div className="space-y-3">
-              {aiAnalysis?.insights?.map((spark, index) => (
+              {renderSparks.map((spark, index) => (
                 <div
                   key={index}
                   className="p-3 bg-white/60 dark:bg-slate-700/40 rounded-lg border border-slate-200/40 dark:border-slate-600/40"
@@ -161,6 +117,11 @@ export function ThoughtRecordSparks({
                   </div>
                 </div>
               ))}
+              {error && (
+                <div className="text-xs text-red-500 px-1.5">
+                  {error}
+                </div>
+              )}
             </div>
           </div>
         )}

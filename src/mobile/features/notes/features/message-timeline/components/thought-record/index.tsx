@@ -190,7 +190,8 @@ export const MobileThoughtRecord = ({
           open={isExpandedEditing}
           onOpenChange={open => {
             if (!open) {
-              presenter.noteEditManager.switchToInlineMode();
+              // Requirement: exiting expanded editor should also exit inline edit mode
+              presenter.noteEditManager.cancel();
             }
           }}
         >
@@ -205,7 +206,7 @@ export const MobileThoughtRecord = ({
               originalContent={message.content}
               onSave={handleSave}
               onCancel={handleCancel}
-              onCollapse={() => presenter.noteEditManager.switchToInlineMode()}
+              onCollapse={() => presenter.noteEditManager.cancel()}
               isSaving={isSaving}
             />
           </DialogContent>

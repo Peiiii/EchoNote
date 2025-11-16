@@ -1,9 +1,9 @@
-import { Lightbulb } from "lucide-react";
-import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
-import { generateSparksForTextSimple } from "@/desktop/features/notes/features/ai-assistant/services/insights.service";
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { useState, useEffect, useCallback } from "react";
+import { Lightbulb, X } from "lucide-react";
+import { Message } from "@/core/stores/notes-data.store";
+import { useEffect } from "react";
 import { getFeaturesConfig } from "@/core/config/features.config";
+import { Button } from "@/common/components/ui/button";
+import { useSparks } from "@/common/features/notes/hooks/use-sparks";
 
 interface MobileThoughtRecordSparksProps {
   message: Message;
@@ -20,50 +20,24 @@ export function MobileThoughtRecordSparks({
   className,
   autoGenerate = false,
 }: MobileThoughtRecordSparksProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-
   const aiAnalysis = message.aiAnalysis;
-  const hasSparks = Boolean(aiAnalysis?.insights?.length);
-
-  const handleGenerateSparks = useCallback(async () => {
-    try {
-      setIsGenerating(true);
-      const sparks = await generateSparksForTextSimple(message.content);
-
-      const { userId } = useNotesDataStore.getState();
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
-
-      await channelMessageService.updateMessage({
-        messageId: message.id,
-        channelId: message.channelId,
-        updates: {
-          aiAnalysis: {
-            ...aiAnalysis,
-            insights: sparks,
-            keywords: aiAnalysis?.keywords ?? [],
-            topics: aiAnalysis?.topics ?? [],
-            sentiment: aiAnalysis?.sentiment ?? "neutral",
-            summary: aiAnalysis?.summary ?? "",
-            tags: aiAnalysis?.tags ?? [],
-            relatedTopics: aiAnalysis?.relatedTopics ?? [],
-          },
-        },
-        userId,
-      });
-    } catch (error) {
-      console.error("Failed to generate sparks:", error);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [message.content, message.id, message.channelId, aiAnalysis]);
+  const {
+    isGenerating,
+    error,
+    hasTagContext,
+    contentTooShort,
+    sparks,
+    generate,
+    regenerate,
+  } = useSparks(message, { enableContextEnhancement: true, mode: "stream" });
+  const hasSparks = Boolean((sparks && sparks.length) || aiAnalysis?.insights?.length);
+  const renderSparks = sparks ?? aiAnalysis?.insights ?? [];
 
   useEffect(() => {
     if (autoGenerate && showAnalysis && !hasSparks && !isGenerating) {
-      handleGenerateSparks();
+      generate();
     }
-  }, [autoGenerate, showAnalysis, hasSparks, isGenerating, handleGenerateSparks]);
+  }, [autoGenerate, showAnalysis, hasSparks, isGenerating, generate]);
 
   if (!getFeaturesConfig().channel.thoughtRecord.sparks.enabled) {
     return null;
@@ -75,8 +49,9 @@ export function MobileThoughtRecordSparks({
 
   return (
     <div className={className}>
-      {hasSparks ? (
-        <div className="space-y-2">
+      <div className="space-y-2">
+        {/* Toggle chip */}
+        <div className="flex items-center gap-2">
           <button
             onClick={onToggleAnalysis}
             className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 group"
@@ -84,35 +59,80 @@ export function MobileThoughtRecordSparks({
           >
             <Lightbulb className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-              {aiAnalysis!.insights.length}
+              {hasSparks ? aiAnalysis!.insights.length : 0}
             </span>
           </button>
+          {hasTagContext && (
+            <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+              Tag‑enhanced
+            </span>
+          )}
+        </div>
 
-          {showAnalysis && (
-            <div className="space-y-2">
-              {aiAnalysis!.insights.map((insight: string, index: number) => (
-                <div
-                  key={index}
-                  className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
-                >
-                  {insight}
+        {/* Panel */}
+        {showAnalysis && (
+          <div className="space-y-2">
+            {!hasSparks ? (
+              <div className="flex items-center justify-between p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50 bg-slate-50/60 dark:bg-slate-800/30">
+                <div className="flex items-center gap-2">
+                  {isGenerating ? (
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      Generating sparks...
+                    </div>
+                  ) : error ? (
+                    <div className="text-xs text-red-500">Failed: {error}</div>
+                  ) : contentTooShort ? (
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      Add a bit more content to get meaningful sparks
+                    </div>
+                  ) : (
+                    <div className="text-xs text-slate-500 dark:text-slate-400">No sparks yet</div>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center justify-center py-4">
-          {isGenerating ? (
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              Generating sparks...
-            </div>
-          ) : (
-            <div className="text-xs text-slate-400 dark:text-slate-500">No sparks available</div>
-          )}
-        </div>
-      )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={generate}
+                    disabled={isGenerating || contentTooShort}
+                  >
+                    {isGenerating ? "Generating..." : "Generate"}
+                  </Button>
+                  <button
+                    onClick={onToggleAnalysis}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
+                    title="Close analysis"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {renderSparks.map((insight: string, index: number) => (
+                  <div
+                    key={index}
+                    className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed p-2 bg-white/60 dark:bg-slate-700/40 rounded-lg border border-slate-200/40 dark:border-slate-600/40"
+                  >
+                    {insight}
+                  </div>
+                ))}
+                <div className="flex items-center justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={regenerate}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? "Generating..." : "Regenerate"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

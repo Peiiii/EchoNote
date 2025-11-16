@@ -32,7 +32,8 @@ export const ExpandedEditorOverlay = ({
           content={editContent}
           onSave={() => presenter.noteEditManager.save(false)}
           onCancel={() => presenter.noteEditManager.cancel()}
-          onCollapse={() => presenter.noteEditManager.switchToInlineMode()}
+          // Requirement: collapsing expanded editor also exits editing entirely
+          onCollapse={() => presenter.noteEditManager.cancel()}
           isSaving={isSaving}
         />
       </DialogContent>
