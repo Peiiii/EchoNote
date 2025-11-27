@@ -21,6 +21,11 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
   const footerItems = items.filter(item => item.group === ActivityBarGroup.FOOTER);
 
   const handleActiveChange = (activeId: string) => {
+    // Feedback activity lives in the footer and only opens a modal,
+    // so we don't want it to change the main active route.
+    if (activeId === "feedback") {
+      return;
+    }
     setActiveId(activeId);
   };
 

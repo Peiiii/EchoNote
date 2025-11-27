@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { DesktopSetupApp } from "./desktop-setup-app";
 import { notesExtension } from "./features/notes/extensions";
 import { demoExtension } from "./features/demo/extensions/demo-extension";
+import { feedbackExtension } from "./features/feedback/extensions";
 import { DesktopPresenterContext } from "./hooks/use-desktop-presenter-context";
 import { DesktopPresenter } from "./services/desktop-presenter";
 
@@ -12,7 +13,7 @@ export const DesktopApp = () => {
   
   // Only include demo extension in development
   const extensions = useMemo(() => {
-    const baseExtensions = [notesExtension];
+    const baseExtensions = [notesExtension, feedbackExtension];
     
     // Add demo extension only in development
     if (import.meta.env.DEV) {
