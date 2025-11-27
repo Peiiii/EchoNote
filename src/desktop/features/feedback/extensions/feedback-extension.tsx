@@ -17,8 +17,8 @@ export const feedbackExtension = defineExtension({
       Disposable.from(
         useActivityBarStore.getState().addItem({
           id: "feedback",
-          label: "反馈",
-          title: "产品反馈",
+          label: "Feedback",
+          title: "Product Feedback",
           group: ActivityBarGroup.FOOTER,
           icon: "heart",
           order: 1000,

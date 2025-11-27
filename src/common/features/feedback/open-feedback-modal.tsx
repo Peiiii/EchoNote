@@ -12,9 +12,9 @@ export function openFeedbackModal() {
       <div className="flex flex-col w-screen max-w-[1024px] h-[80vh]">
         <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-background">
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">产品反馈</span>
+            <span className="text-sm font-semibold">Product Feedback</span>
             <span className="text-xs text-muted-foreground">
-              在下面的空间里直接写下你的想法，我们会定期查看
+              Share your thoughts in the space below, we'll review them regularly
             </span>
           </div>
           <button
@@ -22,7 +22,7 @@ export function openFeedbackModal() {
             className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded"
             onClick={() => modalController?.close()}
           >
-            关闭
+            Close
           </button>
         </div>
         <div className="flex-1 bg-muted">
