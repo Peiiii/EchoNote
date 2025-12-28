@@ -23,7 +23,7 @@ import {
 } from "firebase/firestore";
 import { v4 } from "uuid";
 import { firebaseConfig } from "@/common/config/firebase.config";
-import { Message, Channel } from "@/core/stores/notes-data.store";
+import type { Message, Channel } from "@/core/types/notes";
 
 /**
  * Firebase Notes Service - Handle Firebase operations related to user notes and thoughts

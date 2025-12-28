@@ -128,7 +128,7 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
     setNodes(positioned);
 
     // Persist after first layout for better UX next time
-    onPersist(positioned.map(({ r, ...rest }) => rest));
+    onPersist(positioned.map(({ r: _r, ...rest }) => rest));
   }, [data.nodes, data.edges, size.width, size.height, onPersist]);
 
   // Setup zoom behavior
@@ -167,7 +167,7 @@ function MindmapGraph({ data, onPersist }: { data: MindmapData; onPersist: (node
         setNodes((prev) => prev.map((n) => (n.id === d.id ? { ...n, x: nx, y: ny } : n)));
       })
       .on("end", () => {
-        onPersist(nodes.map(({ r, ...rest }) => rest));
+        onPersist(nodes.map(({ r: _r, ...rest }) => rest));
       });
     return dragBehavior;
   }, [nodes, onPersist]);
@@ -538,7 +538,8 @@ function MindmapLR({
   const onToggle = useCallback((id: string) => {
     setCollapsed((prev) => {
       const ns = new Set(prev);
-      ns.has(id) ? ns.delete(id) : ns.add(id);
+      if (ns.has(id)) ns.delete(id);
+      else ns.add(id);
       return ns;
     });
   }, []);
@@ -658,7 +659,9 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
 
   const resetLayout = useCallback(() => {
     // Clear persisted positions and let graph recompute
-    const clearedNodes: MindmapNode[] = data.nodes.map(({ x, y, ...rest }): MindmapNode => ({ ...rest }));
+    const clearedNodes: MindmapNode[] = data.nodes.map(
+      ({ x: _x, y: _y, ...rest }): MindmapNode => ({ ...rest })
+    );
     const cleared: MindmapData = {
       ...data,
       nodes: clearedNodes,

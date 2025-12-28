@@ -1,8 +1,8 @@
 import { RxEvent } from "@/common/lib/rx-event";
-import { firebaseNotesService } from "@/common/services/firebase";
 import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import type { Cursor } from "@/core/storage/types";
+import { getStorageProvider } from "@/core/storage/provider";
 import { createDataContainer, createSlice } from "rx-nested-bean";
 import {
   combineLatest,
@@ -35,7 +35,7 @@ export type ChannelState = {
   loading: boolean;
   loadingMore: boolean;
   hasMore: boolean;
-  lastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
+  lastVisible: Cursor | null;
   subscription?: {
     unsubscribe: () => void;
   };
@@ -181,18 +181,18 @@ export class ChannelMessageService {
     setLoading(true);
 
     try {
-      const result = await firebaseNotesService.fetchInitialMessages(
-        userId,
-        channelId,
-        messagesLimit
-      );
+      const result = await getStorageProvider().notes.listMessages(userId, channelId, {
+        limit: messagesLimit,
+        cursor: null,
+        includeSenders: ["user"],
+      });
 
-      result.messages.forEach(addMessage);
-      setLastVisible(result.lastVisible);
-      setHasMore(!result.allLoaded);
+      result.items.forEach(addMessage);
+      setLastVisible(result.nextCursor);
+      setHasMore(!!result.nextCursor);
 
-      if (result.messages.length > 0) {
-        const latestTimestamp = result.messages[0].timestamp;
+      if (result.items.length > 0) {
+        const latestTimestamp = result.items[0].timestamp;
         const unsubscribe = this.subscribeToNewMessages({
           channelId,
           afterTimestamp: latestTimestamp,
@@ -225,21 +225,20 @@ export class ChannelMessageService {
     setLoadingMore(true);
 
     try {
-      const result = await firebaseNotesService.fetchMoreMessages(
-        userId,
-        channelId,
-        messagesLimit,
-        lastVisible
-      );
+      const result = await getStorageProvider().notes.listMessages(userId, channelId, {
+        limit: messagesLimit,
+        cursor: lastVisible,
+        includeSenders: ["user"],
+      });
 
-      if (result.messages.length > 0) {
-        const updatedMessages = [...result.messages, ...messages];
+      if (result.items.length > 0) {
+        const updatedMessages = [...result.items, ...messages];
         setMessages(updatedMessages);
-        setLastVisible(result.lastVisible);
-        this.moreMessageLoadedEvent$.emit({ channelId, messages: result.messages });
+        setLastVisible(result.nextCursor);
+        this.moreMessageLoadedEvent$.emit({ channelId, messages: result.items });
       }
 
-      setHasMore(!result.allLoaded);
+      setHasMore(!!result.nextCursor);
     } catch (error) {
       console.error("Error loading more messages:", error);
     } finally {
@@ -265,16 +264,13 @@ export class ChannelMessageService {
 
     console.log("🔔 [subscribeToNewMessages] 开始订阅新消息", { channelId, afterTimestamp });
 
-    const unsubscribe = firebaseNotesService.subscribeToNewMessages(
-      userId,
-      channelId,
-      afterTimestamp,
-      newMessages => {
-        newMessages.forEach(message => {
-          addMessage(message);
-        });
-      }
-    );
+    const notesRepo = getStorageProvider().notes;
+    if (!notesRepo.subscribeNewMessages) return () => {};
+    const unsubscribe = notesRepo.subscribeNewMessages(userId, channelId, afterTimestamp, newMessages => {
+      newMessages.forEach(message => {
+        addMessage(message);
+      });
+    });
     setSubscription({ unsubscribe });
 
     return unsubscribe;
@@ -298,11 +294,7 @@ export class ChannelMessageService {
     await withOptimisticUpdate(
       () => removeMessage(messageId),
       async () => {
-        if (hardDelete) {
-          await firebaseNotesService.deleteMessage(userId, messageId);
-        } else {
-          await firebaseNotesService.softDeleteMessage(userId, messageId);
-        }
+        await getStorageProvider().notes.deleteMessage(userId, messageId, { hardDelete });
         console.log("Message deleted successfully:", { messageId, channelId, hardDelete });
       },
       () => {
@@ -318,7 +310,7 @@ export class ChannelMessageService {
     const { addMessage, fixFakeMessage } = this.getChannelStateControl(message.channelId);
     const tmpMessage: Message = { ...message, id: v4(), timestamp: new Date(), isNew: true };
     addMessage(tmpMessage);
-    const realMsgId = await firebaseNotesService.createMessage(userId, message);
+    const realMsgId = await getStorageProvider().notes.createMessage(userId, message);
     fixFakeMessage(tmpMessage.id, realMsgId);
   };
 
@@ -350,7 +342,7 @@ export class ChannelMessageService {
     await withOptimisticUpdate(
       () => setMessages(messages.map(m => (m.id === messageId ? updatedMessage : m))),
       async () => {
-        await firebaseNotesService.updateMessage(userId, messageId, updates);
+        await getStorageProvider().notes.updateMessage(userId, messageId, updates);
         console.log("Message updated successfully:", { messageId, channelId, updates });
       },
       () => {
