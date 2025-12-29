@@ -1,8 +1,8 @@
-# EchoNote UI Design System
+# StillRoot UI Design System
 
 ## 📁 Documentation Structure
 
-This directory contains the complete design system documentation for EchoNote's UI transformation.
+This directory contains the complete design system documentation for StillRoot's UI transformation.
 
 ### 📋 Documents
 
@@ -11,7 +11,7 @@ This directory contains the complete design system documentation for EchoNote's 
 
 ## 🎯 Design Goals
 
-Transform EchoNote from a basic white interface to a sophisticated, Apple-inspired design with:
+Transform StillRoot from a basic white interface to a sophisticated, Apple-inspired design with:
 
 - **Layered Visual Hierarchy** - Rich depth through background layers
 - **Apple Aesthetic** - Clean, modern, and intuitive interface
@@ -21,26 +21,31 @@ Transform EchoNote from a basic white interface to a sophisticated, Apple-inspir
 ## 🚀 Quick Start
 
 ### Immediate Improvements (Can implement today)
+
 1. **Background Layers**: Add subtle gray backgrounds to different areas
 2. **Rounded Corners**: Apply consistent border-radius to components
 3. **Subtle Shadows**: Add depth with box-shadow effects
 
 ### Phase 1 (Week 1-2)
+
 - Establish color system and design tokens
 - Update core components (Button, Input, Card)
 - Implement layered background system
 
 ### Phase 2 (Week 3-4)
+
 - Add Apple-inspired visual elements
 - Enhance typography system
 - Improve spacing and layout
 
 ### Phase 3 (Week 5-6)
+
 - Implement glass morphism effects
 - Add micro-animations
 - Enhance interactive feedback
 
 ### Phase 4 (Week 7-8)
+
 - Polish details and optimize performance
 - Ensure accessibility compliance
 - Final testing and refinement
@@ -48,17 +53,20 @@ Transform EchoNote from a basic white interface to a sophisticated, Apple-inspir
 ## 🎨 Key Design Elements
 
 ### Color System
+
 - **Primary**: Apple Blue (#007AFF)
 - **Backgrounds**: Layered grays for depth
 - **Text**: High contrast for readability
 
 ### Visual Hierarchy
+
 - **Level 0**: Pure white for content
 - **Level 1**: Light gray for panels
 - **Level 2**: Medium gray for sidebars
 - **Level 3**: Dark gray for modals
 
 ### Component Design
+
 - **Rounded Corners**: 4px, 8px, 12px, 16px system
 - **Shadows**: 4-level elevation system
 - **Spacing**: 4px-based spacing system
@@ -67,18 +75,20 @@ Transform EchoNote from a basic white interface to a sophisticated, Apple-inspir
 ## 🔧 Technical Implementation
 
 ### CSS Custom Properties
+
 ```css
 :root {
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8F9FA;
-  --bg-tertiary: #F1F3F4;
-  --color-primary: #007AFF;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f3f4;
+  --color-primary: #007aff;
   --radius-md: 8px;
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 ```
 
 ### Component Updates
+
 - Start with base components (Button, Input, Card)
 - Update layout components (Sidebar, Header)
 - Enhance feature components (MessageTimeline, Toolbar)
@@ -94,6 +104,7 @@ Transform EchoNote from a basic white interface to a sophisticated, Apple-inspir
 ## 🤝 Feedback & Iteration
 
 This design system is designed to be:
+
 - **User-driven**: Based on girlfriend's feedback and preferences
 - **Iterative**: Continuous improvement based on usage
 - **Flexible**: Adaptable to changing needs and requirements
@@ -101,4 +112,4 @@ This design system is designed to be:
 
 ---
 
-*For detailed information, please refer to the individual documents in this directory.*
+_For detailed information, please refer to the individual documents in this directory._

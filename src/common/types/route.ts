@@ -5,4 +5,4 @@ export interface RouteNode {
   children?: RouteNode[];
   order?: number;
   meta?: Record<string, unknown>;
-} 
+}

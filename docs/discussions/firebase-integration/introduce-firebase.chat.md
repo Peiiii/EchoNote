@@ -31,22 +31,22 @@ expand_less
 // src/services/firebaseService.ts
 
 import {
-  doc, onSnapshot, collection, query, where, orderBy, getDocs,
-  addDoc, updateDoc, deleteDoc, serverTimestamp, limit, startAfter, DocumentSnapshot
+doc, onSnapshot, collection, query, where, orderBy, getDocs,
+addDoc, updateDoc, deleteDoc, serverTimestamp, limit, startAfter, DocumentSnapshot
 } from 'firebase/firestore';
 import { db, auth } from './firebaseConfig'; // 你的 Firebase 初始化文件
 
 export interface Note {
-  id: string;
-  text: string;
-  channelId: string;
-  createdAt: any; // Firestore Timestamp
-  updatedAt: any;
+id: string;
+text: string;
+channelId: string;
+createdAt: any; // Firestore Timestamp
+updatedAt: any;
 }
 
 export interface Channel {
-  id: string;
-  name: string;
+id: string;
+name: string;
 }
 
 const getNotesCollectionRef = (userId: string) => collection(db, `users/${userId}/notes`);
@@ -55,69 +55,69 @@ const getChannelsCollectionRef = (userId: string) => collection(db, `users/${use
 // --- 实时订阅服务 ---
 
 export const subscribeToChannels = (userId: string, onUpdate: (channels: Channel[]) => void): (() => void) => {
-  const q = query(getChannelsCollectionRef(userId), orderBy('name'));
-  // onSnapshot 返回一个 unsubscribe 函数，我们直接返回它
-  return onSnapshot(q, (snapshot) => {
-    const channels = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Channel[];
-    onUpdate(channels);
-  });
+const q = query(getChannelsCollectionRef(userId), orderBy('name'));
+// onSnapshot 返回一个 unsubscribe 函数，我们直接返回它
+return onSnapshot(q, (snapshot) => {
+const channels = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Channel[];
+onUpdate(channels);
+});
 };
 
 // 订阅单条笔记（用于实时编辑）
 export const subscribeToNote = (userId: string, noteId: string, onUpdate: (note: Note | null) => void): (() => void) => {
-  const noteRef = doc(db, `users/${userId}/notes/${noteId}`);
-  return onSnapshot(noteRef, (doc) => {
-    onUpdate(doc.exists() ? { id: doc.id, ...doc.data() } as Note : null);
-  });
+const noteRef = doc(db, `users/${userId}/notes/${noteId}`);
+return onSnapshot(noteRef, (doc) => {
+onUpdate(doc.exists() ? { id: doc.id, ...doc.data() } as Note : null);
+});
 };
 
 // --- CRUD & 分页服务 ---
 
 export const fetchInitialNotes = async (userId: string, channelId: string, notesPerPage: number) => {
-  const q = query(
-    getNotesCollectionRef(userId),
-    where('channelId', '==', channelId),
-    orderBy('createdAt', 'desc'),
-    limit(notesPerPage)
-  );
-  const snapshot = await getDocs(q);
-  const notes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Note[];
-  const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-  return { notes, lastVisible };
+const q = query(
+getNotesCollectionRef(userId),
+where('channelId', '==', channelId),
+orderBy('createdAt', 'desc'),
+limit(notesPerPage)
+);
+const snapshot = await getDocs(q);
+const notes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Note[];
+const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+return { notes, lastVisible };
 };
 
 export const fetchMoreNotes = async (userId: string, channelId: string, notesPerPage: number, cursor: DocumentSnapshot) => {
-  const q = query(
-    getNotesCollectionRef(userId),
-    where('channelId', '==', channelId),
-    orderBy('createdAt', 'desc'),
-    startAfter(cursor),
-    limit(notesPerPage)
-  );
-  const snapshot = await getDocs(q);
-  const notes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Note[];
-  const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-  return { notes, lastVisible };
+const q = query(
+getNotesCollectionRef(userId),
+where('channelId', '==', channelId),
+orderBy('createdAt', 'desc'),
+startAfter(cursor),
+limit(notesPerPage)
+);
+const snapshot = await getDocs(q);
+const notes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Note[];
+const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+return { notes, lastVisible };
 };
 
 export const createNote = async (userId: string, noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
-  const docRef = await addDoc(getNotesCollectionRef(userId), {
-    ...noteData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return docRef.id;
+const docRef = await addDoc(getNotesCollectionRef(userId), {
+...noteData,
+createdAt: serverTimestamp(),
+updatedAt: serverTimestamp(),
+});
+return docRef.id;
 };
 
 export const updateNoteText = async (userId: string, noteId: string, text: string): Promise<void> => {
-  await updateDoc(doc(db, `users/${userId}/notes/${noteId}`), {
-    text,
-    updatedAt: serverTimestamp(),
-  });
+await updateDoc(doc(db, `users/${userId}/notes/${noteId}`), {
+text,
+updatedAt: serverTimestamp(),
+});
 };
 
 export const deleteNote = async (userId: string, noteId: string): Promise<void> => {
-  await deleteDoc(doc(db, `users/${userId}/notes/${noteId}`));
+await deleteDoc(doc(db, `users/${userId}/notes/${noteId}`));
 };
 
 设计要点：
@@ -143,97 +143,98 @@ IGNORE_WHEN_COPYING_END
 
 import create from 'zustand';
 import {
-  firebaseService,
-  Note,
-  Channel,
+firebaseService,
+Note,
+Channel,
 } from '../services/firebaseService';
 import { DocumentSnapshot } from 'firebase/firestore';
 
 interface AppState {
-  // --- Auth State ---
-  currentUser: User | null; // User from firebase/auth
-  authIsReady: boolean;
+// --- Auth State ---
+currentUser: User | null; // User from firebase/auth
+authIsReady: boolean;
 
-  // --- Channel State ---
-  channels: Channel[];
-  currentChannelId: string | null;
-  channelUnsubscribe: (() => void) | null;
+// --- Channel State ---
+channels: Channel[];
+currentChannelId: string | null;
+channelUnsubscribe: (() => void) | null;
 
-  // --- Notes State ---
-  notes: { [key: string]: Note }; // 使用对象/Map 存储笔记，方便快速查找和更新
-  noteOrder: string[]; // 维护笔记的顺序
-  isLoadingNotes: boolean;
-  lastVisibleNote: DocumentSnapshot | null;
-  allNotesLoaded: boolean;
-  
-  // --- Actions ---
-  actions: {
-    // Auth Actions
-    setCurrentUser: (user: User | null) => void;
-    setAuthIsReady: () => void;
-    
+// --- Notes State ---
+notes: { [key: string]: Note }; // 使用对象/Map 存储笔记，方便快速查找和更新
+noteOrder: string[]; // 维护笔记的顺序
+isLoadingNotes: boolean;
+lastVisibleNote: DocumentSnapshot | null;
+allNotesLoaded: boolean;
+
+// --- Actions ---
+actions: {
+// Auth Actions
+setCurrentUser: (user: User | null) => void;
+setAuthIsReady: () => void;
+
     // Channel Actions
     initChannelsSubscription: () => void;
     cleanupChannelsSubscription: () => void;
-    
+
     // Notes Actions
     fetchNotesForChannel: (channelId: string) => Promise<void>;
     fetchMoreNotesForCurrentChannel: () => Promise<void>;
     createNote: (text: string, channelId: string) => Promise<void>;
     updateNote: (noteId: string, text: string) => Promise<void>;
     deleteNote: (noteId: string) => Promise<void>;
-  };
+
+};
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  // --- 初始 State ---
-  currentUser: null,
-  authIsReady: false,
-  channels: [],
-  currentChannelId: null,
-  channelUnsubscribe: null,
-  notes: {},
-  noteOrder: [],
-  isLoadingNotes: false,
-  lastVisibleNote: null,
-  allNotesLoaded: false,
+// --- 初始 State ---
+currentUser: null,
+authIsReady: false,
+channels: [],
+currentChannelId: null,
+channelUnsubscribe: null,
+notes: {},
+noteOrder: [],
+isLoadingNotes: false,
+lastVisibleNote: null,
+allNotesLoaded: false,
 
-  // --- Actions 实现 ---
-  actions: {
-    setCurrentUser: (user) => set({ currentUser: user }),
-    setAuthIsReady: () => set({ authIsReady: true }),
-    
+// --- Actions 实现 ---
+actions: {
+setCurrentUser: (user) => set({ currentUser: user }),
+setAuthIsReady: () => set({ authIsReady: true }),
+
     initChannelsSubscription: () => {
       const userId = get().currentUser?.uid;
       if (!userId) return;
-      
+
       // 先清理旧的订阅
       get().actions.cleanupChannelsSubscription();
-      
+
       const unsubscribe = firebaseService.subscribeToChannels(userId, (channels) => {
         set({ channels });
         // 可选：如果当前频道被删除，则切换到第一个频道
       });
       set({ channelUnsubscribe: unsubscribe });
     },
-    
+
     cleanupChannelsSubscription: () => {
       get().channelUnsubscribe?.();
       set({ channelUnsubscribe: null });
     },
-    
+
     fetchNotesForChannel: async (channelId) => {
       const userId = get().currentUser?.uid;
       if (!userId || get().isLoadingNotes) return;
-      
+
       set({ isLoadingNotes: true, currentChannelId: channelId, notes: {}, noteOrder: [], allNotesLoaded: false });
-      
+
       const { notes, lastVisible } = await firebaseService.fetchInitialNotes(userId, channelId, 20); // 20 is notesPerPage
-      
+
       const newNotesMap = notes.reduce((acc, note) => ({ ...acc, [note.id]: note }), {});
       const newNoteOrder = notes.map(note => note.id);
 
-      set({ 
+      set({
         notes: newNotesMap,
         noteOrder: newNoteOrder,
         lastVisibleNote: lastVisible,
@@ -249,7 +250,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ isLoadingNotes: true });
 
       const { notes, lastVisible } = await firebaseService.fetchMoreNotes(currentUser.uid, currentChannelId, 20, lastVisibleNote);
-      
+
       const newNotesMap = notes.reduce((acc, note) => ({ ...acc, [note.id]: note }), {});
       const newNoteOrder = notes.map(note => note.id);
 
@@ -261,7 +262,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         allNotesLoaded: notes.length < 20,
       }));
     },
-    
+
     createNote: async (text, channelId) => {
       const userId = get().currentUser?.uid;
       if (!userId) return;
@@ -287,7 +288,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         set(state => {
           const { [optimisticNote.id]: _, ...restNotes } = state.notes; // 移除临时笔记
           const newRealNote = { ...optimisticNote, id: newNoteId, createdAt: "Syncing..." }; // 理想情况下应该获取真实时间戳
-          
+
           return {
             notes: { [newNoteId]: newRealNote, ...restNotes },
             noteOrder: state.noteOrder.map(id => id === optimisticNote.id ? newNoteId : id),
@@ -305,20 +306,21 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
       }
     },
-    
+
     // updateNote 和 deleteNote 也可以实现类似的乐观更新
     updateNote: async (noteId, text) => { /* ... */ },
     deleteNote: async (noteId) => { /* ... */ },
-  },
+
+},
 }));
 
 // --- Selector Hooks (为了方便在组件中使用) ---
 export const useCurrentUser = () => useAppStore(state => state.currentUser);
 export const useChannels = () => useAppStore(state => state.channels);
 export const useNotes = () => {
-    const notes = useAppStore(state => state.notes);
-    const noteOrder = useAppStore(state => state.noteOrder);
-    return noteOrder.map(id => notes[id]);
+const notes = useAppStore(state => state.notes);
+const noteOrder = useAppStore(state => state.noteOrder);
+return noteOrder.map(id => notes[id]);
 };
 export const useAppActions = () => useAppStore(state => state.actions);
 
@@ -349,44 +351,45 @@ import { auth } from './services/firebaseConfig';
 import { useAppActions, useCurrentUser } from './store/useAppStore';
 
 function App() {
-  const { setCurrentUser, setAuthIsReady, initChannelsSubscription, cleanupChannelsSubscription } = useAppActions();
-  const currentUser = useCurrentUser();
+const { setCurrentUser, setAuthIsReady, initChannelsSubscription, cleanupChannelsSubscription } = useAppActions();
+const currentUser = useCurrentUser();
 
-  useEffect(() => {
-    // 监听 Firebase Auth 状态，这是整个应用的起点
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setAuthIsReady();
-    });
-    return unsubscribe;
-  }, [setCurrentUser, setAuthIsReady]);
+useEffect(() => {
+// 监听 Firebase Auth 状态，这是整个应用的起点
+const unsubscribe = onAuthStateChanged(auth, (user) => {
+setCurrentUser(user);
+setAuthIsReady();
+});
+return unsubscribe;
+}, [setCurrentUser, setAuthIsReady]);
 
-  useEffect(() => {
-    // 当用户登录状态变化时，管理频道订阅
-    if (currentUser) {
-      initChannelsSubscription();
-    } else {
-      cleanupChannelsSubscription();
-    }
-  }, [currentUser, initChannelsSubscription, cleanupChannelsSubscription]);
-  
-  // ... 渲染你的路由和组件
+useEffect(() => {
+// 当用户登录状态变化时，管理频道订阅
+if (currentUser) {
+initChannelsSubscription();
+} else {
+cleanupChannelsSubscription();
+}
+}, [currentUser, initChannelsSubscription, cleanupChannelsSubscription]);
+
+// ... 渲染你的路由和组件
 }
 
 // 在你的笔记列表组件中
 function NoteList() {
-  const notes = useNotes();
-  const { fetchMoreNotesForCurrentChannel } = useAppActions();
-  const isLoading = useAppStore(state => state.isLoadingNotes);
-  
-  // ... 使用 Intersection Observer 实现无限滚动，并调用 fetchMoreNotes...
-  
-  return (
-    <ul>
-      {notes.map(note => <li key={note.id}>{note.text}</li>)}
-      {isLoading && <li>Loading...</li>}
-    </ul>
-  );
+const notes = useNotes();
+const { fetchMoreNotesForCurrentChannel } = useAppActions();
+const isLoading = useAppStore(state => state.isLoadingNotes);
+
+// ... 使用 Intersection Observer 实现无限滚动，并调用 fetchMoreNotes...
+
+return (
+
+<ul>
+{notes.map(note => <li key={note.id}>{note.text}</li>)}
+{isLoading && <li>Loading...</li>}
+</ul>
+);
 }
 
 这套架构为你提供了一个非常坚实的基础，它清晰、可测试、可扩展，并且提供了极佳的用户体验。从这里开始，你可以继续完善错误处理、添加离线支持（Zustand persist middleware + Firestore offline capabilities）等更高级的功能。

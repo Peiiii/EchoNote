@@ -19,7 +19,7 @@ export const useEditor = (options: {
       if (editorRef.current) {
         editorRef.current.destroy();
       }
-      editorRef.current = new Editor(textareaRef.current, (content) => {
+      editorRef.current = new Editor(textareaRef.current, content => {
         updateContentRef.current(content);
       });
     }
@@ -35,9 +35,9 @@ export const useEditor = (options: {
   // Consumer: automatically consume pending operations after content changes
   useEffect(() => {
     if (editorRef.current) {
-     setTimeout(() => {
-      editorRef.current?.consumePendingOperations();
-     }, 0);
+      setTimeout(() => {
+        editorRef.current?.consumePendingOperations();
+      }, 0);
     }
   }, [content]);
 

@@ -7,6 +7,7 @@
 ## 工具一览（频道级 CRUD + 列表）
 
 当前工具由 `ChannelToolsManager` 按频道提供：
+
 - createNote：在当前频道创建一条新笔记
 - readNote：按 ID 读取单条笔记内容
 - updateNote：按 ID 更新笔记内容
@@ -14,6 +15,7 @@
 - listNotes：列出当前频道内的笔记
 
 实现位置：
+
 - `src/common/features/ai-assistant/services/channel-tools-manager.ts:25`（createNote）
 - `src/common/features/ai-assistant/services/channel-tools-manager.ts:69`（readNote）
 - `src/common/features/ai-assistant/services/channel-tools-manager.ts:118`（updateNote）
@@ -25,25 +27,23 @@
 推荐直接复用现有工厂：
 
 ```tsx
-import { useAgentSessionManager, useParseTools, AgentChatCore } from '@agent-labs/agent-chat'
-import { aiAgentFactory } from '@/common/features/ai-assistant/services/ai-agent-factory'
+import { useAgentSessionManager, useParseTools, AgentChatCore } from "@agent-labs/agent-chat";
+import { aiAgentFactory } from "@/common/features/ai-assistant/services/ai-agent-factory";
 
 function NotesChat({ conversationId, channelId }: { conversationId: string; channelId: string }) {
-  const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId])
-  const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools)
-  const agent = useMemo(() => aiAgentFactory.getAgent(), [])
+  const tools = useMemo(() => aiAgentFactory.getChannelTools(channelId), [channelId]);
+  const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
+  const agent = useMemo(() => aiAgentFactory.getAgent(), []);
 
   const session = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
     getContexts: () => aiAgentFactory.getSessionContexts(conversationId, channelId),
     initialMessages: [],
-    getToolExecutor: (name) => toolExecutors[name],
-  })
+    getToolExecutor: name => toolExecutors[name],
+  });
 
-  return (
-    <AgentChatCore agentSessionManager={session} toolRenderers={toolRenderers} />
-  )
+  return <AgentChatCore agentSessionManager={session} toolRenderers={toolRenderers} />;
 }
 ```
 
@@ -64,16 +64,24 @@ function NotesChat({ conversationId, channelId }: { conversationId: string; chan
 ```tsx
 const tools = [
   {
-    name: 'createNote',
-    description: 'Create a new note in current channel',
-    parameters: { type: 'object', properties: { content: { type: 'string' } }, required: ['content'] },
-    execute: async (toolCall) => {
-      const { content } = JSON.parse(toolCall.function.arguments)
+    name: "createNote",
+    description: "Create a new note in current channel",
+    parameters: {
+      type: "object",
+      properties: { content: { type: "string" } },
+      required: ["content"],
+    },
+    execute: async toolCall => {
+      const { content } = JSON.parse(toolCall.function.arguments);
       // 实际逻辑：写入当前频道
-      return { toolCallId: toolCall.id, result: `Created: ${content.slice(0,50)}...`, state: 'result' as const }
+      return {
+        toolCallId: toolCall.id,
+        result: `Created: ${content.slice(0, 50)}...`,
+        state: "result" as const,
+      };
     },
   },
-]
+];
 ```
 
 提示：如果希望在 UI 中同步显示“已插入到时间线”的视觉反馈，可追加一个轻量 render，用于非 result 阶段提示“正在写入…”。
@@ -84,27 +92,30 @@ const tools = [
 
 ```tsx
 // 基于 useParseTools 的返回，覆盖同名渲染器
-const { toolDefs, toolExecutors, toolRenderers: baseRenderers } = useParseTools(tools)
+const { toolDefs, toolExecutors, toolRenderers: baseRenderers } = useParseTools(tools);
 
 const toolRenderers = {
   ...baseRenderers,
   listNotes: {
-    definition: toolDefs.find(d => d.name === 'listNotes')!,
-    render: (invocation) => {
-      if (invocation.state !== 'result') {
-        const args = typeof invocation.args === 'string' ? invocation.args : JSON.stringify(invocation.args)
+    definition: toolDefs.find(d => d.name === "listNotes")!,
+    render: invocation => {
+      if (invocation.state !== "result") {
+        const args =
+          typeof invocation.args === "string" ? invocation.args : JSON.stringify(invocation.args);
         return (
           <div className="p-3 border rounded-md text-sm text-muted-foreground">
             正在读取笔记列表… 参数：{args}
           </div>
-        )
+        );
       }
       // 现有 execute 返回的是字符串化的数组，这里还原后展示
-      let items: Array<{ noteId: string; content: string; timestampReadable: string }>
+      let items: Array<{ noteId: string; content: string; timestampReadable: string }>;
       try {
-        items = JSON.parse(String(invocation.result))
+        items = JSON.parse(String(invocation.result));
       } catch {
-        return <pre className="text-xs whitespace-pre-wrap break-all">{String(invocation.result)}</pre>
+        return (
+          <pre className="text-xs whitespace-pre-wrap break-all">{String(invocation.result)}</pre>
+        );
       }
       return (
         <div className="p-3 border rounded-md bg-muted/20">
@@ -118,10 +129,10 @@ const toolRenderers = {
             ))}
           </ul>
         </div>
-      )
+      );
     },
   },
-}
+};
 ```
 
 注意：如需更进一步的交互（比如“跳转到该笔记”），可以在 li 中加入按钮，触发应用内的跳转逻辑。
@@ -132,23 +143,44 @@ const toolRenderers = {
 
 ```tsx
 const updateNoteInteractive = {
-  name: 'updateNote',
-  description: 'Update note after user confirmation',
-  parameters: { type: 'object', properties: { noteId: { type: 'string' }, content: { type: 'string' } }, required: ['noteId', 'content'] },
+  name: "updateNote",
+  description: "Update note after user confirmation",
+  parameters: {
+    type: "object",
+    properties: { noteId: { type: "string" }, content: { type: "string" } },
+    required: ["noteId", "content"],
+  },
   render: (invocation, onResult) => {
-    const { noteId, content } = typeof invocation.args === 'string' ? JSON.parse(invocation.args) : (invocation.args as any)
+    const { noteId, content } =
+      typeof invocation.args === "string" ? JSON.parse(invocation.args) : (invocation.args as any);
     return (
       <div className="p-3 border rounded-md text-sm">
-        <div className="mb-2">确认更新笔记 <code>{noteId}</code> 吗？</div>
+        <div className="mb-2">
+          确认更新笔记 <code>{noteId}</code> 吗？
+        </div>
         <pre className="text-xs whitespace-pre-wrap break-all mb-2">{content}</pre>
         <div className="flex gap-2">
-          <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={() => onResult({ toolCallId: invocation.toolCallId, result: 'confirmed', state: 'result' })}>确认</button>
-          <button className="px-3 py-1 rounded" onClick={() => onResult({ toolCallId: invocation.toolCallId, result: 'cancelled', state: 'result' })}>取消</button>
+          <button
+            className="px-3 py-1 rounded bg-blue-600 text-white"
+            onClick={() =>
+              onResult({ toolCallId: invocation.toolCallId, result: "confirmed", state: "result" })
+            }
+          >
+            确认
+          </button>
+          <button
+            className="px-3 py-1 rounded"
+            onClick={() =>
+              onResult({ toolCallId: invocation.toolCallId, result: "cancelled", state: "result" })
+            }
+          >
+            取消
+          </button>
         </div>
       </div>
-    )
-  }
-}
+    );
+  },
+};
 ```
 
 实际是否启用“纯交互”取决于产品策略；对批量/危险操作建议采用交互确认。

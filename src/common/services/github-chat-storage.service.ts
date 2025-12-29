@@ -1,4 +1,4 @@
-import { githubStorageService, GitHubStorageService } from './github-storage.service';
+import { githubStorageService, GitHubStorageService } from "./github-storage.service";
 
 export interface ChatMessage {
   id: string;
@@ -109,12 +109,16 @@ export class GitHubChatStorageService {
   }
 
   // 存储每日消息
-  async storeDailyMessages(channelSlug: string, date: string, messages: ChatMessage[]): Promise<void> {
+  async storeDailyMessages(
+    channelSlug: string,
+    date: string,
+    messages: ChatMessage[]
+  ): Promise<void> {
     const path = `channels/${channelSlug}/messages/${date}.json`;
     const dailyData: DailyMessages = {
       date,
       channelSlug,
-      messages
+      messages,
     };
     await this.storageService.storeJSON(path, dailyData);
   }
@@ -144,7 +148,11 @@ export class GitHubChatStorageService {
   }
 
   // 获取频道所有消息（简单实现，按日期加载）
-  async getChannelMessages(channelSlug: string, startDate?: string, endDate?: string): Promise<ChatMessage[]> {
+  async getChannelMessages(
+    channelSlug: string,
+    startDate?: string,
+    endDate?: string
+  ): Promise<ChatMessage[]> {
     // 这里简化实现，实际应该通过索引快速定位
     const dates = this.getDateRange(startDate, endDate);
     const allMessages: ChatMessage[] = [];
@@ -154,7 +162,9 @@ export class GitHubChatStorageService {
       allMessages.push(...messages);
     }
 
-    return allMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    return allMessages.sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
   }
 
   // 简单的日期范围生成
@@ -165,7 +175,7 @@ export class GitHubChatStorageService {
 
     const current = new Date(start);
     while (current <= end) {
-      dates.push(current.toISOString().split('T')[0]);
+      dates.push(current.toISOString().split("T")[0]);
       current.setDate(current.getDate() + 1);
     }
 
@@ -199,7 +209,7 @@ export class GitHubChatStorageService {
         totalMessages: 0,
         totalDays: 0,
         fileIndex: {},
-        threads: {}
+        threads: {},
       };
     }
 
@@ -211,12 +221,14 @@ export class GitHubChatStorageService {
       lastMessage: null,
       firstTimestamp: null,
       lastTimestamp: null,
-      size: "0KB" // 简化实现，暂时不计算文件大小
+      size: "0KB", // 简化实现，暂时不计算文件大小
     };
 
     // 更新统计信息
-    index.totalMessages = Object.values(index.fileIndex)
-      .reduce((sum, file) => sum + file.messageCount, 0);
+    index.totalMessages = Object.values(index.fileIndex).reduce(
+      (sum, file) => sum + file.messageCount,
+      0
+    );
     index.totalDays = Object.keys(index.fileIndex).length;
     index.lastUpdated = new Date().toISOString();
 
@@ -242,7 +254,7 @@ export class GitHubChatStorageService {
       status: "active",
       priority: "high",
       lastMessageId: null, // 简化实现
-      lastMessageTimestamp: index?.lastUpdated || metadata.lastUpdated
+      lastMessageTimestamp: index?.lastUpdated || metadata.lastUpdated,
     };
   }
 
@@ -278,8 +290,8 @@ export class GitHubChatStorageService {
           totalMessages: 0,
           totalDays: 0,
           lastSync: new Date().toISOString(),
-          storageSize: "0MB"
-        }
+          storageSize: "0MB",
+        },
       };
     }
 
@@ -300,4 +312,3 @@ export class GitHubChatStorageService {
 
 // 创建默认实例
 export const githubChatStorageService = new GitHubChatStorageService();
-

@@ -1,7 +1,7 @@
-import React from 'react';
-import { AiQuickTest } from '@/desktop/features/demo/components/ai-quick-test';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { Sparkles } from 'lucide-react';
+import React from "react";
+import { AiQuickTest } from "@/desktop/features/demo/components/ai-quick-test";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Sparkles } from "lucide-react";
 
 export const AiQuickTestDemoPage: React.FC = () => {
   return (

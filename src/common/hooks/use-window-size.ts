@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export interface WindowSize {
   width: number;
@@ -21,13 +21,13 @@ export function useWindowSize(): WindowSize {
 
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(document.body);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return size;
-} 
+}

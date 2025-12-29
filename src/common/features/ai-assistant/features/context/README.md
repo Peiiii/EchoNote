@@ -3,16 +3,19 @@ Context System Overview
 This document explains the context system used by the AI assistant in EchoNote, including how channel data is collected, cached, exposed to the agent, and reflected in the UI.
 
 Goals
+
 - Provide relevant note content to the AI with predictable coverage.
 - Scale to many channels with progressive hydration and non‑blocking UX.
 - Make readiness status meaningful and consistent with what the AI actually knows.
 
 Terminology
+
 - Channel: A thought space; contains user notes (messages).
 - Context: The auxiliary data we pass to the AI before/along with user prompts.
 - Hydration: Fetching channel metadata and recent messages so they can be included in context.
 
 Key Components
+
 - ContextDataCache (service)
   - Responsibilities: independent cache for channel metadata and recent messages; full channel index for “all” mode; prefetch orchestration.
   - Key methods:
@@ -53,13 +56,15 @@ Key Components
   - Code: `src/common/features/ai-assistant/components/ai-conversation-chat.tsx:95`
 
 Data Flow (High Level)
-1) User selects a context mode in ConversationContextControl.
-2) On apply, for “all” mode, ensureAllMetas() loads the full channel index. Then background hydration begins (ensureFetched per channel, concurrency‑limited).
-3) When the agent sends/receives messages, AIConversationChat asks SessionContextManager.getSessionContexts() for the latest contexts.
-4) SessionContextManager blends a global index with detailed contexts for all channels that are already hydrated at least once.
-5) Context status store observes cache changes and updates the UI status dot accordingly.
+
+1. User selects a context mode in ConversationContextControl.
+2. On apply, for “all” mode, ensureAllMetas() loads the full channel index. Then background hydration begins (ensureFetched per channel, concurrency‑limited).
+3. When the agent sends/receives messages, AIConversationChat asks SessionContextManager.getSessionContexts() for the latest contexts.
+4. SessionContextManager blends a global index with detailed contexts for all channels that are already hydrated at least once.
+5. Context status store observes cache changes and updates the UI status dot accordingly.
 
 Context Modes
+
 - Auto (no explicit contexts on the conversation)
   - Follow the current channel; single‑channel context.
 - None
@@ -70,6 +75,7 @@ Context Modes
   - Provide a global index for all channels and detailed context for every channel as it becomes hydrated. Readiness is green when every channel has been fetched at least once.
 
 Progressive Hydration
+
 - Motivation: prevent blocking and keep UX responsive while scaling to many channels.
 - Strategy:
   - Preload full channel index first (ensureAllMetas).
@@ -77,6 +83,7 @@ Progressive Hydration
   - Each turn calls getSessionContexts() again, so newly hydrated channels automatically appear in the agent context.
 
 Fetch Details
+
 - Metadata source: FirebaseNotesService.fetchChannels (decoupled from UI store).
 - Message fetch: FirebaseNotesService.fetchInitialMessages (users’ messages only), LIMIT=50 default.
 - Throttling:
@@ -84,17 +91,20 @@ Fetch Details
   - ensureAllMetas: full index refresh throttled to ~15s.
 
 Status Semantics (Why the dot is green)
+
 - Channels mode: dot is green when all selected channels are fetched.
 - All mode: dot is green only when every channel in the full index is fetched once; until then, it remains loading.
 - Empty channels (0 messages) count as ready once fetched (they still provide metadata context).
 
 Agent Context Shape
+
 - ChannelContextManager returns two items per channel:
   - System Instructions: tailored to the channel (name, count, rules) so the AI acts consistently.
   - Notes: the latest N (LIMIT) user messages, ascending by timestamp for readability.
 - All mode prepends the global index item: `{ total, channels: [{ id, name, messageCount }] }`.
 
 API Quick Reference
+
 - Getting contexts for a turn (inside chat session wiring):
   - `aiAgentFactory.getSessionContexts(conversationId, fallbackChannelId)`
   - Code: `src/common/features/ai-assistant/services/ai-agent-factory.ts:99`
@@ -104,6 +114,7 @@ API Quick Reference
   - Channels mode after apply: `ensureFetched` for the selected ids.
 
 Operational Tips
+
 - Token budget: Large accounts may generate substantial context. Consider:
   - Reducing LIMIT (per‑channel message limit) if needed.
   - Down‑sampling channels (e.g., include most active first) or introducing a maximum channel count for a single turn.
@@ -111,11 +122,12 @@ Operational Tips
 - Observability: look for console logs prefixed with "🔔" to trace context fetches and agent tool behavior.
 
 Extensibility Hooks
+
 - Add channel ranking or filtering when constructing the global index.
 - Introduce a configuration surface for LIMIT, concurrency, and maximum channels per turn.
 - Add per‑channel heuristics (e.g., skip channels with no activity for long periods).
 
 Known Limitations
+
 - Context is fetched on demand and cached with simple throttling; extreme account sizes may still require tighter quotas or pagination strategies.
 - The agent cannot “see” messages outside the LIMIT window per channel.
-

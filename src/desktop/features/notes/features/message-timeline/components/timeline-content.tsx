@@ -1,61 +1,89 @@
 import { MessageTimelineSkeleton } from "@/common/features/notes/components/message-timeline/message-skeleton";
-import { MessageTimeline, MessageTimelineRef } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { MessageTimeline } from "@/common/features/notes/components/message-timeline/message-timeline";
+import { SpaceEmptyState } from "@/common/features/notes/components/message-timeline/space-empty-state";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
 import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-messages";
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
-import { useRxEvent } from "@/common/hooks/use-rx-event";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { Message } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { forwardRef } from "react";
+import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
+import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
 
-interface TimelineContentProps {
-    renderThoughtRecord: (message: Message, threadCount: number) => React.ReactNode;
-    className?: string;
+interface TimelineContentWrapperProps {
+  children: React.ReactNode;
+  className?: string;
 }
 
-export const TimelineContent = forwardRef<MessageTimelineRef, TimelineContentProps>(({ 
-    renderThoughtRecord,
-    className = "",
-}, ref) => {
-    const { currentChannelId } = useNotesViewStore();
+interface TimelineContentProps {
+  className?: string;
+}
 
-    const onHistoryMessagesLoadedEvent$ = useRxEvent<Message[]>();
+const TimelineContentWrapper = ({ children = "", className = "" }: TimelineContentWrapperProps) => {
+  return <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>{children}</div>;
+};
 
-    const {
-        messages,
-        loading,
-        hasMore,
-        loadMore,
-        getChannelState,
-    } = useChannelMessages({
-        onHistoryMessagesChange: (messages) => {
-            onHistoryMessagesLoadedEvent$.emit(messages);
-        }
-    });
+export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
+  const presenter = useCommonPresenterContext();
+  const { currentChannelId } = useNotesViewStore();
 
-    const { handleScroll } = useLazyLoading({
-        onTrigger: () => currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
-        canTrigger: !!hasMore && !loading,
-        getState: getChannelState,
-    });
+  const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
+    onHistoryMessagesChange: messages => {
+      presenter.rxEventBus.onHistoryMessagesLoadedEvent$.emit(messages);
+    },
+  });
+  const { handleScroll } = useLazyLoading({
+    onTrigger: () =>
+      currentChannelId && loadMore({ channelId: currentChannelId, messagesLimit: 20 }),
+    canTrigger: !!hasMore && !loading,
+    getState: getChannelState,
+    // With latest-first ordering, we load older messages when the user nears the bottom
+    direction: 'bottom',
+  });
 
-    const groupedMessages = useGroupedMessages(messages);
+  // Use latest-first ordering for a top-down reading experience
+  const groupedMessages = useGroupedMessages(messages, { latestFirst: true });
 
+  const hasMessages = Object.values(groupedMessages).some(dayMessages =>
+    (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
+  );
 
-    if (loading) {
-        return <MessageTimelineSkeleton count={5} />;
-    }
-
+  if (!currentChannelId) {
     return (
-        <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
-          {messages && <MessageTimeline
-                ref={ref}
-                renderThoughtRecord={renderThoughtRecord}
-                groupedMessages={groupedMessages}
-                messages={messages}
-                onScroll={handleScroll}
-                onHistoryMessagesLoadedEvent$={onHistoryMessagesLoadedEvent$}
-            />}
-        </div>
+      <TimelineContentWrapper>
+        <DesktopWelcomeGuide />
+      </TimelineContentWrapper>
     );
-});
+  }
+
+  if (loading) {
+    return (
+      <TimelineContentWrapper>
+        <MessageTimelineSkeleton count={5} />
+      </TimelineContentWrapper>
+    );
+  }
+
+  if (!hasMessages) {
+    return (
+      <TimelineContentWrapper>
+        <SpaceEmptyState />
+      </TimelineContentWrapper>
+    );
+  }
+
+  return (
+    <TimelineContentWrapper className={className}>
+      <div className={`flex-1 flex flex-col min-h-0 relative ${className}`}>
+        <MessageTimeline
+          renderThoughtRecord={(message: Message, threadCount: number) => (
+            <ThoughtRecord message={message} threadCount={threadCount} />
+          )}
+          groupedMessages={groupedMessages}
+          messages={messages}
+          onScroll={handleScroll}
+        />
+      </div>
+    </TimelineContentWrapper>
+  );
+};

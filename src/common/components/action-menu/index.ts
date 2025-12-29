@@ -7,11 +7,9 @@ export { ConfigurableActionMenuContent } from "./configurable-action-menu-conten
 export type { ActionMenuProps } from "./action-menu";
 export type { ActionMenuItemProps } from "./action-menu-item";
 export type { ActionMenuGroupProps } from "./action-menu-group";
-export type { 
-  ConfigurableActionMenuProps, 
-  ActionMenuItemConfig, 
-  ActionMenuGroupConfig 
+export type {
+  ConfigurableActionMenuProps,
+  ActionMenuItemConfig,
+  ActionMenuGroupConfig,
 } from "./configurable-action-menu";
-export type { 
-  ConfigurableActionMenuContentProps 
-} from "./configurable-action-menu-content";
+export type { ConfigurableActionMenuContentProps } from "./configurable-action-menu-content";

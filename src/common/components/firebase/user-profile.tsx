@@ -1,12 +1,17 @@
-import { useState } from 'react';
-import { User } from 'firebase/auth';
-import { Button } from '@/common/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/common/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
-import { LogOut } from 'lucide-react';
-import { firebaseAuthService } from '@/common/services/firebase';
-import { LoginButton } from '@/common/features/auth/components/login-button';
+import { useState } from "react";
+import { User } from "firebase/auth";
+import { Button } from "@/common/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/common/components/ui/tooltip";
+import { LogOut } from "lucide-react";
+import { firebaseAuthService } from "@/common/services/firebase";
+import { LoginButton } from "@/common/features/auth/components/login-button";
 
 interface UserProfileProps {
   user: User | null; // Firebase User
@@ -37,7 +42,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
       await firebaseAuthService.signOut();
       setIsOpen(false);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -55,7 +60,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={user.photoURL || undefined} alt="User avatar" />
                   <AvatarFallback className="text-xs">
-                    {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -67,19 +72,17 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user.photoURL || undefined} alt="User avatar" />
                     <AvatarFallback>
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                      {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {user.displayName || 'User'}
-                    </p>
+                    <p className="text-sm font-medium truncate">{user.displayName || "User"}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                       {user.email}
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Actions */}
                 <div className="space-y-2">
                   <Button
@@ -98,7 +101,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         </TooltipTrigger>
         <TooltipContent side="right">
           <div className="text-center">
-            <p className="font-medium">{user.displayName || 'User'}</p>
+            <p className="font-medium">{user.displayName || "User"}</p>
             <p className="text-xs text-slate-400">{user.email}</p>
             <p className="text-xs text-slate-500">Click to manage account</p>
           </div>

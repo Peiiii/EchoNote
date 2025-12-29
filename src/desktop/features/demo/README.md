@@ -1,12 +1,12 @@
 # Demo Extension
 
-This is an extension that demonstrates the usage of EchoNote's plugin architecture.
+This is an extension that demonstrates the usage of StillRoot's plugin architecture.
 
 ## Features
 
 - ✅ Demonstrates basic usage of plugin architecture
 - ✅ Shows activity bar state management
-- ✅ Shows route state management  
+- ✅ Shows route state management
 - ✅ Shows icon state management
 - ✅ Shows page container component usage
 
@@ -28,7 +28,7 @@ This is an extension that demonstrates the usage of EchoNote's plugin architectu
 ### Basic Usage
 
 ```tsx
-import { PageContainer } from '@/common/components/page-container';
+import { PageContainer } from "@/common/components/page-container";
 
 export function MyPage() {
   return (
@@ -43,11 +43,11 @@ export function MyPage() {
 
 ```tsx
 <PageContainer
-  maxWidth="lg"        // Limit maximum width
-  padding="lg"         // Use large padding
-  centered={true}      // Center content
-  scrollable={false}   // Disable scrolling
-  className="custom"   // Custom styles
+  maxWidth="lg" // Limit maximum width
+  padding="lg" // Use large padding
+  centered={true} // Center content
+  scrollable={false} // Disable scrolling
+  className="custom" // Custom styles
 >
   <div>Page content</div>
 </PageContainer>
@@ -83,4 +83,4 @@ export function MyPage() {
 - Use `PageContainer` to wrap page content
 - Follow single responsibility principle, each extension should only handle one functional area
 - Use `Disposable` to ensure proper resource cleanup
-- Keep extensions decoupled, avoid direct dependencies 
+- Keep extensions decoupled, avoid direct dependencies

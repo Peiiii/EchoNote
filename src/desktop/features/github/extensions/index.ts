@@ -1,1 +1,1 @@
-export { githubExtension } from './github-extension';
+export { githubExtension } from "./github-extension";

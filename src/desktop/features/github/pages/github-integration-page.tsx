@@ -1,10 +1,10 @@
-import { GitHubAuthStatusSection } from '../components/github-auth-status-section';
-import { GitHubStorageConfigSection } from '../components/github-storage-config-section';
-import { GitHubSyncStatus } from '../components/github-sync-status';
-import { GitHubDebugInfo } from '../components/github-debug-info';
-import { GitHubSetupWizard } from '../components/github-setup-wizard';
-import { GitHubTestSection } from '../components/github-test-section';
-import { QuickSyncSection } from '../components/quick-sync-section';
+import { GitHubAuthStatusSection } from "../components/github-auth-status-section";
+import { GitHubStorageConfigSection } from "../components/github-storage-config-section";
+import { GitHubSyncStatus } from "../components/github-sync-status";
+import { GitHubDebugInfo } from "../components/github-debug-info";
+import { GitHubSetupWizard } from "../components/github-setup-wizard";
+import { GitHubTestSection } from "../components/github-test-section";
+import { QuickSyncSection } from "../components/quick-sync-section";
 
 export function GitHubIntegrationPage() {
   return (
@@ -15,8 +15,8 @@ export function GitHubIntegrationPage() {
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold">GitHub Integration</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Store and synchronize your EchoNote data in your GitHub repository. 
-              Get version control, backup, and access from anywhere.
+              Store and synchronize your StillRoot data in your GitHub repository. Get version
+              control, backup, and access from anywhere.
             </p>
           </div>
 
@@ -36,7 +36,7 @@ export function GitHubIntegrationPage() {
             <div className="space-y-6">
               {/* Authentication Status */}
               <GitHubAuthStatusSection />
-              
+
               {/* Storage Configuration */}
               <GitHubStorageConfigSection />
             </div>
@@ -45,7 +45,7 @@ export function GitHubIntegrationPage() {
             <div className="space-y-6">
               {/* GitHub Sync Status */}
               <GitHubSyncStatus />
-              
+
               {/* Test Section */}
               <GitHubTestSection />
             </div>

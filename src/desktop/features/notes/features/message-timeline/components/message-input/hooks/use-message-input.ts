@@ -1,77 +1,120 @@
-import { useState, useRef, useEffect, useMemo } from "react";
 import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-messages";
-import { channelMessageService } from "@/core/services/channel-message.service";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useChatReply } from "@/common/features/notes/hooks/use-chat-reply";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { MessageInputProps } from "../types";
+import { useEffect, useMemo, useRef } from "react";
+import { useComposerStateStore } from "@/core/stores/composer-state.store";
+import { isMac } from "@/common/lib/keyboard-shortcuts";
 
-export function useMessageInput({ onSend, replyToMessageId }: MessageInputProps) {
-    const [message, setMessage] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { sendMessage } = channelMessageService;
-    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
-    const { currentChannelId, isAddingMessage } = useNotesViewStore();
+export function useMessageInput() {
+  const presenter = useCommonPresenterContext();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { currentChannelId, isAddingMessage } = useNotesViewStore();
+  const { messages: channelMessages = [] } = useChannelMessages({});
+  const {
+    clearReplyToMessageId,
+    replyToMessageId,
+    handleCancelReply
+  } = useChatReply();
+  
+  const replyToMessage = useMemo(
+    () =>
+      replyToMessageId && channelMessages.length > 0
+        ? channelMessages.find(msg => msg.id === replyToMessageId)
+        : null,
+    [replyToMessageId, channelMessages]
+  );
 
-    const { messages: channelMessages = [] } = useChannelMessages({});
+  const composerExpanded = useComposerStateStore(s => s.expanded);
+  const draft = useComposerStateStore(s => (currentChannelId ? (s.drafts[currentChannelId] ?? "") : ""));
+  const setDraft = useComposerStateStore(s => s.setDraft);
+  const clearDraft = useComposerStateStore(s => s.clearDraft);
 
-    const replyToMessage = useMemo(() =>
-        replyToMessageId && channelMessages.length > 0
-            ? channelMessages.find(msg => msg.id === replyToMessageId)
-            : null
-        , [replyToMessageId, channelMessages]);
+  const message = draft;
 
-    const handleSend = async () => {
-        if (!message.trim() || !currentChannelId) return;
+  const handleSend = async () => {
+    if (!message.trim() || !currentChannelId) return;
 
-        if (replyToMessageId) {
-            addThreadMessage(replyToMessageId, {
-                content: message.trim(),
-                sender: "user" as const,
-                channelId: currentChannelId,
-            });
-        } else {
-            sendMessage({
-                content: message.trim(),
-                sender: "user" as const,
-                channelId: currentChannelId,
-            });
-        }
+    const messageContent = message.trim();
+    const hasTags = messageContent.includes('#');
+    const noteType = NoteType.TEXT;
 
-        onSend();
-        setMessage("");
-    };
+    logService.logNoteCreate(
+      currentChannelId,
+      noteType,
+      messageContent.length,
+      hasTags
+    );
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
+    if (replyToMessageId) {
+      logService.logMessageReply(
+        replyToMessageId,
+        currentChannelId,
+        replyToMessageId
+      );
+      presenter.threadManager.addThreadMessage(replyToMessageId, {
+        content: messageContent,
+        sender: "user" as const,
+        channelId: currentChannelId,
+      });
+    } else {
+      presenter.noteManager.sendMessage({
+        content: messageContent,
+        sender: "user" as const,
+        channelId: currentChannelId,
+      });
+    }
 
-    const handleMessageChange = (newMessage: string) => {
-        setMessage(newMessage);
-    };
+    clearReplyToMessageId();
+    presenter.rxEventBus.requestTimelineScrollToLatest$.emit();
+    clearDraft(currentChannelId);
+  };
 
-    useEffect(() => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-        }
-    }, [message]);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Ctrl/Cmd+Enter sends while Enter alone keeps adding new lines
+    if (!composerExpanded && e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-    const placeholder = replyToMessage 
-        ? "Reply to this message... (Enter to send, Shift+Enter for new line)"
-        : "Record your thoughts... (Enter to send, Shift+Enter for new line)";
+  const handleMessageChange = (newMessage: string) => {
+    if (!currentChannelId) return;
+    setDraft(currentChannelId, newMessage);
+  };
 
-    return {
-        message,
-        textareaRef,
-        replyToMessage,
-        isAddingMessage,
-        handleSend,
-        handleKeyPress,
-        handleMessageChange,
-        placeholder,
-        currentChannelId
-    };
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [message]);
+
+  const placeholder = useMemo(
+    () =>
+      replyToMessage
+        ? "Reply to this message..."
+        : "What's on your mind...",
+    [replyToMessage]
+  );
+
+  const shortcutHint = useMemo(() => {
+    const modifierKey = isMac() ? "Command" : "Ctrl";
+    return `${modifierKey}+Enter`;
+  }, []);
+
+  return {
+    message,
+    textareaRef,
+    replyToMessage,
+    isAddingMessage,
+    handleSend,
+    handleKeyDown,
+    handleMessageChange,
+    placeholder,
+    shortcutHint,
+    currentChannelId,
+    handleCancelReply,
+  };
 }

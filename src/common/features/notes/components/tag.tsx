@@ -19,13 +19,13 @@ const tagVariants = {
   secondary: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
   outline: "border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300",
   destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  footer: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+  footer: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
 
 const tagSizes = {
   sm: "px-2 py-1 text-xs",
   md: "px-2.5 py-1.5 text-sm",
-  lg: "px-3 py-2 text-base"
+  lg: "px-3 py-2 text-base",
 };
 
 export function Tag({
@@ -37,7 +37,7 @@ export function Tag({
   onRemove,
   className,
   truncate = false,
-  maxWidth = "80px"
+  maxWidth = "80px",
 }: TagProps) {
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -96,7 +96,7 @@ export function TagList({
   className,
   maxTags,
   truncate = false,
-  maxWidth = "80px"
+  maxWidth = "80px",
 }: TagListProps) {
   const displayTags = maxTags ? tags.slice(0, maxTags) : tags;
   const remainingCount = maxTags && tags.length > maxTags ? tags.length - maxTags : 0;
@@ -107,7 +107,7 @@ export function TagList({
 
   return (
     <div className={cn("flex flex-wrap gap-1", className)}>
-      {displayTags.map((tag) => (
+      {displayTags.map(tag => (
         <Tag
           key={tag}
           name={tag}
@@ -121,9 +121,7 @@ export function TagList({
         />
       ))}
       {remainingCount > 0 && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          +{remainingCount} more
-        </span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">+{remainingCount} more</span>
       )}
     </div>
   );

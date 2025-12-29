@@ -17,7 +17,7 @@ export interface DeleteNoteRenderArgs {
 }
 
 export interface DeleteNoteRenderResult {
-  status: 'deleted' | 'cancelled';
+  status: "deleted" | "cancelled";
   message: string;
 }
 
@@ -27,7 +27,7 @@ export interface UpdateNoteRenderArgs {
 }
 
 export interface UpdateNoteRenderResult {
-  status: 'updated' | 'cancelled';
+  status: "updated" | "cancelled";
   message: string;
 }
 
@@ -36,7 +36,7 @@ export interface CreateNoteRenderArgs {
 }
 
 export interface CreateNoteRenderResult {
-  status: 'created' | 'cancelled';
+  status: "created" | "cancelled";
   message: string;
 }
 

@@ -1,14 +1,19 @@
-import { EventType, ToolCallArgsDeltaEvent, ToolCallEndEvent, ToolCallStartEvent } from '@agent-labs/agent-chat';
-import OpenAI from 'openai';
-import { EventEncoder } from '../encoder';
-import { StreamContext, StreamHandler } from '../types';
+import {
+  EventType,
+  ToolCallArgsDeltaEvent,
+  ToolCallEndEvent,
+  ToolCallStartEvent,
+} from "@agent-labs/agent-chat";
+import OpenAI from "openai";
+import { EventEncoder } from "../encoder";
+import { StreamContext, StreamHandler } from "../types";
 
 export class ToolCallHandler implements StreamHandler {
-  constructor(private encoder: EventEncoder) { }
+  constructor(private encoder: EventEncoder) {}
 
   async *handle(
     chunk: OpenAI.Chat.Completions.ChatCompletionChunk,
-    context: StreamContext,
+    context: StreamContext
   ): AsyncGenerator<string, void, unknown> {
     const toolCall = chunk.choices[0].delta.tool_calls?.[0];
     if (!toolCall) {
@@ -16,8 +21,8 @@ export class ToolCallHandler implements StreamHandler {
     }
 
     if (!context.isToolCallStarted) {
-      context.toolCallId = toolCall.id ?? '';
-      context.toolCallName = toolCall.function?.name ?? '';
+      context.toolCallId = toolCall.id ?? "";
+      context.toolCallName = toolCall.function?.name ?? "";
       context.isToolCallStarted = true;
 
       const event: ToolCallStartEvent = {
@@ -39,10 +44,7 @@ export class ToolCallHandler implements StreamHandler {
     }
   }
 
-
-  async * finalize(
-    context: StreamContext,
-  ): AsyncGenerator<string, void, unknown> {
+  async *finalize(context: StreamContext): AsyncGenerator<string, void, unknown> {
     if (context.isToolCallStarted) {
       const event: ToolCallEndEvent = {
         type: EventType.TOOL_CALL_END,

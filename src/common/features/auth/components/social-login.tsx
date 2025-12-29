@@ -1,4 +1,5 @@
-import { Button } from '@/common/components/ui/button';
+import { Button } from "@/common/components/ui/button";
+import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 
 interface SocialLoginProps {
   onGoogleLogin: () => void;
@@ -6,6 +7,12 @@ interface SocialLoginProps {
 }
 
 export const SocialLogin = ({ onGoogleLogin, isAuthenticating }: SocialLoginProps) => {
+  const { isGoogleAuthSupported } = useGoogleAuthSupport();
+
+  if (!isGoogleAuthSupported) {
+    return null;
+  }
+
   return (
     <div className="mb-6">
       <Button

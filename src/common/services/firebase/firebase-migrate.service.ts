@@ -1,29 +1,25 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { collection, doc, getDocs, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor, UserMigrationState } from "./migrations/types";
 import {
   AddIsDeletedToMessagesMigration,
   AddLastMessageTimeToChannelsMigration,
   AddIsDeletedToChannelsMigration,
+  CreateDefaultGeneralChannelMigration,
 } from "./migrations";
 import { MigrationLogger } from "./migrations/migration-logger";
+import { getFeaturesConfig } from "@/core/config/features.config";
 
 class MigrationStateManager {
-  private getMigrationsCollectionRef = (userId: string) =>
-    collection(db, `users/${userId}/migrations`);
+  private getMigrationsCollectionRef = (userId: string) => {
+    return collection(firebaseConfig.getDb(), `users/${userId}/migrations`);
+  };
 
   async getUserMigrationState(userId: string): Promise<UserMigrationState> {
     try {
       const migrationDocRef = doc(this.getMigrationsCollectionRef(userId), "state");
       const migrationDoc = await getDoc(migrationDocRef);
-      
+
       if (migrationDoc.exists()) {
         const data = migrationDoc.data();
         return {
@@ -33,7 +29,7 @@ class MigrationStateManager {
           version: data.version || "1.0.0",
         };
       }
-      
+
       return {
         userId,
         completedMigrations: [],
@@ -52,8 +48,8 @@ class MigrationStateManager {
   }
 
   async updateUserMigrationState(
-    userId: string, 
-    completedMigrations: string[], 
+    userId: string,
+    completedMigrations: string[],
     version: string
   ): Promise<void> {
     try {
@@ -74,9 +70,13 @@ class MigrationStateManager {
   async markMigrationCompleted(userId: string, migrationVersion: string): Promise<void> {
     try {
       const currentState = await this.getUserMigrationState(userId);
-      const updatedMigrations = [...new Set([...currentState.completedMigrations, migrationVersion])];
+      const updatedMigrations = [
+        ...new Set([...currentState.completedMigrations, migrationVersion]),
+      ];
       await this.updateUserMigrationState(userId, updatedMigrations, currentState.version);
-      MigrationLogger.printStateInfo(`Migration ${migrationVersion} marked as completed for user ${userId}`);
+      MigrationLogger.printStateInfo(
+        `Migration ${migrationVersion} marked as completed for user ${userId}`
+      );
     } catch (error) {
       MigrationLogger.printStateError("Failed to mark migration as completed", error);
       throw error;
@@ -99,21 +99,24 @@ class MigrationExecutorManager {
     new AddIsDeletedToMessagesMigration(),
     new AddLastMessageTimeToChannelsMigration(),
     new AddIsDeletedToChannelsMigration(),
-  ];
+    // Create the default "General" channel for brand new users (runs once)
+    getFeaturesConfig().channel.autoCreateDefault.enabled &&
+      new CreateDefaultGeneralChannelMigration(),
+  ].filter(Boolean) as MigrationExecutor[];
 
   getAllMigrations(): MigrationExecutor[] {
     return this.migrations;
   }
 
   getPendingMigrations(completedMigrations: string[]): MigrationExecutor[] {
-    return this.migrations.filter(
-      migration => !completedMigrations.includes(migration.version)
-    );
+    return this.migrations.filter(migration => !completedMigrations.includes(migration.version));
   }
 
   async executeMigration(migration: MigrationExecutor, userId: string): Promise<void> {
     try {
-      MigrationLogger.printExecutorInfo(`Starting migration ${migration.version}: ${migration.name}`);
+      MigrationLogger.printExecutorInfo(
+        `Starting migration ${migration.version}: ${migration.name}`
+      );
       await migration.execute(userId);
       MigrationLogger.printExecutorInfo(`Migration ${migration.version} completed successfully`);
     } catch (error) {
@@ -124,41 +127,58 @@ class MigrationExecutorManager {
 
   addMigration(migration: MigrationExecutor): void {
     this.migrations.push(migration);
-    MigrationLogger.printExecutorInfo(`Added new migration: ${migration.version} - ${migration.name}`);
+    MigrationLogger.printExecutorInfo(
+      `Added new migration: ${migration.version} - ${migration.name}`
+    );
   }
 }
 
 class FirebaseMigrateService {
+  // Prevent concurrent runs for the same user within this session
+  private inProgressUsers = new Set<string>();
   private stateManager = new MigrationStateManager();
   private executorManager = new MigrationExecutorManager();
 
   async runAllMigrations(userId: string): Promise<void> {
     try {
+      if (this.inProgressUsers.has(userId)) {
+        MigrationLogger.printServiceInfo(
+          `Migration already in progress for user: ${userId}, skipping duplicate trigger`
+        );
+        return;
+      }
+      this.inProgressUsers.add(userId);
       MigrationLogger.printHeader(userId);
-      
+
       const currentState = await this.stateManager.getUserMigrationState(userId);
       const allMigrations = this.executorManager.getAllMigrations();
-      const pendingMigrations = this.executorManager.getPendingMigrations(currentState.completedMigrations);
-      const skippedMigrations = allMigrations.filter(m => 
+      const pendingMigrations = this.executorManager.getPendingMigrations(
+        currentState.completedMigrations
+      );
+      const skippedMigrations = allMigrations.filter(m =>
         currentState.completedMigrations.includes(m.version)
       );
-      
-      MigrationLogger.printOverview(allMigrations.length, skippedMigrations.length, pendingMigrations.length);
-      
+
+      MigrationLogger.printOverview(
+        allMigrations.length,
+        skippedMigrations.length,
+        pendingMigrations.length
+      );
+
       if (pendingMigrations.length === 0) {
         MigrationLogger.printAllCompleted(skippedMigrations.length);
         return;
       }
-      
+
       MigrationLogger.printPendingMigrations(pendingMigrations);
-      
+
       let successCount = 0;
       let failureCount = 0;
-      
+
       for (let i = 0; i < pendingMigrations.length; i++) {
         const migration = pendingMigrations[i];
         const progress = `[${i + 1}/${pendingMigrations.length}]`;
-        
+
         try {
           MigrationLogger.printMigrationStart(progress, migration.version, migration.name);
           await this.executorManager.executeMigration(migration, userId);
@@ -170,12 +190,13 @@ class FirebaseMigrateService {
           failureCount++;
         }
       }
-      
+
       MigrationLogger.printExecutionSummary(successCount, failureCount, skippedMigrations.length);
-      
     } catch (error) {
       MigrationLogger.printCriticalError(error);
       throw error;
+    } finally {
+      this.inProgressUsers.delete(userId);
     }
   }
 
@@ -191,22 +212,30 @@ class FirebaseMigrateService {
     try {
       const currentState = await this.stateManager.getUserMigrationState(userId);
       const allMigrations = this.executorManager.getAllMigrations();
-      const pendingMigrations = this.executorManager.getPendingMigrations(currentState.completedMigrations);
-      const skippedMigrations = allMigrations.filter(m => 
+      const pendingMigrations = this.executorManager.getPendingMigrations(
+        currentState.completedMigrations
+      );
+      const skippedMigrations = allMigrations.filter(m =>
         currentState.completedMigrations.includes(m.version)
       );
-      
-      const messagesSnapshot = await getDocs(collection(db, `users/${userId}/messages`));
+
+      const messagesSnapshot = await getDocs(
+        collection(firebaseConfig.getDb(), `users/${userId}/messages`)
+      );
       const messagesNeedMigration = messagesSnapshot.docs.filter(
         doc => doc.data().isDeleted === undefined
       ).length;
 
-      const channelsSnapshot = await getDocs(collection(db, `users/${userId}/channels`));
+      const channelsSnapshot = await getDocs(
+        collection(firebaseConfig.getDb(), `users/${userId}/channels`)
+      );
       const channelsNeedMigration = channelsSnapshot.docs.filter(
         doc => !doc.data().lastMessageTime
       ).length;
 
-      MigrationLogger.printServiceInfo(`Status check: ${pendingMigrations.length} pending, ${messagesNeedMigration} messages, ${channelsNeedMigration} channels need migration`);
+      MigrationLogger.printServiceInfo(
+        `Status check: ${pendingMigrations.length} pending, ${messagesNeedMigration} messages, ${channelsNeedMigration} channels need migration`
+      );
 
       return {
         messagesNeedMigration,

@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { Message } from "./notes-data.store";
 import { useNotesDataStore } from "./notes-data.store";
 import { User } from "firebase/auth";
+import { addRecentChannel } from "@/common/lib/recent-channels";
 
 export interface NotesViewState {
   // View state
@@ -21,24 +22,21 @@ export interface NotesViewState {
   setAuth: (user: User | null) => void;
 
   // View actions
-  setCurrentChannel: (channelId: string) => void;
+  setCurrentChannel: (channelId: string | null) => void;
   setIsAddingMessage: (isLoading: boolean) => void;
   setIsUpdatingMessage: (isLoading: boolean) => void;
   setIsDeletingMessage: (isLoading: boolean) => void;
   // Data actions
   addMessage: (message: Omit<Message, "id" | "timestamp">) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
-  updateMessage: (
-    messageId: string,
-    updates: Partial<Message>
-  ) => Promise<void>;
+  updateMessage: (messageId: string, updates: Partial<Message>) => Promise<void>;
 }
 
 export const useNotesViewStore = create<NotesViewState>()(
   persist(
     (set, get) => ({
       // Initial view state
-      currentChannelId: "general",
+      currentChannelId: null,
       isAddingMessage: false,
       isUpdatingMessage: false,
       isDeletingMessage: false,
@@ -46,25 +44,28 @@ export const useNotesViewStore = create<NotesViewState>()(
       authIsReady: false,
 
       // Auth actions
-      setAuth: (user) => {
+      setAuth: user => {
         set({ currentUser: user, authIsReady: true });
       },
 
       // View actions
-      setCurrentChannel: (channelId) => {
+      setCurrentChannel: channelId => {
         set({ currentChannelId: channelId });
+        if (channelId) {
+          addRecentChannel(channelId);
+        }
       },
-      setIsAddingMessage: (isLoading) => {
+      setIsAddingMessage: isLoading => {
         set({ isAddingMessage: isLoading });
       },
-      setIsUpdatingMessage: (isLoading) => {
+      setIsUpdatingMessage: isLoading => {
         set({ isUpdatingMessage: isLoading });
       },
-      setIsDeletingMessage: (isLoading) => {
+      setIsDeletingMessage: isLoading => {
         set({ isDeletingMessage: isLoading });
       },
       // Data actions
-      addMessage: async (message) => {
+      addMessage: async message => {
         // 设置加载状态
         get().setIsAddingMessage(true);
         try {
@@ -74,7 +75,7 @@ export const useNotesViewStore = create<NotesViewState>()(
           get().setIsAddingMessage(false);
         }
       },
-      deleteMessage: async (messageId) => {
+      deleteMessage: async messageId => {
         // 设置加载状态
         get().setIsDeletingMessage(true);
         try {

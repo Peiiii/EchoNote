@@ -27,13 +27,13 @@ export function ActionMenu({
   align = "end",
   sideOffset = 4,
   width = "md",
-  alwaysVisible = false
+  alwaysVisible = false,
 }: ActionMenuProps) {
   const widthClasses = {
     sm: "w-44",
-    md: "w-52", 
+    md: "w-52",
     lg: "w-60",
-    xl: "w-72"
+    xl: "w-72",
   };
 
   const defaultTrigger = (
@@ -43,7 +43,7 @@ export function ActionMenu({
       className={cn(
         "h-8 w-8 p-0 transition-all duration-200 rounded-md",
         "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
-        "hover:bg-slate-100 dark:hover:bg-slate-800",
+        "hover:bg-slate-200/60 dark:hover:bg-slate-700/60",
         "focus:outline-none",
         alwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100",
         triggerClassName
@@ -56,15 +56,14 @@ export function ActionMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {trigger || defaultTrigger}
-      </DropdownMenuTrigger>
-      
+      <DropdownMenuTrigger asChild>{trigger || defaultTrigger}</DropdownMenuTrigger>
+
       <DropdownMenuContent
         align={align}
         className={cn(
-          "p-1 rounded-lg border shadow-lg bg-white dark:bg-slate-900",
+          "p-1 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl",
           "min-w-[200px] max-w-[280px]",
+          "shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_10px_15px_-3px_rgba(0,0,0,0.3),0_4px_6px_-2px_rgba(0,0,0,0.1)]",
           widthClasses[width],
           contentClassName
         )}

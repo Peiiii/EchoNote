@@ -5,8 +5,12 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import { handleAutoTitleSnapshot } from "@/common/features/ai-assistant/services/title-generator.service";
 
-function shouldGenerateTitleForConversation(conversation: AIConversation, state: State, messages: UIMessage[]): boolean {
-  if(conversation.id.startsWith("temp-")) {
+function shouldGenerateTitleForConversation(
+  conversation: AIConversation,
+  state: State,
+  messages: UIMessage[]
+): boolean {
+  if (conversation.id.startsWith("temp-")) {
     return false;
   }
 
@@ -18,15 +22,16 @@ function shouldGenerateTitleForConversation(conversation: AIConversation, state:
     return false;
   }
 
-  const hasUserMessage = messages.some(m => m.role === 'user');
+  const hasUserMessage = messages.some(m => m.role === "user");
   if (!hasUserMessage) {
     return false;
   }
 
-  const isDefaultTitle = !conversation.title ||
+  const isDefaultTitle =
+    !conversation.title ||
     /^New Conversation/i.test(conversation.title) ||
-    conversation.title.startsWith('temp-') ||
-    conversation.title === 'Generating title...';
+    conversation.title.startsWith("temp-") ||
+    conversation.title === "Generating title...";
 
   return isDefaultTitle;
 }
@@ -35,28 +40,41 @@ type State = {
   conversations: AIConversation[];
   currentConversationId: string | null;
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
   selectionTick: number;
-  uiView: 'list' | 'chat';
+  uiView: "list" | "chat";
   deletingIds: string[];
   showArchived: boolean;
   query: string;
   titleGeneratingMap: Record<string, boolean>;
   autoTitleEnabled: boolean;
   autoTitleDone: Record<string, boolean>;
-  autoTitleMode: 'deterministic' | 'ai' | 'auto';
+  autoTitleMode: "deterministic" | "ai" | "auto";
+  // pagination
+  nextCursor: Date | null;
+  hasMore: boolean;
 };
 
 type Actions = {
-  createConversation: (userId: string, title: string, contexts?: ConversationContextConfig) => Promise<AIConversation>;
+  createConversation: (
+    userId: string,
+    title: string,
+    contexts?: ConversationContextConfig
+  ) => Promise<AIConversation>;
   loadConversations: (userId: string) => Promise<void>;
+  loadMoreConversations: (userId: string) => Promise<void>;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
-  updateConversation: (userId: string, conversationId: string, updates: Partial<AIConversation>) => Promise<void>;
+  updateConversation: (
+    userId: string,
+    conversationId: string,
+    updates: Partial<AIConversation>
+  ) => Promise<void>;
   clearError: () => void;
   showList: () => void;
   showChat: () => void;
-  setView: (v: 'list' | 'chat') => void;
+  setView: (v: "list" | "chat") => void;
   setShowArchived: (v: boolean) => void;
   setQuery: (q: string) => void;
   archiveConversation: (userId: string, conversationId: string) => Promise<void>;
@@ -65,25 +83,30 @@ type Actions = {
   completeTitleGenerating: (id: string) => void;
   clearTitleGenerating: (id: string) => void;
   setAutoTitleDone: (id: string) => void;
-  setAutoTitleMode: (m: 'deterministic' | 'ai' | 'auto') => void;
+  setAutoTitleMode: (m: "deterministic" | "ai" | "auto") => void;
   onMessagesSnapshot: (conversationId: string, messages: UIMessage[]) => void;
 };
+
+export const isTempConversation = (conversationId: string) => conversationId.startsWith("temp-");
 
 export const useConversationStore = create<State & Actions>((set, get) => ({
   conversations: [],
   currentConversationId: null,
   loading: true,
+  loadingMore: false,
   error: null,
   selectionTick: 0,
-  uiView: 'chat',
+  uiView: "chat",
   deletingIds: [],
   showArchived: false,
-  query: '',
+  query: "",
   titleGeneratingMap: {},
   autoTitleEnabled: true,
   autoTitleDone: {},
   // autoTitleMode: 'deterministic',
-  autoTitleMode: 'ai',
+  autoTitleMode: "ai",
+  nextCursor: null,
+  hasMore: false,
 
   async createConversation(userId, title, contexts) {
     set({ error: null });
@@ -99,13 +122,21 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       isArchived: false,
       ...(contexts ? { contexts } : {}),
     };
-    set(s => ({ conversations: [optimistic, ...s.conversations], currentConversationId: tempId, uiView: 'chat' }));
+    set(s => ({
+      conversations: [optimistic, ...s.conversations],
+      currentConversationId: tempId,
+      uiView: "chat",
+    }));
     try {
-      const created = await firebaseAIConversationService.createConversation(userId, title, contexts);
+      const created = await firebaseAIConversationService.createConversation(
+        userId,
+        title,
+        contexts
+      );
       set(s => ({
         conversations: s.conversations.map(c => (c.id === tempId ? created : c)),
         currentConversationId: created.id,
-        uiView: 'chat',
+        uiView: "chat",
       }));
       return created;
     } catch (err) {
@@ -119,21 +150,54 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   async loadConversations(userId) {
-    set({ loading: true, error: null });
+    // Initial page (~20)
+    set({ loading: true, error: null, nextCursor: null, hasMore: false });
     try {
-      const list = await firebaseAIConversationService.getConversations(userId);
+      const { items, nextCursor } = await firebaseAIConversationService.listConversations(userId, {
+        limit: 20,
+      });
       const currentId = get().currentConversationId;
-      set({ conversations: list, loading: false });
-      if (list.length > 0 && !currentId) {
-        set({ currentConversationId: list[0].id });
+      set({ conversations: items, loading: false, nextCursor, hasMore: Boolean(nextCursor) });
+      if (items.length > 0 && !currentId) {
+        set({ currentConversationId: items[0].id });
       }
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : "Failed to load conversations" });
+      set({
+        loading: false,
+        error: err instanceof Error ? err.message : "Failed to load conversations",
+      });
+    }
+  },
+
+  async loadMoreConversations(userId) {
+    const { nextCursor, loadingMore, hasMore } = get();
+    if (!hasMore || loadingMore) return;
+    set({ loadingMore: true });
+    try {
+      const { items, nextCursor: next } = await firebaseAIConversationService.listConversations(
+        userId,
+        { limit: 20, startAfterLastMessageAt: nextCursor }
+      );
+      // Append and dedupe by id
+      const existing = get().conversations;
+      const merged = [...existing];
+      for (const c of items) {
+        if (!merged.some(x => x.id === c.id)) merged.push(c);
+      }
+      set({ conversations: merged, nextCursor: next, hasMore: Boolean(next) });
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : "Failed to load more conversations" });
+    } finally {
+      set({ loadingMore: false });
     }
   },
 
   selectConversation(conversationId) {
-    set(s => ({ currentConversationId: conversationId, selectionTick: s.selectionTick + 1, uiView: 'chat' }));
+    set(s => ({
+      currentConversationId: conversationId,
+      selectionTick: s.selectionTick + 1,
+      uiView: "chat",
+    }));
   },
 
   async deleteConversation(userId, conversationId) {
@@ -163,12 +227,17 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   async updateConversation(userId, conversationId, updates) {
     // Optimistic update: apply locally first for instant UI feedback
     const prev = get().conversations;
-    set(s => ({ conversations: s.conversations.map(c => (c.id === conversationId ? { ...c, ...updates } : c)) }));
+    set(s => ({
+      conversations: s.conversations.map(c => (c.id === conversationId ? { ...c, ...updates } : c)),
+    }));
     try {
       await firebaseAIConversationService.updateConversation(userId, conversationId, updates);
     } catch (err) {
       // Revert on failure
-      set({ conversations: prev, error: err instanceof Error ? err.message : "Failed to update conversation" });
+      set({
+        conversations: prev,
+        error: err instanceof Error ? err.message : "Failed to update conversation",
+      });
       throw err as Error;
     }
   },
@@ -178,10 +247,10 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   showList() {
-    set({ uiView: 'list' });
+    set({ uiView: "list" });
   },
   showChat() {
-    set({ uiView: 'chat' });
+    set({ uiView: "chat" });
   },
   setView(v) {
     set({ uiView: v });
@@ -195,27 +264,49 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   async archiveConversation(userId, conversationId) {
-    await firebaseAIConversationService.updateConversation(userId, conversationId, { isArchived: true, updatedAt: new Date() });
-    set(s => ({ conversations: s.conversations.map(c => c.id === conversationId ? { ...c, isArchived: true } : c) }));
+    await firebaseAIConversationService.updateConversation(userId, conversationId, {
+      isArchived: true,
+      updatedAt: new Date(),
+    });
+    set(s => ({
+      conversations: s.conversations.map(c =>
+        c.id === conversationId ? { ...c, isArchived: true } : c
+      ),
+    }));
   },
   async unarchiveConversation(userId, conversationId) {
-    await firebaseAIConversationService.updateConversation(userId, conversationId, { isArchived: false, updatedAt: new Date() });
-    set(s => ({ conversations: s.conversations.map(c => c.id === conversationId ? { ...c, isArchived: false } : c) }));
+    await firebaseAIConversationService.updateConversation(userId, conversationId, {
+      isArchived: false,
+      updatedAt: new Date(),
+    });
+    set(s => ({
+      conversations: s.conversations.map(c =>
+        c.id === conversationId ? { ...c, isArchived: false } : c
+      ),
+    }));
   },
 
   setTitleGenerating(id: string) {
     set(s => ({ titleGeneratingMap: { ...s.titleGeneratingMap, [id]: true } }));
   },
   completeTitleGenerating(id: string) {
-    set(s => { const t = { ...s.titleGeneratingMap }; delete t[id]; return { titleGeneratingMap: t }; });
+    set(s => {
+      const t = { ...s.titleGeneratingMap };
+      delete t[id];
+      return { titleGeneratingMap: t };
+    });
   },
   clearTitleGenerating(id: string) {
-    set(s => { const t = { ...s.titleGeneratingMap }; delete t[id]; return { titleGeneratingMap: t }; });
+    set(s => {
+      const t = { ...s.titleGeneratingMap };
+      delete t[id];
+      return { titleGeneratingMap: t };
+    });
   },
   setAutoTitleDone(id: string) {
     set(s => ({ autoTitleDone: { ...s.autoTitleDone, [id]: true } }));
   },
-  setAutoTitleMode(m: 'deterministic' | 'ai' | 'auto') {
+  setAutoTitleMode(m: "deterministic" | "ai" | "auto") {
     set({ autoTitleMode: m });
   },
 
@@ -239,10 +330,13 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       update: async (userId, id, title) => {
         await firebaseAIConversationService.updateConversation(userId, id, { title });
       },
-      applyLocal: (id, title) => set(s => ({ conversations: s.conversations.map(c => (c.id === id ? { ...c, title } : c)) })),
-      markDone: (id) => set(s => ({ autoTitleDone: { ...s.autoTitleDone, [id]: true } })),
-      setTitleGenerating: (id) => get().setTitleGenerating(id),
-      completeTitleGenerating: (id) => get().completeTitleGenerating(id),
+      applyLocal: (id, title) =>
+        set(s => ({
+          conversations: s.conversations.map(c => (c.id === id ? { ...c, title } : c)),
+        })),
+      markDone: id => set(s => ({ autoTitleDone: { ...s.autoTitleDone, [id]: true } })),
+      setTitleGenerating: id => get().setTitleGenerating(id),
+      completeTitleGenerating: id => get().completeTitleGenerating(id),
     });
   },
 }));

@@ -1,4 +1,4 @@
-import { EventType } from '@agent-labs/agent-chat';
+import { EventType } from "@agent-labs/agent-chat";
 
 export interface StreamContext {
   messageId: string;
@@ -44,7 +44,7 @@ export interface EventData {
   name?: string;
   toolCalls?: Array<{
     id: string;
-    type: 'function';
+    type: "function";
     function: {
       name: string;
       arguments: string;
@@ -57,7 +57,7 @@ export interface EventData {
     name?: string;
     toolCalls?: Array<{
       id: string;
-      type: 'function';
+      type: "function";
       function: {
         name: string;
         arguments: string;
@@ -74,4 +74,4 @@ export interface StreamProcessor {
   process(stream: AsyncIterable<unknown>): AsyncGenerator<string, void, unknown>;
   handleError(error: Error): AsyncGenerator<string, void, unknown>;
   addHandler(type: string, handler: StreamHandler): void;
-} 
+}

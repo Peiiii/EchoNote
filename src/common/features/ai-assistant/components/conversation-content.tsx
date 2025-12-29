@@ -10,7 +10,12 @@ interface ConversationContentProps {
   onClose?: () => void;
 }
 
-export function ConversationContent({ currentConversationId, channelId, hasConversations, onClose }: ConversationContentProps) {
+export function ConversationContent({
+  currentConversationId,
+  channelId,
+  hasConversations,
+  onClose,
+}: ConversationContentProps) {
   const { createConversation } = useConversationState();
   const { userId } = useNotesDataStore();
   if (currentConversationId) {
@@ -27,5 +32,11 @@ export function ConversationContent({ currentConversationId, channelId, hasConve
     return <div className="flex-1" />;
   }
 
-  return <AIConversationEmptyPane onCreate={() => { if (userId) void createConversation(userId, "New Conversation"); }} />;
+  return (
+    <AIConversationEmptyPane
+      onCreate={() => {
+        if (userId) void createConversation(userId, "New Conversation");
+      }}
+    />
+  );
 }

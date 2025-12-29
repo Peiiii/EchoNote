@@ -23,28 +23,29 @@ A refined, elegant popover component designed with a quiet and gentle aesthetic 
 
 ```tsx
 import { RefinedPopover } from "@/common/components/refined-popover";
+import { Plus } from "lucide-react";
 
 <RefinedPopover>
   <RefinedPopover.Trigger>
     <Button>Open Popover</Button>
   </RefinedPopover.Trigger>
-  
-  <RefinedPopover.Content>
+
+  <RefinedPopover.Content align="center" side="bottom">
     <RefinedPopover.Header>
-      <h3>Title</h3>
-      <p>Description</p>
+      <Plus className="w-4 h-4 text-primary/80" />
+      <div className="text-sm font-semibold text-foreground/90">Title</div>
     </RefinedPopover.Header>
-    
+
     <RefinedPopover.Body>
       <div>Main content goes here</div>
     </RefinedPopover.Body>
-    
+
     <RefinedPopover.Actions>
-      <Button variant="outline">Cancel</Button>
-      <Button>Save</Button>
+      <RefinedPopover.Button variant="outline">Cancel</RefinedPopover.Button>
+      <RefinedPopover.Button variant="default">Save</RefinedPopover.Button>
     </RefinedPopover.Actions>
   </RefinedPopover.Content>
-</RefinedPopover>
+</RefinedPopover>;
 ```
 
 ### Controlled State
@@ -54,15 +55,13 @@ const [isOpen, setIsOpen] = useState(false);
 
 <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
   {/* ... content ... */}
-</RefinedPopover>
+</RefinedPopover>;
 ```
 
 ### Custom Width
 
 ```tsx
-<RefinedPopover.Content width="w-96">
-  {/* ... content ... */}
-</RefinedPopover.Content>
+<RefinedPopover.Content width="w-96">{/* ... content ... */}</RefinedPopover.Content>
 ```
 
 ## API Reference
@@ -72,6 +71,7 @@ const [isOpen, setIsOpen] = useState(false);
 The main container component that wraps the entire popover.
 
 **Props:**
+
 - `children`: ReactNode - The popover content
 - `open?`: boolean - Controlled open state
 - `onOpenChange?`: (open: boolean) => void - Callback when open state changes
@@ -81,6 +81,7 @@ The main container component that wraps the entire popover.
 The element that triggers the popover to open.
 
 **Props:**
+
 - `children`: ReactNode - The trigger element
 - `asChild?`: boolean - Whether to render as a child element
 
@@ -89,23 +90,45 @@ The element that triggers the popover to open.
 The styled content wrapper with consistent styling.
 
 **Props:**
+
 - `children`: ReactNode - The popover content
 - `width?`: string - Custom width class (default: "w-88")
 - `className?`: string - Additional CSS classes
 
 ### RefinedPopover.Header
 
-The header section with subtle background and border.
+The header section with icon and title in a clean, minimal style.
 
 **Props:**
-- `children`: ReactNode - Header content
+
+- `children`: ReactNode - Header content (typically an icon and title div)
 - `className?`: string - Additional CSS classes
+
+**Recommended Structure:**
+
+```tsx
+<RefinedPopover.Header>
+  <IconComponent className="w-4 h-4 text-primary/80" />
+  <div className="text-sm font-semibold text-foreground/90">Title</div>
+  {/* Optional close button */}
+  <RefinedPopover.Button
+    variant="ghost"
+    size="sm"
+    className="h-6 w-6 p-0 ml-auto"
+    onClick={() => setIsOpen(false)}
+    title="Close"
+  >
+    <X className="h-3 w-3" />
+  </RefinedPopover.Button>
+</RefinedPopover.Header>
+```
 
 ### RefinedPopover.Body
 
 The main content area with consistent spacing.
 
 **Props:**
+
 - `children`: ReactNode - Body content
 - `className?`: string - Additional CSS classes
 
@@ -114,8 +137,36 @@ The main content area with consistent spacing.
 The action buttons area with proper alignment and spacing.
 
 **Props:**
-- `children`: ReactNode - Action buttons
+
+- `children`: ReactNode - Action buttons (use RefinedPopover.Button for consistency)
 - `className?`: string - Additional CSS classes
+
+### RefinedPopover.Button
+
+Consistent button component for popover actions.
+
+**Props:**
+
+- `variant?`: "default" | "outline" | "ghost" | "destructive" - Button style variant (default: "default")
+- `size?`: "sm" | "md" - Button size (default: "md")
+- `disabled?`: boolean - Whether the button is disabled
+- `onClick?`: () => void - Click handler
+- `type?`: "button" | "submit" | "reset" - Button type
+- `className?`: string - Additional CSS classes
+- All standard HTML button attributes
+
+**Recommended Usage:**
+
+```tsx
+<RefinedPopover.Actions>
+  <RefinedPopover.Button variant="outline" onClick={handleCancel}>
+    Cancel
+  </RefinedPopover.Button>
+  <RefinedPopover.Button variant="default" onClick={handleSave}>
+    Save
+  </RefinedPopover.Button>
+</RefinedPopover.Actions>
+```
 
 ## Styling
 
@@ -123,10 +174,15 @@ The action buttons area with proper alignment and spacing.
 
 The component uses a consistent set of Tailwind CSS classes:
 
-- **Container**: `border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-white dark:bg-slate-900 rounded-xl`
-- **Header**: `px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30`
-- **Body**: `px-5 pt-5 pb-0 space-y-5`
-- **Actions**: `px-5 pb-5 pt-2 flex items-center justify-end gap-3`
+- **Container**: `p-4 border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-popover text-popover-foreground rounded-xl`
+- **Header**: `flex items-center gap-2.5 mb-5`
+- **Body**: `space-y-4`
+- **Actions**: `flex justify-end gap-2.5 pt-3 mt-2`
+- **Button**:
+  - Base: `h-8 px-4 rounded-lg text-sm transition-all duration-200 font-medium flex items-center justify-center`
+  - Default variant: `bg-primary text-primary-foreground hover:bg-primary/90`
+  - Outline variant: `text-muted-foreground hover:text-foreground hover:bg-accent/30`
+  - Destructive variant: `bg-destructive text-destructive-foreground hover:bg-destructive/90`
 
 ### Customization
 
@@ -147,13 +203,13 @@ You can override any styling by passing `className` props to individual componen
   <RefinedPopover.Trigger>
     <Button variant="outline">Edit Settings</Button>
   </RefinedPopover.Trigger>
-  
+
   <RefinedPopover.Content>
     <RefinedPopover.Header>
-      <h3 className="text-base font-medium">Edit Settings</h3>
-      <p className="text-sm text-slate-500">Update your preferences</p>
+      <SlidersHorizontal className="w-4 h-4 text-primary/80" />
+      <div className="text-sm font-semibold text-foreground/90">Edit Settings</div>
     </RefinedPopover.Header>
-    
+
     <RefinedPopover.Body>
       <div className="space-y-4">
         <div className="space-y-2">
@@ -166,7 +222,7 @@ You can override any styling by passing `className` props to individual componen
         </div>
       </div>
     </RefinedPopover.Body>
-    
+
     <RefinedPopover.Actions>
       <Button variant="outline">Cancel</Button>
       <Button>Save Changes</Button>
@@ -182,12 +238,12 @@ You can override any styling by passing `className` props to individual componen
   <RefinedPopover.Trigger>
     <InfoIcon className="w-4 h-4 text-slate-400" />
   </RefinedPopover.Trigger>
-  
+
   <RefinedPopover.Content width="w-80">
     <RefinedPopover.Header>
       <h3 className="text-base font-medium">Help Information</h3>
     </RefinedPopover.Header>
-    
+
     <RefinedPopover.Body>
       <p className="text-sm text-slate-600">
         This feature allows you to organize your thoughts into dedicated spaces.

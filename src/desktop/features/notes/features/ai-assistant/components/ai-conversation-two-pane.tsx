@@ -2,15 +2,15 @@ import { AIConversationList } from "@/common/features/ai-assistant/components/ai
 import { ConversationContent } from "@/common/features/ai-assistant/components/conversation-content";
 import { ConversationPaneProps } from "@/common/features/ai-assistant/types/conversation.types";
 
-export function AIConversationTwoPane({ 
-  conversations, 
-  currentConversationId, 
-  loading, 
-  channelId, 
-  onClose 
+export function AIConversationTwoPane({
+  conversations,
+  currentConversationId,
+  loading,
+  channelId,
+  onClose,
 }: ConversationPaneProps) {
   const hasConversations = conversations.length > 0;
-  
+
   return (
     <>
       <div className="w-80 flex flex-col">
@@ -18,7 +18,6 @@ export function AIConversationTwoPane({
           conversations={conversations}
           currentConversationId={currentConversationId}
           loading={loading}
-          currentChannelId={channelId}
           withHeader={false}
         />
       </div>

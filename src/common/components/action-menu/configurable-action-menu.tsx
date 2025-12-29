@@ -39,12 +39,12 @@ export function ConfigurableActionMenu({
   align = "end",
   sideOffset = 4,
   width = "md",
-  alwaysVisible = false
+  alwaysVisible = false,
 }: ConfigurableActionMenuProps) {
   const visibleGroups = groups
     .map(group => ({
       ...group,
-      items: group.items.filter(item => !item.hidden)
+      items: group.items.filter(item => !item.hidden),
     }))
     .filter(group => group.items.length > 0);
 
@@ -65,7 +65,7 @@ export function ConfigurableActionMenu({
           variant={group.variant}
           showSeparator={group.showSeparator !== false && groupIndex > 0}
         >
-          {group.items.map((item) => (
+          {group.items.map(item => (
             <ActionMenuItem
               key={item.id}
               icon={item.icon}

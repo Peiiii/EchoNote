@@ -1,1 +1,1 @@
-export { mobileNotesExtension } from './mobile-notes-extension';
+export { mobileNotesExtension } from "./mobile-notes-extension";

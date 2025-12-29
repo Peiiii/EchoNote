@@ -29,15 +29,13 @@ export class TagProcessor {
 
   // Remove a rule by pattern
   removeRule(pattern: string | RegExp): void {
-    this.rules = this.rules.filter(rule => 
-      rule.pattern.toString() !== pattern.toString()
-    );
+    this.rules = this.rules.filter(rule => rule.pattern.toString() !== pattern.toString());
   }
 
   // Process tags using the rule engine
   processTags(content: string, tags: string[]): TagAnalysisResult {
     const tagPrompts: string[] = [];
-    
+
     for (const tag of tags) {
       const rule = this.findMatchingRule(tag);
       if (rule) {
@@ -51,15 +49,15 @@ export class TagProcessor {
     if (tagPrompts.length === 0) {
       return {
         enhancedPrompt: content,
-        hasTagContext: false
+        hasTagContext: false,
       };
     }
 
-    const enhancedPrompt = `Special instructions:\n${tagPrompts.join('\n')}`;
-    
+    const enhancedPrompt = `Special instructions:\n${tagPrompts.join("\n")}`;
+
     return {
       enhancedPrompt,
-      hasTagContext: true
+      hasTagContext: true,
     };
   }
 
@@ -69,17 +67,17 @@ export class TagProcessor {
   }
 
   // Get all supported patterns
-  getSupportedPatterns(): Array<{pattern: string, description: string, priority: number}> {
+  getSupportedPatterns(): Array<{ pattern: string; description: string; priority: number }> {
     return this.rules.map(rule => ({
       pattern: rule.pattern.toString(),
-      description: rule.description || 'No description',
-      priority: rule.priority || 0
+      description: rule.description || "No description",
+      priority: rule.priority || 0,
     }));
   }
 
   private findMatchingRule(tag: string): TagRule | null {
     for (const rule of this.rules) {
-      if (typeof rule.pattern === 'string') {
+      if (typeof rule.pattern === "string") {
         if (tag.toLowerCase() === rule.pattern.toLowerCase()) {
           return rule;
         }
@@ -95,35 +93,35 @@ export class TagProcessor {
   private initializeDefaultRules(): void {
     // Exact match rules
     this.addRule({
-      pattern: 'prompt',
+      pattern: "prompt",
       handler: (_tag, content) => `<instruction>${content}</instruction>`,
       priority: 10,
-      description: 'Convert content to instruction'
+      description: "Convert content to instruction",
     });
 
     this.addRule({
-      pattern: 'translate',
+      pattern: "translate",
       handler: (_tag, content) => `<translate>${content}</translate>`,
       priority: 10,
-      description: 'Translate content'
+      description: "Translate content",
     });
 
     this.addRule({
-      pattern: 'to-english',
+      pattern: "to-english",
       handler: (_tag, content) => `<translate-to-english>${content}</translate-to-english>`,
       priority: 10,
-      description: 'Translate content to English'
+      description: "Translate content to English",
     });
 
     // Prefix-based rules
     this.addRule({
       pattern: /^prompt:/i,
-      handler: (tag) => {
+      handler: tag => {
         const instruction = tag.substring(7).trim();
-        return instruction ? `<instruction>${instruction}</instruction>` : '';
+        return instruction ? `<instruction>${instruction}</instruction>` : "";
       },
       priority: 20,
-      description: 'Any tag starting with prompt: becomes an instruction'
+      description: "Any tag starting with prompt: becomes an instruction",
     });
 
     // You can easily add more rules here or through the addRule method
@@ -154,7 +152,11 @@ export function hasTagContext(tag: string): boolean {
  * Get all supported patterns and their descriptions
  * Returns detailed information about all registered rules
  */
-export function getSupportedTags(): Array<{pattern: string, description: string, priority: number}> {
+export function getSupportedTags(): Array<{
+  pattern: string;
+  description: string;
+  priority: number;
+}> {
   return tagProcessor.getSupportedPatterns();
 }
 

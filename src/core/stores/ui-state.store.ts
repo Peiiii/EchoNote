@@ -1,33 +1,44 @@
+import { isMobile } from "@/common/lib/breakpoint-utils";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export enum SideViewEnum {
+  AI_ASSISTANT = "ai_assistant",
+  THREAD = "thread",  
+  SETTINGS = "settings",
+}
+
 export interface UIState {
   // AI Assistant state
-  isAIAssistantOpen: boolean;
-  aiAssistantChannelId: string | null;
-  
+  // isAIAssistantOpen: boolean;
+
   // Thread sidebar state
-  isThreadOpen: boolean;
+  // isThreadOpen: boolean;
+  sideView?: SideViewEnum;
   currentThreadId: string | null;
-  
-  // Settings sidebar state
-  isSettingsOpen: boolean;
-  
+
   // Mobile specific states
   isChannelListOpen: boolean;
-  
+
+  // Studio panel visibility (independent from sideView)
+  isStudioOpen: boolean;
+
   // Actions for AI Assistant
-  openAIAssistant: (channelId: string) => void;
+  openAIAssistant: () => void;
   closeAIAssistant: () => void;
-  
+
   // Actions for Thread
   openThread: (messageId: string) => void;
   closeThread: () => void;
-  
+
   // Actions for Settings
   openSettings: () => void;
   closeSettings: () => void;
-  
+
+  // Actions for Studio
+  openStudio: () => void;
+  closeStudio: () => void;
+
   // Actions for Mobile
   openChannelList: () => void;
   closeChannelList: () => void;
@@ -35,56 +46,60 @@ export interface UIState {
 
 export const useUIStateStore = create<UIState>()(
   persist(
-    (set) => ({
-      // Initial state
-      isAIAssistantOpen: false,
-      aiAssistantChannelId: null,
-      isThreadOpen: false,
+    (set, get) => ({
+      // Initial state - desktop: AI panel open by default
+      sideView: !isMobile() ? SideViewEnum.AI_ASSISTANT : undefined,
       currentThreadId: null,
-      isSettingsOpen: false,
       isChannelListOpen: false,
+      isStudioOpen: !isMobile(),
 
       // AI Assistant actions (mutually exclusive with thread sidebar)
-      openAIAssistant: (channelId: string) => {
+      openAIAssistant: () => {
         set({
-          isAIAssistantOpen: true,
-          aiAssistantChannelId: channelId,
-          isThreadOpen: false,
+          sideView: SideViewEnum.AI_ASSISTANT,
           currentThreadId: null,
         });
       },
 
       closeAIAssistant: () => {
         set({
-          isAIAssistantOpen: false,
-          aiAssistantChannelId: null,
+          sideView: undefined,
         });
       },
 
       // Thread actions (mutually exclusive with AI assistant)
       openThread: (messageId: string) => {
         set({
-          isThreadOpen: true,
+          sideView: SideViewEnum.THREAD,
           currentThreadId: messageId,
-          isAIAssistantOpen: false,
-          aiAssistantChannelId: null,
         });
       },
 
       closeThread: () => {
         set({
-          isThreadOpen: false,
+          sideView: undefined,
           currentThreadId: null,
         });
       },
 
       // Settings actions
       openSettings: () => {
-        set({ isSettingsOpen: true });
+        set({ sideView: SideViewEnum.SETTINGS });
       },
 
       closeSettings: () => {
-        set({ isSettingsOpen: false });
+        if (get().sideView === SideViewEnum.SETTINGS) {
+          set({ sideView: undefined });
+        }
+      },
+
+      // Studio actions
+      openStudio: () => {
+        set({ isStudioOpen: true });
+      },
+
+      closeStudio: () => {
+        set({ isStudioOpen: false });
       },
 
       // Mobile actions
@@ -97,9 +112,8 @@ export const useUIStateStore = create<UIState>()(
       },
     }),
     {
-      name: 'echonote-ui-state',
-      // Only persist the AI assistant open/close state to satisfy the requirement
-      partialize: (state) => ({ isAIAssistantOpen: state.isAIAssistantOpen }),
+      name: "echonote-ui-state",
+      partialize: state => ({ sideView: state.sideView, isStudioOpen: state.isStudioOpen }),
     }
   )
 );

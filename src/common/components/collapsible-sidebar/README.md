@@ -29,27 +29,25 @@ import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
 
 function MyLayout() {
-    return (
-        <div className="flex h-screen">
-            <CollapsibleSidebar>
-                <CollapsibleSidebar.Header>
-                    <h3>Navigation</h3>
-                    <CollapsibleSidebar.ToggleButton />
-                </CollapsibleSidebar.Header>
-                <CollapsibleSidebar.Content>
-                    <nav>
-                        <a href="/dashboard">Dashboard</a>
-                        <a href="/settings">Settings</a>
-                        <a href="/profile">Profile</a>
-                    </nav>
-                </CollapsibleSidebar.Content>
-            </CollapsibleSidebar>
-            
-            <main className="flex-1 p-4">
-                Main content area
-            </main>
-        </div>
-    );
+  return (
+    <div className="flex h-screen">
+      <CollapsibleSidebar>
+        <CollapsibleSidebar.Header>
+          <h3>Navigation</h3>
+          <CollapsibleSidebar.ToggleButton />
+        </CollapsibleSidebar.Header>
+        <CollapsibleSidebar.Content>
+          <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/settings">Settings</a>
+            <a href="/profile">Profile</a>
+          </nav>
+        </CollapsibleSidebar.Content>
+      </CollapsibleSidebar>
+
+      <main className="flex-1 p-4">Main content area</main>
+    </div>
+  );
 }
 ```
 
@@ -57,10 +55,10 @@ function MyLayout() {
 
 ```tsx
 <CollapsibleSidebar>
-    <CollapsibleSidebar.Content>
-        {/* Your existing sidebar content */}
-        <YourExistingSidebarComponent />
-    </CollapsibleSidebar.Content>
+  <CollapsibleSidebar.Content>
+    {/* Your existing sidebar content */}
+    <YourExistingSidebarComponent />
+  </CollapsibleSidebar.Content>
 </CollapsibleSidebar>
 ```
 
@@ -68,35 +66,35 @@ function MyLayout() {
 
 ### CollapsibleSidebar (Root Component)
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | - | **Required**. Child components (Header, Content, etc.) |
-| `width` | `string` | `"w-80"` | Tailwind CSS class for expanded sidebar width |
-| `collapsedWidth` | `string` | `"w-0"` | Tailwind CSS class for collapsed sidebar width |
-| `className` | `string` | `""` | Additional CSS classes for the sidebar container |
-| `collapsed` | `boolean` | `undefined` | External control of collapsed state (controlled component) |
-| `onCollapseChange` | `(collapsed: boolean) => void` | `undefined` | Callback when collapse state changes |
+| Prop               | Type                           | Default     | Description                                                |
+| ------------------ | ------------------------------ | ----------- | ---------------------------------------------------------- |
+| `children`         | `ReactNode`                    | -           | **Required**. Child components (Header, Content, etc.)     |
+| `width`            | `string`                       | `"w-80"`    | Tailwind CSS class for expanded sidebar width              |
+| `collapsedWidth`   | `string`                       | `"w-0"`     | Tailwind CSS class for collapsed sidebar width             |
+| `className`        | `string`                       | `""`        | Additional CSS classes for the sidebar container           |
+| `collapsed`        | `boolean`                      | `undefined` | External control of collapsed state (controlled component) |
+| `onCollapseChange` | `(collapsed: boolean) => void` | `undefined` | Callback when collapse state changes                       |
 
 ### CollapsibleSidebar.Header
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | - | **Required**. Header content |
-| `className` | `string` | `""` | Additional CSS classes for the header |
+| Prop        | Type        | Default | Description                           |
+| ----------- | ----------- | ------- | ------------------------------------- |
+| `children`  | `ReactNode` | -       | **Required**. Header content          |
+| `className` | `string`    | `""`    | Additional CSS classes for the header |
 
 ### CollapsibleSidebar.ToggleButton
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `className` | `string` | `""` | Additional CSS classes for the button |
-| `children` | `ReactNode` | `<PanelLeft />` | Custom button content (icon, text, etc.) |
+| Prop        | Type        | Default         | Description                              |
+| ----------- | ----------- | --------------- | ---------------------------------------- |
+| `className` | `string`    | `""`            | Additional CSS classes for the button    |
+| `children`  | `ReactNode` | `<PanelLeft />` | Custom button content (icon, text, etc.) |
 
 ### CollapsibleSidebar.Content
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | - | **Required**. Content to render inside the sidebar |
-| `className` | `string` | `""` | Additional CSS classes for the content area |
+| Prop        | Type        | Default | Description                                        |
+| ----------- | ----------- | ------- | -------------------------------------------------- |
+| `children`  | `ReactNode` | -       | **Required**. Content to render inside the sidebar |
+| `className` | `string`    | `""`    | Additional CSS classes for the content area        |
 
 ### useCollapsibleSidebar Hook
 
@@ -104,9 +102,9 @@ function MyLayout() {
 const { isCollapsed, toggleCollapse } = useCollapsibleSidebar();
 ```
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `isCollapsed` | `boolean` | Current collapsed state |
+| Property         | Type         | Description                       |
+| ---------------- | ------------ | --------------------------------- |
+| `isCollapsed`    | `boolean`    | Current collapsed state           |
 | `toggleCollapse` | `() => void` | Function to toggle collapse state |
 
 ## Advanced Examples
@@ -114,18 +112,14 @@ const { isCollapsed, toggleCollapse } = useCollapsibleSidebar();
 ### Custom Width and Styling
 
 ```tsx
-<CollapsibleSidebar 
-    width="w-96"
-    collapsedWidth="w-0"
-    className="bg-blue-50 border-blue-200"
->
-    <CollapsibleSidebar.Header className="bg-blue-100">
-        <h3 className="text-blue-700">Custom Sidebar</h3>
-        <CollapsibleSidebar.ToggleButton />
-    </CollapsibleSidebar.Header>
-    <CollapsibleSidebar.Content className="bg-blue-50">
-        Custom styled content
-    </CollapsibleSidebar.Content>
+<CollapsibleSidebar width="w-96" collapsedWidth="w-0" className="bg-blue-50 border-blue-200">
+  <CollapsibleSidebar.Header className="bg-blue-100">
+    <h3 className="text-blue-700">Custom Sidebar</h3>
+    <CollapsibleSidebar.ToggleButton />
+  </CollapsibleSidebar.Header>
+  <CollapsibleSidebar.Content className="bg-blue-50">
+    Custom styled content
+  </CollapsibleSidebar.Content>
 </CollapsibleSidebar>
 ```
 
@@ -134,27 +128,25 @@ const { isCollapsed, toggleCollapse } = useCollapsibleSidebar();
 ```tsx
 const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-<CollapsibleSidebar 
-    onCollapseChange={(collapsed) => {
-        setSidebarCollapsed(collapsed);
-        // Sync with parent component state
-        // or trigger other actions
-    }}
+<CollapsibleSidebar
+  onCollapseChange={collapsed => {
+    setSidebarCollapsed(collapsed);
+    // Sync with parent component state
+    // or trigger other actions
+  }}
 >
-    <CollapsibleSidebar.Content>
-        Sidebar content
-    </CollapsibleSidebar.Content>
-</CollapsibleSidebar>
+  <CollapsibleSidebar.Content>Sidebar content</CollapsibleSidebar.Content>
+</CollapsibleSidebar>;
 ```
 
 ### Custom Toggle Button
 
 ```tsx
 <CollapsibleSidebar.Header>
-    <h3>My App</h3>
-    <CollapsibleSidebar.ToggleButton>
-        <CustomIcon className="w-4 h-4" />
-    </CollapsibleSidebar.ToggleButton>
+  <h3>My App</h3>
+  <CollapsibleSidebar.ToggleButton>
+    <CustomIcon className="w-4 h-4" />
+  </CollapsibleSidebar.ToggleButton>
 </CollapsibleSidebar.Header>
 ```
 
@@ -162,16 +154,14 @@ const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
 ```tsx
 function MyCustomSidebarContent() {
-    const { isCollapsed, toggleCollapse } = useCollapsibleSidebar();
-    
-    return (
-        <div>
-            <p>Sidebar is {isCollapsed ? 'collapsed' : 'expanded'}</p>
-            <button onClick={toggleCollapse}>
-                Toggle from inside content
-            </button>
-        </div>
-    );
+  const { isCollapsed, toggleCollapse } = useCollapsibleSidebar();
+
+  return (
+    <div>
+      <p>Sidebar is {isCollapsed ? "collapsed" : "expanded"}</p>
+      <button onClick={toggleCollapse}>Toggle from inside content</button>
+    </div>
+  );
 }
 ```
 
@@ -205,16 +195,19 @@ The component uses these default Tailwind classes:
 ## Animation Details
 
 ### Sidebar Animation
+
 - **Duration**: 300ms
 - **Easing**: `ease-in-out`
 - **Properties**: Width and opacity
 
 ### Button Transitions
+
 - **Toggle Button**: Fades out with scale effect during collapse
 - **Expand Button**: Slides in from left with fade effect
 - **Duration**: 300ms (synchronized with sidebar)
 
 ### CSS Classes Used
+
 ```css
 /* Sidebar container */
 .transition-all.duration-300.ease-in-out
@@ -230,15 +223,17 @@ The component uses these default Tailwind classes:
 ## Best Practices
 
 ### 1. Container Setup
+
 ```tsx
 // ✅ Correct: Parent has relative positioning
 <div className="flex h-screen relative">
-    <CollapsibleSidebar>...</CollapsibleSidebar>
-    <main className="flex-1">...</main>
+  <CollapsibleSidebar>...</CollapsibleSidebar>
+  <main className="flex-1">...</main>
 </div>
 ```
 
 ### 2. Content Organization
+
 ```tsx
 // ✅ Recommended: Use Header + Content pattern
 <CollapsibleSidebar>
@@ -260,24 +255,21 @@ The component uses these default Tailwind classes:
 ```
 
 ### 3. State Management
+
 ```tsx
 // ✅ Good: Use callback for external state sync
-<CollapsibleSidebar onCollapseChange={handleCollapseChange}>
-    {/* ... */}
-</CollapsibleSidebar>
+<CollapsibleSidebar onCollapseChange={handleCollapseChange}>{/* ... */}</CollapsibleSidebar>;
 
 // ✅ Good: Use hook for internal communication
 const { isCollapsed } = useCollapsibleSidebar();
 ```
 
 ### 4. Responsive Design
+
 ```tsx
 // ✅ Consider mobile behavior
-<CollapsibleSidebar 
-    width="w-80 md:w-64" 
-    className="md:relative md:translate-x-0"
->
-    {/* ... */}
+<CollapsibleSidebar width="w-80 md:w-64" className="md:relative md:translate-x-0">
+  {/* ... */}
 </CollapsibleSidebar>
 ```
 
@@ -313,26 +305,26 @@ const { isCollapsed } = useCollapsibleSidebar();
 
 ```tsx
 function AppLayout() {
-    return (
-        <div className="flex h-screen relative">
-            <CollapsibleSidebar>
-                <CollapsibleSidebar.Header>
-                    <h3>Navigation</h3>
-                    <CollapsibleSidebar.ToggleButton />
-                </CollapsibleSidebar.Header>
-                <CollapsibleSidebar.Content>
-                    <nav>
-                        <NavLink to="/dashboard">Dashboard</NavLink>
-                        <NavLink to="/users">Users</NavLink>
-                        <NavLink to="/settings">Settings</NavLink>
-                    </nav>
-                </CollapsibleSidebar.Content>
-            </CollapsibleSidebar>
-            <main className="flex-1 overflow-auto">
-                <Outlet />
-            </main>
-        </div>
-    );
+  return (
+    <div className="flex h-screen relative">
+      <CollapsibleSidebar>
+        <CollapsibleSidebar.Header>
+          <h3>Navigation</h3>
+          <CollapsibleSidebar.ToggleButton />
+        </CollapsibleSidebar.Header>
+        <CollapsibleSidebar.Content>
+          <nav>
+            <NavLink to="/dashboard">Dashboard</NavLink>
+            <NavLink to="/users">Users</NavLink>
+            <NavLink to="/settings">Settings</NavLink>
+          </nav>
+        </CollapsibleSidebar.Content>
+      </CollapsibleSidebar>
+      <main className="flex-1 overflow-auto">
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 ```
 

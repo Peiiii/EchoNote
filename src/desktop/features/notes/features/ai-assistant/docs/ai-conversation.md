@@ -37,7 +37,7 @@ type UIMessage = {
   id: string;
   role: "user" | "assistant" | "system";
   parts: MessagePart[];
-}
+};
 ```
 
 ## Firebase Structure

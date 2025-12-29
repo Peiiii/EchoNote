@@ -23,18 +23,21 @@ This directory contains optimized mobile-specific components for displaying thou
 ## Key Features
 
 ### 🎨 **Modern Design**
+
 - Clean, minimalist interface optimized for mobile screens
 - Smooth transitions and hover effects
 - Consistent spacing and typography scales
 - Dark mode support with proper contrast ratios
 
 ### 📱 **Mobile-First UX**
+
 - Touch-friendly button sizes and spacing
 - Responsive layout that adapts to different screen sizes
 - Optimized for one-handed operation
 - Reduced cognitive load with progressive disclosure
 
 ### 🔧 **Rich Functionality**
+
 - Full markdown support with mobile-optimized styling
 - Inline editing with real-time preview
 - AI insights display (Sparks)
@@ -42,6 +45,7 @@ This directory contains optimized mobile-specific components for displaying thou
 - Copy, edit, and delete operations
 
 ### ⚡ **Performance Optimized**
+
 - Lazy loading of markdown content
 - Efficient state management
 - Smooth animations with CSS transitions
@@ -50,21 +54,25 @@ This directory contains optimized mobile-specific components for displaying thou
 ## Design Principles
 
 ### 1. **Simplicity First**
+
 - Remove unnecessary visual clutter
 - Focus on essential information
 - Use progressive disclosure for advanced features
 
 ### 2. **Touch Optimization**
+
 - Minimum 44px touch targets
 - Adequate spacing between interactive elements
 - Clear visual feedback for all interactions
 
 ### 3. **Consistency**
+
 - Maintain design language with desktop version
 - Use consistent spacing, colors, and typography
 - Follow established interaction patterns
 
 ### 4. **Accessibility**
+
 - Proper contrast ratios
 - Screen reader support
 - Keyboard navigation support
@@ -73,14 +81,14 @@ This directory contains optimized mobile-specific components for displaying thou
 ## Usage
 
 ```tsx
-import { MobileThoughtRecord } from './thought-record';
+import { MobileThoughtRecord } from "./thought-record";
 
 <MobileThoughtRecord
-    message={message}
-    onOpenThread={handleOpenThread}
-    onReply={handleReply}
-    threadCount={5}
-/>
+  message={message}
+  onOpenThread={handleOpenThread}
+  onReply={handleReply}
+  threadCount={5}
+/>;
 ```
 
 ## Styling

@@ -4,14 +4,14 @@ import { persist } from "zustand/middleware";
 export interface UIPreferencesState {
   // Sidebar states
   isLeftSidebarCollapsed: boolean;
-  
+
   // Panel states
   rightSidebarVisible: boolean;
   rightSidebarSize: number;
-  
+
   // Layout preferences
-  layoutMode: 'default' | 'compact' | 'wide';
-  
+  layoutMode: "default" | "compact" | "wide";
+
   // Display settings
   showTimestamps: boolean;
   showUserAvatars: boolean;
@@ -20,13 +20,13 @@ export interface UIPreferencesState {
   timelineCoverCollapsed: boolean;
   // Timeline input states keyed by channel id
   timelineInputCollapsed: Record<string, boolean>;
-  
+
   // Actions
   toggleLeftSidebar: () => void;
   setLeftSidebarCollapsed: (collapsed: boolean) => void;
   setRightSidebarVisible: (visible: boolean) => void;
   setRightSidebarSize: (size: number) => void;
-  setLayoutMode: (mode: 'default' | 'compact' | 'wide') => void;
+  setLayoutMode: (mode: "default" | "compact" | "wide") => void;
   setShowTimestamps: (show: boolean) => void;
   setShowUserAvatars: (show: boolean) => void;
   // Set global timeline cover collapsed
@@ -36,21 +36,21 @@ export interface UIPreferencesState {
 
 export const useUIPreferencesStore = create<UIPreferencesState>()(
   persist(
-    (set) => ({
+    set => ({
       // Initial state
       isLeftSidebarCollapsed: false,
       rightSidebarVisible: false,
       rightSidebarSize: 35,
-      layoutMode: 'default',
+      layoutMode: "default",
       showTimestamps: true,
       showUserAvatars: true,
-      timelineCoverCollapsed: false,
+      timelineCoverCollapsed: true,
       timelineInputCollapsed: {},
 
       // Actions
       toggleLeftSidebar: () => {
-        set((state) => ({ 
-          isLeftSidebarCollapsed: !state.isLeftSidebarCollapsed 
+        set(state => ({
+          isLeftSidebarCollapsed: !state.isLeftSidebarCollapsed,
         }));
       },
 
@@ -66,7 +66,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
         set({ rightSidebarSize: size });
       },
 
-      setLayoutMode: (mode: 'default' | 'compact' | 'wide') => {
+      setLayoutMode: (mode: "default" | "compact" | "wide") => {
         set({ layoutMode: mode });
       },
 
@@ -83,7 +83,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
       },
 
       setTimelineInputCollapsed: (channelId: string, collapsed: boolean) => {
-        set((state) => ({
+        set(state => ({
           timelineInputCollapsed: {
             ...state.timelineInputCollapsed,
             [channelId]: collapsed,
@@ -94,7 +94,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
     {
       name: "echonote-ui-preferences-storage",
       // Persist selected UI preferences only
-      partialize: (state) => ({
+      partialize: state => ({
         isLeftSidebarCollapsed: state.isLeftSidebarCollapsed,
         rightSidebarVisible: state.rightSidebarVisible,
         rightSidebarSize: state.rightSidebarSize,
@@ -108,7 +108,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
       version: 2,
       migrate: (persisted, version) => {
         // If the previous version had per-channel map, convert to a single boolean
-        if (version < 2 && persisted && typeof persisted === 'object') {
+        if (version < 2 && persisted && typeof persisted === "object") {
           type PersistedShape = Partial<UIPreferencesState> & {
             // In v1 this was a Record<string, boolean>; in v2 it's a boolean
             timelineCoverCollapsed?: boolean | Record<string, boolean>;
@@ -116,7 +116,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
           const prev = persisted as PersistedShape;
           const map = prev.timelineCoverCollapsed;
           let collapsed: boolean;
-          if (map && typeof map === 'object' && !Array.isArray(map)) {
+          if (map && typeof map === "object" && !Array.isArray(map)) {
             // If any channel was collapsed, treat global as collapsed; otherwise default false
             collapsed = Object.values(map as Record<string, boolean>).some(Boolean);
           } else {

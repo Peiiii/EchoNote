@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from '@/common/lib/utils';
+import React from "react";
+import { cn } from "@/common/lib/utils";
 
 interface SkeletonProps {
   className?: string;
@@ -8,20 +8,11 @@ interface SkeletonProps {
 
 export const Skeleton: React.FC<SkeletonProps> = ({ className, children }) => {
   if (children) {
-    return (
-      <div className={cn('animate-pulse', className)}>
-        {children}
-      </div>
-    );
+    return <div className={cn("animate-pulse", className)}>{children}</div>;
   }
-  
+
   return (
-    <div
-      className={cn(
-        'animate-pulse rounded-md bg-slate-200 dark:bg-slate-700',
-        className
-      )}
-    />
+    <div className={cn("animate-pulse rounded-md bg-slate-200 dark:bg-slate-700", className)} />
   );
 };
 
@@ -40,19 +31,19 @@ export const AppSkeleton: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="flex h-[calc(100vh-4rem)]">
         {/* 左侧边栏骨架 */}
         <div className="w-16 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700">
           <div className="py-4 space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="flex justify-center">
                 <Skeleton className="w-10 h-10 rounded-lg" />
               </div>
             ))}
           </div>
         </div>
-        
+
         {/* 主内容区域骨架 */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto space-y-6">
@@ -61,9 +52,9 @@ export const AppSkeleton: React.FC = () => {
               <Skeleton className="w-48 h-8" />
               <Skeleton className="w-96 h-4" />
             </div>
-            
+
             {/* 内容卡片骨架 */}
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="p-6 border border-slate-200 dark:border-slate-700 rounded-lg">
                 <div className="space-y-3">
                   <Skeleton className="w-3/4 h-5" />

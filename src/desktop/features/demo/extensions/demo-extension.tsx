@@ -11,7 +11,7 @@ import {
   Settings,
   Star,
   TestTube,
-  Users
+  Users,
 } from "lucide-react";
 import { DemoChatPage } from "../pages/demo-chat-page";
 import { DemoDocsPage } from "../pages/demo-docs-page";
@@ -21,6 +21,7 @@ import { SpaceChatDemoPage } from "../pages/space-chat-demo-page";
 import { AiObjectDemoPage } from "../pages/ai-object-demo-page";
 import { AiQuickTestDemoPage } from "../pages/ai-quick-test-demo-page";
 import { TimeFormatDemoPage } from "../pages/time-format-demo-page";
+import { SVGHomepageDemo } from "../pages/svg-homepage-demo";
 
 export const demoExtension = defineExtension({
   manifest: {
@@ -28,7 +29,7 @@ export const demoExtension = defineExtension({
     name: "Demo Extension",
     description: "Demonstrates the usage of plugin architecture",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "test-tube",
   },
   activate: ({ subscriptions }) => {
@@ -130,6 +131,12 @@ export const demoExtension = defineExtension({
             element: <TimeFormatDemoPage />,
             order: 107,
           },
+          {
+            id: "demo-svg-homepage-page",
+            path: "/demo/svg-homepage",
+            element: <SVGHomepageDemo />,
+            order: 108,
+          },
         ])
       )
     );
@@ -150,4 +157,4 @@ export const demoExtension = defineExtension({
       )
     );
   },
-}); 
+});

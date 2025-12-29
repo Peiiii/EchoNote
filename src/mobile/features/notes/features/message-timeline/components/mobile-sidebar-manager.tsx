@@ -1,92 +1,59 @@
-import { MobileAIAssistant } from "@/mobile/features/notes/features/ai-assistant";
-import { MobileChannelList } from "@/mobile/features/notes/features/channel-management";
-import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
 import { Sheet, SheetContent } from "@/common/components/ui/sheet";
-import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
+import { MobileSettingsSidebar } from "@/mobile/features/notes/components/mobile-settings-sidebar";
+import { MobileAIAssistant } from "@/mobile/features/notes/features/ai-assistant";
+import { MobileChannelList } from "@/mobile/features/notes/features/channel-management/components";
+import { MobileThreadSidebar } from "@/mobile/features/notes/features/thread-management";
 
 export const MobileSidebarManager = () => {
-    const { setCurrentChannel, currentChannelId } = useNotesViewStore();
-    const { 
-        isChannelListOpen,
-        isAIAssistantOpen,
-        isSettingsOpen,
-        isThreadOpen,
-        closeChannelList,
-        closeAIAssistant,
-        closeSettings,
-        closeThread
-    } = useUIStateStore();
-    const addThreadMessage = useNotesDataStore(state => state.addThreadMessage);
+  const presenter = useCommonPresenterContext();
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
+  const isChannelListOpen = useUIStateStore(state => state.isChannelListOpen);
+  const sideView = useUIStateStore(state => state.sideView);
 
-    // Handle channel selection: switch channel and close channel list
-    const handleChannelSelect = (channelId: string) => {
-        setCurrentChannel(channelId);
-        closeChannelList();
-    };
-
-    // Handle thread message sending
-    const handleSendThreadMessage = (content: string) => {
-        if (currentChannelId) {
-            addThreadMessage(currentChannelId, {
-                content,
-                sender: "user" as const,
-                channelId: currentChannelId,
-            });
-        }
-    };
-    return (
-        <>
-            {/* Channel List Sidebar */}
-            <MobileChannelList
-                isOpen={isChannelListOpen}
-                onClose={closeChannelList}
-                onChannelSelect={handleChannelSelect}
+  return (
+    <>
+      <MobileChannelList
+        isOpen={isChannelListOpen}
+      />
+      {currentChannelId && (
+        <Sheet open={sideView === SideViewEnum.AI_ASSISTANT} onOpenChange={presenter.closeAIAssistant}>
+          <SheetContent
+            side="bottom"
+            className="h-[80vh] p-0 border-t border-border/60"
+            hideClose
+            onOpenAutoFocus={e => e.preventDefault()}
+          >
+            <MobileAIAssistant
+              channelId={currentChannelId}
+              isOpen={sideView === SideViewEnum.AI_ASSISTANT}
+              onClose={() => presenter.closeAIAssistant()}
             />
-
-            {/* AI Assistant - Bottom Sheet */}
-            {currentChannelId && (
-                <Sheet open={isAIAssistantOpen} onOpenChange={closeAIAssistant}>
-                    <SheetContent
-                        side="bottom"
-                        className="h-[80vh] p-0 border-t border-border/60"
-                        hideClose
-                        onOpenAutoFocus={(e) => e.preventDefault()}
-                    >
-                        <MobileAIAssistant
-                            channelId={currentChannelId}
-                            isOpen={isAIAssistantOpen}
-                            onClose={closeAIAssistant}
-                        />
-                    </SheetContent>
-                </Sheet>
-            )}
-
-            {/* Thread Sidebar */}
-            {isThreadOpen && (
-                <Sheet open={isThreadOpen} onOpenChange={closeThread}>
-                    <SheetContent
-                        side="right"
-                        className="w-full max-w-md p-0 border-l border-border/60"
-                    >
-                        <MobileThreadSidebar
-                            onSendMessage={handleSendThreadMessage}
-                        />
-                    </SheetContent>
-                </Sheet>
-            )}
-
-            {/* Settings Sidebar */}
-            <Sheet open={isSettingsOpen} onOpenChange={closeSettings}>
-                <SheetContent
-                    side="right"
-                    className="w-full max-w-md p-0 border-l border-border/60"
-                >
-                    <MobileSettingsSidebar />
-                </SheetContent>
-            </Sheet>
-        </>
-    );
+          </SheetContent>
+        </Sheet>
+      )}
+      {sideView === SideViewEnum.THREAD && (
+        <Sheet open={sideView === SideViewEnum.THREAD} onOpenChange={() => presenter.closeThread()}>
+          <SheetContent
+            side="right"
+            className="w-full max-w-md p-0 border-l border-border/60"
+            hideClose
+          >
+            <MobileThreadSidebar />
+          </SheetContent>
+        </Sheet>
+      )}
+      <Sheet open={sideView === SideViewEnum.SETTINGS} onOpenChange={() => presenter.closeSettings()}>
+        <SheetContent
+          side="right"
+          className="w-full max-w-md p-0 border-l border-border/60"
+          hideClose
+        >
+          <MobileSettingsSidebar onClose={() => presenter.closeSettings()} />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
 };

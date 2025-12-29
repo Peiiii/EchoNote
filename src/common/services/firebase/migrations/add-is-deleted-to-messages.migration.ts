@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { MigrationExecutor } from "./types";
 
 /**
@@ -13,13 +13,14 @@ export class AddIsDeletedToMessagesMigration implements MigrationExecutor {
   createdAt = new Date("2025-01-27");
 
   async execute(userId: string): Promise<void> {
+    const db = firebaseConfig.getDb();
     const messagesCollectionRef = collection(db, `users/${userId}/messages`);
     const messagesSnapshot = await getDocs(messagesCollectionRef);
     let migratedCount = 0;
-    
+
     for (const messageDoc of messagesSnapshot.docs) {
       const messageData = messageDoc.data();
-      
+
       // If the message does not have the isDeleted field, add isDeleted: false
       if (messageData.isDeleted === undefined) {
         const messageRef = doc(messagesCollectionRef, messageDoc.id);
@@ -29,7 +30,7 @@ export class AddIsDeletedToMessagesMigration implements MigrationExecutor {
         migratedCount++;
       }
     }
-    
+
     // Only log if there were actual changes
     if (migratedCount > 0) {
       console.log(`   📊 Updated ${migratedCount} messages with isDeleted field`);

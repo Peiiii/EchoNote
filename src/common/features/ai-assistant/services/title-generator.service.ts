@@ -2,7 +2,7 @@ import { generateText } from "@/common/services/ai/generate-text";
 
 type Inflight = { promise: Promise<string>; ts: number };
 
-export type TitleGenMode = 'deterministic' | 'ai' | 'auto';
+export type TitleGenMode = "deterministic" | "ai" | "auto";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import type { AIConversation } from "@/common/types/ai-conversation";
 
@@ -14,22 +14,29 @@ class TitleGeneratorService {
   private minIntervalMs = 1500;
   private results: Map<string, { title?: string; error?: unknown }> = new Map();
 
-  setEnabled(v: boolean) { this.enabled = v; }
+  setEnabled(v: boolean) {
+    this.enabled = v;
+  }
 
-  request(conversationId: string, text: string, options?: { mode?: TitleGenMode }): Promise<string> {
+  request(
+    conversationId: string,
+    text: string,
+    options?: { mode?: TitleGenMode }
+  ): Promise<string> {
     if (!this.enabled) return Promise.resolve("");
     const existing = this.inFlight.get(conversationId);
     if (existing) return existing.promise;
     const p = new Promise<string>((resolve, reject) => {
-      const mode: TitleGenMode = options?.mode || 'deterministic';
+      const mode: TitleGenMode = options?.mode || "deterministic";
       this.queue.push(JSON.stringify({ id: conversationId, text, mode }));
-      this.runLoop().catch(() => { });
+      this.runLoop().catch(() => {});
       const check = setInterval(() => {
         const done = this.results.get(conversationId);
         if (done !== undefined) {
           clearInterval(check);
           this.results.delete(conversationId);
-          if (done.error) reject(done.error); else resolve(done.title || "");
+          if (done.error) reject(done.error);
+          else resolve(done.title || "");
         }
       }, 50);
     });
@@ -45,9 +52,14 @@ class TitleGeneratorService {
     while (this.queue.length) {
       const item = this.queue.shift();
       if (!item) break;
-      const { id, text, mode } = JSON.parse(item) as { id: string; text: string; mode: TitleGenMode };
+      const { id, text, mode } = JSON.parse(item) as {
+        id: string;
+        text: string;
+        mode: TitleGenMode;
+      };
       const delta = Date.now() - lastTs;
-      if (delta < this.minIntervalMs) await new Promise(r => setTimeout(r, this.minIntervalMs - delta));
+      if (delta < this.minIntervalMs)
+        await new Promise(r => setTimeout(r, this.minIntervalMs - delta));
       try {
         const title = await this.generateTitle(text, mode);
         this.results.set(id, { title });
@@ -61,15 +73,15 @@ class TitleGeneratorService {
   }
 
   private async generateTitle(text: string, mode: TitleGenMode): Promise<string> {
-    if (mode === 'deterministic') {
+    if (mode === "deterministic") {
       return this.generateDeterministicTitle(text);
     }
 
-    if (mode === 'auto' && !this.enabled) {
+    if (mode === "auto" && !this.enabled) {
       return this.generateDeterministicTitle(text);
     }
 
-    if (mode === 'ai' || (mode === 'auto' && this.enabled)) {
+    if (mode === "ai" || (mode === "auto" && this.enabled)) {
       return this.generateAITitle(text);
     }
 
@@ -77,7 +89,7 @@ class TitleGeneratorService {
   }
 
   private generateDeterministicTitle(text: string): string {
-    return text.trim().replace(/\s+/g, ' ').slice(0, 200);
+    return text.trim().replace(/\s+/g, " ").slice(0, 200);
   }
 
   private async generateAITitle(text: string): Promise<string> {
@@ -92,7 +104,7 @@ class TitleGeneratorService {
 
       return this.generateDeterministicTitle(text);
     } catch (error) {
-      console.warn('AI title generation failed, falling back to deterministic:', error);
+      console.warn("AI title generation failed, falling back to deterministic:", error);
       return this.generateDeterministicTitle(text);
     }
   }
@@ -110,8 +122,9 @@ Content: ${text}`;
   private async callAIService(prompt: string): Promise<string> {
     return await generateText({
       prompt,
-      system: "You are a helpful assistant that generates concise, descriptive titles for conversations.",
-      temperature: 0.3
+      system:
+        "You are a helpful assistant that generates concise, descriptive titles for conversations.",
+      temperature: 0.3,
     });
   }
 
@@ -159,7 +172,6 @@ export async function handleAutoTitleSnapshot(opts: AutoTitleSnapshotOptions): P
     }
     await updateConversationTitle(opts, title);
     opts.completeTitleGenerating(opts.conversationId);
-
   } catch (error) {
     opts.completeTitleGenerating(opts.conversationId);
     throw error;
@@ -171,37 +183,45 @@ function shouldGenerateTitle(opts: AutoTitleSnapshotOptions): boolean {
 
   if (autoTitleDone[conversationId]) return false;
 
-  const isDefaultTitle = !conversation.title ||
+  const isDefaultTitle =
+    !conversation.title ||
     /^New Conversation/i.test(conversation.title) ||
-    conversation.title.startsWith('temp-');
+    conversation.title.startsWith("temp-");
 
   return isDefaultTitle;
 }
 
 function extractUserText(messages: UIMessage[]): string {
-  const firstUser = messages.find(m => m.role === 'user');
-  if (!firstUser) return '';
+  const firstUser = messages.find(m => m.role === "user");
+  if (!firstUser) return "";
 
-  const textPart = firstUser.parts.find(p => p.type === 'text') as { type: 'text'; text: string } | undefined;
-  return textPart?.text?.trim() || '';
+  const textPart = firstUser.parts.find(p => p.type === "text") as
+    | { type: "text"; text: string }
+    | undefined;
+  return textPart?.text?.trim() || "";
 }
 
-async function generateTitleForSnapshot(opts: AutoTitleSnapshotOptions, text: string): Promise<string> {
+async function generateTitleForSnapshot(
+  opts: AutoTitleSnapshotOptions,
+  text: string
+): Promise<string> {
   const { conversationId, autoTitleEnabled, autoTitleMode } = opts;
-  const mode: TitleGenMode = autoTitleEnabled ? autoTitleMode : 'deterministic';
+  const mode: TitleGenMode = autoTitleEnabled ? autoTitleMode : "deterministic";
 
   try {
     const title = await titleGeneratorService.request(conversationId, text, { mode });
     if (title) return title;
   } catch {
-    return text.replace(/\s+/g, ' ').slice(0, 36);
-
+    return text.replace(/\s+/g, " ").slice(0, 36);
   }
 
-  return text.replace(/\s+/g, ' ').slice(0, 36);
+  return text.replace(/\s+/g, " ").slice(0, 36);
 }
 
-async function updateConversationTitle(opts: AutoTitleSnapshotOptions, title: string): Promise<void> {
+async function updateConversationTitle(
+  opts: AutoTitleSnapshotOptions,
+  title: string
+): Promise<void> {
   const { conversationId, getUserId, update, applyLocal, markDone } = opts;
 
   const userId = getUserId();

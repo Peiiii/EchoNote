@@ -1,6 +1,6 @@
 // Small helper to ensure channel messages are loaded before executing a tool.
 // Centralizes the previously duplicated polling logic.
-import { channelMessageService } from '@/core/services/channel-message.service';
+import { channelMessageService } from "@/core/services/channel-message.service";
 
 /**
  * Ensure channel messages exist and are not in loading state.
@@ -10,7 +10,10 @@ import { channelMessageService } from '@/core/services/channel-message.service';
  * (request + poll). If the request workflow is not connected elsewhere,
  * callers should ensure ChannelMessageService workflow is active.
  */
-export async function ensureChannelMessagesLoaded(channelId: string, opts?: { timeoutMs?: number; intervalMs?: number }) {
+export async function ensureChannelMessagesLoaded(
+  channelId: string,
+  opts?: { timeoutMs?: number; intervalMs?: number }
+) {
   const timeoutMs = opts?.timeoutMs ?? 10_000; // cap wait to avoid infinite loops
   const intervalMs = opts?.intervalMs ?? 100;
 
@@ -19,7 +22,7 @@ export async function ensureChannelMessagesLoaded(channelId: string, opts?: { ti
 
   // Trigger load if missing
   if (!state) {
-    channelMessageService.requestLoadInitialMessages$.next(channelId);
+    channelMessageService.requestLoadInitialMessages$.next({ channelId });
   }
 
   const started = Date.now();
@@ -27,10 +30,10 @@ export async function ensureChannelMessagesLoaded(channelId: string, opts?: { ti
     const check = () => {
       const s = channelMessageService.dataContainer.get().messageByChannel[channelId];
       if (s && !s.loading) return resolve();
-      if (Date.now() - started > timeoutMs) return reject(new Error(`Timeout waiting channel ${channelId} messages to load`));
+      if (Date.now() - started > timeoutMs)
+        return reject(new Error(`Timeout waiting channel ${channelId} messages to load`));
       setTimeout(check, intervalMs);
     };
     check();
   });
 }
-

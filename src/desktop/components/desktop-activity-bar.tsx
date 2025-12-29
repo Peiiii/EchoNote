@@ -17,14 +17,15 @@ interface DesktopActivityBarProps {
 export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
   const { activeId, setActiveId, items } = useActivityBarStore();
 
-  const mainGroupItems = items.filter(
-    (item) => item.group === ActivityBarGroup.MAIN
-  );
-  const footerItems = items.filter(
-    (item) => item.group === ActivityBarGroup.FOOTER
-  );
+  const mainGroupItems = items.filter(item => item.group === ActivityBarGroup.MAIN);
+  const footerItems = items.filter(item => item.group === ActivityBarGroup.FOOTER);
 
   const handleActiveChange = (activeId: string) => {
+    // Feedback activity lives in the footer and only opens a modal,
+    // so we don't want it to change the main active route.
+    if (activeId === "feedback") {
+      return;
+    }
     setActiveId(activeId);
   };
 
@@ -52,7 +53,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
               <LayoutDashboard className="w-5 h-5" />
             </div>
           }
-          title="EchoNote"
+          title="StillRoot"
           showSearch={false}
           showSeparator={false}
           className="bg-sidebar"
@@ -69,12 +70,7 @@ export function DesktopActivityBar({ className }: DesktopActivityBarProps) {
                 activeClassName="bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                 collapsedLabel={item.collapsedLabel}
                 icon={
-                  <div
-                    data-testid={item.id}
-                    className={cn(
-                      "flex items-center justify-center",
-                    )}
-                  >
+                  <div data-testid={item.id} className={cn("flex items-center justify-center")}>
                     <IconRegistry id={item.icon} />
                   </div>
                 }

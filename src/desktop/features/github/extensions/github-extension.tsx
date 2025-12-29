@@ -1,7 +1,4 @@
-import {
-  ActivityBarGroup,
-  useActivityBarStore,
-} from "@/core/stores/activity-bar.store";
+import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -16,7 +13,7 @@ export const githubExtension = defineExtension({
     name: "GitHub Integration",
     description: "Integrate with GitHub for data storage and synchronization",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "github",
   },
   activate: ({ subscriptions }) => {

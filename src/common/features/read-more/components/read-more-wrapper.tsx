@@ -1,11 +1,10 @@
+import { collapseWithElementTopToContainerTop } from "@/common/features/read-more/core/collapse-utils";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  selectShowFloatingCollapse,
-  useReadMoreStore,
-} from "../store/read-more.store";
-import { READ_MORE_DATA_ATTRS } from "../core/dom-constants";
+import { READ_MORE_DATA_ATTRS, READ_MORE_SELECTORS } from "../core/dom-constants";
+import { selectShowFloatingCollapse, useReadMoreStore } from "../store/read-more.store";
 
 interface ReadMoreBaseWrapperProps {
   children: React.ReactNode;
@@ -28,28 +27,19 @@ export function ReadMoreBaseWrapper({
   readMoreLabel = "Read more",
   collapseLabel = "Collapse",
 }: ReadMoreBaseWrapperProps) {
-  const setStatus = useReadMoreStore(
-    useCallback((state) => state.setStatus, [])
-  );
-  const pendingCollapseId = useReadMoreStore(
-    (state) => state.pendingCollapseId
-  );
-  const acknowledgeCollapse = useReadMoreStore(
-    useCallback((state) => state.acknowledgeCollapse, [])
-  );
+  const presenter = useCommonPresenterContext();
+  const setStatus = useReadMoreStore(useCallback(state => state.setStatus, []));
+  const pendingCollapseId = useReadMoreStore(state => state.pendingCollapseId);
+  const acknowledgeCollapse = useReadMoreStore(useCallback(state => state.acknowledgeCollapse, []));
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const showFloatingCollapse = useReadMoreStore(selectShowFloatingCollapse);
-  const activeMessageId = useReadMoreStore(
-    useCallback((state) => state.activeMessageId, [])
-  );
-  const notifyLayoutChange = useReadMoreStore(
-    useCallback((state) => state.notifyLayoutChange, [])
-  );
+  const activeMessageId = useReadMoreStore(useCallback(state => state.activeMessageId, []));
+  const notifyLayoutChange = useReadMoreStore(useCallback(state => state.notifyLayoutChange, []));
   const activateAutoScrollSuppression = useReadMoreStore(
-    useCallback((state) => state.activateAutoScrollSuppression, [])
+    useCallback(state => state.activateAutoScrollSuppression, [])
   );
   const previousExpandedRef = useRef(false);
 
@@ -85,9 +75,28 @@ export function ReadMoreBaseWrapper({
     previousExpandedRef.current = isExpanded;
   }, [isExpanded, activateAutoScrollSuppression]);
 
-  const handleToggle = () => setIsExpanded((prev) => !prev);
-  const inlineHidden =
-    showFloatingCollapse && activeMessageId === messageId && isExpanded;
+  const handleCollapse = () => {
+    const container = presenter.scrollManager.getScrollContainer();
+    if (!container) return;
+    const element = container.querySelector(
+      READ_MORE_SELECTORS.messageById(messageId)
+    ) as HTMLElement | null;
+    collapseWithElementTopToContainerTop({
+      container: container,
+      element: element!,
+      onCollapse: () => setIsExpanded(false),
+    });
+  };
+
+  const handleToggle = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+      return;
+    } else {
+      handleCollapse();
+    }
+  };
+  const inlineHidden = showFloatingCollapse && activeMessageId === messageId && isExpanded;
   const collapseInlineData = {
     [READ_MORE_DATA_ATTRS.collapseInlineFor]: messageId,
   } as const;
@@ -97,7 +106,7 @@ export function ReadMoreBaseWrapper({
       <div
         ref={contentRef}
         className={cn(
-          "transition-all duration-300 ease-in-out",
+          "transition-all duration-100 ease-in-out",
           !isExpanded && showReadMore ? "overflow-hidden" : "",
           isExpanded && showReadMore ? "pb-12" : ""
         )}

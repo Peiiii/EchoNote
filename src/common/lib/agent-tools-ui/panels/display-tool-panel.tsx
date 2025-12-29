@@ -1,7 +1,7 @@
-import { ToolInvocation, ToolInvocationStatus } from '@agent-labs/agent-chat';
-import React from 'react';
-import { ToolPanel } from './tool-panel';
-import { getParsedArgs } from '../utils/invocation-utils';
+import { ToolInvocation, ToolInvocationStatus } from "@agent-labs/agent-chat";
+import React from "react";
+import { ToolPanel } from "./tool-panel";
+import { getParsedArgs } from "../utils/invocation-utils";
 
 export interface DisplayToolPanelProps<Args, Result> {
   invocation: ToolInvocation<Args, Result>;
@@ -25,14 +25,14 @@ export function DisplayToolPanel<Args, Result>({
   invocation,
   icon,
   title,
-  loadingText = 'Loading...',
+  loadingText = "Loading...",
   loadingIcon,
   successIcon,
   errorIcon,
   readyIcon,
   successStatusText,
   errorStatusText,
-  readyStatusText = 'Ready',
+  readyStatusText = "Ready",
   contentScrollable = true,
   headerCardClassName,
   contentCardClassName,
@@ -79,9 +79,12 @@ export function DisplayToolPanel<Args, Result>({
         icon={successIcon || icon}
         title={title}
         status="success"
-        statusText={successStatusText ? successStatusText(result) : 'Success'}
+        statusText={successStatusText ? successStatusText(result) : "Success"}
         contentScrollable={contentScrollable}
-        headerCardClassName={headerCardClassName || "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950"}
+        headerCardClassName={
+          headerCardClassName ||
+          "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950"
+        }
         contentCardClassName={contentCardClassName || "border-gray-200 dark:border-gray-800 mt-2"}
       >
         {children(args, result)}
@@ -96,7 +99,7 @@ export function DisplayToolPanel<Args, Result>({
         icon={errorIcon || icon}
         title={title}
         status="error"
-        statusText={errorStatusText ? errorStatusText(error) : 'Error occurred'}
+        statusText={errorStatusText ? errorStatusText(error) : "Error occurred"}
         contentScrollable={contentScrollable}
         headerCardClassName={headerCardClassName || "border-red-200 dark:border-red-800"}
         contentCardClassName={contentCardClassName || "border-red-200 dark:border-red-800 mt-2"}

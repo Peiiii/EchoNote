@@ -1,1 +1,1 @@
-export { demoExtension } from './demo-extension'; 
+export { demoExtension } from "./demo-extension";

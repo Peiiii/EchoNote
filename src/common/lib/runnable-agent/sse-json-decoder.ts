@@ -21,6 +21,6 @@ export function decodeEventStream(): OperatorFunction<string, unknown> {
           }
           subscriber.complete();
         });
-      }),
+      })
     );
-} 
+}

@@ -22,16 +22,16 @@ npm install @dimstack/git-auth
 ### 基本使用
 
 ```typescript
-import { GitAuth, generateState, parseAuthCode, GitHubProvider } from '@dimstack/git-auth';
+import { GitAuth, generateState, parseAuthCode, GitHubProvider } from "@dimstack/git-auth";
 
 // 1. 创建GitHub提供者
 const githubProvider = new GitHubProvider();
 
 // 2. 创建认证实例
 const auth = new GitAuth(githubProvider, {
-  clientId: 'your-github-client-id',
-  redirectUri: 'https://your-app.com/auth/callback',
-  scopes: ['repo', 'user']
+  clientId: "your-github-client-id",
+  redirectUri: "https://your-app.com/auth/callback",
+  scopes: ["repo", "user"],
 });
 
 // 3. 启动认证流程
@@ -39,28 +39,27 @@ const state = generateState(32); // 生成状态参数
 const authUrl = await auth.startAuth({ state });
 
 // 4. 存储状态参数（由使用者决定存储方式）
-localStorage.setItem('github_auth_state', state);
+localStorage.setItem("github_auth_state", state);
 
 // 5. 重定向用户到Git平台
 window.location.href = authUrl;
 
 // 6. 在回调页面处理认证结果
 const { code, state: receivedState } = parseAuthCode(window.location.href);
-const originalState = localStorage.getItem('github_auth_state');
+const originalState = localStorage.getItem("github_auth_state");
 
 if (code && receivedState === originalState) {
   try {
     const result = await auth.handleCallback(code, receivedState);
-    console.log('认证成功:', result.user.login);
-    
+    console.log("认证成功:", result.user.login);
+
     // 存储认证结果（由使用者决定存储方式）
-    localStorage.setItem('github_auth_result', JSON.stringify(result));
-    
+    localStorage.setItem("github_auth_result", JSON.stringify(result));
+
     // 清理临时状态
-    localStorage.removeItem('github_auth_state');
-    
+    localStorage.removeItem("github_auth_state");
   } catch (error) {
-    console.error('认证失败:', error);
+    console.error("认证失败:", error);
   }
 }
 ```
@@ -70,42 +69,42 @@ if (code && receivedState === originalState) {
 如果遇到跨域问题，可以通过配置自定义HTTP客户端来解决：
 
 ```typescript
-import { GitAuth, GitHubProvider } from '@dimstack/git-auth';
+import { GitAuth, GitHubProvider } from "@dimstack/git-auth";
 
 // 创建带有自定义HTTP客户端的GitHub Provider
 const githubProvider = new GitHubProvider({
   httpClient: {
     fetch: async (url, options) => {
       // 对token交换请求使用proxy解决跨域
-      if (url.includes('github.com/login/oauth/access_token')) {
+      if (url.includes("github.com/login/oauth/access_token")) {
         const proxyUrl = `https://proxy.brainbo.fun/?${url}`;
         return fetch(proxyUrl, options);
       }
       // 其他请求直接使用fetch
       return fetch(url, options);
-    }
-  }
+    },
+  },
 });
 
 const auth = new GitAuth(githubProvider, {
-  clientId: 'your-github-client-id',
-  redirectUri: 'https://your-app.com/callback',
-  scopes: ['repo', 'user']
+  clientId: "your-github-client-id",
+  redirectUri: "https://your-app.com/callback",
+  scopes: ["repo", "user"],
 });
 ```
 
 ### 支持GitHub
 
 ```typescript
-import { GitAuth, GitHubProvider } from '@dimstack/git-auth';
+import { GitAuth, GitHubProvider } from "@dimstack/git-auth";
 
 // 创建GitHub提供者
 const githubProvider = new GitHubProvider();
 
 const githubAuth = new GitAuth(githubProvider, {
-  clientId: 'your-github-client-id',
-  redirectUri: 'https://your-app.com/auth/github/callback',
-  scopes: ['repo', 'user', 'pages']
+  clientId: "your-github-client-id",
+  redirectUri: "https://your-app.com/auth/github/callback",
+  scopes: ["repo", "user", "pages"],
 });
 
 // 启动认证
@@ -116,15 +115,15 @@ window.location.href = authUrl;
 ### 支持Gitee
 
 ```typescript
-import { GitAuth, GiteeProvider } from '@dimstack/git-auth';
+import { GitAuth, GiteeProvider } from "@dimstack/git-auth";
 
 // 创建Gitee提供者
 const giteeProvider = new GiteeProvider();
 
 const giteeAuth = new GitAuth(giteeProvider, {
-  clientId: 'your-gitee-client-id',
-  redirectUri: 'https://your-app.com/auth/gitee/callback',
-  scopes: ['projects', 'user_info']
+  clientId: "your-gitee-client-id",
+  redirectUri: "https://your-app.com/auth/gitee/callback",
+  scopes: ["projects", "user_info"],
 });
 
 // 启动认证
@@ -155,14 +154,14 @@ window.location.href = authUrl;
 const githubProvider = new GitHubProvider();
 
 const auth = new GitAuth(githubProvider, {
-  clientId: 'abc123def456',
-  redirectUri: 'https://myblog.com/auth/github/callback',
-  scopes: ['repo', 'pages']
+  clientId: "abc123def456",
+  redirectUri: "https://myblog.com/auth/github/callback",
+  scopes: ["repo", "pages"],
 });
 
 // 生成状态参数并存储
 const state = generateState(32);
-sessionStorage.setItem('github_auth_state', state);
+sessionStorage.setItem("github_auth_state", state);
 
 // 启动认证流程
 const authUrl = await auth.startAuth({ state });
@@ -172,6 +171,7 @@ window.location.href = authUrl;
 #### 第三阶段：GitHub授权页面
 
 用户被重定向到GitHub，看到授权页面：
+
 - "我的博客平台 想要访问你的账户"
 - [x] 访问你的仓库
 - [x] 管理GitHub Pages
@@ -187,23 +187,22 @@ window.location.href = authUrl;
 
 // 解析回调参数
 const { code, state: receivedState } = parseAuthCode(window.location.href);
-const originalState = sessionStorage.getItem('github_auth_state');
+const originalState = sessionStorage.getItem("github_auth_state");
 
 if (code && receivedState === originalState) {
   try {
     const result = await auth.handleCallback(code, receivedState);
-    
+
     // 存储认证结果
-    localStorage.setItem('github_auth', JSON.stringify(result));
-    
+    localStorage.setItem("github_auth", JSON.stringify(result));
+
     // 清理临时状态
-    sessionStorage.removeItem('github_auth_state');
-    
+    sessionStorage.removeItem("github_auth_state");
+
     // 显示成功消息
-    showSuccessMessage('GitHub连接成功！');
-    
+    showSuccessMessage("GitHub连接成功！");
   } catch (error) {
-    showErrorMessage('认证失败: ' + error.message);
+    showErrorMessage("认证失败: " + error.message);
   }
 }
 ```
@@ -212,14 +211,14 @@ if (code && receivedState === originalState) {
 
 ```typescript
 // 现在可以使用访问令牌了
-const authResult = JSON.parse(localStorage.getItem('github_auth'));
+const authResult = JSON.parse(localStorage.getItem("github_auth"));
 const { accessToken, user } = authResult;
 
 // 创建Git Provider（使用现有的@dimstack/git-provider库）
-import { GitHubProvider } from '@dimstack/git-provider';
+import { GitHubProvider } from "@dimstack/git-provider";
 
 const provider = new GitHubProvider({
-  token: accessToken
+  token: accessToken,
 });
 
 // 获取用户的仓库列表
@@ -228,11 +227,11 @@ const repos = await provider.getRepositories();
 // 发布新文章
 const fs = new GitFileSystem(provider, {
   owner: user.login,
-  repo: 'my-blog'
+  repo: "my-blog",
 });
 
-await fs.writeFile('posts/new-article.md', articleContent, {
-  message: 'Add new blog post: Article Title'
+await fs.writeFile("posts/new-article.md", articleContent, {
+  message: "Add new blog post: Article Title",
 });
 ```
 
@@ -257,9 +256,9 @@ new GitAuth(config: GitAuthConfig)
 
 ```typescript
 interface GitAuthConfig {
-  clientId: string;                       // 客户端ID
-  redirectUri: string;                    // 回调地址
-  scopes?: string[];                      // 权限范围
+  clientId: string; // 客户端ID
+  redirectUri: string; // 回调地址
+  scopes?: string[]; // 权限范围
 }
 ```
 
@@ -267,14 +266,14 @@ interface GitAuthConfig {
 
 ```typescript
 interface AuthResult {
-  accessToken: string;                    // 访问令牌
-  refreshToken?: string;                  // 刷新令牌
-  tokenType: string;                      // 令牌类型
-  expiresIn: number;                      // 过期时间（秒）
-  scope: string;                          // 权限范围
-  user: UserInfo;                         // 用户信息
-  platform: string;                       // 平台名称
-  createdAt: number;                      // 创建时间
+  accessToken: string; // 访问令牌
+  refreshToken?: string; // 刷新令牌
+  tokenType: string; // 令牌类型
+  expiresIn: number; // 过期时间（秒）
+  scope: string; // 权限范围
+  user: UserInfo; // 用户信息
+  platform: string; // 平台名称
+  createdAt: number; // 创建时间
 }
 ```
 
@@ -287,7 +286,7 @@ interface AuthResult {
 ## 错误处理
 
 ```typescript
-import { GitAuthError } from '@dimstack/git-auth';
+import { GitAuthError } from "@dimstack/git-auth";
 
 try {
   const result = await auth.handleCallback(code, state);
@@ -296,7 +295,7 @@ try {
     console.error(`认证错误: ${error.message}`);
     console.error(`错误代码: ${error.code}`);
   } else {
-    console.error('未知错误:', error);
+    console.error("未知错误:", error);
   }
 }
 ```
@@ -304,21 +303,25 @@ try {
 ## 最佳实践
 
 ### 1. 状态参数管理
+
 - 始终使用状态参数防止CSRF攻击
 - 状态参数应该是一次性的，使用后立即删除
 - 可以使用sessionStorage存储状态参数
 
 ### 2. 错误处理
+
 - 处理网络错误和认证失败
 - 提供用户友好的错误信息
 - 实现重试机制
 
 ### 3. 令牌管理
+
 - 安全存储访问令牌
 - 实现令牌过期检查
 - 考虑令牌刷新机制
 
 ### 4. 用户体验
+
 - 显示认证进度
 - 提供清晰的授权说明
 - 实现认证状态持久化

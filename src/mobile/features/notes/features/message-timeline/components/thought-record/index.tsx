@@ -1,16 +1,19 @@
 import { MarkdownContent } from "@/common/components/markdown";
 import { Dialog, DialogContent } from "@/common/components/ui/dialog";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/notes-data.store";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
-import { useState, useEffect } from "react";
+import { useEditNote } from "@/desktop/features/notes/features/message-timeline/components/thought-record/hooks/use-edit-note";
+import { useEffect, useState } from "react";
 import { MobileExpandedEditor } from "./mobile-expanded-editor";
 import { MobileInlineEditor } from "./mobile-inline-editor";
 import { MobileMoreActionsMenu } from "./mobile-more-actions-menu";
 import { MobileReadMoreWrapper } from "./mobile-read-more-wrapper";
 import { MobileThoughtRecordSparks } from "./mobile-thought-record-sparks";
 import { MobileThreadIndicator } from "./mobile-thread-indicator";
+import { MoveNoteModal } from "@/common/features/notes/components/move-note-modal";
+import { modal } from "@/common/components/modal";
 
 interface MobileThoughtRecordProps {
   message: Message;
@@ -23,25 +26,13 @@ export const MobileThoughtRecord = ({
   onReply,
   threadCount = 0,
 }: MobileThoughtRecordProps) => {
-  const { deleteMessage } = channelMessageService;
+  const presenter = useCommonPresenterContext();
+  const { isEditing, editMode, isSaving, isExpandedEditing } = useEditNote(message);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [shouldAutoGenerate, setShouldAutoGenerate] = useState(false);
-
-  // Edit state management
-  const {
-    editingMessageId,
-    editMode,
-    isSaving,
-    startEditing: startEdit,
-    save,
-    cancel,
-    switchToExpandedMode,
-    switchToInlineMode,
-  } = useEditStateStore();
-
-  const isEditing = editingMessageId === message.id;
-  const isExpandedEditing = isEditing && editMode === "expanded";
-
+  
+  // Get editor mode from store (for reading only)
+  const editorMode = useEditStateStore(s => s.editorMode);
 
   // 重置自动生成标志
   useEffect(() => {
@@ -50,23 +41,19 @@ export const MobileThoughtRecord = ({
     }
   }, [shouldAutoGenerate]);
 
-
   // If message is deleted, don't show it
   if (message.isDeleted) {
     return null;
   }
 
-
   // Action handlers
   const handleEdit = () => {
-    startEdit(message.id, message.content);
+    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
   };
 
   const handleDelete = async () => {
     const messagePreview =
-      message.content.length > 100
-        ? `${message.content.substring(0, 100)}...`
-        : message.content;
+      message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
     const confirmed = window.confirm(
       `🗑️ Delete Thought\n\n` +
@@ -77,18 +64,10 @@ export const MobileThoughtRecord = ({
     );
 
     if (confirmed) {
-      try {
-        await deleteMessage({
-          messageId: message.id,
-          channelId: message.channelId,
-        });
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        alert(
-          `❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`
-        );
-      }
+      await presenter.noteManager.deleteMessage({
+        messageId: message.id,
+        channelId: message.channelId,
+      });
     }
   };
 
@@ -105,27 +84,47 @@ export const MobileThoughtRecord = ({
     navigator.clipboard.writeText(message.content);
   };
 
-
   const handleReply = () => {
     onReply?.();
   };
 
+  const handleMove = () => {
+    modal.show({
+      content: (
+        <MoveNoteModal
+          fromChannelId={message.channelId}
+          onMove={async toChannelId => {
+            await presenter.noteManager.moveMessage({
+              messageId: message.id,
+              fromChannelId: message.channelId,
+              toChannelId,
+            });
+          }}
+        />
+      ),
+      showFooter: false,
+      className: "max-w-md",
+    });
+  };
+
   // Edit handlers
   const handleSave = async () => {
-    await save();
+    await presenter.noteEditManager.save();
   };
 
   const handleCancel = () => {
-    cancel();
+    presenter.noteEditManager.cancel();
   };
 
   const handleExpand = () => {
-    switchToExpandedMode();
+    presenter.noteEditManager.switchToExpandedMode();
   };
 
   return (
     <div className="w-full flex flex-col overflow-hidden group">
-      <div className="relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out">
+      <div
+        className={`relative w-full px-4 py-4 bg-muted/20 hover:bg-muted/40 transition-all duration-200 ease-out ${message.isNew ? "animate-in slide-in-from-bottom-5 fade-in duration-400" : ""}`}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
@@ -145,6 +144,9 @@ export const MobileThoughtRecord = ({
             onGenerateSparks={handleGenerateSparks}
             onViewDetails={() => {}}
             onBookmark={() => {}}
+            editorMode={editorMode}
+            onEditorModeChange={presenter.noteEditManager.setEditorMode}
+            onMove={handleMove}
           />
         </div>
 
@@ -156,6 +158,8 @@ export const MobileThoughtRecord = ({
               onCancel={handleCancel}
               onExpand={handleExpand}
               isSaving={isSaving}
+              editorMode={editorMode}
+              onEditorModeChange={presenter.noteEditManager.setEditorMode}
             />
           ) : (
             <MobileReadMoreWrapper maxHeight={400} messageId={message.id}>
@@ -177,26 +181,24 @@ export const MobileThoughtRecord = ({
         {/* Footer - Floor bottom thread indicator */}
         {!isEditing && threadCount > 0 && (
           <div className="flex justify-end mt-4 pt-2">
-            <MobileThreadIndicator
-              threadCount={threadCount}
-              messageId={message.id}
-            />
+            <MobileThreadIndicator threadCount={threadCount} messageId={message.id} />
           </div>
         )}
 
         {/* Expanded Editor Modal */}
         <Dialog
           open={isExpandedEditing}
-          onOpenChange={(open) => {
+          onOpenChange={open => {
             if (!open) {
-              switchToInlineMode();
+              // Requirement: exiting expanded editor should also exit inline edit mode
+              presenter.noteEditManager.cancel();
             }
           }}
         >
           <DialogContent
             showCloseButton={false}
             className="h-[90vh] w-[95vw] max-w-none p-0 border-0 bg-background"
-            onInteractOutside={(e) => {
+            onInteractOutside={e => {
               e.preventDefault();
             }}
           >
@@ -204,7 +206,7 @@ export const MobileThoughtRecord = ({
               originalContent={message.content}
               onSave={handleSave}
               onCancel={handleCancel}
-              onCollapse={switchToInlineMode}
+              onCollapse={() => presenter.noteEditManager.cancel()}
               isSaving={isSaving}
             />
           </DialogContent>

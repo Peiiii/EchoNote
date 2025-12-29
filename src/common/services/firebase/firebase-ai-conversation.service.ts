@@ -12,18 +12,26 @@ import {
   increment,
   DocumentSnapshot,
   onSnapshot,
+  limit,
   limitToLast,
   startAfter,
   endBefore,
   FieldValue,
 } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
-import { AIConversation, UIMessage, MessageListOptions, ConversationContextConfig } from "@/common/types/ai-conversation";
+import { firebaseConfig } from "@/common/config/firebase.config";
+import {
+  AIConversation,
+  UIMessage,
+  MessageListOptions,
+  ConversationContextConfig,
+} from "@/common/types/ai-conversation";
 import { sanitizeUIMessageForPersistence } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 
 export class FirebaseAIConversationService {
-  private db = db;
-  
+  private getDb() {
+    return firebaseConfig.getDb();
+  }
+
   // 对话管理
   async createConversation(
     userId: string,
@@ -42,81 +50,114 @@ export class FirebaseAIConversationService {
       isArchived: false,
       ...(contexts ? { contexts } : {}),
     };
-    
-    await setDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
+
+    await setDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
       ...conversation,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       lastMessageAt: serverTimestamp(),
     });
-    
+
     return conversation;
   }
-  
+
   async getConversations(userId: string): Promise<AIConversation[]> {
     const q = this.buildConversationsQuery(userId);
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToAIConversation(doc));
   }
-  
+
+  /**
+   * Paginated conversation listing ordered by lastMessageAt desc.
+   * Returns items and a nextCursor (Date) for subsequent pages.
+   * If items.length < limit, nextCursor will be null (no more pages).
+   */
+  async listConversations(
+    userId: string,
+    options: { limit?: number; startAfterLastMessageAt?: Date | null } = {}
+  ): Promise<{ items: AIConversation[]; nextCursor: Date | null }> {
+    const pageSize = options.limit ?? 20;
+    let q = query(
+      collection(this.getDb(), `users/${userId}/aiConversations`),
+      orderBy("lastMessageAt", "desc"),
+      limit(pageSize)
+    );
+    if (options.startAfterLastMessageAt) {
+      // Firestore SDK accepts JS Date for startAfter on timestamp fields
+      q = query(q, startAfter(options.startAfterLastMessageAt));
+    }
+
+    const snapshot = await getDocs(q);
+    const items = snapshot.docs.map(doc => this.docToAIConversation(doc));
+    // Derive next cursor from the last doc's lastMessageAt (as Date)
+    let nextCursor: Date | null = null;
+    if (items.length === pageSize) {
+      const last = snapshot.docs[snapshot.docs.length - 1];
+      const ts = last.data()?.lastMessageAt;
+      nextCursor = ts?.toDate?.() ?? items[items.length - 1]?.lastMessageAt ?? null;
+    }
+    return { items, nextCursor };
+  }
+
   async getConversation(userId: string, conversationId: string): Promise<AIConversation | null> {
-    const docRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}`);
+    const docRef = doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`);
     const docSnap = await getDoc(docRef);
-    
+
     if (!docSnap.exists()) return null;
     return this.docToAIConversation(docSnap);
   }
-  
+
   async deleteConversation(userId: string, conversationId: string): Promise<void> {
     // 删除对话下的所有消息
-    const messagesRef = collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`);
+    const messagesRef = collection(
+      this.getDb(),
+      `users/${userId}/aiConversations/${conversationId}/uiMessages`
+    );
     const messagesSnapshot = await getDocs(messagesRef);
     const deletePromises = messagesSnapshot.docs.map(doc => deleteDoc(doc.ref));
     await Promise.all(deletePromises);
-    
+
     // 删除对话
-    await deleteDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`));
+    await deleteDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`));
   }
-  
-  async updateConversation(userId: string, conversationId: string, updates: Partial<AIConversation>): Promise<void> {
-    await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}`),
-      {
-        ...updates,
-        updatedAt: serverTimestamp(),
-      }
-    );
+
+  async updateConversation(
+    userId: string,
+    conversationId: string,
+    updates: Partial<AIConversation>
+  ): Promise<void> {
+    await updateDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    });
   }
-  
+
   async addMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
-    const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
+    const messageRef = doc(
+      this.getDb(),
+      `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`
+    );
     const messageDoc = await getDoc(messageRef);
     const isNewMessage = !messageDoc.exists();
-    
+
     if (isNewMessage) {
       console.log("[FirebaseAIConversationService] addMessage new message", message);
       const toSave = sanitizeUIMessageForPersistence(message);
-      await setDoc(
-        messageRef,
-        {
-          ...toSave,
-          conversationId,
-          timestamp: serverTimestamp(),
-        }
-      );
+      await setDoc(messageRef, {
+        ...toSave,
+        conversationId,
+        timestamp: serverTimestamp(),
+      });
     } else {
       console.log("[FirebaseAIConversationService] addMessage existing message", message);
       const toSave = sanitizeUIMessageForPersistence(message);
-      await updateDoc(
-        messageRef,
-        {
-          ...toSave,
-          conversationId,
-          timestamp: serverTimestamp(),
-        }
-      );
+      await updateDoc(messageRef, {
+        ...toSave,
+        conversationId,
+        timestamp: serverTimestamp(),
+      });
     }
-    
+
     // 更新对话的 lastMessageAt 和 messageCount（只有新消息才增加计数）
     const updateData: {
       lastMessageAt: ReturnType<typeof serverTimestamp>;
@@ -126,16 +167,22 @@ export class FirebaseAIConversationService {
       lastMessageAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
-    
+
     if (isNewMessage) {
       updateData.messageCount = increment(1);
     }
-    
-    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), updateData);
+
+    await updateDoc(
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`),
+      updateData
+    );
   }
 
   async createMessage(userId: string, conversationId: string, message: UIMessage): Promise<void> {
-    const messageRef = doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`);
+    const messageRef = doc(
+      this.getDb(),
+      `users/${userId}/aiConversations/${conversationId}/uiMessages/${message.id}`
+    );
     const messageDoc = await getDoc(messageRef);
     if (messageDoc.exists()) {
       return;
@@ -146,125 +193,145 @@ export class FirebaseAIConversationService {
       conversationId,
       timestamp: serverTimestamp(),
     });
-    await updateDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}`), {
+    await updateDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
       lastMessageAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       messageCount: increment(1),
     });
   }
-  
+
   async getMessages(userId: string, conversationId: string): Promise<UIMessage[]> {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
-      orderBy('timestamp', 'asc')
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      orderBy("timestamp", "asc")
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToUIMessage(doc));
   }
-  
+
   async listMessages(
-    userId: string, 
-    conversationId: string, 
+    userId: string,
+    conversationId: string,
     options: MessageListOptions = {}
   ): Promise<UIMessage[]> {
-    const { limit = 50, orderBy: order = 'asc', startAfter: startAfterId, endBefore: endBeforeId } = options;
-    
+    const {
+      limit = 50,
+      orderBy: order = "asc",
+      startAfter: startAfterId,
+      endBefore: endBeforeId,
+    } = options;
+
     let q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
-      orderBy('timestamp', order)
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      orderBy("timestamp", order)
     );
-    
+
     if (limit) {
       q = query(q, limitToLast(limit));
     }
-    
+
     if (startAfterId) {
-      const startAfterDoc = await getDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${startAfterId}`));
+      const startAfterDoc = await getDoc(
+        doc(
+          this.getDb(),
+          `users/${userId}/aiConversations/${conversationId}/uiMessages/${startAfterId}`
+        )
+      );
       q = query(q, startAfter(startAfterDoc));
     }
-    
+
     if (endBeforeId) {
-      const endBeforeDoc = await getDoc(doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${endBeforeId}`));
+      const endBeforeDoc = await getDoc(
+        doc(
+          this.getDb(),
+          `users/${userId}/aiConversations/${conversationId}/uiMessages/${endBeforeId}`
+        )
+      );
       q = query(q, endBefore(endBeforeDoc));
     }
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => this.docToUIMessage(doc));
   }
-  
-  async updateMessage(userId: string, conversationId: string, messageId: string, updates: Partial<UIMessage> | UIMessage): Promise<void> {
+
+  async updateMessage(
+    userId: string,
+    conversationId: string,
+    messageId: string,
+    updates: Partial<UIMessage> | UIMessage
+  ): Promise<void> {
     const updateData: Record<string, unknown> = { updatedAt: serverTimestamp() };
     // Only persist fields we care about and sanitize nested parts
     const maybe = updates as Partial<UIMessage>;
-    if (Object.prototype.hasOwnProperty.call(maybe, 'role')) {
+    if (Object.prototype.hasOwnProperty.call(maybe, "role")) {
       updateData.role = maybe.role;
     }
-    if (Object.prototype.hasOwnProperty.call(maybe, 'parts')) {
+    if (Object.prototype.hasOwnProperty.call(maybe, "parts")) {
       // reuse sanitizer internals via public API
       const sanitized = sanitizeUIMessageForPersistence({
         id: messageId,
-        role: (maybe.role ?? 'assistant') as UIMessage['role'],
+        role: (maybe.role ?? "assistant") as UIMessage["role"],
         parts: maybe.parts as unknown,
       } as UIMessage);
       updateData.parts = sanitized.parts;
     }
 
     await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`),
+      doc(
+        this.getDb(),
+        `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`
+      ),
       updateData as { [x: string]: FieldValue | Partial<unknown> | undefined }
     );
   }
-  
+
   async deleteMessage(userId: string, conversationId: string, messageId: string): Promise<void> {
     await deleteDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`)
+      doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages/${messageId}`)
     );
-    
+
     // 更新对话的 messageCount
-    await updateDoc(
-      doc(this.db, `users/${userId}/aiConversations/${conversationId}`),
-      {
-        messageCount: increment(-1),
-        updatedAt: serverTimestamp(),
-      }
-    );
+    await updateDoc(doc(this.getDb(), `users/${userId}/aiConversations/${conversationId}`), {
+      messageCount: increment(-1),
+      updatedAt: serverTimestamp(),
+    });
   }
-  
+
   // 实时监听
   subscribeToMessages(
-    userId: string, 
-    conversationId: string, 
+    userId: string,
+    conversationId: string,
     callback: (messages: UIMessage[]) => void
   ): () => void {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations/${conversationId}/uiMessages`),
-      orderBy('timestamp', 'asc')
+      collection(this.getDb(), `users/${userId}/aiConversations/${conversationId}/uiMessages`),
+      orderBy("timestamp", "asc")
     );
-    
-    return onSnapshot(q, (snapshot) => {
+
+    return onSnapshot(q, snapshot => {
       const messages = snapshot.docs.map(doc => this.docToUIMessage(doc));
       callback(messages);
     });
   }
-  
+
   subscribeToConversations(
-    userId: string, 
+    userId: string,
     callback: (conversations: AIConversation[]) => void
   ): () => void {
     const q = this.buildConversationsQuery(userId);
-    
-    return onSnapshot(q, (snapshot) => {
+
+    return onSnapshot(q, snapshot => {
       const conversations = snapshot.docs.map(doc => this.docToAIConversation(doc));
       callback(conversations);
     });
   }
-  
+
   // 辅助方法
   private buildConversationsQuery(userId: string) {
     const q = query(
-      collection(this.db, `users/${userId}/aiConversations`),
-      orderBy('lastMessageAt', 'desc')
+      collection(this.getDb(), `users/${userId}/aiConversations`),
+      orderBy("lastMessageAt", "desc")
     );
     return q;
   }
@@ -286,11 +353,11 @@ export class FirebaseAIConversationService {
     if (data.contexts) {
       contexts = data.contexts as ConversationContextConfig;
     } else if (data.channelId) {
-      contexts = { mode: 'channels', channelIds: [data.channelId] } as ConversationContextConfig;
+      contexts = { mode: "channels", channelIds: [data.channelId] } as ConversationContextConfig;
     }
     return contexts ? { ...base, contexts } : base;
   }
-  
+
   private docToUIMessage(doc: DocumentSnapshot): UIMessage {
     const data = doc.data()!;
     return {

@@ -1,112 +1,130 @@
+import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
+import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
+import { useAutoSelectFirstChannel } from "@/common/hooks/use-auto-select-first-channel";
+import { sortChannelsByActivity } from "@/common/lib/channel-sorting";
+import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { Plus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
-import { CreateChannelPopover } from "./create-channel-popover";
+import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
-import { CollapsibleSidebar } from "@/common/components/collapsible-sidebar";
-import { useRef, useState, useEffect } from "react";
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
+import { Search } from "lucide-react";
 
 interface ChannelListProps {
-    showFadeEffect?: boolean;
+  showFadeEffect?: boolean;
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
-    const { channels, channelsLoading, addChannel, deleteChannel } = useNotesDataStore();
-    const { currentChannelId, setCurrentChannel } = useNotesViewStore();
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [hasScroll, setHasScroll] = useState(false);
+  const presenter = useCommonPresenterContext();
+  const channels = useNotesDataStore(state => state.channels);
+  const channelsLoading = useNotesDataStore(state => state.channelsLoading);
+  const currentChannelId = useNotesViewStore(state => state.currentChannelId);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [hasScroll, setHasScroll] = useState(false);
 
-    const handleAddChannel = (channel: { name: string; description: string; emoji?: string }) => {
-        addChannel(channel);
-    };
+  useAutoSelectFirstChannel();
 
-    const handleDeleteChannel = async (channelId: string) => {
-        const channel = channels.find(c => c.id === channelId);
-        if (!channel) return;
+  // Sort channels by activity using unified sorting function
+  const orderedChannels = useMemo(() => {
+    return sortChannelsByActivity(channels);
+  }, [channels]);
 
-        const confirmed = window.confirm(
-            `🗑️ Delete Channel\n\n` +
-            `"${channel.name}"\n\n` +
-            `⚠️ This action cannot be undone.\n` +
-            `The channel and all its messages will be moved to trash.\n\n` +
-            `Are you sure you want to continue?`
-        );
-
-        if (confirmed) {
-            try {
-                await deleteChannel(channelId);
-                // If the deleted channel was the current channel, switch to first available channel
-                if (currentChannelId === channelId && channels.length > 1) {
-                    const remainingChannels = channels.filter(c => c.id !== channelId);
-                    if (remainingChannels.length > 0) {
-                        setCurrentChannel(remainingChannels[0].id);
-                    }
-                }
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                alert(`❌ Failed to delete the channel.\n\nError: ${errorMessage}\n\nPlease try again.`);
-            }
-        }
-    };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        if (scrollContainerRef.current) {
-            const { scrollHeight, clientHeight } = scrollContainerRef.current;
-            setHasScroll(scrollHeight > clientHeight);
-        }
-    });
-
-    // Show skeleton while loading
-    if (channelsLoading) {
-        return <ChannelListSkeleton />;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const { scrollHeight, clientHeight } = scrollContainerRef.current;
+      setHasScroll(scrollHeight > clientHeight);
     }
+  });
 
-    return (
-        <div data-component="channel-list" className="flex flex-col h-full overflow-hidden bg-card shadow-sm">
-            {/* Header */}
-            <div data-component="channel-list-header" className="h-12 px-4 flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
-                        Thought Spaces
-                    </h3>
-                </div>
-                <CollapsibleSidebar.ToggleButton />
-            </div>
+  // Show skeleton while loading
+  if (channelsLoading) {
+    return <ChannelListSkeleton />;
+  }
 
-            {/* Channel List */}
-            <div
-                ref={scrollContainerRef}
-                data-component="channel-list-content"
-                className="flex-1 overflow-y-auto p-3 space-y-1 min-h-0 channel-list-content"
-                style={{
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none'
-                }}
-            >
-                {channels.map((channel) => (
-                    <ChannelItem
-                        key={channel.id}
-                        channel={channel}
-                        isActive={currentChannelId === channel.id}
-                        onClick={() => setCurrentChannel(channel.id)}
-                        onDelete={() => handleDeleteChannel(channel.id)}
-                    />
-                ))}
-            </div>
-
-            {/* Fade effect overlay container - positioned outside channel list */}
-            {hasScroll && showFadeEffect && (
-                <div className="relative">
-                    <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-100/90 dark:from-slate-800/90 to-transparent pointer-events-none" />
-                </div>
-            )}
-
-            {/* Create Channel Button - Bottom Layout */}
-            <div data-component="channel-list-footer" className="p-3">
-                <CreateChannelPopover onAddChannel={handleAddChannel} />
-            </div>
-
+  return (
+    <div
+      data-component="channel-list"
+      className="flex flex-col h-full overflow-hidden bg-card"
+    >
+      {/* Header */}
+      <div
+        data-component="channel-list-header"
+        className="h-11 px-4 flex items-center justify-between border-b border-slate-200/50 dark:border-slate-700/50"
+      >
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+            Spaces
+          </h3>
         </div>
-    );
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => openQuickSearchModal({ defaultScope: "all" })}
+            className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Search all notes"
+            title="Search all notes (Cmd/Ctrl+K)"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+          <CreateChannelPopover
+            instantCreate
+            trigger={
+              <button
+                type="button"
+                className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="New space"
+                title="New space"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            }
+          />
+          <CollapsibleSidebar.ToggleButton />
+        </div>
+      </div>
+
+      {/* Channel List */}
+      <div
+        ref={scrollContainerRef}
+        data-component="channel-list-content"
+        className="flex-1 overflow-y-auto px-2.5 py-2 space-y-1 min-h-0 channel-list-content"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        {orderedChannels.length === 0 ? (
+          <ChannelListEmptyState />
+        ) : (
+          orderedChannels.map(channel => (
+            <ChannelItem
+              key={channel.id}
+              channel={channel}
+              isActive={currentChannelId === channel.id}
+              onClick={() => {
+                logService.logChannelSelect(
+                  channel.id,
+                  channel.name,
+                  channel.messageCount || 0
+                );
+                presenter.viewStateManager.setCurrentChannel(channel.id);
+              }}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Fade effect overlay container - positioned outside channel list */}
+      {hasScroll && showFadeEffect && (
+        <div className="relative">
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-100/90 dark:from-slate-800/90 to-transparent pointer-events-none" />
+        </div>
+      )}
+    </div>
+  );
 }

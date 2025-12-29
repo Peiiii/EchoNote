@@ -49,39 +49,41 @@ import { auth } from './firebaseConfig'; // 确保 auth 实例被导出
 // ... 其他服务函数
 
 export const firebaseService = {
-  
-  // ... 你已有的 channel 和 message services
 
-  // --- Auth Services ---
+// ... 你已有的 channel 和 message services
 
-  /**
-   * 触发 Google 登录弹窗流程.
-   * @returns 成功登录后的用户凭证.
-   */
+// --- Auth Services ---
+
+/\*\*
+
+- 触发 Google 登录弹窗流程.
+- @returns 成功登录后的用户凭证.
+  \*/
   signInWithGoogle: async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      // Google Access Token. 你可以用它来调用 Google API.
-      // const credential = GoogleAuthProvider.credentialFromResult(result);
-      // const token = credential.accessToken;
-      // The signed-in user info.
-      // const user = result.user;
-      return result.user; // 返回用户对象
-    } catch (error) {
-      // 处理错误，例如用户关闭了弹窗
-      console.error("Google Sign-In Error:", error);
-      return null;
-    }
+  const provider = new GoogleAuthProvider();
+  try {
+  const result = await signInWithPopup(auth, provider);
+  // Google Access Token. 你可以用它来调用 Google API.
+  // const credential = GoogleAuthProvider.credentialFromResult(result);
+  // const token = credential.accessToken;
+  // The signed-in user info.
+  // const user = result.user;
+  return result.user; // 返回用户对象
+  } catch (error) {
+  // 处理错误，例如用户关闭了弹窗
+  console.error("Google Sign-In Error:", error);
+  return null;
+  }
   },
 
-  /**
-   * 登出当前用户.
-   */
+/\*\*
+
+- 登出当前用户.
+  \*/
   signOutUser: async () => {
-    await signOut(auth);
+  await signOut(auth);
   },
-  
+
 };
 
 说明：
@@ -109,18 +111,18 @@ import React from 'react';
 import { firebaseService } from '../services/firebaseService';
 
 export const LoginButton = () => {
-  const handleLogin = async () => {
-    const user = await firebaseService.signInWithGoogle();
-    if (user) {
-      console.log(`Welcome, ${user.displayName}!`);
-      // 登录成功后你什么都不用做！
-      // 我们的 onAuthStateChanged 监听器会自动检测到状态变化，
-      // 并调用 Zustand store 的 setAuth action，
-      // 从而触发整个应用的更新。
-    }
-  };
+const handleLogin = async () => {
+const user = await firebaseService.signInWithGoogle();
+if (user) {
+console.log(`Welcome, ${user.displayName}!`);
+// 登录成功后你什么都不用做！
+// 我们的 onAuthStateChanged 监听器会自动检测到状态变化，
+// 并调用 Zustand store 的 setAuth action，
+// 从而触发整个应用的更新。
+}
+};
 
-  return <button onClick={handleLogin}>Sign in with Google</button>;
+return <button onClick={handleLogin}>Sign in with Google</button>;
 };
 code
 Jsx
@@ -136,19 +138,20 @@ import { useCurrentUser } from '../store/useChatDataStore'; // 使用我们创�
 import { firebaseService } from '../services/firebaseService';
 
 export const UserProfile = () => {
-  const currentUser = useCurrentUser();
+const currentUser = useCurrentUser();
 
-  if (!currentUser) {
-    return <LoginButton />;
-  }
+if (!currentUser) {
+return <LoginButton />;
+}
 
-  return (
-    <div>
-      <img src={currentUser.photoURL || undefined} alt="User avatar" style={{ width: 40, borderRadius: '50%' }} />
-      <span>Hello, {currentUser.displayName}</span>
-      <button onClick={firebaseService.signOutUser}>Logout</button>
-    </div>
-  );
+return (
+
+<div>
+<img src={currentUser.photoURL || undefined} alt="User avatar" style={{ width: 40, borderRadius: '50%' }} />
+<span>Hello, {currentUser.displayName}</span>
+<button onClick={firebaseService.signOutUser}>Logout</button>
+</div>
+);
 };
 第四步：确保你的 onAuthStateChanged 监听器就位
 
@@ -169,36 +172,38 @@ import { auth } from './services/firebaseConfig';
 import { useChatDataStore } from './store/useChatDataStore';
 
 function App() {
-  // 注意：这里我们直接从 store 获取 setAuth，避免在每次渲染时都重新获取
-  const setAuth = useChatDataStore(state => state.setAuth);
+// 注意：这里我们直接从 store 获取 setAuth，避免在每次渲染时都重新获取
+const setAuth = useChatDataStore(state => state.setAuth);
 
-  useEffect(() => {
-    // 启动对 Firebase Auth 状态的全局监听
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // 无论用户是通过 Google 登录、刷新页面、还是关闭浏览器后重开，
-      // 这个监听器都会被触发，并将最新的用户状态 (user 或 null)
-      // 更新到我们的 Zustand store 中。
-      setAuth(user);
-    });
+useEffect(() => {
+// 启动对 Firebase Auth 状态的全局监听
+const unsubscribe = onAuthStateChanged(auth, (user) => {
+// 无论用户是通过 Google 登录、刷新页面、还是关闭浏览器后重开，
+// 这个监听器都会被触发，并将最新的用户状态 (user 或 null)
+// 更新到我们的 Zustand store 中。
+setAuth(user);
+});
 
     // 在组件卸载时，清理监听器
     return () => unsubscribe();
-  }, [setAuth]); // 依赖数组确保 setAuth 稳定
 
-  const authIsReady = useChatDataStore(state => state.authIsReady);
+}, [setAuth]); // 依赖数组确保 setAuth 稳定
 
-  // 在 Firebase 完成初次认证状态检查前，可以显示一个加载动画
-  if (!authIsReady) {
-    return <div>Loading authentication state...</div>;
-  }
+const authIsReady = useChatDataStore(state => state.authIsReady);
 
-  // 认证状态就绪后，渲染你的应用
-  return (
-    <div>
-      <UserProfile />
-      {/* ... 你的路由和应用的其他部分 ... */}
-    </div>
-  );
+// 在 Firebase 完成初次认证状态检查前，可以显示一个加载动画
+if (!authIsReady) {
+return <div>Loading authentication state...</div>;
+}
+
+// 认证状态就绪后，渲染你的应用
+return (
+
+<div>
+<UserProfile />
+{/_ ... 你的路由和应用的其他部分 ... _/}
+</div>
+);
 }
 
 export default App;

@@ -1,1 +1,1 @@
-export { GitHubAuthStatus } from './github-auth-button';
+export { GitHubAuthStatus } from "./github-auth-button";

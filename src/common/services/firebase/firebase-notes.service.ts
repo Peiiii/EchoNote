@@ -8,6 +8,7 @@ import {
   limit,
   startAfter,
   getDocs,
+  getDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -17,32 +18,35 @@ import {
   DocumentSnapshot,
   increment,
   FieldValue,
+  writeBatch,
+  collectionGroup,
 } from "firebase/firestore";
-import { db } from "@/common/config/firebase.config";
+import { v4 } from "uuid";
+import { firebaseConfig } from "@/common/config/firebase.config";
 import { Message, Channel } from "@/core/stores/notes-data.store";
 
 /**
  * Firebase Notes Service - Handle Firebase operations related to user notes and thoughts
- * 
+ *
  * This service manages:
  * - Thought Spaces (channels): User-created spaces for organizing thoughts
  * - Thought Records (messages): Individual notes and thoughts within spaces
- * 
+ *
  * Important notes about the isDeleted field:
- * 
+ *
  * 1. Data model standardization:
  *    - All new thought records will automatically include isDeleted: false
  *    - Use where("isDeleted", "==", false) to query non-deleted thought records
  *    - This allows efficient use of Firestore indexes, optimal performance
- * 
+ *
  * 2. Data migration:
  *    - Use migrateMessagesForIsDeleted() to add isDeleted field to existing thought records
  *    - It is recommended to execute this once when the application starts
- * 
+ *
  * 3. Query optimization:
  *    - Avoid using where("isDeleted", "!=", true), because it will exclude documents without the field
  *    - Use where("isDeleted", "==", false) to ensure only non-deleted thought records are returned
- * 
+ *
  * 4. Soft delete process:
  *    - Call softDeleteMessage() to set isDeleted: true
  *    - Call restoreMessage() to restore thought records
@@ -57,21 +61,43 @@ const docToChannel = (doc: DocumentSnapshot): Channel => {
     description: data.description,
     emoji: data.emoji,
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+    updatedAt: data.updatedAt ? (data.updatedAt as Timestamp).toDate() : undefined,
     messageCount: data.messageCount || 0,
     lastMessageTime: (data.lastMessageTime as Timestamp)?.toDate(),
     backgroundImage: data.backgroundImage,
     backgroundColor: data.backgroundColor,
+    shareToken: data.shareToken,
+    shareMode: data.shareMode || (data.shareToken ? "read-only" : undefined),
   };
 };
 
 const docToMessage = (doc: DocumentSnapshot): Message => {
   const data = doc.data()!;
+
+  // More robust timestamp conversion with logging
+  let timestamp: Date;
+  if (data.timestamp) {
+    if (data.timestamp instanceof Timestamp) {
+      timestamp = data.timestamp.toDate();
+    } else if (data.timestamp.toDate && typeof data.timestamp.toDate === "function") {
+      timestamp = data.timestamp.toDate();
+    } else if (data.timestamp instanceof Date) {
+      timestamp = data.timestamp;
+    } else {
+      console.warn("Invalid timestamp format in document:", doc.id, data.timestamp);
+      timestamp = new Date();
+    }
+  } else {
+    console.warn("Missing timestamp in document:", doc.id);
+    timestamp = new Date();
+  }
+
   return {
     id: doc.id,
     content: data.content,
     sender: data.sender,
     channelId: data.channelId,
-    timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(),
+    timestamp,
     tags: data.tags,
     parentId: data.parentId,
     threadId: data.threadId,
@@ -88,15 +114,17 @@ const docToMessage = (doc: DocumentSnapshot): Message => {
 
 // Helper functions to get collection references
 const getChannelsCollectionRef = (userId: string) =>
-  collection(db, `users/${userId}/channels`);
+  collection(firebaseConfig.getDb(), `users/${userId}/channels`);
 const getMessagesCollectionRef = (userId: string) =>
-  collection(db, `users/${userId}/messages`);
-
+  collection(firebaseConfig.getDb(), `users/${userId}/messages`);
 
 export class FirebaseNotesService {
   async getChannel(userId: string, channelId: string): Promise<Channel | null> {
     try {
-      const snap = await getDocs(query(getChannelsCollectionRef(userId), where("isDeleted", "==", false), where("__name__", "==", channelId)));
+      const channelsRef = await getChannelsCollectionRef(userId);
+      const snap = await getDocs(
+        query(channelsRef, where("isDeleted", "==", false), where("__name__", "==", channelId))
+      );
       const docSnap = snap.docs[0];
       if (!docSnap) return null;
       return docToChannel(docSnap);
@@ -106,10 +134,7 @@ export class FirebaseNotesService {
     }
   }
   // Channel Services
-  subscribeToChannels = (
-    userId: string,
-    onUpdate: (channels: Channel[]) => void
-  ): (() => void) => {
+  subscribeToChannels = (userId: string, onUpdate: (channels: Channel[]) => void): (() => void) => {
     console.log("🔔 [firebaseNotesService][subscribeToChannels]:", { userId });
     const q = query(
       getChannelsCollectionRef(userId),
@@ -119,11 +144,11 @@ export class FirebaseNotesService {
 
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
+      snapshot => {
         const channels = snapshot.docs.map(docToChannel);
         onUpdate(channels);
       },
-      (error) => {
+      error => {
         console.error("Error subscribing to channels:", error);
       }
     );
@@ -137,8 +162,12 @@ export class FirebaseNotesService {
     channelId: string,
     messagesLimit: number,
     onUpdate: (messages: Message[], hasMore: boolean) => void
-    ): (() => void) => {
-    console.log("🔔 [firebaseNotesService][subscribeToChannelMessages]:", { userId, channelId, messagesLimit });
+  ): (() => void) => {
+    console.log("🔔 [firebaseNotesService][subscribeToChannelMessages]:", {
+      userId,
+      channelId,
+      messagesLimit,
+    });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -152,12 +181,12 @@ export class FirebaseNotesService {
 
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
+      snapshot => {
         const messages = snapshot.docs.map(docToMessage);
         const hasMore = messages.length >= messagesLimit;
         onUpdate(messages, hasMore);
       },
-      (error) => {
+      error => {
         console.error("Error subscribing to channel messages:", error);
       }
     );
@@ -185,10 +214,11 @@ export class FirebaseNotesService {
     const filteredChannelData = Object.fromEntries(
       Object.entries(channelData).filter(([, value]) => value !== undefined)
     );
-    
+
     const docRef = await addDoc(getChannelsCollectionRef(userId), {
       ...filteredChannelData,
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       messageCount: 0,
       isDeleted: false,
       lastMessageTime: serverTimestamp(), // Initialize last message time
@@ -202,10 +232,11 @@ export class FirebaseNotesService {
     updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
   ): Promise<void> => {
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
-    
+
     // Process updates to handle undefined values properly
-    const processedUpdates: Record<string, FieldValue | string | number | boolean | Date | null> = {};
-    
+    const processedUpdates: Record<string, FieldValue | string | number | boolean | Date | null> =
+      {};
+
     for (const [key, value] of Object.entries(updates)) {
       if (value === undefined) {
         // Use deleteField() for undefined values to remove the field
@@ -214,16 +245,15 @@ export class FirebaseNotesService {
         processedUpdates[key] = value;
       }
     }
-    
+    // Always bump updatedAt
+    processedUpdates.updatedAt = serverTimestamp();
+
     await updateDoc(channelRef, processedUpdates);
   };
 
-  deleteChannel = async (
-    userId: string,
-    channelId: string
-  ): Promise<void> => {
+  deleteChannel = async (userId: string, channelId: string): Promise<void> => {
     console.log("🔔 [firebaseNotesService][deleteChannel]:", { userId, channelId });
-    
+
     // Soft delete the channel document
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
     await updateDoc(channelRef, {
@@ -231,7 +261,7 @@ export class FirebaseNotesService {
       deletedAt: serverTimestamp(),
       deletedBy: userId,
     });
-    
+
     // Soft delete all messages in this channel
     try {
       const messagesQuery = query(
@@ -240,12 +270,12 @@ export class FirebaseNotesService {
         where("isDeleted", "==", false) // Only get non-deleted messages
       );
       const messagesSnapshot = await getDocs(messagesQuery);
-      
+
       // Soft delete messages in batches
       const batchSize = 500;
       for (let i = 0; i < messagesSnapshot.docs.length; i += batchSize) {
         const batch = messagesSnapshot.docs.slice(i, i + batchSize);
-        const softDeletePromises = batch.map(doc => 
+        const softDeletePromises = batch.map(doc =>
           updateDoc(doc.ref, {
             isDeleted: true,
             deletedAt: serverTimestamp(),
@@ -255,25 +285,30 @@ export class FirebaseNotesService {
         );
         await Promise.all(softDeletePromises);
       }
-      
-      console.log("🔔 [firebaseNotesService][deleteChannel]: Successfully soft deleted channel and messages", { 
-        channelId, 
-        messageCount: messagesSnapshot.docs.length 
-      });
+
+      console.log(
+        "🔔 [firebaseNotesService][deleteChannel]: Successfully soft deleted channel and messages",
+        {
+          channelId,
+          messageCount: messagesSnapshot.docs.length,
+        }
+      );
     } catch (error) {
-      console.error("🔔 [firebaseNotesService][deleteChannel]: Error soft deleting messages:", error);
+      console.error(
+        "🔔 [firebaseNotesService][deleteChannel]: Error soft deleting messages:",
+        error
+      );
       // Even if message soft deletion fails, the channel is already soft deleted
-      throw new Error(`Channel soft deleted but failed to soft delete associated messages: ${error}`);
+      throw new Error(
+        `Channel soft deleted but failed to soft delete associated messages: ${error}`
+      );
     }
   };
 
   // Restore soft deleted channel
-  restoreChannel = async (
-    userId: string,
-    channelId: string
-  ): Promise<void> => {
+  restoreChannel = async (userId: string, channelId: string): Promise<void> => {
     console.log("🔔 [firebaseNotesService][restoreChannel]:", { userId, channelId });
-    
+
     // Restore the channel document
     const channelRef = doc(getChannelsCollectionRef(userId), channelId);
     await updateDoc(channelRef, {
@@ -281,7 +316,7 @@ export class FirebaseNotesService {
       deletedAt: null,
       deletedBy: null,
     });
-    
+
     // Restore all messages in this channel
     try {
       const messagesQuery = query(
@@ -291,12 +326,12 @@ export class FirebaseNotesService {
         where("deletedChannelId", "==", channelId) // Only restore messages deleted with this channel
       );
       const messagesSnapshot = await getDocs(messagesQuery);
-      
+
       // Restore messages in batches
       const batchSize = 500;
       for (let i = 0; i < messagesSnapshot.docs.length; i += batchSize) {
         const batch = messagesSnapshot.docs.slice(i, i + batchSize);
-        const restorePromises = batch.map(doc => 
+        const restorePromises = batch.map(doc =>
           updateDoc(doc.ref, {
             isDeleted: false,
             deletedAt: null,
@@ -306,24 +341,27 @@ export class FirebaseNotesService {
         );
         await Promise.all(restorePromises);
       }
-      
-      console.log("🔔 [firebaseNotesService][restoreChannel]: Successfully restored channel and messages", { 
-        channelId, 
-        messageCount: messagesSnapshot.docs.length 
-      });
+
+      console.log(
+        "🔔 [firebaseNotesService][restoreChannel]: Successfully restored channel and messages",
+        {
+          channelId,
+          messageCount: messagesSnapshot.docs.length,
+        }
+      );
     } catch (error) {
       console.error("🔔 [firebaseNotesService][restoreChannel]: Error restoring messages:", error);
       // Even if message restoration fails, the channel is already restored
       throw new Error(`Channel restored but failed to restore associated messages: ${error}`);
     }
-    };
+  };
 
-  fetchInitialMessages = async (
-    userId: string,
-    channelId: string,
-    messagesLimit: number
-  ) => {
-    console.log("🔔 [firebaseNotesService][fetchInitialMessages]:", { userId, channelId, messagesLimit });
+  fetchInitialMessages = async (userId: string, channelId: string, messagesLimit: number) => {
+    console.log("🔔 [firebaseNotesService][fetchInitialMessages]:", {
+      userId,
+      channelId,
+      messagesLimit,
+    });
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
       getMessagesCollectionRef(userId),
@@ -348,7 +386,6 @@ export class FirebaseNotesService {
     channelId: string,
     messagesLimit: number
   ) => {
-    console.log("🔔 [firebaseNotesService][fetchInitialMessagesAllSenders]:", { userId, channelId, messagesLimit });
     const q = query(
       getMessagesCollectionRef(userId),
       where("isDeleted", "==", false),
@@ -362,7 +399,6 @@ export class FirebaseNotesService {
       const messages = snapshot.docs.map(docToMessage);
       const lastVisible = snapshot.docs[snapshot.docs.length - 1];
       const allLoaded = messages.length < messagesLimit;
-      console.log("🔔 [firebaseNotesService][fetchInitialMessagesAllSenders]: done", { count: messages.length });
       return { messages, lastVisible, allLoaded };
     } catch (err) {
       console.error("❌ [firebaseNotesService][fetchInitialMessagesAllSenders] failed", err);
@@ -376,7 +412,12 @@ export class FirebaseNotesService {
     messagesLimit: number,
     cursor: DocumentSnapshot
   ) => {
-    console.log("🔔 [firebaseNotesService][fetchMoreMessages]:", { userId, channelId, messagesLimit, cursor });
+    console.log("🔔 [firebaseNotesService][fetchMoreMessages]:", {
+      userId,
+      channelId,
+      messagesLimit,
+      cursor,
+    });
 
     // Use == operator to query messages with isDeleted: false (recommended solution)
     const q = query(
@@ -404,7 +445,11 @@ export class FirebaseNotesService {
     afterTimestamp: Date,
     onUpdate: (newMessages: Message[]) => void
   ): (() => void) => {
-    console.log("🔔 [firebaseNotesService][subscribeToNewMessages]:", { userId, channelId, afterTimestamp });
+    console.log("🔔 [firebaseNotesService][subscribeToNewMessages]:", {
+      userId,
+      channelId,
+      afterTimestamp,
+    });
     const q = query(
       getMessagesCollectionRef(userId),
       where("isDeleted", "==", false),
@@ -416,11 +461,11 @@ export class FirebaseNotesService {
 
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
+      snapshot => {
         const newMessages = snapshot.docs.map(docToMessage);
         onUpdate(newMessages);
       },
-      (error) => {
+      error => {
         console.error("Error subscribing to new messages:", error);
       }
     );
@@ -436,7 +481,7 @@ export class FirebaseNotesService {
     const filteredMessageData = Object.fromEntries(
       Object.entries(messageData).filter(([, value]) => value !== undefined)
     );
-    
+
     const docRef = await addDoc(getMessagesCollectionRef(userId), {
       ...filteredMessageData,
       timestamp: serverTimestamp(),
@@ -458,21 +503,74 @@ export class FirebaseNotesService {
     messageId: string,
     updates: Partial<Message>
   ): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, updates);
   };
 
-  deleteMessage = async (
+  moveMessage = async (
     userId: string,
-    messageId: string
+    messageId: string,
+    fromChannelId: string,
+    toChannelId: string
   ): Promise<void> => {
+    if (fromChannelId === toChannelId) {
+      return;
+    }
+
+    const db = firebaseConfig.getDb();
     const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageSnap = await getDoc(messageRef);
+
+    if (!messageSnap.exists()) {
+      throw new Error("Message not found");
+    }
+
+    const currentChannelId = messageSnap.data()?.channelId;
+    if (currentChannelId === toChannelId) {
+      return;
+    }
+
+    const threadMessagesSnapshot = await getDocs(
+      query(
+        getMessagesCollectionRef(userId),
+        where("threadId", "==", messageId)
+      )
+    );
+
+    const batch = writeBatch(db);
+    batch.update(messageRef, { channelId: toChannelId });
+
+    threadMessagesSnapshot.docs.forEach(threadDoc => {
+      batch.update(threadDoc.ref, { channelId: toChannelId });
+    });
+
+    const movedMessagesCount = 1 + threadMessagesSnapshot.docs.length;
+
+    const fromChannelRef = doc(getChannelsCollectionRef(userId), fromChannelId);
+    const toChannelRef = doc(getChannelsCollectionRef(userId), toChannelId);
+
+    batch.update(fromChannelRef, {
+      messageCount: increment(-movedMessagesCount),
+      updatedAt: serverTimestamp(),
+    });
+
+    batch.update(toChannelRef, {
+      messageCount: increment(movedMessagesCount),
+      lastMessageTime: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    await batch.commit();
+  };
+
+  deleteMessage = async (userId: string, messageId: string): Promise<void> => {
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await deleteDoc(messageRef);
-    };
+  };
 
   // Soft delete message
   softDeleteMessage = async (userId: string, messageId: string): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: true,
       deletedAt: serverTimestamp(),
@@ -482,7 +580,7 @@ export class FirebaseNotesService {
 
   // Restore message
   restoreMessage = async (userId: string, messageId: string): Promise<void> => {
-    const messageRef = doc(db, `users/${userId}/messages/${messageId}`);
+    const messageRef = doc(firebaseConfig.getDb(), `users/${userId}/messages/${messageId}`);
     await updateDoc(messageRef, {
       isDeleted: false,
       deletedAt: null,
@@ -518,6 +616,80 @@ export class FirebaseNotesService {
     }
   };
 
-};
+  publishSpace = async (userId: string, channelId: string, shareMode: "read-only" | "append-only" = "read-only"): Promise<string> => {
+    const shareToken = v4();
+    await this.updateChannel(userId, channelId, { shareToken, shareMode });
+    return shareToken;
+  };
+
+  unpublishSpace = async (userId: string, channelId: string): Promise<void> => {
+    await this.updateChannel(userId, channelId, { shareToken: undefined, shareMode: undefined });
+  };
+
+  findChannelByShareToken = async (shareToken: string): Promise<{ channel: Channel; userId: string } | null> => {
+    try {
+      const db = firebaseConfig.getDb();
+      const q = query(
+        collectionGroup(db, "channels"),
+        where("shareToken", "==", shareToken),
+        where("isDeleted", "==", false),
+        limit(1)
+      );
+
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const docSnap = snapshot.docs[0];
+      const channel = docToChannel(docSnap);
+      
+      const pathParts = docSnap.ref.path.split("/");
+      const userIdIndex = pathParts.indexOf("users");
+      if (userIdIndex === -1 || userIdIndex + 1 >= pathParts.length) {
+        console.warn("[firebaseNotesService.findChannelByShareToken] Invalid document path:", docSnap.ref.path);
+        return null;
+      }
+      const userId = pathParts[userIdIndex + 1];
+
+      return { channel, userId };
+    } catch (error) {
+      console.error("[firebaseNotesService.findChannelByShareToken] failed", error);
+      return null;
+    }
+  };
+
+  createMessageForPublicSpace = async (
+    shareToken: string,
+    messageData: Omit<Message, "id" | "timestamp">
+  ): Promise<string> => {
+    const channelInfo = await this.findChannelByShareToken(shareToken);
+    if (!channelInfo) {
+      throw new Error("Channel not found or not published");
+    }
+
+    if (channelInfo.channel.shareMode !== "append-only") {
+      throw new Error("This space is read-only. Messages cannot be added.");
+    }
+
+    const filteredMessageData = Object.fromEntries(
+      Object.entries(messageData).filter(([, value]) => value !== undefined)
+    );
+
+    const docRef = await addDoc(getMessagesCollectionRef(channelInfo.userId), {
+      ...filteredMessageData,
+      timestamp: serverTimestamp(),
+      isDeleted: false,
+    });
+
+    const channelRef = doc(getChannelsCollectionRef(channelInfo.userId), channelInfo.channel.id);
+    await updateDoc(channelRef, {
+      lastMessageTime: serverTimestamp(),
+      messageCount: increment(1),
+    });
+
+    return docRef.id;
+  };
+}
 
 export const firebaseNotesService = new FirebaseNotesService();

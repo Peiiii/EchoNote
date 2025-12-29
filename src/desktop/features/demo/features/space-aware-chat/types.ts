@@ -2,7 +2,7 @@ export interface SpaceRecord {
   id: string;
   content: string;
   timestamp: number;
-  type: 'text' | 'image' | 'file';
+  type: "text" | "image" | "file";
   tags?: string[];
 }
 

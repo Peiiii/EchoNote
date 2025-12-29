@@ -1,7 +1,7 @@
-import React from 'react';
-import { AiObjectDemo } from '@/desktop/features/demo/components/ai-object-demo';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { Bot } from 'lucide-react';
+import React from "react";
+import { AiObjectDemo } from "@/desktop/features/demo/components/ai-object-demo";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Bot } from "lucide-react";
 
 export const AiObjectDemoPage: React.FC = () => {
   return (

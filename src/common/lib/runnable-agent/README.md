@@ -24,7 +24,7 @@ VITE_OPENAI_API_URL=https://api.openai.com/v1
 ## 基本使用
 
 ```typescript
-import { ExperimentalInBrowserAgent } from '@/common/lib/runnable-agent';
+import { ExperimentalInBrowserAgent } from "@/common/lib/runnable-agent";
 
 // 创建agent实例
 const agent = new ExperimentalInBrowserAgent({
@@ -38,13 +38,13 @@ const agent = new ExperimentalInBrowserAgent({
 
 // 运行agent
 const events$ = agent.run({
-  threadId: 'thread-123',
-  runId: 'run-456',
+  threadId: "thread-123",
+  runId: "run-456",
   messages: [
     {
-      id: '1',
-      role: 'user',
-      content: '你好，请介绍一下你自己',
+      id: "1",
+      role: "user",
+      content: "你好，请介绍一下你自己",
     },
   ],
   tools: [],
@@ -53,14 +53,14 @@ const events$ = agent.run({
 
 // 监听事件
 events$.subscribe({
-  next: (event) => {
-    console.log('Agent event:', event);
+  next: event => {
+    console.log("Agent event:", event);
   },
-  error: (error) => {
-    console.error('Agent error:', error);
+  error: error => {
+    console.error("Agent error:", error);
   },
   complete: () => {
-    console.log('Agent completed');
+    console.log("Agent completed");
   },
 });
 ```
@@ -82,29 +82,29 @@ events$.subscribe({
 ```typescript
 const tools = [
   {
-    name: 'get_weather',
-    description: '获取天气信息',
+    name: "get_weather",
+    description: "获取天气信息",
     parameters: {
-      type: 'object',
+      type: "object",
       properties: {
         location: {
-          type: 'string',
-          description: '城市名称',
+          type: "string",
+          description: "城市名称",
         },
       },
-      required: ['location'],
+      required: ["location"],
     },
   },
 ];
 
 const events$ = agent.run({
-  threadId: 'thread-123',
-  runId: 'run-456',
+  threadId: "thread-123",
+  runId: "run-456",
   messages: [
     {
-      id: '1',
-      role: 'user',
-      content: '北京今天天气怎么样？',
+      id: "1",
+      role: "user",
+      content: "北京今天天气怎么样？",
     },
   ],
   tools,
@@ -117,23 +117,23 @@ const events$ = agent.run({
 ```typescript
 const context = [
   {
-    description: '用户偏好',
-    value: '用户喜欢简洁的回答',
+    description: "用户偏好",
+    value: "用户喜欢简洁的回答",
   },
   {
-    description: '当前时间',
-    value: '2024年1月1日 12:00',
+    description: "当前时间",
+    value: "2024年1月1日 12:00",
   },
 ];
 
 const events$ = agent.run({
-  threadId: 'thread-123',
-  runId: 'run-456',
+  threadId: "thread-123",
+  runId: "run-456",
   messages: [
     {
-      id: '1',
-      role: 'user',
-      content: '请给我一些建议',
+      id: "1",
+      role: "user",
+      content: "请给我一些建议",
     },
   ],
   tools: [],
@@ -146,13 +146,13 @@ const events$ = agent.run({
 ### 设置API密钥
 
 ```typescript
-agent.setApiKey('your-new-api-key');
+agent.setApiKey("your-new-api-key");
 ```
 
 ### 设置模型
 
 ```typescript
-agent.setModel('gpt-4');
+agent.setModel("gpt-4");
 ```
 
 ### 获取当前配置
@@ -184,4 +184,4 @@ console.log(config);
 - `rxjs` - 响应式编程库
 - `uuid` - UUID生成器
 - `@agent-labs/agent-chat` - Agent聊天框架
-- `@ag-ui/core` - UI核心库 
+- `@ag-ui/core` - UI核心库

@@ -1,7 +1,7 @@
-import React from 'react';
-import { TimeFormatDemo } from '@/desktop/features/demo/components/time-format-demo';
-import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { Clock } from 'lucide-react';
+import React from "react";
+import { TimeFormatDemo } from "@/desktop/features/demo/components/time-format-demo";
+import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Clock } from "lucide-react";
 
 export const TimeFormatDemoPage: React.FC = () => {
   return (

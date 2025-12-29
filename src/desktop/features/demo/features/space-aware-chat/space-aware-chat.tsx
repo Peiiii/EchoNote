@@ -1,18 +1,18 @@
-import React from 'react';
-import { SpaceAwareChatProps } from './types';
-import { useSpaceRecords } from './hooks/use-space-records';
-import { useSpaceAIChat } from './hooks/use-space-ai-chat';
-import { SpaceContextDisplay } from './components/space-context-display';
-import { ChatMessage } from './components/chat-message';
-import { ChatInput } from './components/chat-input';
-import { Button } from '@/common/components/ui/button';
-import { ScrollArea } from '@/common/components/ui/scroll-area';
-import { RefreshCw, MessageSquare } from 'lucide-react';
+import React from "react";
+import { SpaceAwareChatProps } from "./types";
+import { useSpaceRecords } from "./hooks/use-space-records";
+import { useSpaceAIChat } from "./hooks/use-space-ai-chat";
+import { SpaceContextDisplay } from "./components/space-context-display";
+import { ChatMessage } from "./components/chat-message";
+import { ChatInput } from "./components/chat-input";
+import { Button } from "@/common/components/ui/button";
+import { ScrollArea } from "@/common/components/ui/scroll-area";
+import { RefreshCw, MessageSquare } from "lucide-react";
 
 export const SpaceAwareChat: React.FC<SpaceAwareChatProps> = ({
   spaceId,
-  className = '',
-  placeholder
+  className = "",
+  placeholder,
 }) => {
   const spaceContext = useSpaceRecords(spaceId);
   const { messages, isLoading, sendMessage, clearMessages } = useSpaceAIChat(spaceId, spaceContext);
@@ -21,7 +21,7 @@ export const SpaceAwareChat: React.FC<SpaceAwareChatProps> = ({
     <div className={`space-y-4 ${className}`}>
       {/* 空间上下文显示 */}
       <SpaceContextDisplay spaceContext={spaceContext} spaceId={spaceId} />
-      
+
       {/* 聊天区域 */}
       <div className="border rounded-lg p-4 bg-background">
         <div className="flex items-center justify-between mb-4">
@@ -41,7 +41,7 @@ export const SpaceAwareChat: React.FC<SpaceAwareChatProps> = ({
             </Button>
           </div>
         </div>
-        
+
         {/* 消息列表 */}
         <ScrollArea className="h-96 mb-4">
           <div className="pr-4">
@@ -52,13 +52,11 @@ export const SpaceAwareChat: React.FC<SpaceAwareChatProps> = ({
                 <p className="text-sm">AI助手已经了解了该空间的所有记录</p>
               </div>
             ) : (
-              messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
-              ))
+              messages.map(message => <ChatMessage key={message.id} message={message} />)
             )}
           </div>
         </ScrollArea>
-        
+
         {/* 输入框 */}
         <ChatInput
           onSendMessage={sendMessage}
@@ -66,7 +64,7 @@ export const SpaceAwareChat: React.FC<SpaceAwareChatProps> = ({
           placeholder={placeholder || `向AI助手询问关于 ${spaceId} 空间的问题...`}
         />
       </div>
-      
+
       {/* 使用提示 */}
       <div className="text-xs text-muted-foreground text-center">
         <p>💡 提示：你可以询问AI助手关于该空间的任何问题，比如：</p>

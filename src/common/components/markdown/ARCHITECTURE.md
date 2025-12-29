@@ -19,16 +19,19 @@ src/common/components/markdown/
 ## Design Principles
 
 ### 1. **Separation of Concerns**
+
 - **CodeBlock**: Handles only code rendering and copy functionality
 - **MarkdownContent**: Desktop-specific styling and layout
 - **MobileMarkdownContent**: Mobile-specific optimizations
 
 ### 2. **Reusability**
+
 - Components can be imported from `@/common/components/markdown`
 - Consistent API across all platforms
 - Easy to extend and customize
 
 ### 3. **Platform Optimization**
+
 - Desktop: Rich styling, hover effects, complex layouts
 - Mobile: Touch-friendly spacing, simplified interactions, responsive design
 
@@ -39,16 +42,18 @@ src/common/components/markdown/
 **Purpose**: Renders code blocks with copy functionality and syntax highlighting
 
 **Features**:
+
 - Language detection from className
 - Inline vs block code distinction
 - Copy to clipboard with visual feedback
 - World-class design inspired by GitHub/Notion
 
 **Props**:
+
 ```typescript
 interface CodeBlockProps {
-    className?: string;        // Language class (e.g., "language-javascript")
-    children?: React.ReactNode; // Code content
+  className?: string; // Language class (e.g., "language-javascript")
+  children?: React.ReactNode; // Code content
 }
 ```
 
@@ -57,6 +62,7 @@ interface CodeBlockProps {
 **Purpose**: Desktop-optimized Markdown renderer with enhanced styling
 
 **Features**:
+
 - Rich typography and spacing
 - Hover effects and interactions
 - Complex layout support
@@ -67,6 +73,7 @@ interface CodeBlockProps {
 **Purpose**: Mobile-optimized Markdown renderer
 
 **Features**:
+
 - Touch-friendly spacing
 - Simplified interactions
 - Responsive design
@@ -75,6 +82,7 @@ interface CodeBlockProps {
 ## Integration Points
 
 ### Desktop Integration
+
 ```typescript
 // Old way
 import { MarkdownContent } from "./markdown-content";
@@ -84,6 +92,7 @@ import { MarkdownContentWrapper as MarkdownContent } from "./markdown-content";
 ```
 
 ### Mobile Integration
+
 ```typescript
 // Old way
 import { MobileMarkdownContent } from "./mobile-markdown-content";
@@ -93,23 +102,27 @@ import { MobileMarkdownContentWrapper as MobileMarkdownContent } from "./mobile-
 ```
 
 ### Direct Usage
+
 ```typescript
-import { MarkdownContent, MobileMarkdownContent, CodeBlock } from '@/common/components/markdown';
+import { MarkdownContent, MobileMarkdownContent, CodeBlock } from "@/common/components/markdown";
 ```
 
 ## Migration Strategy
 
 ### Phase 1: Component Creation
+
 - ✅ Created reusable components in `src/common/components/markdown/`
 - ✅ Implemented world-class design and functionality
 - ✅ Added mobile optimization
 
 ### Phase 2: Integration
+
 - ✅ Updated desktop components to use new system
 - ✅ Updated mobile components to use new system
 - ✅ Maintained backward compatibility through wrapper components
 
 ### Phase 3: Cleanup
+
 - ✅ Removed duplicate code
 - ✅ Standardized imports
 - ✅ Added comprehensive documentation
@@ -117,21 +130,25 @@ import { MarkdownContent, MobileMarkdownContent, CodeBlock } from '@/common/comp
 ## Benefits
 
 ### 1. **Code Quality**
+
 - Single source of truth for Markdown rendering
 - Consistent styling across platforms
 - Easier maintenance and updates
 
 ### 2. **Developer Experience**
+
 - Clear import paths
 - Comprehensive documentation
 - Type-safe interfaces
 
 ### 3. **Performance**
+
 - Shared components reduce bundle size
 - Optimized for each platform
 - Efficient re-rendering
 
 ### 4. **Maintainability**
+
 - Centralized styling logic
 - Easy to add new features
 - Consistent design language
@@ -139,21 +156,25 @@ import { MarkdownContent, MobileMarkdownContent, CodeBlock } from '@/common/comp
 ## Future Enhancements
 
 ### 1. **Syntax Highlighting**
+
 - Integration with Prism.js or highlight.js
 - Custom theme support
 - Language-specific optimizations
 
 ### 2. **Interactive Elements**
+
 - Collapsible sections
 - Copy buttons for all code blocks
 - Custom block types
 
 ### 3. **Accessibility**
+
 - Screen reader optimizations
 - Keyboard navigation
 - High contrast themes
 
 ### 4. **Performance**
+
 - Lazy loading for large documents
 - Virtual scrolling for long content
 - Memoization optimizations
@@ -161,15 +182,17 @@ import { MarkdownContent, MobileMarkdownContent, CodeBlock } from '@/common/comp
 ## Best Practices
 
 ### 1. **Import Usage**
+
 ```typescript
 // ✅ Correct: Import from common components
-import { MarkdownContent } from '@/common/components/markdown';
+import { MarkdownContent } from "@/common/components/markdown";
 
 // ❌ Incorrect: Import from local files
-import { MarkdownContent } from './markdown-content';
+import { MarkdownContent } from "./markdown-content";
 ```
 
 ### 2. **Component Composition**
+
 ```typescript
 // ✅ Correct: Use wrapper components for platform-specific needs
 export function MyComponent() {
@@ -183,6 +206,7 @@ export function MyComponent() {
 ```
 
 ### 3. **Styling Customization**
+
 ```typescript
 // ✅ Correct: Pass className for custom styling
 <MarkdownContent content={content} className="custom-prose" />

@@ -1,18 +1,33 @@
 import { ConversationListProps } from "../types/conversation.types";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
-import { Trash2, Archive, Filter } from "lucide-react";
+import { Trash2, Archive, Filter, MessageSquare } from "lucide-react";
 import { useConversationState } from "../hooks/use-conversation-state";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/common/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from "@/common/components/ui/popover";
 import { useConversationStore } from "../stores/conversation.store";
 import { toast } from "sonner";
 
 import { useState } from "react";
-import type { ConversationContextConfig } from "@/common/types/ai-conversation";
 
-export function AIConversationList({ conversations, currentConversationId, loading, currentChannelId }: ConversationListProps) {
-  const { selectConversation, deleteConversation, updateConversation } = useConversationState();
-  const { userId, channels } = useNotesDataStore();
+export function AIConversationList({
+  conversations,
+  currentConversationId,
+  loading,
+}: ConversationListProps) {
+  const {
+    selectConversation,
+    deleteConversation,
+    updateConversation,
+    loadMoreConversations,
+    hasMore,
+    loadingMore,
+  } = useConversationState();
+  const { userId } = useNotesDataStore();
   const deletingIds = useConversationStore(s => s.deletingIds);
   const showArchived = useConversationStore(s => s.showArchived);
   const setShowArchived = useConversationStore(s => s.setShowArchived);
@@ -26,54 +41,49 @@ export function AIConversationList({ conversations, currentConversationId, loadi
     if (!showArchived && c.isArchived) return false;
     if (!query) return true;
     const q = query.toLowerCase();
-    return (c.title || '').toLowerCase().includes(q);
+    return (c.title || "").toLowerCase().includes(q);
   });
 
-  const getChannelName = (id: string) => channels.find(ch => ch.id === id)?.name || id;
-  const getContextLabelParts = (c: { contexts?: ConversationContextConfig | null }): { text: string; more: number } => {
-    const ctx = c.contexts;
-    if (!ctx) {
-      if (currentChannelId) return { text: `Default: ${getChannelName(currentChannelId)}`, more: 0 };
-      return { text: 'Default', more: 0 };
-    }
-    if (ctx.mode === 'none') return { text: 'No Context', more: 0 };
-    if (ctx.mode === 'all') return { text: 'All Channels', more: 0 };
-    const ids = ctx.channelIds || [];
-    if (ids.length === 0) return { text: 'No Context', more: 0 };
-    const primary = getChannelName(ids[0]);
-    const more = Math.max(0, ids.length - 1);
-    // Only show first name in text; put "+N" in a separate badge to avoid being truncated away
-    return { text: primary, more };
-  };
   return (
     <div className="flex flex-col h-full">
-      <div className="p-2 px-3 sticky top-0 bg-background z-10 border-b flex items-center gap-2">
+      <div className="p-3 sticky top-0 z-10 flex items-center gap-3">
         <div className="flex-1">
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search conversations"
-            className="w-full h-8 px-2 rounded-md border bg-muted text-sm focus:outline-none"
+            className="w-full h-9 px-3 rounded-lg border bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
           />
         </div>
         <Popover>
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="h-8 w-8 inline-flex items-center justify-center rounded-md border bg-background hover:bg-accent"
+              className="h-9 w-9 inline-flex items-center justify-center rounded-lg border bg-background hover:bg-accent transition-colors"
               aria-label="Filter"
             >
               <Filter className="w-4 h-4" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+          <PopoverContent
+            align="end"
+            sideOffset={6}
+            className="p-2 w-56"
+            onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => setShowArchived(!showArchived)}
-              className="w-full h-8 px-2 rounded-md border bg-background text-sm flex items-center justify-between hover:bg-accent"
+              className="w-full h-8 px-3 rounded-md border bg-background text-sm flex items-center justify-between hover:bg-accent transition-colors"
             >
               <span>Show archived</span>
-              <span className={"inline-block w-5 h-5 rounded-sm border " + (showArchived ? 'bg-primary' : 'bg-background')}></span>
+              <span
+                className={
+                  "inline-block w-4 h-4 rounded-sm border " +
+                  (showArchived ? "bg-primary border-primary" : "bg-background")
+                }
+              ></span>
             </button>
           </PopoverContent>
         </Popover>
@@ -85,106 +95,169 @@ export function AIConversationList({ conversations, currentConversationId, loadi
         ) : filtered.length === 0 ? (
           <div className="p-4 text-center text-muted-foreground">No conversations yet</div>
         ) : (
-          filtered.map((c) => (
-            <div
-              key={c.id}
-              className={`group px-3 py-2 cursor-pointer hover:bg-accent ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? 'opacity-50 pointer-events-none' : ''}`}
-              onClick={() => selectConversation(c.id)}
-            >
-              <div className="flex items-center gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">
-                    {editingId === c.id ? (
-                      <input
-                        value={draftTitle}
-                        onChange={e => setDraftTitle(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }
-                          if (e.key === 'Escape') { setEditingId(null); }
-                        }}
-                        onBlur={() => { const t = draftTitle.trim(); if (t && userId) { void updateConversation(userId, c.id, { title: t }); } setEditingId(null); }}
-                        className="h-7 px-2 rounded-sm border bg-background text-sm w-full"
-                        autoFocus
-                        onClick={e => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span onDoubleClick={(e) => { e.stopPropagation(); setEditingId(c.id); setDraftTitle(c.title || ''); }}>
-                        {titleGeneratingMap[c.id] ? "Generating title..." : (c.title || "New Conversation")}
-                      </span>
-                    )}
-                    {c.isArchived && <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground">Archived</span>}
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
-                    <span>{c.messageCount} messages</span>
-                    <span>•</span>
-                    <span>{formatTimeForSocial(c.lastMessageAt)}</span>
-                    <span>•</span>
-                    {(() => {
-                      const { text, more } = getContextLabelParts(c);
-                      return (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border text-[10px] leading-none bg-background max-w-[14rem]">
-                          <span>Context:</span>
-                          <span className="font-medium text-foreground/80 truncate max-w-[9rem]">{text}</span>
-                          {more > 0 && (
-                            <span className="ml-0.5 inline-flex items-center justify-center px-1 rounded-sm border bg-muted text-foreground/80 whitespace-nowrap">+{more}</span>
+          <>
+            {filtered.map(c => (
+              <div
+                key={c.id}
+                className={`group px-4 py-3 cursor-pointer hover:bg-accent/50 transition-colors ${currentConversationId === c.id ? "bg-accent" : ""} ${deletingIds.includes(c.id) ? "opacity-50 pointer-events-none" : ""}`}
+                onClick={() => selectConversation(c.id)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-foreground truncate mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate">
+                          {editingId === c.id ? (
+                            <input
+                              value={draftTitle}
+                              onChange={e => setDraftTitle(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === "Enter") {
+                                  const t = draftTitle.trim();
+                                  if (t && userId) {
+                                    void updateConversation(userId, c.id, { title: t });
+                                  }
+                                  setEditingId(null);
+                                }
+                                if (e.key === "Escape") {
+                                  setEditingId(null);
+                                }
+                              }}
+                              onBlur={() => {
+                                const t = draftTitle.trim();
+                                if (t && userId) {
+                                  void updateConversation(userId, c.id, { title: t });
+                                }
+                                setEditingId(null);
+                              }}
+                              className="h-7 px-2 rounded-sm border bg-background text-sm w-full"
+                              autoFocus
+                              onClick={e => e.stopPropagation()}
+                            />
+                          ) : (
+                            <span
+                              onDoubleClick={e => {
+                                e.stopPropagation();
+                                setEditingId(c.id);
+                                setDraftTitle(c.title || "");
+                              }}
+                            >
+                              {titleGeneratingMap[c.id]
+                                ? "Generating title..."
+                                : c.title || "New Conversation"}
+                            </span>
                           )}
                         </span>
-                      );
-                    })()}
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <MessageSquare className="w-3 h-3 text-muted-foreground/60" />
+                          <span className="text-xs text-muted-foreground/70">{c.messageCount}</span>
+                        </div>
+                      </div>
+                      {c.isArchived && (
+                        <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          Archived
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatTimeForSocial(c.lastMessageAt)}
+                    </div>
                   </div>
-                </div>
-                {userId && (
-                  <>
-                  <button
-                    type="button"
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
-                    onClick={(e) => { e.stopPropagation(); if (!c.isArchived) { void updateConversation(userId, c.id, { isArchived: true }); toast.success('Conversation archived'); } else { void updateConversation(userId, c.id, { isArchived: false }); toast.success('Conversation restored'); } }}
-                    aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
-                  >
-                    <Archive className="w-4 h-4" />
-                  </button>
-                  <Popover>
-                    <PopoverTrigger asChild>
+                  {userId && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground p-2 rounded-md"
-                        onClick={(e) => { e.stopPropagation(); }}
-                        onMouseDown={(e) => { e.stopPropagation(); }}
-                        onKeyDown={(e) => { e.stopPropagation(); }}
-                        aria-label="Delete conversation"
+                        className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent/50 transition-colors"
+                        onClick={e => {
+                          e.stopPropagation();
+                          if (!c.isArchived) {
+                            void updateConversation(userId, c.id, { isArchived: true });
+                            toast.success("Conversation archived");
+                          } else {
+                            void updateConversation(userId, c.id, { isArchived: false });
+                            toast.success("Conversation restored");
+                          }
+                        }}
+                        aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Archive className="w-4 h-4" />
                       </button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" sideOffset={6} className="p-2 w-56" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-                      <div className="text-sm mb-2">Delete this conversation?</div>
-                      <div className="flex justify-end gap-2">
-                        <PopoverClose asChild>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <button
                             type="button"
-                            className="h-8 px-3 rounded-md text-sm border hover:bg-accent"
-                            onClick={(e) => { e.stopPropagation(); }}
+                            className="text-muted-foreground hover:text-foreground p-1.5 rounded-md hover:bg-accent/50 transition-colors"
+                            onClick={e => {
+                              e.stopPropagation();
+                            }}
+                            onMouseDown={e => {
+                              e.stopPropagation();
+                            }}
+                            onKeyDown={e => {
+                              e.stopPropagation();
+                            }}
+                            aria-label="Delete conversation"
                           >
-                            Cancel
+                            <Trash2 className="w-4 h-4" />
                           </button>
-                        </PopoverClose>
-                        <PopoverClose asChild>
-                          <button
-                            type="button"
-                            className="h-8 px-3 rounded-md text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={(e) => { e.stopPropagation(); void deleteConversation(userId, c.id).then(() => toast.success('Conversation deleted')).catch(() => toast.error('Delete failed')); }}
-                          >
-                            Delete
-                          </button>
-                        </PopoverClose>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  </>
-                )}
+                        </PopoverTrigger>
+                        <PopoverContent
+                          align="end"
+                          sideOffset={6}
+                          className="p-2 w-56"
+                          onClick={e => e.stopPropagation()}
+                          onMouseDown={e => e.stopPropagation()}
+                        >
+                          <div className="text-sm mb-2">Delete this conversation?</div>
+                          <div className="flex justify-end gap-2">
+                            <PopoverClose asChild>
+                              <button
+                                type="button"
+                                className="h-8 px-3 rounded-md text-sm border hover:bg-accent"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </PopoverClose>
+                            <PopoverClose asChild>
+                              <button
+                                type="button"
+                                className="h-8 px-3 rounded-md text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  void deleteConversation(userId, c.id)
+                                    .then(() => toast.success("Conversation deleted"))
+                                    .catch(() => toast.error("Delete failed"));
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </PopoverClose>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+            {hasMore && userId && (
+              <div className="p-4 border-t">
+                <button
+                  type="button"
+                  className="w-full h-9 px-4 rounded-lg text-sm border bg-background hover:bg-accent disabled:opacity-60 transition-colors"
+                  disabled={loadingMore}
+                  onClick={() => {
+                    void loadMoreConversations(userId);
+                  }}
+                >
+                  {loadingMore ? "Loading…" : "Load more"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

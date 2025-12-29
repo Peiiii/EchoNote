@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/common/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/common/components/ui/card';
-import { RefreshCw, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Button } from "@/common/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/common/components/ui/card";
+import { RefreshCw, X } from "lucide-react";
 
 export const PWAUpdatePrompt = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -13,36 +19,36 @@ export const PWAUpdatePrompt = () => {
     };
 
     // Listen for service worker updates
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_UPDATE_AVAILABLE') {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", event => {
+        if (event.data && event.data.type === "SW_UPDATE_AVAILABLE") {
           setUpdateAvailable(true);
         }
       });
     }
 
     return () => {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.removeEventListener('message', handleUpdateFound);
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.removeEventListener("message", handleUpdateFound);
       }
     };
   }, []);
 
   const handleUpdate = async () => {
     setIsUpdating(true);
-    
+
     try {
-      if ('serviceWorker' in navigator) {
+      if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration && registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
         }
       }
-      
+
       // Reload the page to apply the update
       window.location.reload();
     } catch (error) {
-      console.error('Failed to update app:', error);
+      console.error("Failed to update app:", error);
       setIsUpdating(false);
     }
   };
@@ -64,33 +70,25 @@ export const PWAUpdatePrompt = () => {
               <RefreshCw className="h-5 w-5" />
               Update Available
             </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-6 w-6 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={handleDismiss} className="h-6 w-6 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
           <CardDescription>
-            A new version of EchoNote is available. Update now for the latest features and improvements.
+            A new version of StillRoot is available. Update now for the latest features and
+            improvements.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex gap-2">
-            <Button 
-              onClick={handleUpdate} 
-              disabled={isUpdating}
-              className="flex-1"
-            >
+            <Button onClick={handleUpdate} disabled={isUpdating} className="flex-1">
               {isUpdating ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                   Updating...
                 </>
               ) : (
-                'Update Now'
+                "Update Now"
               )}
             </Button>
             <Button variant="outline" onClick={handleDismiss}>

@@ -1,2 +1,2 @@
-export { githubExtension } from './extensions';
-export { GitHubIntegrationPage } from './pages/github-integration-page';
+export { githubExtension } from "./extensions";
+export { GitHubIntegrationPage } from "./pages/github-integration-page";

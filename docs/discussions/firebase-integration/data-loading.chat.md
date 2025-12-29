@@ -39,37 +39,38 @@
 
 频道列表通常不会非常庞大，而且用户希望它能实时更新（比如有新频道加入）。
 
-*   **策略：使用 `onSnapshot` 实时加载。**
-*   **实现：**
-    ```javascript
-    // 加载并实时监听当前用户的所有频道
-    function loadChannels() {
-        const channelsCollection = db.collection('users').doc(currentUser.uid).collection('channels');
-        
-        channelsCollection.orderBy('name').onSnapshot(snapshot => {
-            const channelListUI = document.getElementById('channel-list'); // 假设你有一个显示频道的UI元素
-            channelListUI.innerHTML = '';
-            snapshot.forEach(doc => {
-                const channel = doc.data();
-                const channelElement = document.createElement('div');
-                channelElement.textContent = channel.name;
-                channelElement.dataset.channelId = doc.id;
-                
-                // 点击频道时，加载该频道的笔记
-                channelElement.addEventListener('click', () => {
-                    // 切换当前选中的频道
-                    currentChannelId = doc.id;
-                    // 加载笔记（使用下面的分页方案）
-                    loadNotesForChannel(currentChannelId);
-                });
-                
-                channelListUI.appendChild(channelElement);
-            });
-        });
-    }
+- **策略：使用 `onSnapshot` 实时加载。**
+- **实现：**
 
-    // 在用户登录后调用 loadChannels()
-    ```
+  ```javascript
+  // 加载并实时监听当前用户的所有频道
+  function loadChannels() {
+    const channelsCollection = db.collection("users").doc(currentUser.uid).collection("channels");
+
+    channelsCollection.orderBy("name").onSnapshot(snapshot => {
+      const channelListUI = document.getElementById("channel-list"); // 假设你有一个显示频道的UI元素
+      channelListUI.innerHTML = "";
+      snapshot.forEach(doc => {
+        const channel = doc.data();
+        const channelElement = document.createElement("div");
+        channelElement.textContent = channel.name;
+        channelElement.dataset.channelId = doc.id;
+
+        // 点击频道时，加载该频道的笔记
+        channelElement.addEventListener("click", () => {
+          // 切换当前选中的频道
+          currentChannelId = doc.id;
+          // 加载笔记（使用下面的分页方案）
+          loadNotesForChannel(currentChannelId);
+        });
+
+        channelListUI.appendChild(channelElement);
+      });
+    });
+  }
+
+  // 在用户登录后调用 loadChannels()
+  ```
 
 **优点：** 频道列表实时更新，体验好。因为频道数量不多，所以成本和性能都可控。
 
@@ -77,77 +78,83 @@
 
 这部分就是我们之前讨论的**核心问题**。一个频道可能有成千上万条笔记，所以**必须使用分页加载**。
 
-*   **策略：** 基于 `channelId` 和 `createdAt` 进行**分页查询 (Pagination)**。
+- **策略：** 基于 `channelId` 和 `createdAt` 进行**分页查询 (Pagination)**。
 
-*   **实现：**
-    *   首先，在 Firestore 控制台为 `notes` 集合创建一个**复合索引**。Firebase 会在你第一次尝试这种查询时，在控制台的错误信息里给你一个链接，点击一下就能自动创建，非常方便。索引的字段应该是：`channelId` (升序/降序) 和 `createdAt` (降序)。
+- **实现：**
+  - 首先，在 Firestore 控制台为 `notes` 集合创建一个**复合索引**。Firebase 会在你第一次尝试这种查询时，在控制台的错误信息里给你一个链接，点击一下就能自动创建，非常方便。索引的字段应该是：`channelId` (升序/降序) 和 `createdAt` (降序)。
 
-    *   修改我们之前的 `loadUserNotes` 函数，使其接受 `channelId` 参数。
+  - 修改我们之前的 `loadUserNotes` 函数，使其接受 `channelId` 参数。
 
-    ```javascript
-    let currentChannelId = null; // 全局变量，存储当前选中的频道ID
-    // ... (分页相关的变量 lastVisibleNote, isLoading 等保持不变)
+  ```javascript
+  let currentChannelId = null; // 全局变量，存储当前选中的频道ID
+  // ... (分页相关的变量 lastVisibleNote, isLoading 等保持不变)
 
-    function loadNotesForChannel(channelId, loadMore = false) {
-        if (!currentUser || isLoading || !channelId) return;
+  function loadNotesForChannel(channelId, loadMore = false) {
+    if (!currentUser || isLoading || !channelId) return;
 
-        isLoading = true;
+    isLoading = true;
 
-        // 关键改动：查询 notes 集合，并使用 .where() 子句进行筛选
-        let query = db.collection('users').doc(currentUser.uid).collection('notes')
-                      .where('channelId', '==', channelId) // 筛选出属于当前频道的笔记
-                      .orderBy('createdAt', 'desc')      // 然后按时间排序
-                      .limit(NOTES_PER_PAGE);
+    // 关键改动：查询 notes 集合，并使用 .where() 子句进行筛选
+    let query = db
+      .collection("users")
+      .doc(currentUser.uid)
+      .collection("notes")
+      .where("channelId", "==", channelId) // 筛选出属于当前频道的笔记
+      .orderBy("createdAt", "desc") // 然后按时间排序
+      .limit(NOTES_PER_PAGE);
 
-        // 如果是加载更多，逻辑和之前完全一样
-        if (loadMore && lastVisibleNote) {
-            query = query.startAfter(lastVisibleNote);
-        } else {
-            // 如果是切换频道或首次加载，重置所有状态
-            notesList.innerHTML = '';
-            lastVisibleNote = null;
-            allNotesLoaded = false;
-        }
-
-        query.get().then(snapshot => {
-            // ... (处理快照、渲染列表、更新 lastVisibleNote 的逻辑和之前完全一样)
-        }).finally(() => {
-            isLoading = false;
-        });
+    // 如果是加载更多，逻辑和之前完全一样
+    if (loadMore && lastVisibleNote) {
+      query = query.startAfter(lastVisibleNote);
+    } else {
+      // 如果是切换频道或首次加载，重置所有状态
+      notesList.innerHTML = "";
+      lastVisibleNote = null;
+      allNotesLoaded = false;
     }
-    ```
+
+    query
+      .get()
+      .then(snapshot => {
+        // ... (处理快照、渲染列表、更新 lastVisibleNote 的逻辑和之前完全一样)
+      })
+      .finally(() => {
+        isLoading = false;
+      });
+  }
+  ```
 
 ---
 
 ### **整合后的工作流程**
 
 1.  **用户登录：**
-    *   调用 `loadChannels()`。应用获取并实时展示用户的频道列表。
-    *   同时，可以选择加载第一个频道的笔记，或者显示一个欢迎界面。
+    - 调用 `loadChannels()`。应用获取并实时展示用户的频道列表。
+    - 同时，可以选择加载第一个频道的笔记，或者显示一个欢迎界面。
 
 2.  **用户点击频道 A：**
-    *   `currentChannelId` 被设置为频道 A 的 ID。
-    *   调用 `loadNotesForChannel(channelId_A)`。
-    *   应用通过**分页**加载并显示频道 A 的第一页笔记。
+    - `currentChannelId` 被设置为频道 A 的 ID。
+    - 调用 `loadNotesForChannel(channelId_A)`。
+    - 应用通过**分页**加载并显示频道 A 的第一页笔记。
 
 3.  **用户滚动笔记列表：**
-    *   触发无限滚动逻辑。
-    *   调用 `loadNotesForChannel(channelId_A, true)` 来加载频道 A 的下一页笔记。
+    - 触发无限滚动逻辑。
+    - 调用 `loadNotesForChannel(channelId_A, true)` 来加载频道 A 的下一页笔记。
 
 4.  **用户点击频道 B：**
-    *   `currentChannelId` 被更新为频道 B 的 ID。
-    *   调用 `loadNotesForChannel(channelId_B)`。
-    *   应用**清空**现有笔记列表，然后通过**分页**加载并显示频道 B 的第一页笔记。
+    - `currentChannelId` 被更新为频道 B 的 ID。
+    - 调用 `loadNotesForChannel(channelId_B)`。
+    - 应用**清空**现有笔记列表，然后通过**分页**加载并显示频道 B 的第一页笔记。
 
 5.  **单条笔记的实时同步：**
-    *   这个逻辑**完全不受影响**。当用户点击任何一个频道下的某条笔记时，我们依然可以为那**一条**笔记建立 `onSnapshot` 监听，实现实时编辑。
+    - 这个逻辑**完全不受影响**。当用户点击任何一个频道下的某条笔记时，我们依然可以为那**一条**笔记建立 `onSnapshot` 监听，实现实时编辑。
 
 ### **总结**
 
 这个基于 Channel 的数据加载方案，是一个**兼顾了实时性、性能和成本**的成熟方案：
 
-*   **频道层 (少量数据):** 使用**实时监听 (`onSnapshot`)**，提供最佳用户体验。
-*   **笔记层 (海量数据):** 使用**分页查询 (`get` + `.where()` + `startAfter()`)**，保证高性能和低成本。
-*   **单条笔记编辑 (精确操作):** 使用**单文档实时监听 (`doc().onSnapshot()`)**，实现精确的实时同步。
+- **频道层 (少量数据):** 使用**实时监听 (`onSnapshot`)**，提供最佳用户体验。
+- **笔记层 (海量数据):** 使用**分页查询 (`get` + `.where()` + `startAfter()`)**，保证高性能和低成本。
+- **单条笔记编辑 (精确操作):** 使用**单文档实时监听 (`doc().onSnapshot()`)**，实现精确的实时同步。
 
 这套组合拳能很好地支撑你的应用从早期发展到拥有大量用户和数据的阶段。

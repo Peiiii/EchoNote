@@ -1,2 +1,2 @@
-export { ThemeProvider, useTheme } from './context';
-export { ThemeToggle } from './toggle'; 
+export { ThemeProvider, useTheme } from "./context";
+export { ThemeToggle } from "./toggle";

@@ -1,4 +1,3 @@
- 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
@@ -9,17 +8,14 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from "react";
 import { BehaviorSubject, Observable } from "rxjs";
 export function useEffectOnce(effect: () => void | (() => void)): void {
   return useEffect(effect, []);
 }
 
-export function useUpdateEffect(
-  effect: EffectCallback,
-  deps: DependencyList = []
-): void {
+export function useUpdateEffect(effect: EffectCallback, deps: DependencyList = []): void {
   const firstRun: MutableRefObject<boolean> = React.useRef(true);
 
   React.useEffect(() => {
@@ -118,11 +114,7 @@ const setNodeData = (
   if (value === prevValue) return; // no change
   // notify children where the value changed caused by setting the value
   // Todo: do a better diff, now there is no diff, which is bad for the performance
-  const notify = (
-    subscriberNode: BeanControlNode,
-    data: any,
-    prevData: any
-  ) => {
+  const notify = (subscriberNode: BeanControlNode, data: any, prevData: any) => {
     if (data !== prevData) {
       subscriberNode.$.next(data);
     }
@@ -132,7 +124,6 @@ const setNodeData = (
   };
   taskManager.freeze();
   if (!path) {
-     
     dataTree.data = value;
     notify(controlTree, value, prevValue);
   } else {
@@ -157,8 +148,7 @@ const setNodeData = (
     // parentData[route[route.length - 1]] = value;
     // parentData[route[route.length - 1]] = value;
     // get the subscriber node that is cooresponding to the path
-    const targetSubscriberNode =
-      parentSubscriberNode?.children[route[route.length - 1]];
+    const targetSubscriberNode = parentSubscriberNode?.children[route[route.length - 1]];
     changed.push([targetSubscriberNode, value, route[route.length - 1]]); // the last one is the target, which is also changed
 
     const tasks: (() => void)[] = [];
@@ -180,7 +170,7 @@ const setNodeData = (
         changedChildValue = realNewData;
       }
     }
-     
+
     dataTree.data = changedChildValue;
 
     // from the upper level to the lower level, notify the subscribers
@@ -193,7 +183,7 @@ const setNodeData = (
       } else break;
     }
 
-    tasks.reverse().forEach((task) => task());
+    tasks.reverse().forEach(task => task());
 
     if (targetSubscriberNode)
       Object.entries(targetSubscriberNode.children).forEach(([key, child]) => {
@@ -203,11 +193,7 @@ const setNodeData = (
   taskManager.unfreeze();
 };
 
-const getControlNode = (
-  dataTree: DataTree,
-  controlTree: BeanControlNode,
-  path?: string
-) => {
+const getControlNode = (dataTree: DataTree, controlTree: BeanControlNode, path?: string) => {
   if (!path) {
     return controlTree;
   } else {
@@ -232,15 +218,11 @@ const getControlNode = (
   }
 };
 
-const useNodeData = (
-  dataTree: DataTree,
-  controlTree: BeanControlNode,
-  path?: string
-) => {
+const useNodeData = (dataTree: DataTree, controlTree: BeanControlNode, path?: string) => {
   const { $ } = getControlNode(dataTree, controlTree, path);
   const [, setState] = useState(() => $.getValue());
   useEffect(() => {
-    const sub = $.subscribe((value) => {
+    const sub = $.subscribe(value => {
       setState(value);
     });
     return () => sub.unsubscribe();
@@ -294,31 +276,20 @@ const createNestedBeanInner = <T extends Record<string, any>>(
   };
   return new Proxy({ $$isBean: true } as INestedBean<T>, {
     ownKeys(target) {
-      return Reflect.ownKeys(target).concat([
-        "use",
-        "get",
-        "set",
-        "$",
-        "namespaces",
-      ]);
+      return Reflect.ownKeys(target).concat(["use", "get", "set", "$", "namespaces"]);
     },
-     
+
     get(target: any, actionAndProp) {
       if (actionAndProp in target) {
         return target[actionAndProp];
       }
       if (typeof actionAndProp === "string") {
         if (["$", "get", "set", "use"].includes(actionAndProp)) {
-          const controlNode = getControlNode(
-            dataTree as any,
-            controlTree,
-            scope
-          );
+          const controlNode = getControlNode(dataTree as any, controlTree, scope);
           if (actionAndProp === "$") {
             return controlNode.$;
           } else if (actionAndProp === "get") {
-            if (!controlNode.get)
-              controlNode.get = () => getNodeData(dataTree as any, scope);
+            if (!controlNode.get) controlNode.get = () => getNodeData(dataTree as any, scope);
             return controlNode.get!;
           } else if (actionAndProp === "set") {
             if (!controlNode.set)
@@ -327,9 +298,7 @@ const createNestedBeanInner = <T extends Record<string, any>>(
                   dataTree as any,
                   controlTree,
                   scope,
-                  typeof value === "function"
-                    ? value(getNodeData(dataTree as any, scope))
-                    : value
+                  typeof value === "function" ? value(getNodeData(dataTree as any, scope)) : value
                 );
             return controlNode.set!;
           } else if (actionAndProp === "use") {
@@ -344,11 +313,7 @@ const createNestedBeanInner = <T extends Record<string, any>>(
             {},
             {
               get(_: any, prop: string) {
-                return createNestedBeanInner(
-                  dataTree,
-                  controlTree,
-                  normalizeKey(prop)
-                );
+                return createNestedBeanInner(dataTree, controlTree, normalizeKey(prop));
               },
             }
           );
@@ -386,10 +351,7 @@ export const onCleanup = (fn: CleanupTask | CleanupTask[]) => {
   if (Array.isArray(fn)) execution.cleanupTasks.push(...fn);
   else execution.cleanupTasks.push(fn);
 };
-export const executeInit = (
-  init: ((bean: any) => any) | undefined,
-  bean: any
-) => {
+export const executeInit = (init: ((bean: any) => any) | undefined, bean: any) => {
   execution.renderingTasks = [];
   execution.cleanupTasks = [];
   const result = init ? Object.assign(bean, init(bean)) : bean;
@@ -399,8 +361,8 @@ export const executeInit = (
   execution.cleanupTasks = [];
   return [
     result,
-    () => renderingTasks.forEach((render) => render()),
-    () => cleanupTasks.forEach((cleanup) => cleanup()),
+    () => renderingTasks.forEach(render => render()),
+    () => cleanupTasks.forEach(cleanup => cleanup()),
   ] as const;
 };
 
@@ -441,7 +403,7 @@ interface IWeakRefConstructor {
 export const defineBean = <
   T extends Record<string, any>,
   O extends Record<string, any> | void,
-  TInitArgs extends any[]
+  TInitArgs extends any[],
 >(
   getData: (...args: TInitArgs) => T,
   init?: (bean: IWrappedNestedBean<T>) => O
@@ -449,11 +411,11 @@ export const defineBean = <
   type TFinalBean = typeof init extends undefined
     ? IWrappedNestedBean<T>
     : IWrappedNestedBean<T> & (O extends void ? object : O);
-  
+
   // 使用条件类型存储实例引用
   const instanceStorage = (() => {
     const globalWeakRef = (globalThis as any).WeakRef as IWeakRefConstructor | undefined;
-    
+
     if (globalWeakRef) {
       const weakRefs: IWeakRefImpl<TFinalBean>[] = [];
       return {
@@ -464,13 +426,13 @@ export const defineBean = <
             return instance ? predicate(instance) : false;
           });
           return ref?.deref();
-        }
+        },
       };
     } else {
       const instances: TFinalBean[] = [];
       return {
         add: (instance: TFinalBean) => instances.push(instance),
-        find: (predicate: (bean: TFinalBean) => boolean) => instances.find(predicate)
+        find: (predicate: (bean: TFinalBean) => boolean) => instances.find(predicate),
       };
     }
   })();
@@ -478,15 +440,15 @@ export const defineBean = <
   const create = (...args: TInitArgs): TFinalBean => {
     const renderingTasks: RenderingTask[] = [];
     const cleanupTasks: CleanupTask[] = [];
-    
+
     const $cleanup = () => {
-      [...cleanupTasks].forEach((cleanup) => {
+      [...cleanupTasks].forEach(cleanup => {
         cleanup();
         cleanupTasks.splice(cleanupTasks.indexOf(cleanup), 1);
       });
     };
     const $render = () => {
-      [...renderingTasks].forEach((render) => {
+      [...renderingTasks].forEach(render => {
         render();
       });
     };
@@ -533,9 +495,9 @@ export const defineBean = <
     const [instance, renderingTask, cleanupTask] = executeInit(init, bean);
     renderingTasks.push(renderingTask);
     cleanupTasks.push(cleanupTask);
-    
+
     instanceStorage.add(instance);
-    
+
     return instance;
   };
   const useInstance = (...args: TInitArgs): TFinalBean => {
@@ -545,8 +507,7 @@ export const defineBean = <
   };
   const Context = createContext<TFinalBean | undefined>(undefined);
   const { Provider } = Context;
-  const useExistingInstance = () =>
-    useContext(Context) as TFinalBean | undefined;
+  const useExistingInstance = () => useContext(Context) as TFinalBean | undefined;
   const find = (predicate: (bean: TFinalBean) => boolean) => {
     return instanceStorage.find(predicate);
   };
@@ -559,20 +520,12 @@ export const defineBean = <
   };
 };
 
-export function useStateFromObservable<T>(
-  subject: Observable<T>
-): T | undefined;
-export function useStateFromObservable<T>(
-  subject: Observable<T>,
-  defaultValue: T
-): T;
-export function useStateFromObservable<T>(
-  subject: Observable<T>,
-  defaultValue?: T
-) {
+export function useStateFromObservable<T>(subject: Observable<T>): T | undefined;
+export function useStateFromObservable<T>(subject: Observable<T>, defaultValue: T): T;
+export function useStateFromObservable<T>(subject: Observable<T>, defaultValue?: T) {
   const [state, setState] = useState(defaultValue);
   useEffect(() => {
-    const sub = subject.subscribe((value) => setState(value));
+    const sub = subject.subscribe(value => setState(value));
     return () => sub.unsubscribe();
   }, []);
   return state;
@@ -584,6 +537,21 @@ export const useBehaviorSubjectFromState = <T>(state: T) => {
     subject.next(state);
   }, [state]);
   return subject;
+};
+
+export const useSubscribeObservable = <T>(
+  observableOrGetObservable: Observable<T> | (() => Observable<T>),
+  next: (value: T) => void
+) => {
+  const observable = useMemo(() => {
+    return typeof observableOrGetObservable === "function"
+      ? observableOrGetObservable()
+      : observableOrGetObservable;
+  }, []);
+  useEffect(() => {
+    const sub = observable.subscribe(next);
+    return () => sub.unsubscribe();
+  }, []);
 };
 
 // export const useStateFromBehaviorSubject = <T, T2>(
@@ -607,10 +575,7 @@ export const useBehaviorSubjectFromState = <T>(state: T) => {
 //   return state;
 // };
 
-export const useSyncStateToBehaviorSubject = <T>(
-  state: T,
-  subject: BehaviorSubject<T>
-) => {
+export const useSyncStateToBehaviorSubject = <T>(state: T, subject: BehaviorSubject<T>) => {
   useEffectOnce(() => {
     const current = subject.getValue();
     if (current !== state) subject.next(state);
@@ -635,13 +600,10 @@ type PathValue<T, P extends BeanPath<T>> = P extends `${infer Key}.${infer Rest}
       : never
     : never
   : P extends keyof T
-  ? T[P]
-  : never;
+    ? T[P]
+    : never;
 
-export const createSlice = <
-  T extends Record<string, any>,
-  P extends BeanPath<T>
->(
+export const createSlice = <T extends Record<string, any>, P extends BeanPath<T>>(
   bean: INestedBean<T>,
   path: P
 ): INestedBean<PathValue<T, P>> => {
@@ -651,10 +613,7 @@ export const createSlice = <
   }, bean as any) as INestedBean<PathValue<T, P>>;
 };
 
-export const useSliceState = <
-  T extends Record<string, any>,
-  P extends BeanPath<T>
->(
+export const useSliceState = <T extends Record<string, any>, P extends BeanPath<T>>(
   bean: INestedBean<T>,
   path: P
 ) => {

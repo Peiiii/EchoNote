@@ -1,6 +1,6 @@
-import { Button } from '@/common/components/ui/button';
-import { Loader2 } from 'lucide-react';
-import React from 'react';
+import { Button } from "@/common/components/ui/button";
+import { Loader2 } from "lucide-react";
+import React from "react";
 
 interface ConfirmFooterProps {
   confirmLabel: string;
@@ -10,18 +10,18 @@ interface ConfirmFooterProps {
   isLoading?: boolean;
   confirmIcon?: React.ReactNode; // shown when not loading
   loadingLabel?: string; // fallback to confirmLabel with ...
-  variant?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
+  variant?: "default" | "outline" | "secondary" | "destructive" | "ghost" | "link";
 }
 
 export function ConfirmFooter({
   confirmLabel,
-  cancelLabel = 'Cancel',
+  cancelLabel = "Cancel",
   onConfirm,
   onCancel,
   isLoading,
   confirmIcon,
   loadingLabel,
-  variant = 'default',
+  variant = "default",
 }: ConfirmFooterProps) {
   return (
     <div className="flex gap-2 pt-2">
@@ -44,4 +44,3 @@ export function ConfirmFooter({
     </div>
   );
 }
-

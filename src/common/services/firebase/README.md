@@ -22,6 +22,7 @@ src/common/services/firebase/
 ## 核心问题
 
 ### 传统迁移的问题
+
 ```typescript
 // ❌ 传统方式：每次都执行迁移
 async function initApp() {
@@ -31,6 +32,7 @@ async function initApp() {
 ```
 
 ### 智能迁移的解决方案
+
 ```typescript
 // ✅ 智能方式：只执行必要的迁移
 async function initApp() {
@@ -42,18 +44,20 @@ async function initApp() {
 ## 迁移系统架构
 
 ### 1. 版本控制
+
 每个迁移都有唯一的版本号，用于跟踪执行状态：
 
 ```typescript
 interface MigrationVersion {
-  version: string;        // 唯一版本号，如 "1.0.0"
-  name: string;           // 迁移名称
-  description: string;    // 迁移描述
-  createdAt: Date;        // 创建时间
+  version: string; // 唯一版本号，如 "1.0.0"
+  name: string; // 迁移名称
+  description: string; // 迁移描述
+  createdAt: Date; // 创建时间
 }
 ```
 
 ### 2. 状态跟踪
+
 在Firestore中维护每个用户的迁移状态：
 
 ```
@@ -65,7 +69,9 @@ users/{userId}/migrations/state
 ```
 
 ### 3. 智能执行
+
 系统会：
+
 - 检查已完成的迁移
 - 只执行待执行的迁移
 - 记录执行结果
@@ -110,6 +116,7 @@ await firebaseMigrateService.forceRerunAllMigrations(userId);
 ## 🚀 添加新迁移（超简单！）
 
 ### 步骤1：创建迁移文件
+
 ```bash
 # 复制示例文件
 cp src/common/services/firebase/migrations/example-new-migration.migration.ts \
@@ -117,10 +124,11 @@ cp src/common/services/firebase/migrations/example-new-migration.migration.ts \
 ```
 
 ### 步骤2：修改迁移类
+
 ```typescript
 // 在 add-user-profile.migration.ts 中
 export class AddUserProfileMigration implements MigrationExecutor {
-  version = "1.0.3";  // 递增版本号
+  version = "1.0.3"; // 递增版本号
   name = "Add user profile fields";
   description = "为用户添加个人资料字段";
   createdAt = new Date("2025-01-29");
@@ -133,13 +141,14 @@ export class AddUserProfileMigration implements MigrationExecutor {
         displayName: "User",
         avatar: null,
         bio: "",
-      }
+      },
     });
   }
 }
 ```
 
 ### 步骤3：注册迁移
+
 ```typescript
 // 在 migrations/index.ts 中添加导出
 export { AddUserProfileMigration } from "./add-user-profile.migration";
@@ -153,7 +162,9 @@ private migrations: MigrationExecutor[] = [
 ```
 
 ### 步骤4：完成！
+
 系统会自动：
+
 - 检测新版本
 - 执行迁移
 - 记录状态
@@ -162,11 +173,13 @@ private migrations: MigrationExecutor[] = [
 ## 迁移版本历史
 
 ### 版本 1.0.0 - 消息isDeleted字段
+
 - **目的**: 为所有消息添加`isDeleted`字段
 - **影响**: 确保数据模型一致性，支持软删除功能
 - **执行条件**: 消息缺少`isDeleted`字段
 
 ### 版本 1.0.1 - 频道lastMessageTime字段
+
 - **目的**: 为所有频道添加`lastMessageTime`和`messageCount`字段
 - **影响**: 支持按最后消息时间排序，显示消息数量
 - **执行条件**: 频道缺少`lastMessageTime`字段
@@ -176,6 +189,7 @@ private migrations: MigrationExecutor[] = [
 ### 1. 迁移设计原则
 
 #### 幂等性
+
 ```typescript
 // ✅ 好的迁移：可以安全地多次执行
 async function migrateExample() {
@@ -193,12 +207,13 @@ async function badMigration() {
 ```
 
 #### 增量迁移
+
 ```typescript
 // ✅ 好的迁移：只处理需要的数据
 async function migrateMessages() {
   const messages = await getMessages();
   const needsMigration = messages.filter(m => !m.isDeleted);
-  
+
   for (const message of needsMigration) {
     await updateMessage(message.id, { isDeleted: false });
   }
@@ -227,14 +242,14 @@ for (const migration of pendingMigrations) {
 async function batchMigration() {
   const batch = db.batch();
   const items = await getItems();
-  
+
   for (const item of items) {
     if (needsMigration(item)) {
-      const ref = doc(db, 'collection', item.id);
+      const ref = doc(db, "collection", item.id);
       batch.update(ref, { newField: defaultValue });
     }
   }
-  
+
   await batch.commit(); // 一次性提交所有更改
 }
 ```
@@ -242,24 +257,28 @@ async function batchMigration() {
 ## 架构优势
 
 ### 🎯 职责分离
+
 - **MigrationStateManager**: 负责版本控制和状态跟踪
 - **MigrationExecutorManager**: 负责管理和执行迁移
 - **MigrationExecutor**: 每个迁移都是独立的类
 - **FirebaseMigrateService**: 主服务，协调各个组件
 
 ### 🔧 易于扩展
+
 - 添加新迁移只需创建新文件
 - 无需修改核心逻辑
 - 支持动态添加迁移
 - 版本管理自动化
 
 ### 🚀 性能优化
+
 - 智能判断，避免重复执行
 - 增量迁移，只处理需要的数据
 - 状态缓存，减少数据库查询
 - 错误隔离，单个失败不影响整体
 
 ### 📁 模块化结构
+
 - 每个迁移都是独立的文件
 - 清晰的目录组织
 - 易于维护和扩展
@@ -268,7 +287,9 @@ async function batchMigration() {
 ## 监控和调试
 
 ### 日志输出
+
 系统会输出详细的日志，包括：
+
 - 迁移开始和完成
 - 处理的文档数量
 - 错误信息
@@ -277,11 +298,13 @@ async function batchMigration() {
 ### 常见问题排查
 
 #### 迁移没有执行
+
 1. 检查`users/{userId}/migrations/state`文档是否存在
 2. 确认迁移版本号是否正确
 3. 查看控制台日志
 
 #### 迁移执行失败
+
 1. 检查Firestore权限
 2. 确认数据格式是否正确
 3. 查看错误日志

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains the best practices for PWA theme color management in EchoNote, based on industry standards and technical limitations.
+This document explains the best practices for PWA theme color management in StillRoot, based on industry standards and technical limitations.
 
 ## Key Limitation: PWA Theme Color is Static
 
@@ -19,20 +19,20 @@ This document explains the best practices for PWA theme color management in Echo
 
 ### Static Theme Color Configuration
 
-EchoNote uses a static theme color that matches the activity bar's primary color:
+StillRoot uses a static theme color that matches the activity bar's primary color:
 
 ```json
 // public/manifest.json
 {
-  "theme_color": "#d6d3d1",  // Light mode activity bar color
+  "theme_color": "#d6d3d1", // Light mode activity bar color
   "background_color": "#ffffff"
 }
 ```
 
 ```html
 <!-- index.html -->
-<meta name="theme-color" content="#d6d3d1">
-<meta name="msapplication-TileColor" content="#d6d3d1">
+<meta name="theme-color" content="#d6d3d1" />
+<meta name="msapplication-TileColor" content="#d6d3d1" />
 ```
 
 ```xml
@@ -126,7 +126,7 @@ EchoNote uses a static theme color that matches the activity bar's primary color
 
 ## Conclusion
 
-EchoNote follows industry best practices by using a static PWA theme color that matches the activity bar. This approach provides:
+StillRoot follows industry best practices by using a static PWA theme color that matches the activity bar. This approach provides:
 
 - **Reliability**: Consistent user experience
 - **Performance**: Optimal app loading

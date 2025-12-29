@@ -1,15 +1,15 @@
-import React from 'react';
-import { Card } from '@/common/components/ui/card';
-import { ToolDisplayHeader } from './tool-display-header';
-import { ToolDisplayContent } from './tool-display-content';
-import { cn } from '@/common/lib/utils';
+import React from "react";
+import { Card } from "@/common/components/ui/card";
+import { ToolDisplayHeader } from "./tool-display-header";
+import { ToolDisplayContent } from "./tool-display-content";
+import { cn } from "@/common/lib/utils";
 
 interface ToolContainerProps {
   children?: React.ReactNode;
   header: {
     icon: React.ReactNode;
     title: string;
-    status: 'loading' | 'ready' | 'success' | 'error';
+    status: "loading" | "ready" | "success" | "error";
     statusText: string;
     hasDetails?: boolean;
     isExpanded?: boolean;
@@ -25,12 +25,12 @@ interface ToolContainerProps {
   contentCardClassName?: string;
 }
 
-export function ToolContainer({ 
-  children, 
-  header, 
-  content, 
+export function ToolContainer({
+  children,
+  header,
+  content,
   headerCardClassName = "border-gray-200 dark:border-gray-800",
-  contentCardClassName = "border-gray-200 dark:border-gray-800 mt-2"
+  contentCardClassName = "border-gray-200 dark:border-gray-800 mt-2",
 }: ToolContainerProps) {
   return (
     <div className="w-full flex flex-col" data-echo-tool>
@@ -40,22 +40,18 @@ export function ToolContainer({
           <ToolDisplayHeader {...header} />
         </Card>
       </div>
-      
+
       {/* Content Card - 独立卡片，可折叠 */}
       {content && content.isExpanded && (
         <div className="w-full">
           <Card className={contentCardClassName}>
-          <ToolDisplayContent {...content} />
+            <ToolDisplayContent {...content} />
           </Card>
         </div>
       )}
-      
+
       {/* Legacy children support */}
-      {children && (
-        <div className="w-full mt-2">
-          {children}
-        </div>
-      )}
+      {children && <div className="w-full mt-2">{children}</div>}
     </div>
   );
 }

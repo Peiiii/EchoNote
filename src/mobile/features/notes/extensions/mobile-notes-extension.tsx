@@ -1,7 +1,4 @@
-import {
-  ActivityBarGroup,
-  useActivityBarStore,
-} from "@/core/stores/activity-bar.store";
+import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
 import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
@@ -9,6 +6,7 @@ import { defineExtension, Disposable } from "@cardos/extension";
 import { Notebook, Hash, Plus, Menu } from "lucide-react";
 import { MobileNotesPage } from "../pages/mobile-notes-page";
 import { Navigate } from "react-router-dom";
+import { PublicSpacePage } from "@/common/features/space-publish/pages/public-space-page";
 
 export const mobileNotesExtension = defineExtension({
   manifest: {
@@ -16,7 +14,7 @@ export const mobileNotesExtension = defineExtension({
     name: "Mobile Notes Extension",
     description: "Mobile-optimized conversational AI note-taking feature",
     version: "1.0.0",
-    author: "EchoNote Team",
+    author: "StillRoot Team",
     icon: "notebook",
   },
   activate: ({ subscriptions }) => {
@@ -24,7 +22,7 @@ export const mobileNotesExtension = defineExtension({
     subscriptions.push(
       Disposable.from(
         useIconStore.getState().addIcons({
-          "notebook": Notebook,
+          notebook: Notebook,
           hash: Hash,
           plus: Plus,
           menu: Menu,
@@ -56,6 +54,12 @@ export const mobileNotesExtension = defineExtension({
             path: "/notes",
             element: <MobileNotesPage />,
             order: 1,
+          },
+          {
+            id: "mobile-public-space",
+            path: "/space/:shareToken",
+            element: <PublicSpacePage />,
+            order: 2,
           },
           // default route to notes
           {

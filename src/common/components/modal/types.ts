@@ -6,6 +6,8 @@ export interface ModalOptions {
   onCancel?: () => void;
   afterClose?: () => void;
   okText?: string;
+  okLoadingText?: string;
+  okVariant?: "default" | "destructive";
   cancelText?: string;
   className?: string;
   showFooter?: boolean;
@@ -18,6 +20,6 @@ export interface ModalState {
 
 export interface ModalContextValue {
   show: (options: ModalOptions) => void;
-  confirm: (options: Omit<ModalOptions, 'content'>) => void;
+  confirm: (options: Omit<ModalOptions, "content">) => void;
   close: () => void;
-} 
+}

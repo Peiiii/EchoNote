@@ -15,8 +15,9 @@ export function EmojiPickerComponent({ onSelect, children }: EmojiPickerProps) {
   useEffect(() => {
     // Check if dark mode is enabled
     const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark') || 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark =
+        document.documentElement.classList.contains("dark") ||
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
       setIsDarkMode(isDark);
     };
 
@@ -26,16 +27,16 @@ export function EmojiPickerComponent({ onSelect, children }: EmojiPickerProps) {
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', checkDarkMode);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", checkDarkMode);
 
     return () => {
       observer.disconnect();
-      mediaQuery.removeEventListener('change', checkDarkMode);
+      mediaQuery.removeEventListener("change", checkDarkMode);
     };
   }, []);
 
@@ -46,9 +47,7 @@ export function EmojiPickerComponent({ onSelect, children }: EmojiPickerProps) {
 
   return (
     <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
-      <RefinedPopover.Trigger asChild>
-        {children}
-      </RefinedPopover.Trigger>
+      <RefinedPopover.Trigger asChild>{children}</RefinedPopover.Trigger>
       <RefinedPopover.Content align="start" sideOffset={8} className="p-0">
         <div className="w-80">
           <EmojiPicker
@@ -60,7 +59,7 @@ export function EmojiPickerComponent({ onSelect, children }: EmojiPickerProps) {
             height={350}
             theme={isDarkMode ? Theme.DARK : Theme.LIGHT}
             previewConfig={{
-              showPreview: false
+              showPreview: false,
             }}
             searchPlaceHolder="Search emojis..."
             defaultSkinTone={SkinTones.NEUTRAL}

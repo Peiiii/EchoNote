@@ -1,12 +1,13 @@
-import { Channel } from "@/core/stores/notes-data.store";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useState } from "react";
+import { RefinedPopover } from "@/common/components/refined-popover";
 import { Button } from "@/common/components/ui/button";
+import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
-import { RefinedPopover } from "@/common/components/refined-popover";
-import { EmojiPickerComponent } from "@/common/components/ui/emoji-picker";
-
+import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { ChannelEditField, logService } from "@/core/services/log.service";
+import { Channel } from "@/core/stores/notes-data.store";
+import { Edit3 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface EditChannelPopoverProps {
   channel: Channel;
@@ -14,27 +15,50 @@ interface EditChannelPopoverProps {
 }
 
 export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProps) => {
+  const presenter = useCommonPresenterContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editName, setEditName] = useState(channel.name);
   const [editDescription, setEditDescription] = useState(channel.description);
   const [editEmoji, setEditEmoji] = useState(channel.emoji || "");
   const [isLoading, setIsLoading] = useState(false);
-  const { updateChannel } = useNotesDataStore();
+
+  // Sync form state with latest channel when popover opens or when channel switches while open.
+  // This fixes stale data when user switches space via dropdown and then clicks edit.
+  useEffect(() => {
+    if (!isOpen) return;
+    setEditName(channel.name);
+    setEditDescription(channel.description);
+    setEditEmoji(channel.emoji || "");
+  }, [isOpen, channel.id, channel.name, channel.description, channel.emoji]);
 
   const handleSave = async () => {
     if (!editName.trim()) return;
-    
+
     setIsLoading(true);
     try {
-      await updateChannel(channel.id, {
+      const hasNameChanged = editName.trim() !== channel.name;
+      const hasDescriptionChanged = editDescription.trim() !== (channel.description || "");
+      const hasEmojiChanged = editEmoji.trim() !== (channel.emoji || "");
+
+      await presenter.channelManager.updateChannel(channel.id, {
         name: editName.trim(),
         description: editDescription.trim(),
-        emoji: editEmoji.trim() || undefined
+        emoji: editEmoji.trim() || undefined,
       });
+
+      if (hasNameChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.NAME);
+      }
+      if (hasDescriptionChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.DESCRIPTION);
+      }
+      if (hasEmojiChanged) {
+        logService.logChannelEdit(channel.id, ChannelEditField.EMOJI);
+      }
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating channel:", error);
-      // Reset to original values on error
       setEditName(channel.name);
       setEditDescription(channel.description);
       setEditEmoji(channel.emoji || "");
@@ -51,28 +75,22 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isLoading) {
+    if (e.key === "Enter" && !isLoading) {
       handleSave();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       handleCancel();
     }
   };
 
   return (
     <RefinedPopover open={isOpen} onOpenChange={setIsOpen}>
-      <RefinedPopover.Trigger asChild>
-        {children}
-      </RefinedPopover.Trigger>
-      <RefinedPopover.Content align="end" sideOffset={8}>
+      <RefinedPopover.Trigger asChild>{children}</RefinedPopover.Trigger>
+      <RefinedPopover.Content align="center" side="bottom">
         <RefinedPopover.Header>
-          <h4 className="text-base font-medium text-slate-900 dark:text-slate-100">
-            Edit Channel
-          </h4>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Update channel information
-          </p>
+          <Edit3 className="w-4 h-4 text-primary/80" />
+          <div className="text-sm font-semibold text-foreground/90">Edit Thought Space</div>
         </RefinedPopover.Header>
-        
+
         <RefinedPopover.Body>
           <div className="space-y-4">
             {/* Emoji selection */}
@@ -81,10 +99,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
                 Emoji
               </Label>
               <div className="flex items-center gap-2">
-                <EmojiPickerComponent
-                  value={editEmoji}
-                  onSelect={setEditEmoji}
-                >
+                <EmojiPickerComponent value={editEmoji} onSelect={setEditEmoji}>
                   <Button
                     variant="outline"
                     size="sm"
@@ -108,8 +123,8 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
 
             {/* Name input */}
             <div className="space-y-2">
-              <Label 
-                htmlFor="channel-name" 
+              <Label
+                htmlFor="channel-name"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 Channel Name
@@ -117,18 +132,18 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
               <Input
                 id="channel-name"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                onChange={e => setEditName(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Enter channel name"
                 disabled={isLoading}
                 className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
               />
             </div>
-            
+
             {/* Description input */}
             <div className="space-y-2">
-              <Label 
-                htmlFor="channel-description" 
+              <Label
+                htmlFor="channel-description"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
                 Description
@@ -136,7 +151,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
               <Input
                 id="channel-description"
                 value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
+                onChange={e => setEditDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Enter channel description"
                 disabled={isLoading}
@@ -145,22 +160,21 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             </div>
           </div>
         </RefinedPopover.Body>
-        
+
         <RefinedPopover.Actions>
-          <Button
+          <RefinedPopover.Button
+            type="button"
             variant="outline"
-            size="sm"
             onClick={handleCancel}
             disabled={isLoading}
-            className="h-9 px-4 rounded-md border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 text-slate-700 dark:text-slate-300"
           >
             Cancel
-          </Button>
-          <Button
-            size="sm"
+          </RefinedPopover.Button>
+          <RefinedPopover.Button
+            type="button"
+            variant="default"
             onClick={handleSave}
             disabled={!editName.trim() || isLoading}
-            className="h-9 px-4 rounded-md bg-slate-700 dark:bg-slate-600 hover:bg-slate-800 dark:hover:bg-slate-500 text-white transition-colors duration-200 disabled:opacity-50"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -170,7 +184,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             ) : (
               "Save"
             )}
-          </Button>
+          </RefinedPopover.Button>
         </RefinedPopover.Actions>
       </RefinedPopover.Content>
     </RefinedPopover>

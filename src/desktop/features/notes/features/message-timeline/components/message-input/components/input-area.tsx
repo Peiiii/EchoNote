@@ -1,31 +1,47 @@
 import { InputAreaProps } from "../types";
+import { useInputCollapse } from "../../../hooks/use-input-collapse";
+import { RichEditorLite } from "@/common/components/RichEditorLite";
+import { useComposerStateStore } from "@/core/stores/composer-state.store";
+// Revert to simple textarea input (no WYSIWYG) per request
 
-export function InputArea({ 
-    message, 
-    onMessageChange, 
-    onKeyPress, 
-    placeholder, 
-    disabled, 
-    textareaRef 
+export function InputArea({
+  message,
+  onMessageChange,
+  onKeyDown,
+  placeholder,
+  disabled,
 }: InputAreaProps) {
-    return (
-        <div className="px-4 pb-2">
-            <div className="w-full">
-                <div className="relative min-h-[50px] bg-transparent">
-                    <textarea
-                        ref={textareaRef}
-                        value={message}
-                        onChange={(e) => onMessageChange(e.target.value)}
-                        onKeyPress={onKeyPress}
-                        placeholder={placeholder}
-                        className="w-full min-h-[50px] max-h-[200px] resize-none pr-12 pl-4 py-2 bg-transparent border-0 rounded-none text-sm leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:text-sm focus:ring-0 focus:outline-none focus:border-0 shadow-none"
-                        disabled={disabled}
-                        style={{
-                            caretColor: '#3b82f6',
-                        }}
-                    />
-                </div>
-            </div>
-        </div>
-    );
+  const { handleExpandInput, inputCollapsed } = useInputCollapse();
+  const composerExpanded = useComposerStateStore(s => s.expanded);
+  
+  const minHeight = 80;
+  const maxHeight = 120;
+  
+  return (
+    <div className="w-full">
+      <div className="relative min-h-[80px]" onMouseDown={handleExpandInput}>
+        <RichEditorLite
+          value={message}
+          onChange={onMessageChange}
+          editable={!disabled}
+          placeholder={placeholder}
+          variant="frameless"
+          hideToolbar
+          minHeight={minHeight}
+          maxHeight={maxHeight}
+          enterSends
+          suspended={inputCollapsed || composerExpanded}
+          onSubmitEnter={() => {
+            const syntheticEvent = {
+              key: 'Enter',
+              metaKey: true,
+              ctrlKey: true,
+              preventDefault: () => undefined,
+            } as unknown as React.KeyboardEvent
+            onKeyDown(syntheticEvent)
+          }}
+        />
+      </div>
+    </div>
+  );
 }

@@ -2,12 +2,10 @@ import { useConnectNavigationStore } from "@/core/hooks/use-connect-navigation-s
 import { useExtensions } from "@/core/hooks/use-extensions";
 import type { ExtensionDefinition } from "@cardos/extension";
 
-export const useSetupApp = (options: {
-    extensions: ExtensionDefinition[]
-}) => {
-    useConnectNavigationStore();
-    const { initialized } = useExtensions(options.extensions);
-    return {
-        initialized,
-    }
-}
+export const useSetupApp = (options: { extensions: ExtensionDefinition[] }) => {
+  useConnectNavigationStore();
+  const { initialized } = useExtensions(options.extensions);
+  return {
+    initialized,
+  };
+};

@@ -1,6 +1,6 @@
-import { usePWA } from '@/common/hooks/use-pwa';
-import { Badge } from '@/common/components/ui/badge';
-import { WifiOff, RefreshCw } from 'lucide-react';
+import { usePWA } from "@/common/hooks/use-pwa";
+import { Badge } from "@/common/components/ui/badge";
+import { WifiOff, RefreshCw } from "lucide-react";
 
 export const PWAStatusIndicator = () => {
   const { isInstalled, isOnline, isUpdateAvailable } = usePWA();
@@ -18,7 +18,7 @@ export const PWAStatusIndicator = () => {
           Offline
         </Badge>
       )}
-      
+
       {isUpdateAvailable && (
         <Badge variant="default" className="flex items-center gap-1">
           <RefreshCw className="h-3 w-3" />

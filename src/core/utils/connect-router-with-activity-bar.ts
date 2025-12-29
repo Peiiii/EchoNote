@@ -3,7 +3,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
 
 /**
  * Route configuration examples:
- * 
+ *
  * ```typescript
  * // Basic route configuration
  * const basicRoutes: RouteConfig[] = [
@@ -17,7 +17,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *     routerPath: "/chat"
  *   }
  * ];
- * 
+ *
  * // Routes with dynamic parameters
  * const dynamicRoutes: RouteConfig[] = [
  *   {
@@ -35,7 +35,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *     ]
  *   }
  * ];
- * 
+ *
  * // Routes with wildcards
  * const wildcardRoutes: RouteConfig[] = [
  *   {
@@ -47,7 +47,7 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *     routerPath: "/profile/*"
  *   }
  * ];
- * 
+ *
  * // Complex nested routes
  * const nestedRoutes: RouteConfig[] = [
  *   {
@@ -71,25 +71,25 @@ import { useActivityBarStore } from "@/core/stores/activity-bar.store";
  *     ]
  *   }
  * ];
- * 
+ *
  * // Usage example
  * function App() {
  *   useEffect(() => {
  *     // Basic usage
  *     const unsubscribe = connectRouterWithActivityBar(basicRoutes);
- *     
+ *
  *     // Usage with match options
  *     const unsubscribeWithOptions = connectRouterWithActivityBar(dynamicRoutes, {
  *       exact: false,
  *       sensitive: true
  *     });
- *     
+ *
  *     return () => {
  *       unsubscribe();
  *       unsubscribeWithOptions();
  *     };
  *   }, []);
- *   
+ *
  *   return <div>...</div>;
  * }
  * ```
@@ -158,7 +158,7 @@ export interface RouteConfig {
  */
 export function createRouterToActivityBarMap(items: RouteConfig[]) {
   const map: Record<string, string> = {};
-  
+
   function processRoute(route: RouteConfig) {
     // Process single route path
     if (route.routerPath) {
@@ -175,7 +175,7 @@ export function createRouterToActivityBarMap(items: RouteConfig[]) {
       route.children.forEach(processRoute);
     }
   }
-  
+
   items.forEach(processRoute);
   return map;
 }
@@ -185,7 +185,7 @@ export function createRouterToActivityBarMap(items: RouteConfig[]) {
  */
 export function createActivityBarToRouterMap(items: RouteConfig[]) {
   const map: Record<string, string> = {};
-  
+
   function processRoute(route: RouteConfig) {
     // Prefer routerPath, if not available use the first path from routerPaths
     const primaryPath = route.routerPath || (route.routerPaths && route.routerPaths[0]);
@@ -196,7 +196,7 @@ export function createActivityBarToRouterMap(items: RouteConfig[]) {
       route.children.forEach(processRoute);
     }
   }
-  
+
   items.forEach(processRoute);
   return map;
 }
@@ -204,23 +204,17 @@ export function createActivityBarToRouterMap(items: RouteConfig[]) {
 /**
  * Convert route path to regular expression
  */
-function pathToRegexp(
-  path: string,
-  options: RouteMatchOptions = {}
-): RegExp {
+function pathToRegexp(path: string, options: RouteMatchOptions = {}): RegExp {
   const { exact = false, sensitive = false } = options;
-  
+
   // Handle dynamic parameters
   const pattern = path
-    .replace(/:[^/]+/g, '([^/]+)') // Convert :param to ([^/]+)
-    .replace(/\*/g, '.*'); // Convert * to .*
-    
-  const flags = sensitive ? '' : 'i';
-  const regexp = new RegExp(
-    `^${pattern}${exact ? '$' : ''}`,
-    flags
-  );
-  
+    .replace(/:[^/]+/g, "([^/]+)") // Convert :param to ([^/]+)
+    .replace(/\*/g, ".*"); // Convert * to .*
+
+  const flags = sensitive ? "" : "i";
+  const regexp = new RegExp(`^${pattern}${exact ? "$" : ""}`, flags);
+
   return regexp;
 }
 
@@ -234,11 +228,15 @@ function findMatchingRoute(
 ): RouteConfig | undefined {
   // Sort by priority: exact match > dynamic parameters > wildcards
   const sortedRoutes = [...routes].sort((a, b) => {
-    const aHasParams = (a.routerPath?.includes(':') || a.routerPaths?.some(p => p.includes(':'))) ?? false;
-    const bHasParams = (b.routerPath?.includes(':') || b.routerPaths?.some(p => p.includes(':'))) ?? false;
-    const aHasWildcard = (a.routerPath?.includes('*') || a.routerPaths?.some(p => p.includes('*'))) ?? false;
-    const bHasWildcard = (b.routerPath?.includes('*') || b.routerPaths?.some(p => p.includes('*'))) ?? false;
-    
+    const aHasParams =
+      (a.routerPath?.includes(":") || a.routerPaths?.some(p => p.includes(":"))) ?? false;
+    const bHasParams =
+      (b.routerPath?.includes(":") || b.routerPaths?.some(p => p.includes(":"))) ?? false;
+    const aHasWildcard =
+      (a.routerPath?.includes("*") || a.routerPaths?.some(p => p.includes("*"))) ?? false;
+    const bHasWildcard =
+      (b.routerPath?.includes("*") || b.routerPaths?.some(p => p.includes("*"))) ?? false;
+
     if (aHasParams && !bHasParams) return 1;
     if (!aHasParams && bHasParams) return -1;
     if (aHasWildcard && !bHasWildcard) return 1;
@@ -263,7 +261,7 @@ function findMatchingRoute(
         }
       }
     }
-      // Check child routes
+    // Check child routes
     if (route.children) {
       const childMatch = findMatchingRoute(path, route.children, options);
       if (childMatch) {
@@ -271,7 +269,7 @@ function findMatchingRoute(
       }
     }
   }
-  
+
   return undefined;
 }
 
@@ -309,7 +307,7 @@ function updateRouterByActivityBar(
   const targetPaths: string[] = [];
   if (route.routerPath) {
     targetPaths.push(route.routerPath);
-    }
+  }
   if (route.routerPaths) {
     targetPaths.push(...route.routerPaths);
   }
@@ -335,11 +333,11 @@ function updateRouterByActivityBar(
 
   // Sort paths by priority
   const sortedPaths = targetPaths.sort((a, b) => {
-    const aHasParams = a.includes(':');
-    const bHasParams = b.includes(':');
-    const aHasWildcard = a.includes('*');
-    const bHasWildcard = b.includes('*');
-    
+    const aHasParams = a.includes(":");
+    const bHasParams = b.includes(":");
+    const aHasWildcard = a.includes("*");
+    const bHasWildcard = b.includes("*");
+
     // First select static paths
     if (!aHasParams && bHasParams) return -1;
     if (aHasParams && !bHasParams) return 1;
@@ -357,10 +355,7 @@ function updateRouterByActivityBar(
   }
 }
 
-export function mapRouterToActivityBar(
-  routes: RouteConfig[],
-  options: RouteMatchOptions = {}
-) {
+export function mapRouterToActivityBar(routes: RouteConfig[], options: RouteMatchOptions = {}) {
   // Initialize with a mapping
   const currentPath = navigationStore.getState().currentPath;
   if (currentPath) {
@@ -378,11 +373,9 @@ export function mapRouterToActivityBar(
   });
 }
 
-export function mapActivityBarToRouter(
-  routes: RouteConfig[]
-) {
+export function mapActivityBarToRouter(routes: RouteConfig[]) {
   // Initialize with a mapping
-  const activeItemKey = useActivityBarStore.getState().activeId;    
+  const activeItemKey = useActivityBarStore.getState().activeId;
   if (activeItemKey) {
     updateRouterByActivityBar(activeItemKey, routes);
   }

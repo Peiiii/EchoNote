@@ -46,72 +46,72 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);           /* 主内容区 - 纯白 */
+  --background: oklch(1 0 0); /* 主内容区 - 纯白 */
   --foreground: oklch(0.145 0 0);
-  --card: oklch(0.97 0 0);              /* Channel List - 平衡的对比度 */
+  --card: oklch(0.97 0 0); /* Channel List - 平衡的对比度 */
   --card-foreground: oklch(0.145 0 0);
-  --card-accent: oklch(0.94 0 0);       /* Channel List选中项 - 基于card的轻微变化 */
+  --card-accent: oklch(0.94 0 0); /* Channel List选中项 - 基于card的轻微变化 */
   --card-accent-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.3 0 0);            /* Dark gray for light mode - monochrome */
+  --primary: oklch(0.3 0 0); /* Dark gray for light mode - monochrome */
   --primary-foreground: oklch(0.95 0 0);
-  --secondary: oklch(0.96 0 0);         /* 更深的二级背景 */
+  --secondary: oklch(0.96 0 0); /* 更深的二级背景 */
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.95 0 0);             /* AI 助手 - 更明显的背景 */
+  --muted: oklch(0.95 0 0); /* AI 助手 - 更明显的背景 */
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.92 0 0);            /* 活动栏 - 更深的背景 */
+  --accent: oklch(0.92 0 0); /* 活动栏 - 更深的背景 */
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0 0);            /* 主要边框 */
+  --border: oklch(0.88 0 0); /* 主要边框 */
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.3 0 0);               /* 使用深灰色作为ring - monochrome */
+  --ring: oklch(0.3 0 0); /* 使用深灰色作为ring - monochrome */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.94 0.002 60);      /* Activity Bar - 更微妙的暖灰色背景 */
+  --sidebar: oklch(0.94 0.002 60); /* Activity Bar - 更微妙的暖灰色背景 */
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.90 0.002 60);   /* 选中项 - 更明显的区分度 */
+  --sidebar-accent: oklch(0.9 0.002 60); /* 选中项 - 更明显的区分度 */
   --sidebar-accent-foreground: oklch(0.145 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
-  --background: #1C1D1E;        /* 主内容区 - 最亮，突出内容 */
+  --background: #1c1d1e; /* 主内容区 - 最亮，突出内容 */
   --foreground: oklch(0.985 0 0);
-  --card: #191A1A;              /* Channel List - 更暗，不抢夺注意力 */
+  --card: #191a1a; /* Channel List - 更暗，不抢夺注意力 */
   --card-foreground: oklch(0.985 0 0);
-  --card-accent: #1F2021;       /* Channel List选中项 - 基于新card背景的对比 */
+  --card-accent: #1f2021; /* Channel List选中项 - 基于新card背景的对比 */
   --card-accent-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.7 0 0);            /* Light gray for dark mode - monochrome */
+  --primary: oklch(0.7 0 0); /* Light gray for dark mode - monochrome */
   --primary-foreground: oklch(0.2 0 0);
-  --secondary: oklch(0.22 0 0);         /* 更深的二级背景 */
+  --secondary: oklch(0.22 0 0); /* 更深的二级背景 */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: #2A2B2C;             /* AI 助手 - 更明显的背景 */
+  --muted: #2a2b2c; /* AI 助手 - 更明显的背景 */
   --muted-foreground: oklch(0.708 0 0);
-  --accent: #252627;            /* 活动栏 - 更深的背景 */
+  --accent: #252627; /* 活动栏 - 更深的背景 */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.35 0 0);            /* 主要边框 - 提高对比度 */
+  --border: oklch(0.35 0 0); /* 主要边框 - 提高对比度 */
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0 0);               /* 使用浅灰色作为ring - monochrome */
+  --ring: oklch(0.7 0 0); /* 使用浅灰色作为ring - monochrome */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.18 0.002 60);      /* Activity Bar - 更微妙的暖深灰色背景 */
+  --sidebar: oklch(0.18 0.002 60); /* Activity Bar - 更微妙的暖深灰色背景 */
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.25 0.002 60);   /* 选中项 - 更明显的区分度 */
+  --sidebar-accent: oklch(0.25 0.002 60); /* 选中项 - 更明显的区分度 */
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
@@ -124,12 +124,14 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* 启用字体合成以支持中文斜体 */
-  em, i, .italic {
+  em,
+  i,
+  .italic {
     font-synthesis: style;
   }
-  
+
   /* Scrollbar styles */
   .channel-list-content::-webkit-scrollbar {
     display: none;
@@ -137,32 +139,88 @@
 
   .timeline-scroll {
     scrollbar-width: thin;
-    scrollbar-gutter: stable;
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
   }
-  
+
   .timeline-scroll::-webkit-scrollbar {
-    width: 3px;
+    width: 4px;
   }
-  
+
   .timeline-scroll::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.03);
+    background: rgba(148, 163, 184, 0.4);
     border-radius: 2px;
-    transition: background 0.3s ease;
+    transition: all 0.2s ease;
   }
-  
+
   .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.08);
+    background: rgba(148, 163, 184, 0.6);
   }
-  
+
+  .dark .timeline-scroll {
+    scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+  }
+
   .dark .timeline-scroll::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.05);
+    background: rgba(71, 85, 105, 0.5);
   }
-  
+
   .dark .timeline-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(71, 85, 105, 0.12);
+    background: rgba(71, 85, 105, 0.7);
+  }
+
+  /* Global scrollbar styles to prevent layout issues */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+  }
+
+  .dark .overflow-y-auto {
+    scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+  }
+
+  .dark .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.5);
+  }
+
+  .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.7);
+  }
+
+  /* Studio subtle animations */
+  @keyframes breath {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  @keyframes expand-ring {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.8); }
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.3); }
   }
 }

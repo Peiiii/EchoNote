@@ -1,6 +1,6 @@
-import { channelMessageService } from '@/core/services/channel-message.service';
-import { Message } from '@/core/stores/notes-data.store';
-import { createSlice } from 'rx-nested-bean';
+import { channelMessageService } from "@/core/services/channel-message.service";
+import { Message } from "@/core/stores/notes-data.store";
+import { createSlice } from "rx-nested-bean";
 
 export interface ChannelContext {
   recentMessages: Message[];
@@ -34,7 +34,10 @@ export class ChannelContextService {
     options: ContextServiceOptions = {}
   ): ChannelContext | null {
     const opts = { ...this.DEFAULT_OPTIONS, ...options };
-    const state = createSlice(channelMessageService.dataContainer, `messageByChannel.${channelId}`).get();
+    const state = createSlice(
+      channelMessageService.dataContainer,
+      `messageByChannel.${channelId}`
+    ).get();
     if (!state?.messages) {
       console.warn(`[ChannelContextService] No messages found for channel: ${channelId}`);
       return null;
@@ -55,7 +58,7 @@ export class ChannelContextService {
     // Truncate message content to avoid context overflow
     const truncatedMessages = recentMessages.map(msg => ({
       ...msg,
-      content: this.truncateContent(msg.content, opts.maxContentLength)
+      content: this.truncateContent(msg.content, opts.maxContentLength),
     }));
 
     return {
@@ -72,7 +75,7 @@ export class ChannelContextService {
    */
   static formatContextForPrompt(context: ChannelContext): string {
     if (context.recentMessages.length === 0) {
-      return '';
+      return "";
     }
 
     const contextLines = [
@@ -88,10 +91,10 @@ export class ChannelContextService {
         return `    <thought index="${index + 1}" timestamp="${readableTime}">${msg.content}</thought>`;
       }),
       `  </recent_thoughts>`,
-      `</channel_context>\n`
+      `</channel_context>\n`,
     ];
 
-    return contextLines.join('\n');
+    return contextLines.join("\n");
   }
 
   /**
@@ -101,10 +104,10 @@ export class ChannelContextService {
    */
   private static formatReadableTime(timestamp: Date): string {
     return timestamp.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 
@@ -122,22 +125,22 @@ export class ChannelContextService {
     // Try to truncate at sentence boundary
     const truncated = content.substring(0, maxLength);
     const lastSentenceEnd = Math.max(
-      truncated.lastIndexOf('.'),
-      truncated.lastIndexOf('!'),
-      truncated.lastIndexOf('?')
+      truncated.lastIndexOf("."),
+      truncated.lastIndexOf("!"),
+      truncated.lastIndexOf("?")
     );
 
     if (lastSentenceEnd > maxLength * 0.7) {
-      return truncated.substring(0, lastSentenceEnd + 1) + '...';
+      return truncated.substring(0, lastSentenceEnd + 1) + "...";
     }
 
     // Fallback to word boundary
-    const lastSpace = truncated.lastIndexOf(' ');
+    const lastSpace = truncated.lastIndexOf(" ");
     if (lastSpace > maxLength * 0.8) {
-      return truncated.substring(0, lastSpace) + '...';
+      return truncated.substring(0, lastSpace) + "...";
     }
 
     // Final fallback
-    return truncated + '...';
+    return truncated + "...";
   }
 }

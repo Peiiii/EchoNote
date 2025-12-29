@@ -2,12 +2,11 @@ import { Button } from "@/common/components/ui/button";
 import { AIConversationChat } from "@/common/features/ai-assistant/components/ai-conversation-chat";
 import { AIConversationEmptyPane } from "@/common/features/ai-assistant/components/ai-conversation-empty-pane";
 import { AIConversationList } from "@/common/features/ai-assistant/components/ai-conversation-list";
+import { AIConversationSkeleton, AIConversationListSkeleton } from "@/common/features/ai-assistant/components/ai-conversation-skeleton";
 import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
 import { AIConversation } from "@/common/types/ai-conversation";
-import { ArrowLeft, Loader2, MessageSquare, Plus } from "lucide-react";
+import { ArrowLeft, History, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
-import { ConversationContextControl } from "@/common/features/ai-assistant/features/context/components/conversation-context-control";
-// removed: creation-time context dropdown; we now use in-chat context control
 
 export type MobileConversationRef = {
   showList: () => void;
@@ -27,19 +26,12 @@ interface Props {
 
 export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
   function AIConversationMobile(
-    {
-      conversations,
-      currentConversationId,
-      loading,
-      onCreate,
-      channelId,
-      onClose,
-    },
+    { conversations, currentConversationId, loading, onCreate, channelId, onClose },
     ref
   ) {
-    const view = useConversationStore((s) => s.uiView);
-    const showList = useConversationStore((s) => s.showList);
-    const showChat = useConversationStore((s) => s.showChat);
+    const view = useConversationStore(s => s.uiView);
+    const showList = useConversationStore(s => s.showList);
+    const showChat = useConversationStore(s => s.showChat);
     const hasConversations = conversations.length > 0;
     useImperativeHandle(
       ref,
@@ -55,15 +47,19 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       [onCreate, showList, showChat, view]
     );
 
-    const renderListView = () => (
-      <AIConversationList
-        conversations={conversations}
-        currentConversationId={currentConversationId}
-        loading={loading}
-        currentChannelId={channelId}
-        withHeader={false}
-      />
-    );
+    const renderListView = () => {
+      if (loading) {
+        return <AIConversationListSkeleton count={5} />;
+      }
+      return (
+        <AIConversationList
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          loading={loading}
+          withHeader={false}
+        />
+      );
+    };
 
     const renderChatView = () => {
       if (currentConversationId) {
@@ -75,13 +71,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
           />
         );
       } else if (loading) {
-        return (
-          <div className="relative flex-1 flex flex-col">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-4 h-4 animate-spin" />
-            </div>
-          </div>
-        );
+        return <AIConversationSkeleton />;
       } else if (hasConversations) {
         return <div className="flex-1" />;
       } else {
@@ -94,16 +84,19 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
       ? conversations.find(c => c.id === currentConversationId)
       : undefined;
     const titleGeneratingMap = useConversationStore(s => s.titleGeneratingMap);
-    const headerTitle = view === "list"
-      ? "Conversations"
-      : activeConversation
-        ? (titleGeneratingMap[activeConversation.id] ? "Generating title..." : (activeConversation.title || "AI Chat"))
-        : "AI Chat";
+    const headerTitle =
+      view === "list"
+        ? "Conversations"
+        : activeConversation
+          ? titleGeneratingMap[activeConversation.id]
+            ? "Generating title..."
+            : activeConversation.title || "AI Chat"
+          : "AI Chat";
 
     return (
       <div className="relative flex-1 flex flex-col">
         {/* Header Controls */}
-        <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-background">
+        <div className="flex items-center justify-between px-3 pt-2 pb-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {view === "chat" && (
               <Button
@@ -113,7 +106,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 aria-label="Show conversations"
                 className="h-8 w-8 flex-shrink-0"
               >
-                <MessageSquare className="w-4 h-4" />
+                <History className="w-4 h-4" />
               </Button>
             )}
             {view === "list" && (
@@ -127,22 +120,20 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
-            <h3 className="font-semibold text-foreground truncate text-sm leading-6">{headerTitle}</h3>
+            <h3 className="font-semibold text-foreground truncate text-sm leading-6">
+              {headerTitle}
+            </h3>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            {view === 'chat' && currentConversationId && (
-              <ConversationContextControl
-                conversationId={currentConversationId}
-                fallbackChannelId={channelId}
-                variant="compact"
-              />
-            )}
             <Button
               variant="ghost"
               size="icon"
               aria-label="New conversation"
               className="h-8 w-8"
-              onClick={() => { onCreate(); showChat(); }}
+              onClick={() => {
+                onCreate();
+                showChat();
+              }}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -157,7 +148,13 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 <span className="sr-only">Close</span>
                 {/* Using the same icon size as default sheet close */}
                 <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden>
-                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                  <path
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 6l12 12M18 6L6 18"
+                  />
                 </svg>
               </Button>
             )}
@@ -166,20 +163,10 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
 
         {/* Content Area */}
         <div className="relative flex-1">
-          <div
-            className={
-              "absolute inset-0 flex flex-col " +
-              (view === "list" ? "" : "hidden")
-            }
-          >
+          <div className={"absolute inset-0 flex flex-col " + (view === "list" ? "" : "hidden")}>
             {renderListView()}
           </div>
-          <div
-            className={
-              "absolute inset-0 flex flex-col " +
-              (view === "chat" ? "" : "hidden")
-            }
-          >
+          <div className={"absolute inset-0 flex flex-col " + (view === "chat" ? "" : "hidden")}>
             {renderChatView()}
           </div>
         </div>

@@ -1,0 +1,294 @@
+/* Minimal styles for TipTap task list and general readability */
+/* Task list base */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0.25rem;
+}
+
+/* TipTap v3 emits <li data-checked> without data-type; select by structure */
+.tiptap ul[data-type="taskList"] > li {
+  display: flex;
+  align-items: flex-start; /* align checkbox with first line of text */
+  margin: 0.25rem 0;
+}
+
+.tiptap ul[data-type="taskList"] > li > label {
+  margin-right: 0.5rem;
+  user-select: none;
+  line-height: 1; /* prevent label pushing content down */
+  /* Nudge checkbox down slightly to align optical baseline with first line */
+  margin-top: 0.125rem;
+}
+
+.tiptap ul[data-type="taskList"] > li input[type="checkbox"] {
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6; /* tailwind blue-500 */
+}
+
+.tiptap ul[data-type="taskList"] > li > div,
+.tiptap ul[data-type="taskList"] > li > div.content {
+  flex: 1;
+  display: inline-block; /* sit on same row with checkbox */
+  min-height: 1.25rem; /* keep caret visible on empty line */
+}
+
+/* Remove big paragraph margins inside task items (prose typography adds them) */
+.tiptap ul[data-type="taskList"] > li > div > p,
+.tiptap ul[data-type="taskList"] > li > div.content > p {
+  margin: 0;
+}
+
+.tiptap ul[data-type="taskList"] > li[data-checked="true"] > div {
+  opacity: 0.85;
+}
+
+/* Code block readability in editor */
+.tiptap pre {
+  background: rgba(148, 163, 184, 0.15); /* slate-400/15 */
+  color: inherit;
+  border-radius: 0.375rem;
+  padding: 0.75rem 0.875rem;
+  overflow-x: auto;
+}
+
+/* Lowlight/HLJS token styles (lightweight theme) */
+.tiptap pre code.hljs,
+.tiptap pre .hljs {
+  display: block;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  white-space: pre;
+  margin: 0;
+  padding: 0;
+}
+.tiptap .hljs-comment,
+.tiptap .hljs-quote {
+  color: #64748b; /* slate-500 */
+  font-style: italic;
+}
+.tiptap .hljs-keyword,
+.tiptap .hljs-selector-tag,
+.tiptap .hljs-subst {
+  color: #2563eb; /* blue-600 */
+  font-weight: 600;
+}
+.tiptap .hljs-literal,
+.tiptap .hljs-number,
+.tiptap .hljs-symbol,
+.tiptap .hljs-bullet {
+  color: #059669; /* emerald-600 */
+}
+.tiptap .hljs-string,
+.tiptap .hljs-doctag,
+.tiptap .hljs-addition {
+  color: #16a34a; /* green-600 */
+}
+.tiptap .hljs-title,
+.tiptap .hljs-section,
+.tiptap .hljs-selector-id,
+.tiptap .hljs-selector-class {
+  color: #7c3aed; /* violet-600 */
+}
+.tiptap .hljs-attribute,
+.tiptap .hljs-attr,
+.tiptap .hljs-name {
+  color: #b45309; /* amber-700 */
+}
+.tiptap .hljs-deletion {
+  color: #dc2626; /* red-600 */
+}
+
+.tiptap blockquote {
+  border-left: 2px solid rgba(148, 163, 184, 0.5);
+  padding-left: 0.75rem;
+  color: inherit;
+}
+
+/* Link visibility */
+.tiptap a {
+  color: #2563eb; /* blue-600 */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dark .tiptap a {
+  color: #93c5fd; /* blue-300 */
+}
+
+/* Image defaults and selection */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.tiptap img.ProseMirror-selectednode {
+  outline: 2px solid rgba(59, 130, 246, 0.6); /* blue-500/60 */
+  outline-offset: 2px;
+}
+
+/* Make the ProseMirror editable fill the container so empty areas are clickable */
+.tiptap .ProseMirror {
+  min-height: 100%;
+  height: 100%;
+}
+
+/* Placeholder styling */
+.tiptap .is-editor-empty:first-child::before {
+  color: #94a3b8; /* slate-400 */
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Table visibility */
+.tiptap table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tiptap th,
+.tiptap td {
+  border: 1px solid rgba(148, 163, 184, 0.35); /* slate-400/35 */
+  padding: 0.375rem 0.5rem;
+  vertical-align: top;
+  position: relative; /* for column resize handle */
+}
+
+.tiptap th {
+  background: #f8fafc; /* solid light background, no transparency */
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.dark .tiptap th {
+  background: #1f2937; /* slate-800 solid in dark */
+}
+
+/* Generic list styles (unordered/ordered) */
+.tiptap ul:not([data-type="taskList"]) {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0;
+}
+
+.tiptap ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.25rem 0;
+}
+
+/* Reduce jump on first/last block margins to keep editor height stable when toggling list/quote */
+/* revert margin normalization for first/last blocks */
+
+/* Nested list markers */
+.tiptap ul ul:not([data-type="taskList"]) {
+  list-style: circle;
+  padding-left: 1.25rem;
+}
+
+.tiptap ul ul ul:not([data-type="taskList"]) {
+  list-style: square;
+}
+
+.tiptap ol ol {
+  list-style: lower-alpha;
+  padding-left: 1.25rem;
+}
+
+.tiptap ol ol ol {
+  list-style: lower-roman;
+}
+
+.tiptap li {
+  margin: 0.125rem 0;
+}
+
+/* Table column resize handle */
+.tiptap .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+}
+.tiptap .column-resize-handle:hover {
+  background: rgba(59, 130, 246, 0.35); /* blue-500/35 */
+}
+
+/* Code block line numbers (grid layout) */
+.tiptap .codeblock-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* default no LN */
+  border-radius: 0.375rem;
+  background: rgba(148, 163, 184, 0.15);
+}
+.tiptap .codeblock-grid .codeblock-pre {
+  background: transparent; /* pre inherits background from container */
+  margin: 0; /* remove default margin when wrapped */
+}
+
+/* Headings: make them visually distinct inside the editor */
+.tiptap h1 {
+  font-size: 1.5rem; /* text-2xl */
+  line-height: 2rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+.tiptap h2 {
+  font-size: 1.25rem; /* text-xl */
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin: 0.875rem 0 0.375rem;
+}
+.tiptap h3 {
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.75rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+}
+.tiptap h4 {
+  font-size: 1rem; /* text-base */
+  line-height: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+}
+.tiptap h5 {
+  font-size: 0.95rem;
+  line-height: 1.4rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+}
+.tiptap h6 {
+  font-size: 0.9rem;
+  line-height: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* Horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.35); /* slate-400/35 */
+  margin: 0.75rem 0;
+}
+
+/* Inline code */
+.tiptap code:not(pre code) {
+  background: rgba(148, 163, 184, 0.15); /* slate-400/15 */
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
+  font-size: 0.95em;
+}

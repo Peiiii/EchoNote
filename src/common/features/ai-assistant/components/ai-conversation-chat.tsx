@@ -1,43 +1,58 @@
+import { useBreakpoint } from "@/common/components/breakpoint-provider";
 import { useConversationMessages } from "@/common/features/ai-assistant/hooks/use-conversation-messages";
-import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
-import { useConversationStore } from "@/common/features/ai-assistant/stores/conversation.store";
-import { useCollectionDiff } from "@/common/lib/use-collection-diff";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { AgentChatCore, UIMessage, useAgentSessionManager, useAgentSessionManagerState, useParseTools } from "@agent-labs/agent-chat";
-import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { debounceTime } from "rxjs";
+import {
+  isTempConversation,
+  useConversationStore,
+} from "@/common/features/ai-assistant/stores/conversation.store";
+import {
+  AgentChatCore,
+  UIMessage,
+  useAgentSessionManager,
+  useAgentSessionManagerState,
+  useParseTools,
+} from "@agent-labs/agent-chat";
+import { useMemoizedFn } from "ahooks";
+import { isEqual } from "lodash-es";
+import { useEffect, useMemo, useRef } from "react";
+import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
+import { createContextSelectorExtension } from "../extensions/context-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
-
-import { safeHashMessage } from "@/common/features/ai-assistant/utils/sanitize-ui-message";
 import { ConversationChatProps } from "../types/conversation.types";
-import { contextDataCache } from "@/common/features/ai-assistant/features/context/services/context-data-cache";
+import { AIConversationSkeleton } from "./ai-conversation-skeleton";
 
 export function AIConversationChat({ conversationId, channelId }: ConversationChatProps) {
-  const { userId: _userId } = useNotesDataStore();
-  const { messages, createMessage, updateMessage, loading } = useConversationMessages(conversationId);
+  const { messages, createMessage, updateMessage, loading } =
+    useConversationMessages(conversationId);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
-  const isBrandNewConversation = !!conv && (conv.messageCount === 0);
+  const allConversations = useConversationStore(s => s.conversations);
+  const isBrandNewConversation = !!conv && conv.messageCount === 0;
+  const isFirstConversation = allConversations.filter(c => !c.id.startsWith("temp-")).length === 1 && isBrandNewConversation;
   const showLoading = loading && !isBrandNewConversation;
+
+  const lastConversationIdRef = useRef(conversationId);
+  const resetKey = useMemo(() => {
+    const lastConversationId = lastConversationIdRef.current;
+    if (lastConversationId === conversationId) return;
+    lastConversationIdRef.current = conversationId;
+    if (isTempConversation(lastConversationId)) return lastConversationId;
+    return conversationId;
+  }, [conversationId])
+
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="flex-1 overflow-hidden">
         {showLoading ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Loading conversation...</span>
-            </div>
-          </div>
+          <AIConversationSkeleton />
         ) : (
           <AgentChatCoreWrapper
-            key={conversationId}
+            key={resetKey}
             conversationId={conversationId}
             channelId={channelId}
             messages={messages}
             createMessage={createMessage}
             updateMessage={updateMessage}
+            isFirstConversation={isFirstConversation}
           />
         )}
       </div>
@@ -51,122 +66,165 @@ interface AgentChatCoreWrapperProps {
   messages: UIMessage[];
   createMessage: (message: UIMessage) => Promise<void>;
   updateMessage: (message: UIMessage) => Promise<void>;
+  isFirstConversation: boolean;
 }
 
-function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessage, updateMessage }: AgentChatCoreWrapperProps) {
+function AgentChatCoreWrapper({
+  conversationId,
+  channelId,
+  messages,
+  createMessage,
+  updateMessage,
+  isFirstConversation,
+}: AgentChatCoreWrapperProps) {
+  const { isMobile } = useBreakpoint();
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
-  // Select tool target channel based on conversation contexts; fallback to current channel
-  const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
-  const initialToolChannel = useMemo(() => {
-    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds && conv.contexts.channelIds.length > 0) {
-      return conv.contexts.channelIds[0];
-    }
-    return channelId;
-  }, [conv?.contexts, channelId]);
-  const [toolChannelId, setToolChannelId] = useState<string>(initialToolChannel);
   const tools = useMemo(() => {
-    console.log("🔔 [AIConversationChat] getting tools");
     return aiAgentFactory.getChannelTools();
   }, []);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
-  console.log("🔔 [AIConversationChat] parsed tools:", { 
-    toolDefs: toolDefs.map(t => ({ name: t.name, description: t.description })),
-    toolExecutors: Object.keys(toolExecutors),
-    toolRenderers: Object.keys(toolRenderers)
-  });
+
+  const getContextsWithFirstSessionInfo = useMemo(() => {
+    return () => {
+      const baseContexts = aiAgentFactory.getSessionContexts(conversationId, channelId);
+
+      if (isFirstConversation) {
+        return [
+          {
+            description: "Product Information & First Session Guide",
+            value: JSON.stringify({
+              welcomeMessage: "This is the user's first AI conversation. Please DEMONSTRATE your agent capabilities by actively using tools to show what you can do.",
+              productInfo: {
+                name: "StillRoot",
+                purpose: "A personal growth companion platform that helps users become who they want to be",
+                coreFeatures: [
+                  "Personal Growth Guidance: Monitor progress, identify problems in thinking and behavior, provide specific improvement suggestions",
+                  "Deep Understanding: Help users dig deeper from surface phenomena to underlying essence and patterns",
+                  "Insight Discovery: Analyze connections between notes, discover knowledge blind spots, provide new insights",
+                  "Note Management: Create, read, update, and organize notes across channels with AI assistance"
+                ],
+                valueProposition: "StillRoot helps users track thoughts, discover patterns, and grow personally through AI-powered analysis of their notes and ideas.",
+                mission: "Help users become who they want to be through cognitive enhancement and personal growth supervision"
+              },
+              engagementStrategy: "Be enthusiastic, show value by USING TOOLS, demonstrate capabilities, and encourage exploration. Make them feel excited about using StillRoot regularly.",
+              demonstrationRequirements: [
+                "You MUST actively use at least 2-3 tools to demonstrate your capabilities",
+                "Use listNotes to show you can access their notes and provide insights",
+                "Use grepNotes to search their notes and find patterns or interesting content",
+                "Analyze their notes to provide meaningful insights",
+                "Show excitement about their data and suggest ways to explore it",
+                "CRITICAL: Call tools ONE AT A TIME. Wait for each tool to complete before calling the next one. Do not send multiple tool calls in parallel.",
+                "For example, first call listNotes, wait for results, then call grepNotes, wait for results, then analyze"
+              ],
+              suggestedApproach: [
+                "Greet them warmly as their personal growth companion",
+                "Briefly introduce StillRoot's mission and your role",
+                "IMMEDIATELY start using tools (listNotes, grepNotes, etc.) to demonstrate your capabilities",
+                "Show actual insights from their notes, even if they're just starting out",
+                "Highlight the value of having AI-powered analysis of their thoughts",
+                "Invite them to try asking questions or exploring specific topics",
+                "Be encouraging and show enthusiasm about helping them grow"
+              ]
+            }),
+          },
+          ...baseContexts,
+        ];
+      }
+      return baseContexts;
+    };
+  }, [conversationId, channelId, isFirstConversation]);
+
+  const initialMessagesWithWelcome = useMemo(() => {
+    if (isFirstConversation && !isTempConversation(conversationId) && messages.length === 0) {
+      const welcomePrompt: UIMessage = {
+        id: `welcome-${conversationId}`,
+        role: "user",
+        parts: [
+          {
+            type: "text",
+            text: "Hi! I'm new here. Could you please introduce yourself and explain what you can do to help me?",
+          },
+        ],
+      };
+      return [welcomePrompt];
+    }
+    return messages;
+  }, [isFirstConversation, conversationId, messages]);
+
   const agentSessionManager = useAgentSessionManager({
     agent,
     getToolDefs: () => toolDefs,
-    // Dynamic contexts: use conversation-bound contexts when available; fallback to current channel
-    getContexts: () => aiAgentFactory.getSessionContexts(conversationId, channelId),
-    initialMessages: messages,
+    getContexts: getContextsWithFirstSessionInfo,
+    initialMessages: initialMessagesWithWelcome,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
-  const [sessionMessages, setSessionMessages] = useState<UIMessage[]>(messages);
+
+  const welcomeMessageSentRef = useRef(false);
+
   useEffect(() => {
-    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe((arr) => {
-      setSessionMessages(arr);
-      // Feed messages to store for auto-title evaluation (no AI call here; store handles policy)
+    if (isFirstConversation) {
+      if (!welcomeMessageSentRef.current) {
+        welcomeMessageSentRef.current = true;
+        agentSessionManager.runAgent();
+      }
+    }
+  }, [isFirstConversation, conversationId, agentSessionManager]);
+
+  const memoizedCreateMessage = useMemoizedFn(createMessage);
+  const memoizedUpdateMessage = useMemoizedFn(updateMessage);
+
+  useEffect(() => {
+    const sub = agentSessionManager.addMessagesEvent$.subscribe(({ messages }) => {
+      messages.forEach(async m => {
+        memoizedCreateMessage(m);
+      });
+    });
+    return () => sub.unsubscribe();
+  }, [agentSessionManager.addMessagesEvent$, memoizedCreateMessage]);
+
+  useEffect(() => {
+    const sub = agentSessionManager.updateMessageEvent$
+      .pipe(
+        map(({ message }) => message),
+        groupBy(message => message.id),
+        mergeMap(group =>
+          group.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => isEqual(prev, curr))
+          )
+        )
+      )
+      .subscribe(message => {
+        memoizedUpdateMessage(message);
+      });
+
+    return () => sub.unsubscribe();
+  }, [agentSessionManager.updateMessageEvent$, memoizedUpdateMessage]);
+
+  useEffect(() => {
+    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe(arr => {
       useConversationStore.getState().onMessagesSnapshot(conversationId, arr);
     });
     return () => sub.unsubscribe();
-  }, [agentSessionManager]);
+  }, [agentSessionManager, conversationId]);
 
-  // Prefetch context data for current tool channel and explicit contexts (to improve first response quality)
-  useEffect(() => {
-    void contextDataCache.ensureFetched(toolChannelId);
-    if (conv?.contexts?.mode === 'channels' && conv.contexts.channelIds) {
-      conv.contexts.channelIds.forEach(id => void contextDataCache.ensureFetched(id));
-    }
-    if (conv?.contexts?.mode === 'all') {
-      void contextDataCache.ensureAllMetas().then(() => {
-        const ids = contextDataCache.getAllIdsSnapshot();
-        ids.forEach(id => void contextDataCache.ensureFetched(id));
-      });
-    }
-  }, [toolChannelId, conv?.contexts]);
+  const inputExtensions = useMemo(
+    () => [
+      createContextSelectorExtension({
+        conversationId,
+        fallbackChannelId: channelId,
+        showModeNameInCompact: !isMobile,
+      }),
+      createModelSelectorExtension({
+        onModelChange: (modelId: string) => {
+          console.log("Model changed to:", modelId);
+        },
+      }),
+    ],
+    [conversationId, channelId, isMobile]
+  );
 
-  // Auto mode: when conversation has no explicit contexts, keep tool target in sync with current channel
-  useEffect(() => {
-    if (!conv || conv.contexts) return; // manual mode when contexts exists
-    if (toolChannelId !== channelId) {
-      setToolChannelId(channelId);
-    }
-  }, [conv?.contexts, channelId]);
-
-  // When contexts change in manual mode, ensure tool target is valid
-  useEffect(() => {
-    if (!conv?.contexts) return; // auto mode handled above
-    const mode = conv.contexts.mode;
-    if (mode === 'channels') {
-      const ids = conv.contexts.channelIds || [];
-      if (!ids.includes(toolChannelId)) {
-        setToolChannelId(ids[0] || channelId);
-      }
-    } else {
-      // 'none' or 'all' -> default to current channel for tools
-      if (toolChannelId !== channelId) setToolChannelId(channelId);
-    }
-  }, [conv?.contexts, channelId]);
-
-  // Use a safe hash that ignores functions/cycles inside tool parts
-  const hash = (m: UIMessage) => safeHashMessage(m);
-  useCollectionDiff<UIMessage>({
-    items: sessionMessages,
-    getId: (m) => (m.id ? m.id : null),
-    hash,
-    onAdd: async (m) => {
-      console.log("[AgentChatCoreWrapper] onAdd", m);
-      await createMessage(m);
-    },
-    onUpdate: async (m) => {
-      console.log("[AgentChatCoreWrapper] onUpdate", m);
-      await updateMessage(m);
-    },
-    resetKey: conversationId,
-    debounceMs: 1000,
-  });
-
-  const { conversations } = useConversationState();
-  const autoTitleDoneMap = useConversationStore(s => s.autoTitleDone);
-  useEffect(() => {
-    if (autoTitleDoneMap && autoTitleDoneMap[conversationId]) return;
-    const conv = conversations.find(c => c.id === conversationId);
-    if (!conv) return;
-    // Ensure store sees initial static messages too
-    useConversationStore.getState().onMessagesSnapshot(conversationId, sessionMessages);
-  }, [conversations, sessionMessages, conversationId, autoTitleDoneMap]);
-
-  const inputExtensions = useMemo(() => [
-    createModelSelectorExtension({
-      onModelChange: (modelId: string) => {
-        console.log('Model changed to:', modelId);
-      }
-    })
-  ], []);
-
-  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager)
-  console.log("🔔 [AIConversationChat] messages:", _messages);
+  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);
 
   return (
     <div className="h-full flex flex-col agent-chat-fullwidth">
@@ -181,15 +239,19 @@ function AgentChatCoreWrapper({ conversationId, channelId, messages, createMessa
           promptsProps={{
             items: getChannelPrompts(channelId),
             onItemClick: ({ prompt }) => {
-              agentSessionManager.handleAddMessages([{
-                id: crypto.randomUUID(),
-                role: "user",
-                parts: [{
-                  type: "text",
-                  text: prompt,
-                }],
-              }]);
-            }
+              agentSessionManager.handleAddMessages([
+                {
+                  id: crypto.randomUUID(),
+                  role: "user",
+                  parts: [
+                    {
+                      type: "text",
+                      text: prompt,
+                    },
+                  ],
+                },
+              ]);
+            },
           }}
           inputExtensions={inputExtensions}
         />
@@ -202,27 +264,27 @@ function getChannelPrompts(_channelId: string) {
   return [
     {
       id: "prompt-1",
-      prompt: "Let's chat",
+      prompt: "Analyze my recent notes",
     },
     {
       id: "prompt-2",
-      prompt: "Summarize this",
+      prompt: "Summarize my thoughts",
     },
     {
       id: "prompt-3",
-      prompt: "Any suggestions?",
+      prompt: "What patterns do you see?",
     },
     {
       id: "prompt-4",
-      prompt: "What should I do next?",
+      prompt: "Help me organize these ideas",
     },
     {
       id: "prompt-5",
-      prompt: "What important thing am I missing?",
+      prompt: "What am I missing?",
     },
     {
       id: "prompt-6",
-      prompt: "Suggestions for next week",
-    }
+      prompt: "Suggest improvements",
+    },
   ];
 }
