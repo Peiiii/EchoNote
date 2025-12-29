@@ -1,65 +1,21 @@
-import { firebaseNotesService } from "@/common/services/firebase/firebase-notes.service";
 import { getRandomEmoji } from "@/common/utils/emoji";
-import { firebaseMigrateService } from "@/common/services/firebase/firebase-migrate.service";
 import { create } from "zustand";
-import { DocumentSnapshot } from "firebase/firestore";
 import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { useGlobalProcessStore } from "@/core/stores/global-process.store";
+import { getStorageProvider } from "@/core/storage/provider";
+import type { Cursor } from "@/core/storage/types";
+import type { Message, Channel } from "@/core/types/notes";
 
-export interface AIAnalysis {
-  keywords: string[];
-  topics: string[];
-  sentiment: "positive" | "neutral" | "negative";
-  summary: string;
-  tags: string[];
-  insights: string[];
-  relatedTopics: string[];
-}
-
-export interface Message {
-  id: string;
-  content: string;
-  sender: "user" | "ai";
-  timestamp: Date;
-  channelId: string;
-  tags?: string[];
-  parentId?: string;
-  threadId?: string;
-  isThreadExpanded?: boolean;
-  threadCount?: number;
-  aiAnalysis?: AIAnalysis;
-  isDeleted?: boolean;
-  deletedAt?: Date;
-  deletedBy?: string;
-  canRestore?: boolean;
-  isNew?: boolean;
-}
-
-export type ShareMode = "read-only" | "append-only";
-
-export interface Channel {
-  id: string;
-  name: string;
-  description: string;
-  emoji?: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  messageCount: number;
-  lastMessageTime?: Date;
-  backgroundImage?: string;
-  backgroundColor?: string;
-  shareToken?: string;
-  shareMode?: ShareMode;
-}
+export type { AIAnalysis, Message, Channel, ShareMode } from "@/core/types/notes";
 
 // 新增：Channel级别的消息状态类型
 export interface ChannelMessageState {
   messages: Message[];
   loading: boolean;
   hasMore: boolean;
-  lastVisible: DocumentSnapshot | null;
+  lastVisible: Cursor | null;
 }
 
 export interface NotesDataState {
@@ -100,7 +56,7 @@ export interface NotesDataState {
   addChannelMessage: (channelId: string, message: Message) => void;
   setChannelLoading: (channelId: string, loading: boolean) => void;
   setChannelHasMore: (channelId: string, hasMore: boolean) => void;
-  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => void;
+  setChannelLastVisible: (channelId: string, lastVisible: Cursor | null) => void;
   clearChannelMessages: (channelId: string) => void;
   removeChannelMessage: (channelId: string, messageId: string) => void;
 
@@ -157,7 +113,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       emoji: channel.emoji && channel.emoji.trim() ? channel.emoji : getRandomEmoji(),
     };
     const newId = await withErrorHandling(
-      () => firebaseNotesService.createChannel(userId, finalChannel),
+      () => getStorageProvider().notes.createChannel(userId, finalChannel),
       "createChannel"
     );
     // Auto-select the newly created channel if available
@@ -199,7 +155,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     set({ channels: updatedChannels });
 
     await withErrorHandling(
-      () => firebaseNotesService.updateChannel(userId, channelId, updates),
+      () => getStorageProvider().notes.updateChannel(userId, channelId, updates),
       "updateChannel"
     );
   }),
@@ -207,7 +163,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   deleteChannel: withUserValidation(async (userId, channelId) => {
     // 调用 Firebase 服务删除 channel
     await withErrorHandling(
-      () => firebaseNotesService.deleteChannel(userId, channelId),
+      () => getStorageProvider().notes.deleteChannel(userId, channelId),
       "deleteChannel"
     );
 
@@ -231,17 +187,16 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
   addMessage: withUserValidation(async (userId, message) => {
     await withErrorHandling(
-      () => firebaseNotesService.createMessage(userId, message),
+      () => getStorageProvider().notes.createMessage(userId, message),
       "createMessage"
     );
   }),
 
   deleteMessage: withUserValidation(async (userId, messageId, hardDelete = false) => {
-    const operation = hardDelete
-      ? () => firebaseNotesService.deleteMessage(userId, messageId)
-      : () => firebaseNotesService.softDeleteMessage(userId, messageId);
-
-    await withErrorHandling(operation, hardDelete ? "deleteMessage" : "softDeleteMessage");
+    await withErrorHandling(
+      () => getStorageProvider().notes.deleteMessage(userId, messageId, { hardDelete }),
+      hardDelete ? "deleteMessage" : "softDeleteMessage"
+    );
 
     // 更新本地store状态 - 修复逻辑：遍历所有channel找到包含该消息的channel
     const { messagesByChannel } = get();
@@ -259,14 +214,14 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
   updateMessage: withUserValidation(async (userId, messageId, updates) => {
     await withErrorHandling(
-      () => firebaseNotesService.updateMessage(userId, messageId, updates),
+      () => getStorageProvider().notes.updateMessage(userId, messageId, updates),
       "updateMessage"
     );
   }),
 
   moveMessage: withUserValidation(async (userId, messageId, fromChannelId, toChannelId) => {
     try {
-      await firebaseNotesService.moveMessage(userId, messageId, fromChannelId, toChannelId);
+      await getStorageProvider().notes.moveMessage(userId, messageId, fromChannelId, toChannelId);
     } catch (error) {
       console.error("Failed to move message:", { messageId, fromChannelId, toChannelId, error });
       throw error;
@@ -317,7 +272,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   addThreadMessage: withUserValidation(async (userId, parentMessageId, message) => {
     await withErrorHandling(
       () =>
-        firebaseNotesService.createMessage(userId, {
+        getStorageProvider().notes.createMessage(userId, {
           ...message,
           parentId: parentMessageId,
           threadId: parentMessageId,
@@ -328,14 +283,14 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
   restoreMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
-      () => firebaseNotesService.restoreMessage(userId, messageId),
+      () => getStorageProvider().notes.restoreMessage(userId, messageId),
       "restoreMessage"
     );
   }),
 
   permanentDeleteMessage: withUserValidation(async (userId, messageId) => {
     await withErrorHandling(
-      () => firebaseNotesService.deleteMessage(userId, messageId),
+      () => getStorageProvider().notes.deleteMessage(userId, messageId, { hardDelete: true }),
       "permanentDeleteMessage"
     );
   }),
@@ -407,7 +362,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     }));
   },
 
-  setChannelLastVisible: (channelId: string, lastVisible: DocumentSnapshot | null) => {
+  setChannelLastVisible: (channelId: string, lastVisible: Cursor | null) => {
     set(state => ({
       messagesByChannel: {
         ...state.messagesByChannel,
@@ -482,11 +437,11 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       ],
     });
 
-    // Ensure migrations (e.g., default General) are applied before subscribe
+    // Ensure backend initialization (e.g., migrations) is applied before subscribe
     if (migrationsEnabled) {
       try {
         globalProcess.setStepStatus("migrations", "running");
-        await firebaseMigrateService.runAllMigrations(userId);
+        await getStorageProvider().initializeForUser(userId);
         globalProcess.setStepStatus("migrations", "success");
       } catch (e) {
         globalProcess.setStepStatus("migrations", "error");
@@ -495,7 +450,11 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       }
     }
 
-    const unsubscribeChannels = firebaseNotesService.subscribeToChannels(userId, channels => {
+    const notesRepo = getStorageProvider().notes;
+    if (!notesRepo.subscribeChannels) {
+      throw new Error("Current storage backend does not support realtime channel subscriptions");
+    }
+    const unsubscribeChannels = notesRepo.subscribeChannels(userId, channels => {
       const { isListenerEnabled } = get();
       if (!isListenerEnabled) return;
       set({ channels, channelsLoading: false });
@@ -530,7 +489,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   fetchInitialData: async (userId: string) => {
     set({ channelsLoading: true });
     await withErrorHandling(async () => {
-      const channels = await firebaseNotesService.fetchChannels(userId);
+      const channels = await getStorageProvider().notes.listChannels(userId);
       set({ channels, channelsLoading: false });
 
       get().validateAndCleanupCurrentChannel(channels);
@@ -558,7 +517,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     const { userId } = get();
     if (!userId) return "";
     const shareToken = await withErrorHandling(
-      () => firebaseNotesService.publishSpace(userId, channelId, shareMode),
+      () => getStorageProvider().notes.publishSpace(userId, channelId, shareMode),
       "publishSpace"
     );
     if (shareToken) {
@@ -573,7 +532,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
   unpublishSpace: withUserValidation(async (userId, channelId) => {
     await withErrorHandling(
-      () => firebaseNotesService.unpublishSpace(userId, channelId),
+      () => getStorageProvider().notes.unpublishSpace(userId, channelId),
       "unpublishSpace"
     );
     const { channels } = get();
@@ -585,7 +544,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
   updatePublishMode: withUserValidation(async (userId, channelId, shareMode) => {
     await withErrorHandling(
-      () => firebaseNotesService.updateChannel(userId, channelId, { shareMode }),
+      () => getStorageProvider().notes.updateChannel(userId, channelId, { shareMode }),
       "updatePublishMode"
     );
     const { channels } = get();
