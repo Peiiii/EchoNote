@@ -12,39 +12,37 @@ import { useJumpToNote } from "../hooks/use-jump-to-note";
 
 export function NotesPage() {
   const presenter = useDesktopPresenterContext();
-  // Use UI state store
+  // Use unified sideView state
   const sideView = useUIStateStore(s => s.sideView);
   const currentThreadId = useUIStateStore(s => s.currentThreadId);
-  const isStudioOpen = useUIStateStore(s => s.isStudioOpen);
   const { currentChannelId } = useNotesViewStore();
   const { jumpToNote } = useJumpToNote();
   useHandleRxEvent(presenter.rxEventBus.requestJumpToMessage$, jumpToNote);
 
+  // Unified sidebar renderer - all panels are mutually exclusive
   const renderSidebar = () => {
-    if (sideView === SideViewEnum.THREAD) {
-      return (
-        <ThreadSidebar
-          isOpen
-          onClose={() => presenter.closeThread()}
-          currentThreadId={currentThreadId || undefined}
-        />
-      );
+    switch (sideView) {
+      case SideViewEnum.THREAD:
+        return (
+          <ThreadSidebar
+            isOpen
+            onClose={() => presenter.closeThread()}
+            currentThreadId={currentThreadId || undefined}
+          />
+        );
+      case SideViewEnum.AI_ASSISTANT:
+        return (
+          <AIAssistantSidebar
+            isOpen
+            onClose={() => presenter.closeAIAssistant()}
+            channelId={currentChannelId || ""}
+          />
+        );
+      case SideViewEnum.STUDIO:
+        return <StudioSidebar />;
+      default:
+        return null;
     }
-    if (sideView === SideViewEnum.AI_ASSISTANT) {
-      return (
-        <AIAssistantSidebar
-          isOpen
-          onClose={() => presenter.closeAIAssistant()}
-          channelId={currentChannelId || ""}
-        />
-      );
-    }
-    return null;
-  };
-
-  const renderFarRightSidebar = () => {
-    if (!isStudioOpen) return null;
-    return <StudioSidebar />;
   };
 
   return (
@@ -52,7 +50,6 @@ export function NotesPage() {
       sidebar={<ChannelList />}
       content={<MessageTimelineFeature />}
       rightSidebar={renderSidebar()}
-      farRightSidebar={renderFarRightSidebar()}
     />
   );
 }

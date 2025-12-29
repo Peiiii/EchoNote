@@ -6,38 +6,35 @@ export enum SideViewEnum {
   AI_ASSISTANT = "ai_assistant",
   THREAD = "thread",
   SETTINGS = "settings",
+  STUDIO = "studio",
 }
 
 export interface UIState {
-  // AI Assistant state
-  // isAIAssistantOpen: boolean;
-
-  // Thread sidebar state
-  // isThreadOpen: boolean;
+  // Unified side panel state - only one can be open at a time
   sideView?: SideViewEnum;
+
+  // Thread specific context
   currentThreadId: string | null;
 
   // Mobile specific states
   isChannelListOpen: boolean;
 
-  // Studio panel visibility (independent from sideView)
-  isStudioOpen: boolean;
+  // Unified action to set side view
+  setSideView: (view: SideViewEnum | undefined, threadId?: string | null) => void;
+  closeSideView: () => void;
 
-  // Actions for AI Assistant
+  // Convenience actions (for backward compatibility)
   openAIAssistant: () => void;
   closeAIAssistant: () => void;
-
-  // Actions for Thread
   openThread: (messageId: string) => void;
   closeThread: () => void;
-
-  // Actions for Settings
   openSettings: () => void;
   closeSettings: () => void;
-
-  // Actions for Studio
   openStudio: () => void;
   closeStudio: () => void;
+
+  // Legacy computed property for backward compatibility
+  isStudioOpen: boolean;
 
   // Actions for Mobile
   openChannelList: () => void;
@@ -47,48 +44,65 @@ export interface UIState {
 export const useUIStateStore = create<UIState>()(
   persist(
     (set, get) => ({
-      // Initial state - desktop: AI panel open by default (mutually exclusive with studio)
+      // Initial state - desktop: AI panel open by default
       sideView: !isMobile() ? SideViewEnum.AI_ASSISTANT : undefined,
       currentThreadId: null,
       isChannelListOpen: false,
-      isStudioOpen: false, // Default closed to maintain mutual exclusivity with sideView
 
-      // AI Assistant actions (mutually exclusive with thread sidebar and studio)
+      // Computed property for backward compatibility
+      get isStudioOpen() {
+        return get().sideView === SideViewEnum.STUDIO;
+      },
+
+      // Unified action to set side view
+      setSideView: (view, threadId = null) => {
+        set({
+          sideView: view,
+          currentThreadId: view === SideViewEnum.THREAD ? threadId : null,
+        });
+      },
+
+      closeSideView: () => {
+        set({
+          sideView: undefined,
+          currentThreadId: null,
+        });
+      },
+
+      // Convenience actions
       openAIAssistant: () => {
         set({
           sideView: SideViewEnum.AI_ASSISTANT,
           currentThreadId: null,
-          isStudioOpen: false, // Close studio when opening AI assistant
         });
       },
 
       closeAIAssistant: () => {
-        set({
-          sideView: undefined,
-        });
+        if (get().sideView === SideViewEnum.AI_ASSISTANT) {
+          set({ sideView: undefined });
+        }
       },
 
-      // Thread actions (mutually exclusive with AI assistant and studio)
       openThread: (messageId: string) => {
         set({
           sideView: SideViewEnum.THREAD,
           currentThreadId: messageId,
-          isStudioOpen: false, // Close studio when opening thread
         });
       },
 
       closeThread: () => {
-        set({
-          sideView: undefined,
-          currentThreadId: null,
-        });
+        if (get().sideView === SideViewEnum.THREAD) {
+          set({
+            sideView: undefined,
+            currentThreadId: null,
+          });
+        }
       },
 
-      // Settings actions (mutually exclusive with studio)
       openSettings: () => {
         set({
           sideView: SideViewEnum.SETTINGS,
-          isStudioOpen: false, // Close studio when opening settings
+          currentThreadId: null,
         });
       },
 
@@ -98,17 +112,17 @@ export const useUIStateStore = create<UIState>()(
         }
       },
 
-      // Studio actions (mutually exclusive with sideView)
       openStudio: () => {
         set({
-          isStudioOpen: true,
-          sideView: undefined, // Close sideView when opening studio
-          currentThreadId: null, // Also clear thread ID
+          sideView: SideViewEnum.STUDIO,
+          currentThreadId: null,
         });
       },
 
       closeStudio: () => {
-        set({ isStudioOpen: false });
+        if (get().sideView === SideViewEnum.STUDIO) {
+          set({ sideView: undefined });
+        }
       },
 
       // Mobile actions
@@ -122,7 +136,7 @@ export const useUIStateStore = create<UIState>()(
     }),
     {
       name: "echonote-ui-state",
-      partialize: state => ({ sideView: state.sideView, isStudioOpen: state.isStudioOpen }),
+      partialize: state => ({ sideView: state.sideView }),
     }
   )
 );
