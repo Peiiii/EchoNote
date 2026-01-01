@@ -1,10 +1,12 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useCallback } from "react";
-import { useNotesDataStore } from "@/core/stores/notes-data.store";
+import { useAuthStore } from "@/core/stores/auth.store";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { useContainerMode } from "@/common/hooks/use-container-mode";
 import { AIConversationTwoPane } from "./ai-conversation-two-pane";
 import { AIConversationSinglePane, SinglePaneRef } from "./ai-conversation-single-pane";
 import { AIConversationSkeleton } from "@/common/features/ai-assistant/components/ai-conversation-skeleton";
+import { openLoginModal } from "@/common/features/auth/open-login-modal";
+import { Button } from "@/common/components/ui/button";
 import {
   ConversationInterfaceProps,
   ConversationInterfaceRef,
@@ -16,9 +18,15 @@ export const AIConversationInterface = forwardRef<
   ConversationInterfaceRef,
   ConversationInterfaceProps
 >(function AIConversationInterface({ channelId, onClose }, ref) {
-  const { userId } = useNotesDataStore();
-  const { conversations, currentConversationId, loading, createConversation, loadConversations } =
-    useConversationState();
+  const uid = useAuthStore(s => s.currentUser?.uid) ?? null;
+  const {
+    conversations,
+    currentConversationId,
+    loading,
+    createConversation,
+    loadConversations,
+    resetForLoggedOut,
+  } = useConversationState();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { mode, ready } = useContainerMode(containerRef, {
@@ -32,10 +40,10 @@ export const AIConversationInterface = forwardRef<
   const singleRef = useRef<SinglePaneRef>(null);
 
   const handleCreateConversation = useCallback(() => {
-    if (!userId) return;
+    if (!uid) return;
     // MVP v1: conversations are global; default context is provided by UI (current channel)
-    void createConversation(userId, "New Conversation");
-  }, [userId, createConversation]);
+    void createConversation(uid, "New Conversation");
+  }, [uid, createConversation]);
 
   useImperativeHandle(
     ref,
@@ -49,11 +57,32 @@ export const AIConversationInterface = forwardRef<
   );
 
   useEffect(() => {
-    if (userId) {
-      // Load global conversations (decoupled from channels)
-      loadConversations(userId);
+    if (!uid) {
+      resetForLoggedOut();
+      return;
     }
-  }, [userId, loadConversations]);
+    loadConversations(uid);
+  }, [uid, loadConversations, resetForLoggedOut]);
+
+  if (!uid) {
+    return (
+      <div ref={containerRef} className="h-full flex items-center justify-center p-6">
+        <div className="text-sm text-muted-foreground text-center space-y-3">
+          <div>登录后可使用对话列表与云端对话能力。</div>
+          <div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+              onClick={() => openLoginModal({ title: "登录以使用对话能力" })}
+            >
+              去登录
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !ready) {
     return (

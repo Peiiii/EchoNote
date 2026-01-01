@@ -456,7 +456,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     set({
       unsubscribeChannels: null,
       channels: [],
-      channelsLoading: true, // Keep loading state when not authenticated
+      channelsLoading: false,
       userId: null,
       messagesByChannel: {}, // Clear channel messages when cleaning up
     });

@@ -64,6 +64,7 @@ type Actions = {
   ) => Promise<AIConversation>;
   loadConversations: (userId: string) => Promise<void>;
   loadMoreConversations: (userId: string) => Promise<void>;
+  resetForLoggedOut: () => void;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (
@@ -92,7 +93,7 @@ export const isTempConversation = (conversationId: string) => conversationId.sta
 export const useConversationStore = create<State & Actions>((set, get) => ({
   conversations: [],
   currentConversationId: null,
-  loading: true,
+  loading: false,
   loadingMore: false,
   error: null,
   selectionTick: 0,
@@ -107,6 +108,18 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   autoTitleMode: "ai",
   nextCursor: null,
   hasMore: false,
+
+  resetForLoggedOut() {
+    set({
+      conversations: [],
+      currentConversationId: null,
+      loading: false,
+      loadingMore: false,
+      error: null,
+      nextCursor: null,
+      hasMore: false,
+    });
+  },
 
   async createConversation(userId, title, contexts) {
     set({ error: null });

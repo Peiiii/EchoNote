@@ -11,12 +11,17 @@ import { logService, Platform } from "@/core/services/log.service";
 import { useEffect, useRef } from "react";
 import { GlobalProcessOverlay } from "@/common/components/global-process/global-process-overlay";
 import { GuestEntryPrompter } from "@/common/features/auth/components/guest-entry-prompter";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { LandingRouter } from "@/landing/landing-router";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user } = useFirebaseAuth();
   const sessionStartTime = useRef<number>(Date.now());
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
+  const location = useLocation();
+
+  const isLandingPage = location.pathname.startsWith("/landing");
 
   useEffect(() => {
     setNotesViewAuth(user);
@@ -31,6 +36,18 @@ export const App = () => {
       logService.logAppClose(sessionDuration);
     };
   }, [currentBreakpoint]);
+
+  // Show landing page if on /landing route
+  if (isLandingPage) {
+    return (
+      <>
+        <Routes>
+          <Route path="/landing/*" element={<LandingRouter />} />
+        </Routes>
+        <Toaster />
+      </>
+    );
+  }
 
   return (
     <>

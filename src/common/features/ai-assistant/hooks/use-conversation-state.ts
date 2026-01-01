@@ -20,6 +20,7 @@ export interface ConversationActions {
   ) => Promise<AIConversation>;
   loadConversations: (userId: string) => Promise<void>;
   loadMoreConversations: (userId: string) => Promise<void>;
+  resetForLoggedOut: () => void;
   selectConversation: (conversationId: string) => void;
   deleteConversation: (userId: string, conversationId: string) => Promise<void>;
   updateConversation: (
@@ -40,6 +41,7 @@ export function useConversationState(): ConversationState & ConversationActions 
   const createConversation = useConversationStore(s => s.createConversation);
   const loadConversations = useConversationStore(s => s.loadConversations);
   const loadMoreConversations = useConversationStore(s => s.loadMoreConversations);
+  const resetForLoggedOut = useConversationStore(s => s.resetForLoggedOut);
   const selectConversation = useConversationStore(s => s.selectConversation);
   const deleteConversation = useConversationStore(s => s.deleteConversation);
   const updateConversation = useConversationStore(s => s.updateConversation);
@@ -61,6 +63,7 @@ export function useConversationState(): ConversationState & ConversationActions 
     createConversation,
     loadConversations,
     loadMoreConversations,
+    resetForLoggedOut,
     selectConversation,
     deleteConversation,
     updateConversation,
