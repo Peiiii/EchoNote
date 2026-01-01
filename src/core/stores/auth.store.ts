@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "firebase/auth";
 import { firebaseAuthService } from "@/common/services/firebase/firebase-auth.service";
-import { useGlobalProcessStore } from "@/core/stores/global-process.store";
-import { getFeaturesConfig } from "@/core/config/features.config";
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
 
@@ -193,62 +191,17 @@ export const useAuthStore = create<AuthState>()(
           set({ isInitializing: true, authIsReady: false });
         }
 
-        // Show a global, brandable process overlay only when restoring a cached session
-        // Avoid showing it for fresh (logged-out) visits to prevent flicker on the login page
-        try {
-          const globalProcess = useGlobalProcessStore.getState();
-          const displayMode = getFeaturesConfig().ui?.globalProcess?.workspaceInit?.displayMode ?? "fullscreen";
-          const initId = "auth-refresh";
-          const showOverlay = hasCachedUser;
-          if (showOverlay) {
-            globalProcess.show({
-              id: initId,
-              title: "Restoring session",
-              message: "Refreshing authentication state...",
-              displayMode,
-              dismissible: false,
-            });
-          }
-
-          // When auth state resolves, close this overlay if we opened it
-          const maybeCompleteAuthOverlay = () => {
-            if (!showOverlay) return;
-            const state = useGlobalProcessStore.getState();
-            const current = state.process;
-            if (current && current.id === initId) {
-              state.succeed();
-              setTimeout(() => useGlobalProcessStore.getState().hide(), 300);
-            }
-          };
-
         const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
           get().setAuth(user);
 
           if (hasCachedUser) {
             set({ isRefreshing: false, authIsReady: true });
-            // If we were refreshing, finish and hide the global overlay (unless replaced by workspace init)
-            maybeCompleteAuthOverlay();
           } else {
             set({ isInitializing: false, authIsReady: true });
-            // Fresh visit (no cached user): no auth overlay was shown, keep login page stable
-            maybeCompleteAuthOverlay();
           }
         });
 
         return unsubscribe;
-        } catch (err) {
-          // If we fail to show overlay for some reason, don't break auth flow
-          console.warn("[auth.store] Failed to open global auth init overlay", err);
-          const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
-            get().setAuth(user);
-            if (hasCachedUser) {
-              set({ isRefreshing: false, authIsReady: true });
-            } else {
-              set({ isInitializing: false, authIsReady: true });
-            }
-          });
-          return unsubscribe;
-        }
       },
     }),
     {

@@ -1,6 +1,5 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
 import { LoginPage } from "@/common/features/auth/components/login-page";
-import { AppSkeleton } from "@/common/components/ui/skeleton";
 import { Toaster } from "@/common/components/ui/sonner";
 import { PWAInstallPrompt } from "@/common/components/pwa-install-prompt";
 import { PWAUpdatePrompt } from "@/common/components/pwa-update-prompt";
@@ -16,7 +15,7 @@ import { useLocation } from "react-router-dom";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
-  const { user, isInitializing } = useFirebaseAuth();
+  const { user } = useFirebaseAuth();
   const location = useLocation();
   const sessionStartTime = useRef<number>(Date.now());
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
@@ -36,16 +35,6 @@ export const App = () => {
       logService.logAppClose(sessionDuration);
     };
   }, [currentBreakpoint]);
-
-  if (isInitializing && !isPublicSpaceRoute) {
-    return (
-      <>
-        <GlobalProcessOverlay />
-        <AppSkeleton />
-        <Toaster />
-      </>
-    );
-  }
 
   if (!user && !isPublicSpaceRoute) {
     return (

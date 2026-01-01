@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
-import { useGlobalProcessStore } from "@/core/stores/global-process.store";
 import { getStorageProvider } from "@/core/storage/provider";
 import type { Cursor } from "@/core/storage/types";
 import type { Message, Channel } from "@/core/types/notes";
@@ -419,33 +418,14 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     get().cleanupListeners();
     set({ userId, channelsLoading: true });
 
-    // Global process overlay: workspace initialization
     const featuresConfig = getFeaturesConfig();
     const migrationsEnabled = featuresConfig.data?.migrations?.enabled !== false;
-    const globalProcess = useGlobalProcessStore.getState();
-    const displayMode = featuresConfig.ui?.globalProcess?.workspaceInit?.displayMode ?? "dialog";
-    globalProcess.show({
-      id: "workspace-init",
-      title: "Setting up your workspace",
-      message: "Preparing your spaces and notes...",
-      displayMode,
-      steps: [
-        ...(migrationsEnabled
-          ? [{ id: "migrations", title: "Applying migrations", status: "pending" as const }]
-          : []),
-        { id: "subscribe", title: "Connecting to spaces", status: "pending" as const },
-      ],
-    });
 
     // Ensure backend initialization (e.g., migrations) is applied before subscribe
     if (migrationsEnabled) {
       try {
-        globalProcess.setStepStatus("migrations", "running");
         await getStorageProvider().initializeForUser(userId);
-        globalProcess.setStepStatus("migrations", "success");
       } catch (e) {
-        globalProcess.setStepStatus("migrations", "error");
-        globalProcess.fail("Failed to apply migrations");
         throw e;
       }
     }
@@ -461,9 +441,6 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
       // First successful snapshot completes the init overlay
       if (channels) {
-        globalProcess.setStepStatus("subscribe", "success");
-        globalProcess.succeed();
-        setTimeout(() => useGlobalProcessStore.getState().hide(), 400);
       }
 
       get().validateAndCleanupCurrentChannel(channels);
