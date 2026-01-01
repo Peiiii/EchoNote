@@ -15,7 +15,8 @@ export function openGuestDataNoticeModal() {
         </div>
         <div className="flex justify-end gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
+            className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
             onClick={() => {
               modal.close();
               openLoginModal({
@@ -26,10 +27,15 @@ export function openGuestDataNoticeModal() {
           >
             去登录
           </Button>
-          <Button onClick={() => modal.close()}>我知道了</Button>
+          <Button
+            variant="ghost"
+            className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+            onClick={() => modal.close()}
+          >
+            我知道了
+          </Button>
         </div>
       </div>
     ),
   });
 }
-
