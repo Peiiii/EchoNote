@@ -15,6 +15,9 @@ import { Channel } from "@/core/stores/notes-data.store";
 import { Check, Copy, Lock, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/common/lib/utils";
+import { useAuthStore } from "@/core/stores/auth.store";
+import { openLoginModal } from "@/common/features/auth/open-login-modal";
+import { toast } from "sonner";
 
 interface PublishSpaceDialogProps {
   channel: Channel;
@@ -28,6 +31,7 @@ export function PublishSpaceDialog({
   onOpenChange,
 }: PublishSpaceDialogProps) {
   const { publishSpace, unpublishSpace, updatePublishMode } = useNotesDataStore();
+  const currentUser = useAuthStore(s => s.currentUser);
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [selectedMode, setSelectedMode] = useState<ShareMode>(
@@ -46,6 +50,14 @@ export function PublishSpaceDialog({
     : "";
 
   const handlePublish = async () => {
+    if (!currentUser) {
+      toast("Sign in to publish this space");
+      openLoginModal({
+        title: "Sign in to publish",
+        description: "Publishing creates a shareable cloud link for this space.",
+      });
+      return;
+    }
     setIsLoading(true);
     try {
       await publishSpace(channel.id, selectedMode);
@@ -57,6 +69,14 @@ export function PublishSpaceDialog({
   };
 
   const handleUnpublish = async () => {
+    if (!currentUser) {
+      toast("Sign in to unpublish this space");
+      openLoginModal({
+        title: "Sign in to manage publishing",
+        description: "Unpublishing is a cloud action and requires an account.",
+      });
+      return;
+    }
     modal.confirm({
       title: "Unpublish Space",
       description: `This will make the space "${channel.name}" private. Anyone with the share link will no longer be able to access it.`,
@@ -97,6 +117,14 @@ export function PublishSpaceDialog({
 
   const handleConfirmModeChange = async () => {
     if (!channel.shareToken || !hasModeChanged) return;
+    if (!currentUser) {
+      toast("Sign in to update publish mode");
+      openLoginModal({
+        title: "Sign in to update publish mode",
+        description: "Updating publish mode is a cloud action and requires an account.",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -253,4 +281,3 @@ export function PublishSpaceDialog({
     </Dialog>
   );
 }
-

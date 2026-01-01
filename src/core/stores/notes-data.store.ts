@@ -4,6 +4,7 @@ import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { getStorageProvider } from "@/core/storage/provider";
+import { getOrCreateGuestUserId } from "@/core/services/guest-id";
 import type { Cursor } from "@/core/storage/types";
 import type { Message, Channel } from "@/core/types/notes";
 
@@ -61,6 +62,7 @@ export interface NotesDataState {
 
   // Firebase integration
   initFirebaseListeners: (userId: string) => Promise<void>;
+  initGuestWorkspace: () => Promise<void>;
   cleanupListeners: () => void;
   fetchInitialData: (userId: string) => Promise<void>;
   validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
@@ -423,11 +425,7 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
 
     // Ensure backend initialization (e.g., migrations) is applied before subscribe
     if (migrationsEnabled) {
-      try {
-        await getStorageProvider().initializeForUser(userId);
-      } catch (e) {
-        throw e;
-      }
+      await getStorageProvider().initializeForUser(userId);
     }
 
     const notesRepo = getStorageProvider().notes;
@@ -439,14 +437,15 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
       if (!isListenerEnabled) return;
       set({ channels, channelsLoading: false });
 
-      // First successful snapshot completes the init overlay
-      if (channels) {
-      }
-
       get().validateAndCleanupCurrentChannel(channels);
     });
 
     set({ unsubscribeChannels });
+  },
+
+  initGuestWorkspace: async () => {
+    const guestUserId = getOrCreateGuestUserId();
+    await get().initFirebaseListeners(guestUserId);
   },
 
   cleanupListeners: () => {

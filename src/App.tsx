@@ -1,5 +1,4 @@
 import { useBreakpoint } from "@/common/components/breakpoint-provider";
-import { LoginPage } from "@/common/features/auth/components/login-page";
 import { Toaster } from "@/common/components/ui/sonner";
 import { PWAInstallPrompt } from "@/common/components/pwa-install-prompt";
 import { PWAUpdatePrompt } from "@/common/components/pwa-update-prompt";
@@ -11,16 +10,13 @@ import { MobileApp } from "@/mobile/mobile-app";
 import { logService, Platform } from "@/core/services/log.service";
 import { useEffect, useRef } from "react";
 import { GlobalProcessOverlay } from "@/common/components/global-process/global-process-overlay";
-import { useLocation } from "react-router-dom";
+import { GuestEntryPrompter } from "@/common/features/auth/components/guest-entry-prompter";
 
 export const App = () => {
   const { currentBreakpoint } = useBreakpoint();
   const { user } = useFirebaseAuth();
-  const location = useLocation();
   const sessionStartTime = useRef<number>(Date.now());
   const setNotesViewAuth = useNotesViewStore(state => state.setAuth);
-
-  const isPublicSpaceRoute = location.pathname.startsWith("/space/");
 
   useEffect(() => {
     setNotesViewAuth(user);
@@ -36,28 +32,9 @@ export const App = () => {
     };
   }, [currentBreakpoint]);
 
-  if (!user && !isPublicSpaceRoute) {
-    return (
-      <>
-        {/* <GlobalProcessOverlay /> */}
-        <LoginPage />
-        <Toaster />
-      </>
-    );
-  }
-
-  if (!user && isPublicSpaceRoute) {
-    return (
-      <>
-        <GlobalProcessOverlay />
-        {currentBreakpoint === "sm" ? <MobileApp /> : <DesktopApp />}
-        <Toaster />
-      </>
-    );
-  }
-
   return (
     <>
+      <GuestEntryPrompter />
       <GlobalProcessOverlay />
       {currentBreakpoint === "sm" ? <MobileApp /> : <DesktopApp />}
       <Toaster />

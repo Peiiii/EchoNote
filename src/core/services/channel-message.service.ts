@@ -1,6 +1,5 @@
 import { RxEvent } from "@/common/lib/rx-event";
 import { Message, useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import type { Cursor } from "@/core/storage/types";
 import { getStorageProvider } from "@/core/storage/provider";
 import { createDataContainer, createSlice } from "rx-nested-bean";
@@ -167,8 +166,7 @@ export class ChannelMessageService {
     messagesLimit: number;
   }) => {
     console.log("[ChannelMessageService] loadInitialMessages", { channelId, messagesLimit });
-    const { currentUser } = useNotesViewStore.getState();
-    const userId = currentUser?.uid;
+    const { userId } = useNotesDataStore.getState();
     console.log("[ChannelMessageService] loadInitialMessages", {
       channelId,
       messagesLimit,

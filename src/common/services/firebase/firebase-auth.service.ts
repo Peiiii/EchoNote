@@ -2,6 +2,7 @@ import { firebaseConfig } from "@/common/config/firebase.config";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useAuthStore } from "@/core/stores/auth.store";
 import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
+import { hasGuestWorkspace } from "@/core/services/guest-id";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -214,7 +215,6 @@ export const firebaseAuthService = {
   signOut: async (): Promise<void> => {
     const auth = await firebaseConfig.getAuth();
     await signOut(auth);
-    useNotesDataStore.getState().cleanupListeners();
     hasInitializedListeners = false;
   },
 
@@ -274,11 +274,18 @@ export const firebaseAuthService = {
         } else {
           console.log("❌ User email not verified, cleaning up listeners");
           useNotesDataStore.getState().cleanupListeners();
+          if (hasGuestWorkspace()) {
+            await useNotesDataStore.getState().initGuestWorkspace();
+          }
         }
       } else {
         console.log("🚪 No user, cleaning up listeners");
-        useNotesDataStore.getState().cleanupListeners();
         hasInitializedListeners = false;
+        if (hasGuestWorkspace()) {
+          await useNotesDataStore.getState().initGuestWorkspace();
+        } else {
+          useNotesDataStore.getState().cleanupListeners();
+        }
       }
 
       console.log("📞 Calling auth state callback");

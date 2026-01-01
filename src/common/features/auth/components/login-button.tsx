@@ -1,14 +1,13 @@
 import { Button } from "@/common/components/ui/button";
 import { useAuthStore } from "@/core/stores/auth.store";
-import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { LogIn } from "lucide-react";
+import { openLoginModal } from "@/common/features/auth/open-login-modal";
 
 export const LoginButton = () => {
-  const { currentUser, signInWithGoogle, signOut } = useAuthStore();
-  const { isGoogleAuthSupported } = useGoogleAuthSupport();
+  const { currentUser, signOut } = useAuthStore();
 
   const handleLogin = async () => {
-    await signInWithGoogle();
+    openLoginModal();
   };
 
   const handleLogout = async () => {
@@ -24,10 +23,6 @@ export const LoginButton = () => {
         </Button>
       </div>
     );
-  }
-
-  if (!isGoogleAuthSupported) {
-    return null;
   }
 
   return (
