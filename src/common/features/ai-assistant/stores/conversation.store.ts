@@ -4,6 +4,8 @@ import { firebaseAIConversationService } from "@/common/services/firebase/fireba
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import { handleAutoTitleSnapshot } from "@/common/features/ai-assistant/services/title-generator.service";
+import { isGuestUserId } from "@/core/services/guest-id";
+import { localAIConversationService } from "@/common/services/local/local-ai-conversation.service";
 
 function shouldGenerateTitleForConversation(
   conversation: AIConversation,
@@ -141,11 +143,9 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       uiView: "chat",
     }));
     try {
-      const created = await firebaseAIConversationService.createConversation(
-        userId,
-        title,
-        contexts
-      );
+      const created = isGuestUserId(userId)
+        ? await localAIConversationService.createConversation(userId, title, contexts)
+        : await firebaseAIConversationService.createConversation(userId, title, contexts);
       set(s => ({
         conversations: s.conversations.map(c => (c.id === tempId ? created : c)),
         currentConversationId: created.id,
@@ -166,9 +166,9 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
     // Initial page (~20)
     set({ loading: true, error: null, nextCursor: null, hasMore: false });
     try {
-      const { items, nextCursor } = await firebaseAIConversationService.listConversations(userId, {
-        limit: 20,
-      });
+      const { items, nextCursor } = isGuestUserId(userId)
+        ? await localAIConversationService.listConversations(userId, { limit: 20 })
+        : await firebaseAIConversationService.listConversations(userId, { limit: 20 });
       const currentId = get().currentConversationId;
       set({ conversations: items, loading: false, nextCursor, hasMore: Boolean(nextCursor) });
       if (items.length > 0 && !currentId) {
@@ -187,10 +187,15 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
     if (!hasMore || loadingMore) return;
     set({ loadingMore: true });
     try {
-      const { items, nextCursor: next } = await firebaseAIConversationService.listConversations(
-        userId,
-        { limit: 20, startAfterLastMessageAt: nextCursor }
-      );
+      const { items, nextCursor: next } = isGuestUserId(userId)
+        ? await localAIConversationService.listConversations(userId, {
+            limit: 20,
+            startAfterLastMessageAt: nextCursor,
+          })
+        : await firebaseAIConversationService.listConversations(userId, {
+            limit: 20,
+            startAfterLastMessageAt: nextCursor,
+          });
       // Append and dedupe by id
       const existing = get().conversations;
       const merged = [...existing];
@@ -223,7 +228,11 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       currentConversationId: wasCurrent ? null : s.currentConversationId,
     }));
     try {
-      await firebaseAIConversationService.deleteConversation(userId, conversationId);
+      if (isGuestUserId(userId)) {
+        await localAIConversationService.deleteConversation(userId, conversationId);
+      } else {
+        await firebaseAIConversationService.deleteConversation(userId, conversationId);
+      }
     } catch (err) {
       // revert on failure
       set({
@@ -244,7 +253,11 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       conversations: s.conversations.map(c => (c.id === conversationId ? { ...c, ...updates } : c)),
     }));
     try {
-      await firebaseAIConversationService.updateConversation(userId, conversationId, updates);
+      if (isGuestUserId(userId)) {
+        await localAIConversationService.updateConversation(userId, conversationId, updates);
+      } else {
+        await firebaseAIConversationService.updateConversation(userId, conversationId, updates);
+      }
     } catch (err) {
       // Revert on failure
       set({
@@ -277,10 +290,17 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
   },
 
   async archiveConversation(userId, conversationId) {
-    await firebaseAIConversationService.updateConversation(userId, conversationId, {
-      isArchived: true,
-      updatedAt: new Date(),
-    });
+    if (isGuestUserId(userId)) {
+      await localAIConversationService.updateConversation(userId, conversationId, {
+        isArchived: true,
+        updatedAt: new Date(),
+      });
+    } else {
+      await firebaseAIConversationService.updateConversation(userId, conversationId, {
+        isArchived: true,
+        updatedAt: new Date(),
+      });
+    }
     set(s => ({
       conversations: s.conversations.map(c =>
         c.id === conversationId ? { ...c, isArchived: true } : c
@@ -288,10 +308,17 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
     }));
   },
   async unarchiveConversation(userId, conversationId) {
-    await firebaseAIConversationService.updateConversation(userId, conversationId, {
-      isArchived: false,
-      updatedAt: new Date(),
-    });
+    if (isGuestUserId(userId)) {
+      await localAIConversationService.updateConversation(userId, conversationId, {
+        isArchived: false,
+        updatedAt: new Date(),
+      });
+    } else {
+      await firebaseAIConversationService.updateConversation(userId, conversationId, {
+        isArchived: false,
+        updatedAt: new Date(),
+      });
+    }
     set(s => ({
       conversations: s.conversations.map(c =>
         c.id === conversationId ? { ...c, isArchived: false } : c
@@ -341,7 +368,11 @@ export const useConversationStore = create<State & Actions>((set, get) => ({
       autoTitleDone: state.autoTitleDone,
       getUserId: () => useNotesDataStore.getState().userId,
       update: async (userId, id, title) => {
-        await firebaseAIConversationService.updateConversation(userId, id, { title });
+        if (isGuestUserId(userId)) {
+          await localAIConversationService.updateConversation(userId, id, { title });
+        } else {
+          await firebaseAIConversationService.updateConversation(userId, id, { title });
+        }
       },
       applyLocal: (id, title) =>
         set(s => ({

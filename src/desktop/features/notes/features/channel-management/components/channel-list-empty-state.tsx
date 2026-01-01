@@ -1,11 +1,22 @@
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
+import { openLoginModal } from "@/common/features/auth/open-login-modal";
 import { logService } from "@/core/services/log.service";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Plus } from "lucide-react";
 
 export const ChannelListEmptyState = () => {
   const presenter = useCommonPresenterContext();
+  const userId = useNotesDataStore(s => s.userId);
 
   const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
+    if (!userId) {
+      openLoginModal({
+        title: "登录或本地体验",
+        description: "登录后可云同步、发布空间；也可以先用本地模式体验并创建空间。",
+        allowGuest: true,
+      });
+      return;
+    }
     await presenter.channelManager.addChannel(channel);
     logService.logChannelCreate(
       channel.name,

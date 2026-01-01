@@ -4,6 +4,8 @@ import { distinctUntilChanged, filter, shareReplay, switchMap, tap } from "rxjs/
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import { firebaseAIConversationService } from "@/common/services/firebase/firebase-ai-conversation.service";
+import { isGuestUserId } from "@/core/services/guest-id";
+import { localAIConversationService } from "@/common/services/local/local-ai-conversation.service";
 
 export type ConversationMessagesState = {
   messages: UIMessage[];
@@ -103,7 +105,9 @@ export class ConversationMessageService {
     ensureInit();
     setLoading(true);
     try {
-      const list = await firebaseAIConversationService.getMessages(userId, conversationId);
+      const list = isGuestUserId(userId)
+        ? await localAIConversationService.getMessages(userId, conversationId)
+        : await firebaseAIConversationService.getMessages(userId, conversationId);
       setMessages(list);
       const unsubscribe = this.subscribeToMessages({ userId, conversationId });
       setSubscription({ unsubscribe });
@@ -120,17 +124,29 @@ export class ConversationMessageService {
     conversationId: string;
   }) => {
     const { setMessages } = this.getConversationStateControl(conversationId);
-    return firebaseAIConversationService.subscribeToMessages(userId, conversationId, msgs =>
-      setMessages(msgs || [])
-    );
+    return isGuestUserId(userId)
+      ? localAIConversationService.subscribeToMessages(userId, conversationId, msgs =>
+          setMessages(msgs || [])
+        )
+      : firebaseAIConversationService.subscribeToMessages(userId, conversationId, msgs =>
+          setMessages(msgs || [])
+        );
   };
 
   async createMessage(userId: string, conversationId: string, message: UIMessage) {
-    await firebaseAIConversationService.createMessage(userId, conversationId, message);
+    if (isGuestUserId(userId)) {
+      await localAIConversationService.createMessage(userId, conversationId, message);
+    } else {
+      await firebaseAIConversationService.createMessage(userId, conversationId, message);
+    }
   }
 
   async updateMessage(userId: string, conversationId: string, message: UIMessage) {
-    await firebaseAIConversationService.updateMessage(userId, conversationId, message.id, message);
+    if (isGuestUserId(userId)) {
+      await localAIConversationService.updateMessage(userId, conversationId, message.id, message);
+    } else {
+      await firebaseAIConversationService.updateMessage(userId, conversationId, message.id, message);
+    }
   }
 }
 

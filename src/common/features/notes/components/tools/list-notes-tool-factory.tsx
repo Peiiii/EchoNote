@@ -5,9 +5,9 @@ import {
   ListNotesToolArgs,
   ListNotesToolResult,
 } from "@/common/features/agent-tools/renderers/list-notes-tool-renderer";
-import { firebaseNotesService } from "@/common/services/firebase/firebase-notes.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { formatTimeForSocial } from "@/common/lib/time-utils";
+import { getStorageProvider } from "@/core/storage/provider";
 
 // Factory function to create the listNotes tool
 export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResult> {
@@ -37,19 +37,23 @@ export function createListNotesTool(): Tool<ListNotesToolArgs, ListNotesToolResu
     execute: async toolCallArgs => {
       try {
         const { limit = 10, order = "desc", channelId } = toolCallArgs as ListNotesToolArgs;
-        const { userId } = useNotesDataStore.getState();
-        if (!userId) throw new Error("User not signed in");
+        let { userId } = useNotesDataStore.getState();
+        if (!userId) {
+          await useNotesDataStore.getState().initGuestWorkspace();
+          userId = useNotesDataStore.getState().userId;
+        }
+        if (!userId) throw new Error("No active workspace");
 
-        const { messages } = await firebaseNotesService.fetchInitialMessagesAllSenders(
-          userId,
-          channelId,
-          limit
-        );
+        const { items } = await getStorageProvider().notes.listMessages(userId, channelId, {
+          limit,
+          cursor: null,
+          includeSenders: ["user", "ai"],
+        });
 
         const sorted =
           order === "asc"
-            ? [...messages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-            : [...messages].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+            ? [...items].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+            : [...items].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
         const notesForDisplay: NoteForDisplay[] = sorted.map(note => ({
           content: note.content.substring(0, 200) + (note.content.length > 200 ? "..." : ""),

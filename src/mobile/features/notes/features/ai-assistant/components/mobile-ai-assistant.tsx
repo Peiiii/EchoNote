@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useAuthStore } from "@/core/stores/auth.store";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { AIConversationMobile, MobileConversationRef } from "./ai-conversation-mobile";
-import { openLoginModal } from "@/common/features/auth/open-login-modal";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 
 interface MobileAIAssistantProps {
   channelId: string;
@@ -11,7 +10,7 @@ interface MobileAIAssistantProps {
 }
 
 export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssistantProps) => {
-  const uid = useAuthStore(s => s.currentUser?.uid) ?? null;
+  const { userId, initGuestWorkspace } = useNotesDataStore();
   const {
     conversations,
     currentConversationId,
@@ -24,21 +23,20 @@ export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssist
 
   useEffect(() => {
     if (!isOpen) return;
-    if (!uid) {
+    if (!userId) {
       resetForLoggedOut();
-      openLoginModal({ title: "登录以使用对话能力" });
+      void initGuestWorkspace();
       return;
     }
-    loadConversations(uid);
-  }, [uid, isOpen, loadConversations, resetForLoggedOut]);
+    loadConversations(userId);
+  }, [userId, isOpen, initGuestWorkspace, loadConversations, resetForLoggedOut]);
 
   const handleCreateConversation = () => {
-    if (!uid) return;
-    void createConversation(uid, "New Conversation");
+    if (!userId) return;
+    void createConversation(userId, "New Conversation");
   };
 
   if (!isOpen) return null;
-  if (!uid) return null;
 
   return (
     <AIConversationMobile
