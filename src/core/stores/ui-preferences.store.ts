@@ -38,7 +38,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
   persist(
     set => ({
       // Initial state
-      isLeftSidebarCollapsed: false,
+      isLeftSidebarCollapsed: true,
       rightSidebarVisible: false,
       rightSidebarSize: 35,
       layoutMode: "default",
