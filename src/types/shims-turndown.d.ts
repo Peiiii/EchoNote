@@ -1,4 +1,4 @@
-declare module 'turndown' {
+declare module "turndown" {
   export default class TurndownService {
     constructor(options?: Record<string, unknown>);
     use(plugin: unknown): void;
@@ -6,6 +6,6 @@ declare module 'turndown' {
   }
 }
 
-declare module 'turndown-plugin-gfm' {
+declare module "turndown-plugin-gfm" {
   export function gfm(service?: unknown): void;
 }
