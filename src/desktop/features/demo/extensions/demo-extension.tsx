@@ -1,7 +1,5 @@
-import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
-import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import {
   Calendar,
@@ -45,36 +43,6 @@ export const demoExtension = defineExtension({
           "demo-calendar": Calendar,
           "demo-star": Star,
           "demo-heart": Heart,
-        })
-      )
-    );
-
-    // Register activity bar items - main group
-    subscriptions.push(
-      Disposable.from(
-        useActivityBarStore.getState().addItem({
-          id: "demo",
-          label: "Demo",
-          title: "Plugin Architecture Demo",
-          group: ActivityBarGroup.MAIN,
-          icon: "test-tube",
-          order: 100,
-          iconColor: "text-purple-600 dark:text-purple-400",
-        })
-      )
-    );
-
-    // Register activity bar items - footer group
-    subscriptions.push(
-      Disposable.from(
-        useActivityBarStore.getState().addItem({
-          id: "demo-settings",
-          label: "Settings",
-          title: "Demo Settings",
-          group: ActivityBarGroup.FOOTER,
-          icon: "demo-settings",
-          order: 1,
-          iconColor: "text-orange-600 dark:text-orange-400",
         })
       )
     );
@@ -136,22 +104,6 @@ export const demoExtension = defineExtension({
             path: "/demo/svg-homepage",
             element: <SVGHomepageDemo />,
             order: 108,
-          },
-        ])
-      )
-    );
-
-    // Connect routes with activity bar
-    subscriptions.push(
-      Disposable.from(
-        connectRouterWithActivityBar([
-          {
-            activityKey: "demo",
-            routerPath: "/demo",
-          },
-          {
-            activityKey: "demo-settings",
-            routerPath: "/demo/settings",
           },
         ])
       )

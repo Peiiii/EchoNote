@@ -1,7 +1,5 @@
-import { ActivityBarGroup, useActivityBarStore } from "@/core/stores/activity-bar.store";
 import { useIconStore } from "@/core/stores/icon.store";
 import { useRouteTreeStore } from "@/core/stores/route-tree.store";
-import { connectRouterWithActivityBar } from "@/core/utils/connect-router-with-activity-bar";
 import { defineExtension, Disposable } from "@cardos/extension";
 import { Notebook, Hash, Plus, Menu } from "lucide-react";
 import { MobileNotesPage } from "../pages/mobile-notes-page";
@@ -30,21 +28,6 @@ export const mobileNotesExtension = defineExtension({
       )
     );
 
-    // Register activity bar items - mobile optimized
-    subscriptions.push(
-      Disposable.from(
-        useActivityBarStore.getState().addItem({
-          id: "mobile-notes",
-          label: "Notes",
-          title: "Mobile Notes",
-          group: ActivityBarGroup.MAIN,
-          icon: "notebook",
-          order: 1,
-          iconColor: "text-blue-600 dark:text-blue-400",
-        })
-      )
-    );
-
     // Register routes - mobile notes page
     subscriptions.push(
       Disposable.from(
@@ -67,18 +50,6 @@ export const mobileNotesExtension = defineExtension({
             path: "*",
             element: <Navigate to="/notes" />,
             order: 9999,
-          },
-        ])
-      )
-    );
-
-    // Connect routes with activity bar
-    subscriptions.push(
-      Disposable.from(
-        connectRouterWithActivityBar([
-          {
-            activityKey: "mobile-notes",
-            routerPath: "/notes",
           },
         ])
       )

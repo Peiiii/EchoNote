@@ -30,6 +30,7 @@ import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { EditChannelPopover } from "../../../channel-management/components/edit-channel-popover";
 import { Edit2 } from "lucide-react";
 import { PublishSpaceDialog } from "../../../channel-management/components/publish-space-dialog";
+import { HeaderMenu } from "./header-menu";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -165,6 +166,7 @@ export const ChannelHeader = ({
   // without expanding the sidebar.
   const collapsedContent = (
     <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
+      <HeaderMenu tone="dark" />
       {/* Sidebar expand button when sidebar is collapsed */}
       {isLeftSidebarCollapsed && (
         <>
@@ -243,6 +245,7 @@ export const ChannelHeader = ({
     <>
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <HeaderMenu tone="light" />
           {/* Sidebar expand button when sidebar is collapsed */}
           {isLeftSidebarCollapsed && (
             <>
