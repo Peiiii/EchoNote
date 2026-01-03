@@ -6,10 +6,13 @@ import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { hasGuestWorkspace } from "@/core/services/guest-id";
 
+export type SessionMode = "booting" | "cloud" | "local" | "signedOut";
+
 export interface AuthState {
   currentUser: User | null;
   authIsReady: boolean;
   authIsSettled: boolean;
+  sessionMode: SessionMode;
   isInitializing: boolean;
   isRefreshing: boolean;
   isAuthenticating: boolean;
@@ -33,10 +36,6 @@ export interface AuthState {
   sendEmailVerification: () => Promise<void>;
   signOut: () => Promise<void>;
   setAuth: (user: User | null) => void;
-  setAuthReady: (ready: boolean) => void;
-  setInitializing: (initializing: boolean) => void;
-  setRefreshing: (refreshing: boolean) => void;
-  setAuthenticating: (authenticating: boolean) => void;
   setAuthStep: (step: AuthStep, message: string, progress: number) => void;
   initAuthListener: () => Promise<() => void>;
 }
@@ -55,10 +54,28 @@ function getAuthListenerSingleton(): AuthListenerSingleton {
   return g[key]!;
 }
 
+async function applySessionWorkspaceForUser(user: User | null): Promise<SessionMode> {
+  const notes = useNotesDataStore.getState();
+
+  if (user && user.emailVerified) {
+    await notes.initFirebaseListeners(user.uid);
+    return "cloud";
+  }
+
+  if (hasGuestWorkspace()) {
+    await notes.initGuestWorkspace();
+    return "local";
+  }
+
+  notes.cleanupListeners();
+  return "signedOut";
+}
+
 export const useAuthStore = create<AuthState>()((set, get) => ({
   currentUser: null,
   authIsReady: false,
   authIsSettled: false,
+  sessionMode: "booting",
   isInitializing: false,
   isRefreshing: false,
   isAuthenticating: false,
@@ -167,7 +184,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     set({ isAuthenticating: true });
     try {
       await firebaseAuthService.signOut();
-      useNotesDataStore.getState().cleanupListeners();
+      get().setAuth(null);
+      const nextMode = await applySessionWorkspaceForUser(null);
+      set({ sessionMode: nextMode });
     } finally {
       set({ isAuthenticating: false });
     }
@@ -175,22 +194,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   setAuth: (user: User | null) => {
     set({ currentUser: user });
-  },
-
-  setAuthReady: (ready: boolean) => {
-    set({ authIsReady: ready });
-  },
-
-  setInitializing: (initializing: boolean) => {
-    set({ isInitializing: initializing });
-  },
-
-  setRefreshing: (refreshing: boolean) => {
-    set({ isRefreshing: refreshing });
-  },
-
-  setAuthenticating: (authenticating: boolean) => {
-    set({ isAuthenticating: authenticating });
   },
 
   setAuthStep: (step: AuthStep, message: string, progress: number) => {
@@ -212,6 +215,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       authIsSettled: false,
       isInitializing: true,
       isRefreshing: false,
+      sessionMode: "booting",
     });
 
     // Avoid a transient "empty channels" UI between app boot and auth resolution.
@@ -224,37 +228,18 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         get().setAuth(user);
         set({ authIsReady: true, isInitializing: false, isRefreshing: false });
 
-        // Verified user -> use cloud workspace immediately.
         if (user && user.emailVerified) {
           firebaseConfig.setUserIdForAnalytics(user.uid);
-          void useNotesDataStore
-            .getState()
-            .initFirebaseListeners(user.uid)
-            .catch(err => {
-              console.error("[auth] init firebase listeners failed", err);
-              useNotesDataStore.getState().cleanupListeners();
-            })
-            .finally(() => {
-              set({ authIsSettled: true });
-            });
-          return;
         }
 
-        // Logged-out (or unverified) users: enter local automatically if a guest workspace exists.
-        if (hasGuestWorkspace()) {
-          void useNotesDataStore
-            .getState()
-            .initGuestWorkspace()
-            .catch(err => {
-              console.error("[auth] init guest workspace failed", err);
-              useNotesDataStore.getState().cleanupListeners();
-            })
-            .finally(() => set({ authIsSettled: true }));
-          return;
-        }
-
-        useNotesDataStore.getState().cleanupListeners();
-        set({ authIsSettled: true });
+        void applySessionWorkspaceForUser(user)
+          .then(mode => set({ sessionMode: mode }))
+          .catch(err => {
+            console.error("[auth] apply session workspace failed", err);
+            useNotesDataStore.getState().cleanupListeners();
+            set({ sessionMode: "signedOut" });
+          })
+          .finally(() => set({ authIsSettled: true }));
       });
 
       singleton.unsubscribe = unsubscribe;
