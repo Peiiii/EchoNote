@@ -9,10 +9,10 @@ import { modal } from "@/common/components/modal/modal.store";
 export function GuestEntryPrompter() {
   const location = useLocation();
   const currentUser = useAuthStore(s => s.currentUser);
-  const authIsSettled = useAuthStore(s => s.authIsSettled);
+  const sessionMode = useAuthStore(s => s.sessionMode);
 
   useEffect(() => {
-    if (!authIsSettled) return;
+    if (sessionMode === "booting") return;
     if (currentUser) return;
     if (location.pathname.startsWith("/space/")) return;
 
@@ -28,7 +28,7 @@ export function GuestEntryPrompter() {
         allowGuest: true,
       });
     }
-  }, [location.pathname, currentUser, authIsSettled]);
+  }, [location.pathname, currentUser, sessionMode]);
 
   return null;
 }

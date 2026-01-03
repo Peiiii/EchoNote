@@ -10,11 +10,7 @@ export type SessionMode = "booting" | "cloud" | "local" | "signedOut";
 
 export interface AuthState {
   currentUser: User | null;
-  authIsReady: boolean;
-  authIsSettled: boolean;
   sessionMode: SessionMode;
-  isInitializing: boolean;
-  isRefreshing: boolean;
   isAuthenticating: boolean;
   authStep: AuthStep;
   authMessage: string;
@@ -73,11 +69,7 @@ async function applySessionWorkspaceForUser(user: User | null): Promise<SessionM
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
   currentUser: null,
-  authIsReady: false,
-  authIsSettled: false,
   sessionMode: "booting",
-  isInitializing: false,
-  isRefreshing: false,
   isAuthenticating: false,
   authStep: AuthStep.IDLE,
   authMessage: "",
@@ -209,14 +201,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     }
     singleton.started = true;
 
-    // Reset readiness/settling every boot. We rely on Firebase for persistence.
-    set({
-      authIsReady: false,
-      authIsSettled: false,
-      isInitializing: true,
-      isRefreshing: false,
-      sessionMode: "booting",
-    });
+    set({ sessionMode: "booting" });
 
     // Avoid a transient "empty channels" UI between app boot and auth resolution.
     // We keep the channels list in a loading state until auth is settled.
@@ -226,7 +211,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     try {
       const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
         get().setAuth(user);
-        set({ authIsReady: true, isInitializing: false, isRefreshing: false });
 
         if (user && user.emailVerified) {
           firebaseConfig.setUserIdForAnalytics(user.uid);
@@ -238,8 +222,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
             console.error("[auth] apply session workspace failed", err);
             useNotesDataStore.getState().cleanupListeners();
             set({ sessionMode: "signedOut" });
-          })
-          .finally(() => set({ authIsSettled: true }));
+          });
       });
 
       singleton.unsubscribe = unsubscribe;

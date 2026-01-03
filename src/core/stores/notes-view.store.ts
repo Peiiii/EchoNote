@@ -19,7 +19,6 @@ export interface NotesViewState {
 
   // User auth states
   currentUser: User | null;
-  authIsReady: boolean;
 
   // Auth actions
   setAuth: (user: User | null) => void;
@@ -47,11 +46,10 @@ export const useNotesViewStore = create<NotesViewState>()(
       isUpdatingMessage: false,
       isDeletingMessage: false,
       currentUser: null,
-      authIsReady: false,
 
       // Auth actions
       setAuth: user => {
-        set({ currentUser: user, authIsReady: true });
+        set({ currentUser: user });
       },
 
       // View actions

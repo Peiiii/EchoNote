@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/core/stores/auth.store";
 
 export const useFirebaseAuth = () => {
-  const { currentUser, isInitializing, isRefreshing, initAuthListener } = useAuthStore();
+  const { currentUser, sessionMode, initAuthListener } = useAuthStore();
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -22,7 +22,6 @@ export const useFirebaseAuth = () => {
 
   return {
     user: currentUser,
-    isInitializing,
-    isRefreshing,
+    sessionMode,
   };
 };
