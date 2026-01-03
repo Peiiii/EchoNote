@@ -5,7 +5,6 @@ import { useAuthStore } from "@/core/stores/auth.store";
 import { openLoginModal } from "@/common/features/auth/open-login-modal";
 import { openGuestDataNoticeModal } from "@/common/features/auth/open-guest-data-notice-modal";
 import { modal } from "@/common/components/modal/modal.store";
-import { workspaceMode } from "@/core/services/workspace-mode";
 
 export function GuestEntryPrompter() {
   const location = useLocation();
@@ -20,8 +19,7 @@ export function GuestEntryPrompter() {
     // Always prompt when entering the app (route change) in logged-out mode.
     // If a guest workspace exists, show a notice; otherwise show login modal with a "local experience" option.
     modal.close();
-    const mode = workspaceMode.get();
-    if (mode === "local" && hasGuestWorkspace()) {
+    if (hasGuestWorkspace()) {
       openGuestDataNoticeModal();
     } else {
       openLoginModal({

@@ -5,7 +5,6 @@ import { channelMessageService } from "@/core/services/channel-message.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { getStorageProvider } from "@/core/storage/provider";
 import { getOrCreateGuestUserId } from "@/core/services/guest-id";
-import { workspaceMode } from "@/core/services/workspace-mode";
 import type { Cursor } from "@/core/storage/types";
 import type { Message, Channel } from "@/core/types/notes";
 
@@ -445,7 +444,6 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
   },
 
   initGuestWorkspace: async () => {
-    workspaceMode.set("local");
     const guestUserId = getOrCreateGuestUserId();
     await get().initFirebaseListeners(guestUserId);
   },

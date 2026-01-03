@@ -3,10 +3,8 @@ import { User } from "firebase/auth";
 import { firebaseAuthService } from "@/common/services/firebase/firebase-auth.service";
 import { firebaseConfig } from "@/common/config/firebase.config";
 import { AuthStep, AuthMessage, AuthProgress } from "@/common/types/auth.types";
-import { authHint } from "@/common/services/firebase/auth-hint";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { hasGuestWorkspace } from "@/core/services/guest-id";
-import { workspaceMode } from "@/core/services/workspace-mode";
 
 export interface AuthState {
   currentUser: User | null;
@@ -43,12 +41,6 @@ export interface AuthState {
   initAuthListener: () => Promise<() => void>;
 }
 
-const AUTH_HINT_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
-const AUTH_RESTORE_GRACE_MS = 1200;
-
-let pendingRestoreTimer: number | null = null;
-let pendingRestoreSeq = 0;
-
 type AuthListenerSingleton = {
   started: boolean;
   unsubscribe: (() => void) | null;
@@ -61,15 +53,6 @@ function getAuthListenerSingleton(): AuthListenerSingleton {
     g[key] = { started: false, unsubscribe: null };
   }
   return g[key]!;
-}
-
-function getFreshAuthHintUid(): string | null {
-  const uid = authHint.getLastUid();
-  if (!uid) return null;
-  const ts = authHint.getLastSetAtMs();
-  if (!ts) return uid;
-  const age = Date.now() - ts;
-  return age <= AUTH_HINT_MAX_AGE_MS ? uid : null;
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
@@ -183,7 +166,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   signOut: async () => {
     set({ isAuthenticating: true });
     try {
-      authHint.clear();
       await firebaseAuthService.signOut();
       useNotesDataStore.getState().cleanupListeners();
     } finally {
@@ -232,35 +214,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       isRefreshing: false,
     });
 
-    const preferredMode = workspaceMode.get();
-    const hintedUid = preferredMode === "cloud" ? getFreshAuthHintUid() : null;
-
     // Avoid a transient "empty channels" UI between app boot and auth resolution.
     // We keep the channels list in a loading state until auth is settled.
     useNotesDataStore.getState().cleanupListeners();
     useNotesDataStore.getState().setChannelsLoading(true);
 
-    // Do not start Firestore listeners with a "hinted uid" unless Firebase Auth is actually ready.
-    // Starting Firestore queries without credentials can hang the UI in a loading state if rules reject.
-    if (preferredMode === "local" && hasGuestWorkspace()) {
-      void useNotesDataStore.getState().initGuestWorkspace();
-    }
-
     try {
       const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
-        if (pendingRestoreTimer !== null) {
-          window.clearTimeout(pendingRestoreTimer);
-          pendingRestoreTimer = null;
-        }
-
         get().setAuth(user);
         set({ authIsReady: true, isInitializing: false, isRefreshing: false });
 
         // Verified user -> use cloud workspace immediately.
         if (user && user.emailVerified) {
           firebaseConfig.setUserIdForAnalytics(user.uid);
-          authHint.setLastUid(user.uid);
-          workspaceMode.set("cloud");
           void useNotesDataStore
             .getState()
             .initFirebaseListeners(user.uid)
@@ -274,33 +240,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           return;
         }
 
-        // Unverified users are treated as logged-out for data purposes.
-        if (user && !user.emailVerified) {
-          authHint.clear();
-          useNotesDataStore.getState().cleanupListeners();
-          set({ authIsSettled: true });
-          return;
-        }
-
-        // No user: if we had a fresh cloud hint, allow a brief restore window, but never auto-enter local.
-        const shouldGraceRestore = Boolean(hintedUid);
-        if (shouldGraceRestore) {
-          pendingRestoreSeq += 1;
-          const seq = pendingRestoreSeq;
-          set({ authIsSettled: false });
-          pendingRestoreTimer = window.setTimeout(async () => {
-            if (seq !== pendingRestoreSeq) return;
-            const auth = await firebaseConfig.getAuth();
-            if (auth.currentUser) return;
-            authHint.clear();
-            useNotesDataStore.getState().cleanupListeners();
-            set({ authIsSettled: true });
-          }, AUTH_RESTORE_GRACE_MS);
-          return;
-        }
-
-        // Logged-out and no cloud hint: resume local only if that was the chosen mode and workspace exists.
-        if (workspaceMode.get() === "local" && hasGuestWorkspace()) {
+        // Logged-out (or unverified) users: enter local automatically if a guest workspace exists.
+        if (hasGuestWorkspace()) {
           void useNotesDataStore
             .getState()
             .initGuestWorkspace()
