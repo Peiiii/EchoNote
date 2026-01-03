@@ -33,7 +33,7 @@ export const TimelineLayout = ({
     <div className={`relative w-full h-full ${className}`} data-component="timeline-layout">
       <div ref={containerRef} className={`relative flex-1 flex flex-col h-full ${outerPaddingClass}`}>
         <div className={`flex-1 min-h-0 ${contentWidthClass}`}>
-          <div className="relative flex flex-col h-full rounded-2xl border border-border/60 bg-card shadow-sm">
+          <div className="relative flex flex-col h-full overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
             {/* Channel Cover Header */}
             {channel && <AutoHideChannelHeader channel={channel} layoutRef={containerRef} />}
 
