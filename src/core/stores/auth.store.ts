@@ -218,16 +218,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     useNotesDataStore.getState().cleanupListeners();
     useNotesDataStore.getState().setChannelsLoading(true);
 
-    // Optimistically initialize last signed-in workspace (cloud) without ever falling back to local automatically.
-    if (hintedUid && !useNotesDataStore.getState().userId) {
-      void useNotesDataStore
-        .getState()
-        .initFirebaseListeners(hintedUid)
-        .catch(err => {
-          console.warn("[auth] optimistic cloud init failed", err);
-          useNotesDataStore.getState().cleanupListeners();
-        });
-    } else if (preferredMode === "local" && hasGuestWorkspace()) {
+    // Do not start Firestore listeners with a "hinted uid" unless Firebase Auth is actually ready.
+    // Starting Firestore queries without credentials can hang the UI in a loading state if rules reject.
+    if (preferredMode === "local" && hasGuestWorkspace()) {
       void useNotesDataStore.getState().initGuestWorkspace();
     }
 

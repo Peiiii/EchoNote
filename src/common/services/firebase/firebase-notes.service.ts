@@ -150,6 +150,8 @@ export class FirebaseNotesService {
       },
       error => {
         console.error("Error subscribing to channels:", error);
+        // Ensure UI does not hang in a loading state if subscription fails (e.g. permission denied).
+        onUpdate([]);
       }
     );
 
