@@ -30,7 +30,7 @@ import {
   Users,
   Globe,
   Share2,
-  MoreHorizontal,
+  MoreVertical,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
@@ -355,7 +355,7 @@ export const ChannelHeader = ({
                 aria-label="More actions"
                 onClick={e => e.stopPropagation()}
               >
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
@@ -439,34 +439,6 @@ export const ChannelHeader = ({
             >
               <Search className="h-4 w-4" />
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-                  title="More actions"
-                  aria-label="More actions"
-                  onClick={e => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
-                <DropdownMenuItem
-                  className="cursor-pointer rounded-md"
-                  onSelect={() => setIsPublishDialogOpen(true)}
-                >
-                  {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
-                  <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
-                  <ChevronDown className="h-4 w-4" />
-                  <span>Expand header</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button
               variant="ghost"
               size="sm"
@@ -494,6 +466,34 @@ export const ChannelHeader = ({
                 <Settings className="h-4 w-4" />
               </Button>
             )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+                  title="More actions"
+                  aria-label="More actions"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-md"
+                  onSelect={() => setIsPublishDialogOpen(true)}
+                >
+                  {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
+                  <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
+                  <ChevronDown className="h-4 w-4" />
+                  <span>Expand header</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </>
       ) : (
