@@ -213,9 +213,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     const preferredMode = workspaceMode.get();
     const hintedUid = preferredMode === "cloud" ? getFreshAuthHintUid() : null;
 
+    // Avoid a transient "empty channels" UI between app boot and auth resolution.
+    // We keep the channels list in a loading state until auth is settled.
+    useNotesDataStore.getState().cleanupListeners();
+    useNotesDataStore.getState().setChannelsLoading(true);
+
     // Optimistically initialize last signed-in workspace (cloud) without ever falling back to local automatically.
     if (hintedUid && !useNotesDataStore.getState().userId) {
-      useNotesDataStore.getState().setChannelsLoading(true);
       void useNotesDataStore
         .getState()
         .initFirebaseListeners(hintedUid)
@@ -225,9 +229,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         });
     } else if (preferredMode === "local" && hasGuestWorkspace()) {
       void useNotesDataStore.getState().initGuestWorkspace();
-    } else {
-      // Logged-out and no local workspace selected yet: do not keep skeleton forever.
-      useNotesDataStore.getState().cleanupListeners();
     }
 
     const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
