@@ -16,7 +16,7 @@ export const AIConversationInterface = forwardRef<
   ConversationInterfaceRef,
   ConversationInterfaceProps
 >(function AIConversationInterface({ channelId, onClose }, ref) {
-  const { userId, initGuestWorkspace } = useNotesDataStore();
+  const { userId } = useNotesDataStore();
   const {
     conversations,
     currentConversationId,
@@ -57,11 +57,10 @@ export const AIConversationInterface = forwardRef<
   useEffect(() => {
     if (!userId) {
       resetForLoggedOut();
-      void initGuestWorkspace();
       return;
     }
     loadConversations(userId);
-  }, [userId, initGuestWorkspace, loadConversations, resetForLoggedOut]);
+  }, [userId, loadConversations, resetForLoggedOut]);
 
   if (loading || !ready) {
     return (

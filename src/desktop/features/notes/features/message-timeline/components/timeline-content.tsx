@@ -6,6 +6,7 @@ import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-me
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { Message } from "@/core/stores/notes-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { DesktopWelcomeGuide } from "@/desktop/features/notes/components/welcome-guide/desktop-welcome-guide";
 import { ThoughtRecord } from "@/desktop/features/notes/features/message-timeline/components/thought-record";
@@ -26,6 +27,8 @@ const TimelineContentWrapper = ({ children = "", className = "" }: TimelineConte
 export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
   const presenter = useCommonPresenterContext();
   const { currentChannelId } = useNotesViewStore();
+  const channels = useNotesDataStore(s => s.channels);
+  const channelsLoading = useNotesDataStore(s => s.channelsLoading);
 
   const { messages, loading, hasMore, loadMore, getChannelState } = useChannelMessages({
     onHistoryMessagesChange: messages => {
@@ -48,10 +51,28 @@ export const TimelineContent = ({ className = "" }: TimelineContentProps) => {
     (dayMessages as Message[]).some((msg: Message) => msg.sender === "user" && !msg.parentId)
   );
 
+  // If a channel is selected but its metadata hasn't arrived yet, treat as loading.
+  // This prevents a transient "space empty" state where header/input disappear.
+  const hasSelectedChannel = !!currentChannelId;
+  const channelReady =
+    !hasSelectedChannel || channels.some(c => c.id === currentChannelId);
+
   if (!currentChannelId) {
     return (
       <TimelineContentWrapper>
-        <DesktopWelcomeGuide />
+        {channelsLoading || channels.length > 0 ? (
+          <MessageTimelineSkeleton count={5} />
+        ) : (
+          <DesktopWelcomeGuide />
+        )}
+      </TimelineContentWrapper>
+    );
+  }
+
+  if (!channelReady || channelsLoading) {
+    return (
+      <TimelineContentWrapper>
+        <MessageTimelineSkeleton count={5} />
       </TimelineContentWrapper>
     );
   }

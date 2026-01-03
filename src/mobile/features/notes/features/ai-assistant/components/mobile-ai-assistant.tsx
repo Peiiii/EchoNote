@@ -10,7 +10,7 @@ interface MobileAIAssistantProps {
 }
 
 export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssistantProps) => {
-  const { userId, initGuestWorkspace } = useNotesDataStore();
+  const { userId } = useNotesDataStore();
   const {
     conversations,
     currentConversationId,
@@ -25,11 +25,10 @@ export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssist
     if (!isOpen) return;
     if (!userId) {
       resetForLoggedOut();
-      void initGuestWorkspace();
       return;
     }
     loadConversations(userId);
-  }, [userId, isOpen, initGuestWorkspace, loadConversations, resetForLoggedOut]);
+  }, [userId, isOpen, loadConversations, resetForLoggedOut]);
 
   const handleCreateConversation = () => {
     if (!userId) return;

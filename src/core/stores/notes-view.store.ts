@@ -10,6 +10,7 @@ export interface NotesViewState {
   currentChannelId: string | null;
   /** Remember last selected channel per userId (guest:* or firebase uid). */
   lastChannelIdByUserId: Record<string, string>;
+  hasHydrated: boolean;
 
   // Loading states
   isAddingMessage: boolean;
@@ -25,6 +26,7 @@ export interface NotesViewState {
 
   // View actions
   setCurrentChannel: (channelId: string | null) => void;
+  setHasHydrated: (hydrated: boolean) => void;
   setIsAddingMessage: (isLoading: boolean) => void;
   setIsUpdatingMessage: (isLoading: boolean) => void;
   setIsDeletingMessage: (isLoading: boolean) => void;
@@ -40,6 +42,7 @@ export const useNotesViewStore = create<NotesViewState>()(
       // Initial view state
       currentChannelId: null,
       lastChannelIdByUserId: {},
+      hasHydrated: false,
       isAddingMessage: false,
       isUpdatingMessage: false,
       isDeletingMessage: false,
@@ -64,6 +67,9 @@ export const useNotesViewStore = create<NotesViewState>()(
         if (channelId) {
           addRecentChannel(channelId);
         }
+      },
+      setHasHydrated: hydrated => {
+        set({ hasHydrated: hydrated });
       },
       setIsAddingMessage: isLoading => {
         set({ isAddingMessage: isLoading });
@@ -113,6 +119,10 @@ export const useNotesViewStore = create<NotesViewState>()(
       partialize: state => ({
         lastChannelIdByUserId: state.lastChannelIdByUserId,
       }),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) return;
+        state?.setHasHydrated(true);
+      },
       migrate: (persisted, version) => {
         if (version < 2 && persisted && typeof persisted === "object") {
           // Drop any legacy persisted fields that could be non-serializable (e.g., Firebase User).

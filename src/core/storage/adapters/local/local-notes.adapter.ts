@@ -83,31 +83,6 @@ function saveState(userId: string, state: PersistedState) {
   localStorage.setItem(keyForUser(userId), JSON.stringify(state));
 }
 
-function ensureDefaultChannel(userId: string) {
-  const state = loadState(userId);
-  if (state.channels.length > 0) return;
-
-  const now = new Date();
-  const defaultChannel: Channel = {
-    id: uuidv4(),
-    name: "General",
-    description: "Your local workspace",
-    emoji: "📝",
-    createdAt: now,
-    updatedAt: now,
-    messageCount: 0,
-    lastMessageTime: undefined,
-    backgroundColor: undefined,
-    backgroundImage: undefined,
-    shareToken: undefined,
-    shareMode: undefined,
-  };
-
-  state.channels = [toPersistedChannel(defaultChannel)];
-  state.messagesByChannel[defaultChannel.id] = [];
-  saveState(userId, state);
-}
-
 function parseOffsetCursor(cursor: Cursor | null | undefined): number {
   if (!cursor) return 0;
   const n = Number(cursor);
@@ -121,7 +96,6 @@ export class LocalNotesAdapter implements NotesRepository {
   };
 
   async listChannels(userId: string): Promise<Channel[]> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     return state.channels.map(toChannel).sort((a, b) => {
       const at = a.lastMessageTime?.getTime() ?? a.updatedAt?.getTime() ?? a.createdAt.getTime();
@@ -139,7 +113,6 @@ export class LocalNotesAdapter implements NotesRepository {
     userId: string,
     channel: Omit<Channel, "id" | "createdAt" | "messageCount">
   ): Promise<string> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     const now = new Date();
     const id = uuidv4();
@@ -168,7 +141,6 @@ export class LocalNotesAdapter implements NotesRepository {
     channelId: string,
     updates: Partial<Omit<Channel, "id" | "createdAt" | "messageCount">>
   ): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     const idx = state.channels.findIndex(c => c.id === channelId);
     if (idx < 0) return;
@@ -183,7 +155,6 @@ export class LocalNotesAdapter implements NotesRepository {
   }
 
   async deleteChannel(userId: string, channelId: string): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     state.channels = state.channels.filter(c => c.id !== channelId);
     delete state.messagesByChannel[channelId];
@@ -195,7 +166,6 @@ export class LocalNotesAdapter implements NotesRepository {
     channelId: string,
     options: ListMessagesOptions
   ): Promise<PaginatedResult<Message>> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     const all = (state.messagesByChannel[channelId] ?? []).map(toMessage);
 
@@ -246,7 +216,6 @@ export class LocalNotesAdapter implements NotesRepository {
   }
 
   async createMessage(userId: string, message: Omit<Message, "id" | "timestamp">): Promise<string> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     const id = uuidv4();
     const now = new Date();
@@ -290,7 +259,6 @@ export class LocalNotesAdapter implements NotesRepository {
   }
 
   async updateMessage(userId: string, messageId: string, updates: Partial<Message>): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     for (const [channelId, messages] of Object.entries(state.messagesByChannel)) {
       const idx = messages.findIndex(m => m.id === messageId);
@@ -311,7 +279,6 @@ export class LocalNotesAdapter implements NotesRepository {
     messageId: string,
     options: { hardDelete?: boolean } = {}
   ): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     for (const [channelId, messages] of Object.entries(state.messagesByChannel)) {
       const idx = messages.findIndex(m => m.id === messageId);
@@ -335,7 +302,6 @@ export class LocalNotesAdapter implements NotesRepository {
   }
 
   async restoreMessage(userId: string, messageId: string): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     for (const [channelId, messages] of Object.entries(state.messagesByChannel)) {
       const idx = messages.findIndex(m => m.id === messageId);
@@ -358,7 +324,6 @@ export class LocalNotesAdapter implements NotesRepository {
     fromChannelId: string,
     toChannelId: string
   ): Promise<void> {
-    ensureDefaultChannel(userId);
     const state = loadState(userId);
     const from = state.messagesByChannel[fromChannelId] ?? [];
     const idx = from.findIndex(m => m.id === messageId);
@@ -382,4 +347,3 @@ export class LocalNotesAdapter implements NotesRepository {
     throw new Error("Unpublishing requires an account. Please sign in.");
   }
 }
-

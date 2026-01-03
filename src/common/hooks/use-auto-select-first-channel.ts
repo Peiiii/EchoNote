@@ -5,11 +5,17 @@ import { useEffect } from "react";
 export const useAutoSelectFirstChannel = () => {
   const channels = useNotesDataStore(s => s.channels);
   const userId = useNotesDataStore(s => s.userId);
+  const channelsLoading = useNotesDataStore(s => s.channelsLoading);
+  const hasHydrated = useNotesViewStore(s => s.hasHydrated);
   const setCurrentChannel = useNotesViewStore(s => s.setCurrentChannel);
   const currentChannelId = useNotesViewStore(s => s.currentChannelId);
   const lastChannelIdByUserId = useNotesViewStore(s => s.lastChannelIdByUserId);
 
   useEffect(() => {
+    if (!hasHydrated) return;
+    // Wait until we know which dataset we're in (guest:* or firebase uid) and channels are loaded.
+    if (!userId) return;
+    if (channelsLoading) return;
     if (channels.length === 0) return;
 
     const hasValidCurrent =
@@ -23,5 +29,13 @@ export const useAutoSelectFirstChannel = () => {
     }
 
     setCurrentChannel(channels[0].id);
-  }, [channels, currentChannelId, lastChannelIdByUserId, setCurrentChannel, userId]);
+  }, [
+    channels,
+    channelsLoading,
+    currentChannelId,
+    hasHydrated,
+    lastChannelIdByUserId,
+    setCurrentChannel,
+    userId,
+  ]);
 };
