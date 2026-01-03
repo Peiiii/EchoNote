@@ -49,6 +49,20 @@ const AUTH_RESTORE_GRACE_MS = 1200;
 let pendingRestoreTimer: number | null = null;
 let pendingRestoreSeq = 0;
 
+type AuthListenerSingleton = {
+  started: boolean;
+  unsubscribe: (() => void) | null;
+};
+
+function getAuthListenerSingleton(): AuthListenerSingleton {
+  const key = "__echonote_auth_listener_singleton__";
+  const g = globalThis as unknown as Record<string, AuthListenerSingleton | undefined>;
+  if (!g[key]) {
+    g[key] = { started: false, unsubscribe: null };
+  }
+  return g[key]!;
+}
+
 function getFreshAuthHintUid(): string | null {
   const uid = authHint.getLastUid();
   if (!uid) return null;
@@ -202,6 +216,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   initAuthListener: async () => {
+    const singleton = getAuthListenerSingleton();
+    if (singleton.started) {
+      // In React 18 StrictMode/dev, effects can mount/unmount twice. Starting multiple listeners
+      // causes global store churn (channelsLoading/userId toggles) and UI flicker.
+      return () => {};
+    }
+    singleton.started = true;
+
     // Reset readiness/settling every boot. We rely on Firebase for persistence.
     set({
       authIsReady: false,
@@ -224,75 +246,82 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       void useNotesDataStore.getState().initGuestWorkspace();
     }
 
-    const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
-      if (pendingRestoreTimer !== null) {
-        window.clearTimeout(pendingRestoreTimer);
-        pendingRestoreTimer = null;
-      }
+    try {
+      const unsubscribe = await firebaseAuthService.onAuthStateChanged(user => {
+        if (pendingRestoreTimer !== null) {
+          window.clearTimeout(pendingRestoreTimer);
+          pendingRestoreTimer = null;
+        }
 
-      get().setAuth(user);
-      set({ authIsReady: true, isInitializing: false, isRefreshing: false });
+        get().setAuth(user);
+        set({ authIsReady: true, isInitializing: false, isRefreshing: false });
 
-      // Verified user -> use cloud workspace immediately.
-      if (user && user.emailVerified) {
-        firebaseConfig.setUserIdForAnalytics(user.uid);
-        authHint.setLastUid(user.uid);
-        workspaceMode.set("cloud");
-        void useNotesDataStore
-          .getState()
-          .initFirebaseListeners(user.uid)
-          .catch(err => {
-            console.error("[auth] init firebase listeners failed", err);
-            useNotesDataStore.getState().cleanupListeners();
-          })
-          .finally(() => {
-            set({ authIsSettled: true });
-          });
-        return;
-      }
+        // Verified user -> use cloud workspace immediately.
+        if (user && user.emailVerified) {
+          firebaseConfig.setUserIdForAnalytics(user.uid);
+          authHint.setLastUid(user.uid);
+          workspaceMode.set("cloud");
+          void useNotesDataStore
+            .getState()
+            .initFirebaseListeners(user.uid)
+            .catch(err => {
+              console.error("[auth] init firebase listeners failed", err);
+              useNotesDataStore.getState().cleanupListeners();
+            })
+            .finally(() => {
+              set({ authIsSettled: true });
+            });
+          return;
+        }
 
-      // Unverified users are treated as logged-out for data purposes.
-      if (user && !user.emailVerified) {
-        authHint.clear();
-        useNotesDataStore.getState().cleanupListeners();
-        set({ authIsSettled: true });
-        return;
-      }
-
-      // No user: if we had a fresh cloud hint, allow a brief restore window, but never auto-enter local.
-      const shouldGraceRestore = Boolean(hintedUid);
-      if (shouldGraceRestore) {
-        pendingRestoreSeq += 1;
-        const seq = pendingRestoreSeq;
-        set({ authIsSettled: false });
-        pendingRestoreTimer = window.setTimeout(async () => {
-          if (seq !== pendingRestoreSeq) return;
-          const auth = await firebaseConfig.getAuth();
-          if (auth.currentUser) return;
+        // Unverified users are treated as logged-out for data purposes.
+        if (user && !user.emailVerified) {
           authHint.clear();
           useNotesDataStore.getState().cleanupListeners();
           set({ authIsSettled: true });
-        }, AUTH_RESTORE_GRACE_MS);
-        return;
-      }
+          return;
+        }
 
-      // Logged-out and no cloud hint: resume local only if that was the chosen mode and workspace exists.
-      if (workspaceMode.get() === "local" && hasGuestWorkspace()) {
-        void useNotesDataStore
-          .getState()
-          .initGuestWorkspace()
-          .catch(err => {
-            console.error("[auth] init guest workspace failed", err);
+        // No user: if we had a fresh cloud hint, allow a brief restore window, but never auto-enter local.
+        const shouldGraceRestore = Boolean(hintedUid);
+        if (shouldGraceRestore) {
+          pendingRestoreSeq += 1;
+          const seq = pendingRestoreSeq;
+          set({ authIsSettled: false });
+          pendingRestoreTimer = window.setTimeout(async () => {
+            if (seq !== pendingRestoreSeq) return;
+            const auth = await firebaseConfig.getAuth();
+            if (auth.currentUser) return;
+            authHint.clear();
             useNotesDataStore.getState().cleanupListeners();
-          })
-          .finally(() => set({ authIsSettled: true }));
-        return;
-      }
+            set({ authIsSettled: true });
+          }, AUTH_RESTORE_GRACE_MS);
+          return;
+        }
 
-      useNotesDataStore.getState().cleanupListeners();
-      set({ authIsSettled: true });
-    });
+        // Logged-out and no cloud hint: resume local only if that was the chosen mode and workspace exists.
+        if (workspaceMode.get() === "local" && hasGuestWorkspace()) {
+          void useNotesDataStore
+            .getState()
+            .initGuestWorkspace()
+            .catch(err => {
+              console.error("[auth] init guest workspace failed", err);
+              useNotesDataStore.getState().cleanupListeners();
+            })
+            .finally(() => set({ authIsSettled: true }));
+          return;
+        }
 
-    return unsubscribe;
+        useNotesDataStore.getState().cleanupListeners();
+        set({ authIsSettled: true });
+      });
+
+      singleton.unsubscribe = unsubscribe;
+      return () => {};
+    } catch (err) {
+      singleton.started = false;
+      singleton.unsubscribe = null;
+      throw err;
+    }
   },
 }));
