@@ -25,35 +25,38 @@ export const TimelineLayout = ({
   // keep the reading width comfortable and centered.
   const { sideView } = useUIStateStore();
   const isFocusMode = !sideView;
-  const sectionWidthClass = isFocusMode ? "w-full max-w-[850px] mx-auto px-4 sm:px-6" : "w-full";
+  const outerPaddingClass = isFocusMode ? "px-4 sm:px-6 py-4" : "p-3";
+  const contentWidthClass = isFocusMode ? "w-full max-w-[900px] mx-auto" : "w-full";
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className={`relative w-full h-full ${className}`} data-component="timeline-layout">
-      <div ref={containerRef} className="relative flex-1 flex flex-col h-full">
-        {/* Channel Cover Header */}
-        {channel && <AutoHideChannelHeader channel={channel} layoutRef={containerRef} />}
+      <div ref={containerRef} className={`relative flex-1 flex flex-col h-full ${outerPaddingClass}`}>
+        <div className={`flex-1 min-h-0 ${contentWidthClass}`}>
+          <div className="relative flex flex-col h-full rounded-2xl border border-border/60 bg-card shadow-sm">
+            {/* Channel Cover Header */}
+            {channel && <AutoHideChannelHeader channel={channel} layoutRef={containerRef} />}
 
-        {/* Timeline content area */}
-        <div className={`flex-1 flex flex-col min-h-0 ${sectionWidthClass}`}>
-          {content}
+            {/* Timeline content area */}
+            <div className="flex-1 flex flex-col min-h-0">
+              {content}
+            </div>
+
+            {/* Actions area at bottom (composer) */}
+            {actions && (
+              <div className="shrink-0">
+                {actions}
+              </div>
+            )}
+
+            {/* Optional overlay to cover header + content + actions */}
+            {overlay && (
+              <div className="absolute inset-0 z-30">
+                {overlay}
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* Actions area at bottom (composer)
-            - Focus mode: keep the same width as content (centered)
-            - Otherwise: full-width so its top border divides the whole container */}
-        {actions && (
-          <div className={`${sectionWidthClass} shrink-0`}>
-            {actions}
-          </div>
-        )}
-
-        {/* Optional overlay to cover header + content + actions */}
-        {overlay && (
-          <div className="absolute inset-0 z-30">
-            {overlay}
-          </div>
-        )}
       </div>
     </div>
   );
