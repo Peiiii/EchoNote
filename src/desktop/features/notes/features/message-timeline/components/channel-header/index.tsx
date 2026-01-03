@@ -1,5 +1,12 @@
 import { Badge } from "@/common/components/ui/badge";
 import { Button } from "@/common/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/common/components/ui/dropdown-menu";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { useReadMoreStore } from "@/common/features/read-more/store/read-more.store";
@@ -23,6 +30,7 @@ import {
   Users,
   Globe,
   Share2,
+  MoreHorizontal,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { BackgroundSwitcher } from "./background-switcher";
@@ -318,19 +326,6 @@ export const ChannelHeader = ({
           >
             <Search className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-            onClick={() => setIsPublishDialogOpen(true)}
-            title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
-          >
-            {channel.shareToken ? (
-              <Share2 className="h-4 w-4" />
-            ) : (
-              <Globe className="h-4 w-4" />
-            )}
-          </Button>
           {getFeaturesConfig().channel.settings.enabled && (
             <Button
               variant="ghost"
@@ -350,21 +345,34 @@ export const ChannelHeader = ({
             onRemoveBackground={handleRemoveBackground}
             buttonClassName="h-8 w-8 p-0 text-white hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
           />
-          {/* <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </Button> */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-            onClick={handleToggle}
-          >
-            <ChevronUp className="h-4 w-4 transition-transform duration-200" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
+                title="More actions"
+                aria-label="More actions"
+                onClick={e => e.stopPropagation()}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+              <DropdownMenuItem
+                className="cursor-pointer rounded-md"
+                onSelect={() => setIsPublishDialogOpen(true)}
+              >
+                {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
+                <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
+                <ChevronUp className="h-4 w-4" />
+                <span>Collapse header</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -431,19 +439,34 @@ export const ChannelHeader = ({
             >
               <Search className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={() => setIsPublishDialogOpen(true)}
-              title={channel.shareToken ? "Published - Manage sharing" : "Publish space"}
-            >
-              {channel.shareToken ? (
-                <Share2 className="h-4 w-4" />
-              ) : (
-                <Globe className="h-4 w-4" />
-              )}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+                  title="More actions"
+                  aria-label="More actions"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-md"
+                  onSelect={() => setIsPublishDialogOpen(true)}
+                >
+                  {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
+                  <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
+                  <ChevronDown className="h-4 w-4" />
+                  <span>Expand header</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               size="sm"
@@ -471,14 +494,6 @@ export const ChannelHeader = ({
                 <Settings className="h-4 w-4" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={handleToggle}
-            >
-              <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-            </Button>
           </div>
         </>
       ) : (
