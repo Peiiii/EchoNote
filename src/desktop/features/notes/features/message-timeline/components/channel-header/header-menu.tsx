@@ -66,19 +66,23 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" sideOffset={8} className="min-w-[220px]">
-        <DropdownMenuLabel className="text-xs text-muted-foreground">
+      <DropdownMenuContent align="start" sideOffset={8} className="min-w-[220px] p-1">
+        <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1.5">
           {user ? (user.displayName || user.email || "Account") : "Guest mode"}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {user ? (
-          <DropdownMenuItem disabled={isAuthenticating} onSelect={handleLogout}>
+          <DropdownMenuItem
+            className="cursor-pointer rounded-md"
+            disabled={isAuthenticating}
+            onSelect={handleLogout}
+          >
             <LogOut className="h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onSelect={handleLogin}>
+          <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleLogin}>
             <LogIn className="h-4 w-4" />
             <span>Login</span>
           </DropdownMenuItem>
@@ -87,7 +91,7 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger className="cursor-pointer rounded-md">
             {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             <span>Theme</span>
           </DropdownMenuSubTrigger>
@@ -111,7 +115,7 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onSelect={() => openFeedbackModal()}>
+        <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={() => openFeedbackModal()}>
           <MessageSquareText className="h-4 w-4" />
           <span>Feedback</span>
         </DropdownMenuItem>
@@ -119,4 +123,3 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
     </DropdownMenu>
   );
 }
-
