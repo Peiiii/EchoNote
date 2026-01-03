@@ -8,6 +8,8 @@ import { addRecentChannel } from "@/common/lib/recent-channels";
 export interface NotesViewState {
   // View state
   currentChannelId: string | null;
+  /** Remember last selected channel per userId (guest:* or firebase uid). */
+  lastChannelIdByUserId: Record<string, string>;
 
   // Loading states
   isAddingMessage: boolean;
@@ -37,6 +39,7 @@ export const useNotesViewStore = create<NotesViewState>()(
     (set, get) => ({
       // Initial view state
       currentChannelId: null,
+      lastChannelIdByUserId: {},
       isAddingMessage: false,
       isUpdatingMessage: false,
       isDeletingMessage: false,
@@ -50,7 +53,14 @@ export const useNotesViewStore = create<NotesViewState>()(
 
       // View actions
       setCurrentChannel: channelId => {
-        set({ currentChannelId: channelId });
+        const userId = useNotesDataStore.getState().userId;
+        set(state => ({
+          currentChannelId: channelId,
+          lastChannelIdByUserId:
+            userId && channelId
+              ? { ...state.lastChannelIdByUserId, [userId]: channelId }
+              : state.lastChannelIdByUserId,
+        }));
         if (channelId) {
           addRecentChannel(channelId);
         }
@@ -98,6 +108,21 @@ export const useNotesViewStore = create<NotesViewState>()(
     }),
     {
       name: "echonote-notes-view-storage",
+      version: 2,
+      // Only persist serializable view preferences; never persist Firebase User objects.
+      partialize: state => ({
+        lastChannelIdByUserId: state.lastChannelIdByUserId,
+      }),
+      migrate: (persisted, version) => {
+        if (version < 2 && persisted && typeof persisted === "object") {
+          // Drop any legacy persisted fields that could be non-serializable (e.g., Firebase User).
+          const prev = persisted as Partial<NotesViewState>;
+          return {
+            lastChannelIdByUserId: prev.lastChannelIdByUserId ?? {},
+          } as unknown as NotesViewState;
+        }
+        return persisted as NotesViewState;
+      },
     }
   )
 );

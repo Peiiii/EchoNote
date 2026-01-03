@@ -1,5 +1,6 @@
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { Message } from "@/core/stores/notes-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useMemoizedFn } from "ahooks";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -21,6 +22,7 @@ export interface UseChannelMessagesOptions {
 
 export const useChannelMessages = ({ onHistoryMessagesChange }: UseChannelMessagesOptions) => {
   const { currentChannelId } = useNotesViewStore();
+  const userId = useNotesDataStore(s => s.userId);
   const slice = useMemo(
     () => createSlice(channelMessageService.dataContainer, `messageByChannel.${currentChannelId}`),
     [currentChannelId]
@@ -40,10 +42,11 @@ export const useChannelMessages = ({ onHistoryMessagesChange }: UseChannelMessag
     return channelMessageService.connectToRequestWorkflow();
   }, []);
   useEffect(() => {
-    if (currentChannelId) {
+    // Ensure initial load happens when either channel changes or userId becomes available.
+    if (userId && currentChannelId) {
       channelMessageService.requestLoadInitialMessages$.next({ channelId: currentChannelId });
     }
-  }, [currentChannelId]);
+  }, [currentChannelId, userId]);
 
   return {
     messages,
