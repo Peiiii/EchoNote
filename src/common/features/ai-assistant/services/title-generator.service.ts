@@ -6,6 +6,7 @@ type Inflight = { promise: Promise<string>; ts: number };
 export type TitleGenMode = "deterministic" | "ai" | "auto";
 import type { UIMessage } from "@agent-labs/agent-chat";
 import type { AIConversation } from "@/common/types/ai-conversation";
+import type { AppLanguage } from "@/common/i18n";
 
 class TitleGeneratorService {
   private inFlight: Map<string, Inflight> = new Map();
@@ -22,14 +23,15 @@ class TitleGeneratorService {
   request(
     conversationId: string,
     text: string,
-    options?: { mode?: TitleGenMode }
+    options?: { mode?: TitleGenMode; lng?: string }
   ): Promise<string> {
     if (!this.enabled) return Promise.resolve("");
     const existing = this.inFlight.get(conversationId);
     if (existing) return existing.promise;
     const p = new Promise<string>((resolve, reject) => {
       const mode: TitleGenMode = options?.mode || "deterministic";
-      this.queue.push(JSON.stringify({ id: conversationId, text, mode }));
+      const lng = resolveTitleLanguage(options?.lng);
+      this.queue.push(JSON.stringify({ id: conversationId, text, mode, lng }));
       this.runLoop().catch(() => {});
       const check = setInterval(() => {
         const done = this.results.get(conversationId);
@@ -53,16 +55,17 @@ class TitleGeneratorService {
     while (this.queue.length) {
       const item = this.queue.shift();
       if (!item) break;
-      const { id, text, mode } = JSON.parse(item) as {
+      const { id, text, mode, lng } = JSON.parse(item) as {
         id: string;
         text: string;
         mode: TitleGenMode;
+        lng: AppLanguage;
       };
       const delta = Date.now() - lastTs;
       if (delta < this.minIntervalMs)
         await new Promise(r => setTimeout(r, this.minIntervalMs - delta));
       try {
-        const title = await this.generateTitle(text, mode);
+        const title = await this.generateTitle(text, mode, lng);
         this.results.set(id, { title });
         lastTs = Date.now();
       } catch (e) {
@@ -73,7 +76,7 @@ class TitleGeneratorService {
     this.running = false;
   }
 
-  private async generateTitle(text: string, mode: TitleGenMode): Promise<string> {
+  private async generateTitle(text: string, mode: TitleGenMode, lng: AppLanguage): Promise<string> {
     if (mode === "deterministic") {
       return this.generateDeterministicTitle(text);
     }
@@ -83,7 +86,7 @@ class TitleGeneratorService {
     }
 
     if (mode === "ai" || (mode === "auto" && this.enabled)) {
-      return this.generateAITitle(text);
+      return this.generateAITitle(text, lng);
     }
 
     return this.generateDeterministicTitle(text);
@@ -93,10 +96,10 @@ class TitleGeneratorService {
     return text.trim().replace(/\s+/g, " ").slice(0, 200);
   }
 
-  private async generateAITitle(text: string): Promise<string> {
+  private async generateAITitle(text: string, lng: AppLanguage): Promise<string> {
     try {
-      const prompt = this.buildTitlePrompt(text);
-      const aiTitle = await this.callAIService(prompt);
+      const prompt = this.buildTitlePrompt(text, lng);
+      const aiTitle = await this.callAIService(prompt, lng);
       const validatedTitle = this.validateAndTrimTitle(aiTitle);
 
       if (validatedTitle) {
@@ -110,20 +113,31 @@ class TitleGeneratorService {
     }
   }
 
-  private buildTitlePrompt(text: string): string {
+  private buildTitlePrompt(text: string, lng: AppLanguage): string {
+    if (lng === "zh-CN") {
+      return `请根据以下对话内容生成一个简洁、明确的对话标题。要求：
+- 最多 36 个字符
+- 概括主要主题
+- 避免“新对话”这类泛词
+- 只输出标题本身，不要引号、不要多余解释
+
+内容：${text}`;
+    }
+
     return `Generate a concise, descriptive title for this conversation content. The title should be:
 - Maximum 36 characters
 - Capture the main topic or theme
 - Be clear and informative
 - Avoid generic phrases like "New Conversation"
+- Output ONLY the title (no quotes, no extra text)
 
 Content: ${text}`;
   }
 
-  private async callAIService(prompt: string): Promise<string> {
+  private async callAIService(prompt: string, lng: AppLanguage): Promise<string> {
     return await generateText({
       prompt,
-      system: i18n.t("aiAssistant.prompts.systemPrompts.defaultTitleGenerator"),
+      system: i18n.t("aiAssistant.prompts.systemPrompts.defaultTitleGenerator", { lng }),
       temperature: 0.3,
     });
   }
@@ -218,9 +232,10 @@ async function generateTitleForSnapshot(
 ): Promise<string> {
   const { conversationId, autoTitleEnabled, autoTitleMode } = opts;
   const mode: TitleGenMode = autoTitleEnabled ? autoTitleMode : "deterministic";
+  const lng = resolveTitleLanguage(i18n.resolvedLanguage ?? i18n.language);
 
   try {
-    const title = await titleGeneratorService.request(conversationId, text, { mode });
+    const title = await titleGeneratorService.request(conversationId, text, { mode, lng });
     if (title) return title;
   } catch {
     return text.replace(/\s+/g, " ").slice(0, 36);
@@ -241,4 +256,10 @@ async function updateConversationTitle(
   await update(userId, conversationId, title);
   applyLocal(conversationId, title);
   markDone(conversationId);
+}
+
+function resolveTitleLanguage(input: string | null | undefined): AppLanguage {
+  const lower = (input ?? "").toLowerCase();
+  if (lower.startsWith("zh")) return "zh-CN";
+  return "en";
 }
