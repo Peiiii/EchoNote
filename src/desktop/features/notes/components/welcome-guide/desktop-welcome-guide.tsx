@@ -8,6 +8,7 @@ import {
 } from "@/common/components/ui/card";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, FileText, Lightbulb, Plus, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const DesktopWelcomeGuide = () => {
   const { t } = useTranslation();

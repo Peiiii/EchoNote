@@ -311,7 +311,7 @@ export const LoginCard = ({ className }: LoginCardProps) => {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                or
+                {t('auth.login.or')}
               </span>
             </div>
           </div>
@@ -348,7 +348,7 @@ export const LoginCard = ({ className }: LoginCardProps) => {
 
       {isPasswordReset && (
         <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-lg p-3">
-          Password reset email sent! Check your inbox.
+          {t('auth.login.passwordResetSent')}
         </div>
       )}
 

@@ -29,7 +29,7 @@ export function ComparisonLayout({
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {original.label || t('agentTools.comparisonLayout.original')}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">→</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">→</span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {updated.label || t('agentTools.comparisonLayout.updated')}
           </span>

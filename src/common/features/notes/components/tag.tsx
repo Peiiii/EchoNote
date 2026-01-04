@@ -1,6 +1,7 @@
 import { cn } from "@/common/lib/utils";
 import { X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export interface TagProps {
   name: string;

@@ -150,8 +150,9 @@ export function TagEditorPopover({
                   onClick={handleEditTag}
                   disabled={!inputValue.trim()}
                   className="px-2"
+                  aria-label={t('notes.tagEditor.confirm')}
                 >
-                  ✓
+                  <span aria-hidden="true">✓</span>
                 </Button>
               </div>
             ) : (

@@ -182,6 +182,8 @@
         "hintDesc": "You can try local mode (data stays on this device; no cloud sync).",
         "hintTitle": "No data yet?"
       },
+      "or": "or",
+      "passwordResetSent": "Password reset email sent! Check your inbox.",
       "title": "Sign in",
       "titleOrLocal": "Sign in or try locally"
     },
@@ -255,6 +257,20 @@
     "studio": "Studio"
   },
   "channelManagement": {
+    "channelItem": {
+      "editChannel": "Edit channel"
+    },
+    "channelList": {
+      "newSpace": "New space",
+      "searchAllNotes": "Search all notes",
+      "searchAllNotesTooltip": "Search across all spaces",
+      "title": "Spaces"
+    },
+    "channelListEmptyState": {
+      "createFirstSpace": "Create your first space",
+      "description": "Get started by creating your first thought space",
+      "title": "No spaces yet"
+    },
     "createChannel": {
       "createSpace": "Create Space",
       "description": "Description (Optional)",
@@ -312,6 +328,40 @@
       }
     }
   },
+  "demo": {
+    "aiObjectDemo": {
+      "apiKeyWarning": "API key not configured. Please set VITE_DASHSCOPE_API_KEY in your environment.",
+      "defaultPrompt": "Create a todo item for: Review the project proposal",
+      "description": "Generate structured objects from natural language prompts using AI",
+      "generate": "Generate",
+      "generating": "Generating...",
+      "promptLabel": "Prompt",
+      "promptPlaceholder": "Enter your prompt here...",
+      "title": "AI Object Generation Demo"
+    }
+  },
+  "desktop": {
+    "welcomeGuide": {
+      "createFirstSpace": "Create Your First Space",
+      "createMoreHint": "You can create more spaces anytime from the sidebar",
+      "description": "Your personal space for thoughts, ideas, and AI-powered conversations. Create your first thought space to get started.",
+      "feature1": {
+        "description": "Capture and organize your thoughts in dedicated spaces",
+        "title": "Organized Spaces"
+      },
+      "feature2": {
+        "description": "Have intelligent conversations with AI about your notes",
+        "title": "AI Conversations"
+      },
+      "feature3": {
+        "description": "Discover insights and connections in your thoughts",
+        "title": "Smart Insights"
+      },
+      "firstSpaceDescription": "Start your journey here",
+      "firstSpaceName": "My First Space",
+      "title": "Welcome to StillRoot"
+    }
+  },
   "editor": {
     "codeBlock": {
       "plainText": "Plain text",
@@ -321,14 +371,17 @@
     "image": {
       "close": "Close image editor",
       "insert": "Insert",
-      "urlPlaceholder": "Image URL or base64"
+      "urlOrBase64Prompt": "",
+      "urlPlaceholder": "Image URL or base64",
+      "urlPrompt": ""
     },
     "link": {
       "close": "Close link editor",
       "textPlaceholder": "Link text",
       "unlink": "Unlink",
       "urlPlaceholder": "https://"
-    }
+    },
+    "placeholder": "Write your thought..."
   },
   "feedback": {
     "modal": {
@@ -358,6 +411,7 @@
     }
   },
   "homepage": {
+    "brand": "StillRoot",
     "cta": {
       "getStarted": "Get Started",
       "learnMore": "Learn More"
@@ -417,6 +471,11 @@
       "label": "Reply:"
     }
   },
+  "mobile": {
+    "settings": {
+      "title": ""
+    }
+  },
   "notes": {
     "messageTimeline": {
       "collapse": "Collapse",
@@ -444,6 +503,7 @@
       "title": "Your space is ready!"
     },
     "tagEditor": {
+      "confirm": "Confirm",
       "editPlaceholder": "Edit \"{{tag}}\"",
       "editTags": "Edit Tags",
       "noTags": "No tags yet. Add some above.",
@@ -463,6 +523,11 @@
       "refreshing": "Refreshing...",
       "searchAll": "Search all spaces",
       "searchCurrent": "Search current space"
+    },
+    "keyboardShortcuts": {
+      "close": "Close",
+      "navigate": "Navigate",
+      "open": "Open"
     },
     "searchHeader": {
       "all": "All",
@@ -493,6 +558,41 @@
       "title": "Update Available",
       "updating": "Updating..."
     }
+  },
+  "richEditor": {
+    "heading": "Heading {{level}}",
+    "slashCommands": {
+      "bulletedList": "",
+      "clearFormatting": "",
+      "codeBlock": "",
+      "groups": {
+        "blocks": "",
+        "editing": "",
+        "headings": "",
+        "lists": "",
+        "mediaLinks": "",
+        "table": ""
+      },
+      "heading1": "",
+      "heading2": "",
+      "heading3": "",
+      "horizontalRule": "",
+      "image": "",
+      "inlineCode": "",
+      "link": "",
+      "numberedList": "",
+      "quote": "",
+      "table": "",
+      "tableAddColumnLeft": "",
+      "tableAddColumnRight": "",
+      "tableAddRowAbove": "",
+      "tableAddRowBelow": "",
+      "tableDeleteColumn": "",
+      "tableDeleteRow": "",
+      "tableDeleteTable": "",
+      "taskList": ""
+    },
+    "text": "Text"
   },
   "spacePublish": {
     "publicSpacePage": {

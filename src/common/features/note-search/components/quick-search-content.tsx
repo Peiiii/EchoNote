@@ -11,6 +11,7 @@ import { useKeyboardNavigation } from "@/common/hooks/use-keyboard-navigation";
 import { useSwipeGestures } from "@/common/hooks/use-swipe-gestures";
 import { useScrollToActive } from "@/common/hooks/use-scroll-to-active";
 import { useAsyncOperation } from "@/common/hooks/use-async-operation";
+import { useTranslation } from "react-i18next";
 import { SearchHeader } from "./search-header";
 import { SearchResults } from "./search-results";
 import { EmptyStates } from "./search-empty-states";
@@ -24,6 +25,7 @@ export function QuickSearchContent({
   onClose,
   defaultScope = "current",
 }: QuickSearchContentProps) {
+  const { t } = useTranslation();
   const { currentChannelId } = useNotesViewStore();
   const channels = useNotesDataStore(s => s.channels);
   const presenter = useCommonPresenterContext();
@@ -175,15 +177,15 @@ export function QuickSearchContent({
           <div className="flex items-center gap-1.5">
             <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">↑</kbd>
             <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">↓</kbd>
-            <span>Navigate</span>
+            <span>{t('noteSearch.keyboardShortcuts.navigate')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">Enter</kbd>
-            <span>Open</span>
+            <span>{t('noteSearch.keyboardShortcuts.open')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <kbd className="px-1.5 py-0.5 bg-muted/50 rounded text-xs font-mono">Esc</kbd>
-            <span>Close</span>
+            <span>{t('noteSearch.keyboardShortcuts.close')}</span>
           </div>
         </div>
       </div>

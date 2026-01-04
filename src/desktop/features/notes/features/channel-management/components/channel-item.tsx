@@ -111,7 +111,7 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                       size="sm"
                       variant="ghost"
                       className="h-6 w-6 p-0 hover:bg-slate-200 dark:hover:bg-slate-700"
-                      title="Edit channel"
+                      title={t('channelManagement.channelItem.editChannel')}
                       onClick={e => e.stopPropagation()}
                     >
                       <Edit2 className="h-3.5 w-3.5" />

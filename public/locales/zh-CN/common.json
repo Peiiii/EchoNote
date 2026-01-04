@@ -182,6 +182,8 @@
         "hintDesc": "你可以先用本地模式体验（数据仅保存在本机，不会云同步）。",
         "hintTitle": "还没有数据？"
       },
+      "or": "或",
+      "passwordResetSent": "密码重置邮件已发送！请查看您的收件箱。",
       "title": "登录",
       "titleOrLocal": "登录或本地体验"
     },
@@ -255,6 +257,20 @@
     "studio": "工作室"
   },
   "channelManagement": {
+    "channelItem": {
+      "editChannel": "编辑频道"
+    },
+    "channelList": {
+      "newSpace": "新建空间",
+      "searchAllNotes": "搜索所有笔记",
+      "searchAllNotesTooltip": "在所有空间中搜索",
+      "title": "空间"
+    },
+    "channelListEmptyState": {
+      "createFirstSpace": "创建您的第一个空间",
+      "description": "通过创建您的第一个思考空间开始",
+      "title": "还没有空间"
+    },
     "createChannel": {
       "createSpace": "创建空间",
       "description": "描述（可选）",
@@ -312,6 +328,40 @@
       }
     }
   },
+  "demo": {
+    "aiObjectDemo": {
+      "apiKeyWarning": "未配置 API 密钥。请在环境变量中设置 VITE_DASHSCOPE_API_KEY。",
+      "defaultPrompt": "创建一个待办事项：审查项目提案",
+      "description": "使用 AI 从自然语言提示生成结构化对象",
+      "generate": "生成",
+      "generating": "生成中...",
+      "promptLabel": "提示",
+      "promptPlaceholder": "在此输入您的提示...",
+      "title": "AI 对象生成演示"
+    }
+  },
+  "desktop": {
+    "welcomeGuide": {
+      "createFirstSpace": "创建您的第一个空间",
+      "createMoreHint": "您可以随时从侧边栏创建更多空间",
+      "description": "您的个人空间，用于记录想法、灵感和 AI 驱动的对话。创建您的第一个思考空间开始使用。",
+      "feature1": {
+        "description": "在专用空间中捕捉和组织您的想法",
+        "title": "有序空间"
+      },
+      "feature2": {
+        "description": "与 AI 就您的笔记进行智能对话",
+        "title": "AI 对话"
+      },
+      "feature3": {
+        "description": "发现您想法中的见解和联系",
+        "title": "智能洞察"
+      },
+      "firstSpaceDescription": "从这里开始您的旅程",
+      "firstSpaceName": "我的第一个空间",
+      "title": "欢迎使用 StillRoot"
+    }
+  },
   "editor": {
     "codeBlock": {
       "plainText": "纯文本",
@@ -321,14 +371,17 @@
     "image": {
       "close": "关闭图片编辑器",
       "insert": "插入",
-      "urlPlaceholder": "图片 URL 或 base64"
+      "urlOrBase64Prompt": "",
+      "urlPlaceholder": "图片 URL 或 base64",
+      "urlPrompt": ""
     },
     "link": {
       "close": "关闭链接编辑器",
       "textPlaceholder": "链接文本",
       "unlink": "取消链接",
       "urlPlaceholder": "https://"
-    }
+    },
+    "placeholder": "写下您的想法..."
   },
   "feedback": {
     "modal": {
@@ -358,6 +411,7 @@
     }
   },
   "homepage": {
+    "brand": "StillRoot",
     "cta": {
       "getStarted": "开始使用",
       "learnMore": "了解更多"
@@ -417,6 +471,11 @@
       "label": "回复："
     }
   },
+  "mobile": {
+    "settings": {
+      "title": ""
+    }
+  },
   "notes": {
     "messageTimeline": {
       "collapse": "折叠",
@@ -444,6 +503,7 @@
       "title": "你的空间已准备就绪！"
     },
     "tagEditor": {
+      "confirm": "确认",
       "editPlaceholder": "编辑 \"{{tag}}\"",
       "editTags": "编辑标签",
       "noTags": "还没有标签。在上面添加一些。",
@@ -463,6 +523,11 @@
       "refreshing": "正在刷新...",
       "searchAll": "搜索所有空间",
       "searchCurrent": "搜索当前空间"
+    },
+    "keyboardShortcuts": {
+      "close": "关闭",
+      "navigate": "导航",
+      "open": "打开"
     },
     "searchHeader": {
       "all": "全部",
@@ -493,6 +558,41 @@
       "title": "有可用更新",
       "updating": "更新中..."
     }
+  },
+  "richEditor": {
+    "heading": "标题 {{level}}",
+    "slashCommands": {
+      "bulletedList": "",
+      "clearFormatting": "",
+      "codeBlock": "",
+      "groups": {
+        "blocks": "",
+        "editing": "",
+        "headings": "",
+        "lists": "",
+        "mediaLinks": "",
+        "table": ""
+      },
+      "heading1": "",
+      "heading2": "",
+      "heading3": "",
+      "horizontalRule": "",
+      "image": "",
+      "inlineCode": "",
+      "link": "",
+      "numberedList": "",
+      "quote": "",
+      "table": "",
+      "tableAddColumnLeft": "",
+      "tableAddColumnRight": "",
+      "tableAddRowAbove": "",
+      "tableAddRowBelow": "",
+      "tableDeleteColumn": "",
+      "tableDeleteRow": "",
+      "tableDeleteTable": "",
+      "taskList": ""
+    },
+    "text": "文本"
   },
   "spacePublish": {
     "publicSpacePage": {

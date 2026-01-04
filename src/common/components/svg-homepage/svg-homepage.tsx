@@ -58,7 +58,7 @@ export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => 
                 <MessageSquare className="w-7 h-7 text-white" />
               </div>
               <span className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-slate-100 dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
-                StillRoot
+                {t('homepage.brand')}
               </span>
             </div>
 

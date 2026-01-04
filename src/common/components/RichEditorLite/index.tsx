@@ -438,7 +438,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
         dblclick: (_view: unknown, event: Event) => {
           const target = event.target as HTMLElement
           if (target && target.tagName === 'IMG') {
-            const newUrl = window.prompt('Image URL (leave empty to remove)', (target as HTMLImageElement).src || '')
+            const newUrl = window.prompt(t('editor.image.urlPrompt'), (target as HTMLImageElement).src || '')
             if (newUrl === null) return true
             if (!newUrl.trim()) {
               editorRef.current?.chain().focus().deleteSelection().run()
@@ -518,7 +518,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
       const editorElement = editor.view.dom
       const placeholderElements = editorElement.querySelectorAll('[data-placeholder]')
       placeholderElements.forEach((el: Element) => {
-        ;(el as HTMLElement).setAttribute('data-placeholder', placeholder)
+        ;(el as HTMLElement).setAttribute('data-placeholder', placeholder || '')
       })
     }
   }, [placeholder, editor])
@@ -563,7 +563,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
   type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
   const headingLevels: HeadingLevel[] = [1, 2, 3, 4, 5, 6]
   const activeHeadingLevel = editor ? headingLevels.find(level => editor.isActive('heading', { level })) : undefined
-  const headingLabel = activeHeadingLevel ? `H${activeHeadingLevel}` : 'Text'
+  const headingLabel = activeHeadingLevel ? `H${activeHeadingLevel}` : t('richEditor.text')
 
 
   // execAndCleanupSlash no longer used (Suggestion handles command execution)
@@ -673,27 +673,27 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
 
   type SlashItem = { label: string; id: SlashAction; group?: string; aliases?: string[] }
   const allSlashItems: SlashItem[] = [
-    { label: 'Heading 1', id: 'h1', group: 'Headings', aliases: ['h1', 'title'] },
-    { label: 'Heading 2', id: 'h2', group: 'Headings', aliases: ['h2'] },
-    { label: 'Heading 3', id: 'h3', group: 'Headings', aliases: ['h3'] },
-    { label: 'Bulleted list', id: 'bullet', group: 'Lists', aliases: ['ul', 'unordered'] },
-    { label: 'Numbered list', id: 'ordered', group: 'Lists', aliases: ['ol', 'ordered', 'number'] },
-    { label: 'Task list', id: 'task', group: 'Lists', aliases: ['todo', 'checkbox'] },
-    { label: 'Quote', id: 'quote', group: 'Blocks', aliases: ['blockquote'] },
-    { label: 'Code block', id: 'code', group: 'Blocks', aliases: ['fence', '```'] },
-    { label: 'Inline code', id: 'icode', group: 'Blocks', aliases: ['code inline'] },
-    { label: 'Horizontal rule', id: 'hr', group: 'Blocks', aliases: ['divider', 'line'] },
-    { label: 'Table', id: 'table', group: 'Table' },
-    { label: 'Table: add row above', id: 'table-row-above', group: 'Table' },
-    { label: 'Table: add row below', id: 'table-row-below', group: 'Table' },
-    { label: 'Table: delete row', id: 'table-row-delete', group: 'Table' },
-    { label: 'Table: add column left', id: 'table-col-left', group: 'Table' },
-    { label: 'Table: add column right', id: 'table-col-right', group: 'Table' },
-    { label: 'Table: delete column', id: 'table-col-delete', group: 'Table' },
-    { label: 'Table: delete table', id: 'table-delete', group: 'Table' },
-    { label: 'Image…', id: 'image', group: 'Media & Links', aliases: ['img', 'picture'] },
-    { label: 'Link…', id: 'link', group: 'Media & Links', aliases: ['url'] },
-    { label: 'Clear formatting', id: 'clear', group: 'Editing', aliases: ['reset', 'remove style'] },
+    { label: t('richEditor.slashCommands.heading1'), id: 'h1', group: t('richEditor.slashCommands.groups.headings'), aliases: ['h1', 'title'] },
+    { label: t('richEditor.slashCommands.heading2'), id: 'h2', group: t('richEditor.slashCommands.groups.headings'), aliases: ['h2'] },
+    { label: t('richEditor.slashCommands.heading3'), id: 'h3', group: t('richEditor.slashCommands.groups.headings'), aliases: ['h3'] },
+    { label: t('richEditor.slashCommands.bulletedList'), id: 'bullet', group: t('richEditor.slashCommands.groups.lists'), aliases: ['ul', 'unordered'] },
+    { label: t('richEditor.slashCommands.numberedList'), id: 'ordered', group: t('richEditor.slashCommands.groups.lists'), aliases: ['ol', 'ordered', 'number'] },
+    { label: t('richEditor.slashCommands.taskList'), id: 'task', group: t('richEditor.slashCommands.groups.lists'), aliases: ['todo', 'checkbox'] },
+    { label: t('richEditor.slashCommands.quote'), id: 'quote', group: t('richEditor.slashCommands.groups.blocks'), aliases: ['blockquote'] },
+    { label: t('richEditor.slashCommands.codeBlock'), id: 'code', group: t('richEditor.slashCommands.groups.blocks'), aliases: ['fence', '```'] },
+    { label: t('richEditor.slashCommands.inlineCode'), id: 'icode', group: t('richEditor.slashCommands.groups.blocks'), aliases: ['code inline'] },
+    { label: t('richEditor.slashCommands.horizontalRule'), id: 'hr', group: t('richEditor.slashCommands.groups.blocks'), aliases: ['divider', 'line'] },
+    { label: t('richEditor.slashCommands.table'), id: 'table', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableAddRowAbove'), id: 'table-row-above', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableAddRowBelow'), id: 'table-row-below', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableDeleteRow'), id: 'table-row-delete', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableAddColumnLeft'), id: 'table-col-left', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableAddColumnRight'), id: 'table-col-right', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableDeleteColumn'), id: 'table-col-delete', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.tableDeleteTable'), id: 'table-delete', group: t('richEditor.slashCommands.groups.table') },
+    { label: t('richEditor.slashCommands.image'), id: 'image', group: t('richEditor.slashCommands.groups.mediaLinks'), aliases: ['img', 'picture'] },
+    { label: t('richEditor.slashCommands.link'), id: 'link', group: t('richEditor.slashCommands.groups.mediaLinks'), aliases: ['url'] },
+    { label: t('richEditor.slashCommands.clearFormatting'), id: 'clear', group: t('richEditor.slashCommands.groups.editing'), aliases: ['reset', 'remove style'] },
   ]
 
   const getSlashItems = () => {
@@ -784,10 +784,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
               onSelect={() => editor?.chain().focus().setParagraph().run()}
               className="flex items-center gap-2"
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+              <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200" aria-hidden="true">
                 ¶
               </span>
-              <span className="font-medium">Text</span>
+              <span className="font-medium">{t('richEditor.text')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1" />
             {headingLevels.map(level => (
@@ -796,10 +796,10 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
                 onSelect={() => editor?.chain().focus().toggleHeading({ level }).run()}
                 className="flex items-center gap-2"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200" aria-hidden="true">
                   H{level}
                 </span>
-                <span className="font-medium">Heading {level}</span>
+                <span className="font-medium">{t('richEditor.heading', { level })}</span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -834,7 +834,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
           <LinkIcon className="w-4 h-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => {
-          const url = window.prompt('Image URL or base64')
+          const url = window.prompt(t('editor.image.urlOrBase64Prompt'))
           if (url) editor?.chain().focus().setImage({ src: url }).run()
         }}>
           <ImageIcon className="w-4 h-4" />

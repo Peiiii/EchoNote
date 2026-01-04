@@ -1,6 +1,5 @@
 import { modal } from "@/common/lib/imperative-modal";
 import { useTranslation } from "react-i18next";
-import { ReactNode } from "react";
 
 const FEEDBACK_SPACE_URL =
   import.meta.env.VITE_FEEDBACK_SPACE_URL ??

@@ -9,12 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/common/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface MobileSettingsSidebarProps {
   onClose?: () => void;
 }
 
 export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) => {
+  const { t } = useTranslation();
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -22,13 +24,13 @@ export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) =
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <Settings className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold text-foreground">Settings</h3>
+          <h3 className="font-semibold text-foreground">{t('mobile.settings.title')}</h3>
         </div>
         {onClose && (
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="h-8 w-8"
             onClick={onClose}
           >
