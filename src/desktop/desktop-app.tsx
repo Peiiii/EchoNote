@@ -9,21 +9,13 @@ import { DesktopPresenter } from "./services/desktop-presenter";
 export const DesktopApp = () => {
   const desktopPresenter = useMemo(() => new DesktopPresenter(), []);
 
-  // Only include demo extension in development
-  const extensions = useMemo(() => {
-    const baseExtensions = [notesExtension];
-
-
-    return baseExtensions;
-  }, []);
+  const extensions = useMemo(() => [notesExtension], []);
 
   return (
     <DesktopPresenterContext.Provider value={desktopPresenter}>
       <CommonPresenterContext.Provider value={desktopPresenter}>
         <div className="h-screen flex flex-col">
-          <DesktopSetupApp
-            extensions={extensions}
-          />
+          <DesktopSetupApp extensions={extensions} />
           <ModalRenderer />
         </div>
       </CommonPresenterContext.Provider>
