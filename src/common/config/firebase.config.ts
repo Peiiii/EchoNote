@@ -7,7 +7,12 @@ import {
   getAuth,
   initializeAuth,
 } from "firebase/auth";
-import { Firestore, initializeFirestore } from "firebase/firestore";
+import {
+  Firestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 
 interface FirebaseConfigOptions {
   apiKey: string;
@@ -33,12 +38,28 @@ const config: FirebaseConfigOptions = {
 };
 
 const app = initializeApp(config);
-const db = initializeFirestore(app, {
-  host: PROXY_HOST_API,
-  ssl: true,
-  ignoreUndefinedProperties: true,
-  experimentalForceLongPolling: false,
-});
+const createFirestoreDb = (): Firestore => {
+  const base = {
+    host: PROXY_HOST_API,
+    ssl: true,
+    ignoreUndefinedProperties: true,
+    experimentalForceLongPolling: false,
+  };
+
+  try {
+    return initializeFirestore(app, {
+      ...base,
+      // Persist Firestore cache in IndexedDB so repeated app opens can render cached channels/messages fast,
+      // then sync in the background.
+      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    });
+  } catch (error) {
+    console.warn("[firebase] Failed to enable persistent cache, falling back to memory cache.", error);
+    return initializeFirestore(app, base);
+  }
+};
+
+const db = createFirestoreDb();
 
 
 const tryLoadRegionFromLocalStorage = (defaultRegion: string): string => {

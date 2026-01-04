@@ -423,9 +423,14 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     const featuresConfig = getFeaturesConfig();
     const migrationsEnabled = featuresConfig.data?.migrations?.enabled !== false;
 
-    // Ensure backend initialization (e.g., migrations) is applied before subscribe
+    // Run backend initialization (e.g., migrations) in the background so the first channels snapshot
+    // is not blocked by network round-trips.
     if (migrationsEnabled) {
-      await getStorageProvider().initializeForUser(userId);
+      void getStorageProvider()
+        .initializeForUser(userId)
+        .catch(error => {
+          console.warn("[notes] initializeForUser failed (non-blocking)", { userId, error });
+        });
     }
 
     const notesRepo = getStorageProvider().notes;

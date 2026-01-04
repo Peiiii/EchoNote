@@ -15,6 +15,16 @@ export const useAutoSelectFirstChannel = () => {
     if (!hasHydrated) return;
     // Wait until we know which dataset we're in (guest:* or firebase uid) and channels are loaded.
     if (!userId) return;
+
+    // Fast path: preselect the last channel as soon as we know the userId so message loading can
+    // start in parallel with channel subscription. Validity is verified once channels arrive.
+    if (!currentChannelId) {
+      const lastForUser = lastChannelIdByUserId[userId];
+      if (lastForUser) {
+        setCurrentChannel(lastForUser);
+      }
+    }
+
     if (channelsLoading) return;
     if (channels.length === 0) return;
 
