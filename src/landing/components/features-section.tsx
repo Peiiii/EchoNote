@@ -1,52 +1,74 @@
 import { Sparkles, Hash, Search, Layout, Brain, PieChart, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
-const features = [
-  {
-    icon: Sparkles,
-    title: "AI 成长导师",
-    description: "AI 实时监控你的成长状态，提供深度的思维反馈与行动规划建议。",
-    glow: "rgba(59, 130, 246, 0.4)",
-  },
-  {
-    icon: Brain,
-    title: "多维知识整理",
-    description: "通过 Concept Cards 和自动标签，将零散的碎片转化为系统的知识体系。",
-    glow: "rgba(168, 85, 247, 0.4)",
-  },
-  {
-    icon: PieChart,
-    title: "思维可视化",
-    description: "一键生成思维导图与周报，直观呈现你的认知轨迹与项目进展。",
-    glow: "rgba(34, 197, 94, 0.4)",
-  },
-  {
-    icon: Zap,
-    title: "极简记录体验",
-    description: "像发微信一样简单。随时随地，零干扰捕捉你的每一个呼吸间的想法。",
-    glow: "rgba(249, 115, 22, 0.4)",
-  },
-  {
-    icon: Hash,
-    title: "智能标签",
-    description: "使用 #标签 自动组织分类，轻松管理海量笔记",
-    color: "from-indigo-500 to-purple-500", // Retaining original color for this position
-  },
-  {
-    icon: Search,
-    title: "全文搜索",
-    description: "强大的搜索引擎，瞬间找到你需要的任何内容",
-    color: "from-indigo-500 to-purple-500",
-  },
-  {
-    icon: Layout,
-    title: "多维视图",
-    description: "时间线、看板、脑图等多种视图，不同角度看笔记",
-    color: "from-pink-500 to-rose-500",
-  },
+const featureIcons = [
+  Sparkles,
+  Brain,
+  PieChart,
+  Zap,
+  Hash,
+  Search,
+  Layout,
+];
+
+const featureGlows = [
+  "rgba(59, 130, 246, 0.4)",
+  "rgba(168, 85, 247, 0.4)",
+  "rgba(34, 197, 94, 0.4)",
+  "rgba(249, 115, 22, 0.4)",
+  "rgba(99, 102, 241, 0.4)",
+  "rgba(99, 102, 241, 0.4)",
+  "rgba(236, 72, 153, 0.4)",
 ];
 
 export const FeaturesSection = () => {
+  const { t } = useTranslation();
+  
+  const features = [
+    {
+      icon: featureIcons[0],
+      title: t("landing.features.feature1.title"),
+      description: t("landing.features.feature1.description"),
+      glow: featureGlows[0],
+    },
+    {
+      icon: featureIcons[1],
+      title: t("landing.features.feature2.title"),
+      description: t("landing.features.feature2.description"),
+      glow: featureGlows[1],
+    },
+    {
+      icon: featureIcons[2],
+      title: t("landing.features.feature3.title"),
+      description: t("landing.features.feature3.description"),
+      glow: featureGlows[2],
+    },
+    {
+      icon: featureIcons[3],
+      title: t("landing.features.feature4.title"),
+      description: t("landing.features.feature4.description"),
+      glow: featureGlows[3],
+    },
+    {
+      icon: featureIcons[4],
+      title: t("landing.features.feature5.title"),
+      description: t("landing.features.feature5.description"),
+      glow: featureGlows[4],
+    },
+    {
+      icon: featureIcons[5],
+      title: t("landing.features.feature6.title"),
+      description: t("landing.features.feature6.description"),
+      glow: featureGlows[5],
+    },
+    {
+      icon: featureIcons[6],
+      title: t("landing.features.feature7.title"),
+      description: t("landing.features.feature7.description"),
+      glow: featureGlows[6],
+    },
+  ];
   return (
     <section className="px-6 py-32 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -57,7 +79,8 @@ export const FeaturesSection = () => {
             viewport={{ once: true }}
             className="text-5xl md:text-7xl lp-heading font-black tracking-tighter text-white mb-6"
           >
-            系统化你的<span className="lp-gradient-text">碎片灵感</span>
+            {t("landing.features.title")}
+            <span className="lp-gradient-text">{t("landing.features.titleHighlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -66,7 +89,7 @@ export const FeaturesSection = () => {
             transition={{ delay: 0.1 }}
             className="text-lg text-slate-400 font-medium max-w-2xl mx-auto"
           >
-            我们将复杂的功能隐藏在简洁的界面之下，协助你构建属于自己的第二大脑。
+            {t("landing.features.description")}
           </motion.p>
         </div>
 

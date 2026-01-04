@@ -1,7 +1,9 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export const HeroSection = () => {
+  const { t } = useTranslation();
   return (
     <section className="relative overflow-hidden px-6 pt-32 pb-20 lg:px-8 lg:pt-48 lg:pb-32">
       {/* Immersive background elements */}
@@ -21,41 +23,41 @@ export const HeroSection = () => {
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-700">
               <Sparkles className="h-4 w-4" />
-              <span>AI-Powered Note-Taking</span>
+              <span>{t("landing.hero.badge")}</span>
             </div>
 
             <h1 className="text-6xl md:text-8xl lp-heading font-black tracking-tighter text-white leading-[0.85] mb-8">
-              碎片化记录
+              {t("landing.hero.title")}
               <span className="block mt-4 lp-gradient-text underline decoration-blue-500/30 underline-offset-8">
-                AI 助你成长
+                {t("landing.hero.subtitle")}
               </span>
             </h1>
             <p className="text-lg text-slate-400 leading-relaxed mb-10 max-w-lg font-medium">
-              捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。
+              {t("landing.hero.description")}
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row items-center">
               <button className="lp-button-primary px-10 py-4 rounded-full text-white font-bold text-lg flex items-center gap-2 group">
-                立即开始成长
+                {t("landing.hero.primaryButton")}
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button className="px-8 py-4 text-slate-300 font-semibold hover:text-white transition-colors">
-                观看演示视频
+                {t("landing.hero.secondaryButton")}
               </button>
             </div>
 
             <div className="flex items-center gap-8 text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-6">
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/50" />
-                <span>Zero Friction</span>
+                <span>{t("landing.hero.featureZeroFriction")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-cyan-500/50" />
-                <span>AI Insight</span>
+                <span>{t("landing.hero.featureAIInsight")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/50" />
-                <span>Auto Sync</span>
+                <span>{t("landing.hero.featureAutoSync")}</span>
               </div>
             </div>
           </motion.div>
@@ -82,7 +84,7 @@ export const HeroSection = () => {
                 <div className="p-8 space-y-6">
                   <div className="flex justify-end pr-4">
                     <div className="lp-glass px-6 py-4 rounded-3xl rounded-tr-sm text-sm text-slate-200 border-white/10 max-w-[85%]">
-                      感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。
+                      {t("landing.hero.demoMessage")}
                     </div>
                   </div>
                   <div className="flex justify-start pl-4 gap-3">
@@ -123,7 +125,7 @@ export const HeroSection = () => {
               className="absolute -left-12 bottom-12 lp-glass px-6 py-3 rounded-2xl flex items-center gap-3 border-white/10 shadow-2xl"
             >
               <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-xs font-bold text-slate-300 tracking-wider">THOUGHT ORGANIZED</span>
+              <span className="text-xs font-bold text-slate-300 tracking-wider">{t("landing.hero.floatingBadge")}</span>
             </motion.div>
           </motion.div>
         </div>

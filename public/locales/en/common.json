@@ -497,6 +497,98 @@
       "where": "Where"
     }
   },
+  "landing": {
+    "cta": {
+      "benefit1": "AI Mentor Real-time Feedback",
+      "benefit2": "Mindmap One-Click Generation",
+      "benefit3": "Zero-Friction Fragment Recording",
+      "benefit4": "Cross-Platform Auto Sync",
+      "description": "Let every flash of insight become nourishment for growth. Join EchoNote and experience efficient thinking and planning guided by an AI mentor.",
+      "primaryButton": "Start Free Growth Now",
+      "secondaryButton": "Roadmap Plan",
+      "title": "Start Your",
+      "titleHighlight": "Cognitive Evolution Journey"
+    },
+    "demo": {
+      "title": "Real-time Dialogue with Your Growth",
+      "titleHighlight": ""
+    },
+    "features": {
+      "description": "We hide complex features behind a simple interface, helping you build your own second brain.",
+      "feature1": {
+        "description": "AI monitors your growth status in real-time, providing deep thinking feedback and action planning suggestions.",
+        "title": "AI Growth Mentor"
+      },
+      "feature2": {
+        "description": "Transform scattered fragments into a systematic knowledge system through Concept Cards and automatic tags.",
+        "title": "Multi-dimensional Knowledge Organization"
+      },
+      "feature3": {
+        "description": "Generate mind maps and weekly reports with one click, visually presenting your cognitive trajectory and project progress.",
+        "title": "Thinking Visualization"
+      },
+      "feature4": {
+        "description": "As simple as sending a WeChat message. Capture every fleeting thought anytime, anywhere, with zero interference.",
+        "title": "Ultra-simple Recording Experience"
+      },
+      "feature5": {
+        "description": "Use #tags to automatically organize and categorize, easily managing massive notes",
+        "title": "Smart Tags"
+      },
+      "feature6": {
+        "description": "Powerful search engine that instantly finds any content you need",
+        "title": "Full-text Search"
+      },
+      "feature7": {
+        "description": "Timeline, Kanban, Mindmap and other views, see notes from different angles",
+        "title": "Multi-dimensional Views"
+      },
+      "title": "Systematize Your",
+      "titleHighlight": "Fragment Inspiration"
+    },
+    "footer": {
+      "brand": "EchoNote",
+      "company": {
+        "about": "About Us",
+        "blog": "Blog",
+        "label": "Company",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+      },
+      "copyright": "© {{year}} EchoNote. Built for Cognitive Growth.",
+      "description": "Let fragmented recording become the driving force of your growth.\nWith AI's deep organization and mentor-like guidance, start your cognitive evolution journey.",
+      "product": {
+        "changelog": "Changelog",
+        "features": "Features",
+        "label": "Product",
+        "pricing": "Pricing",
+        "useCases": "Use Cases"
+      },
+      "support": {
+        "api": "API Documentation",
+        "community": "Community Forum",
+        "contact": "Contact Us",
+        "docs": "Help Documentation",
+        "label": "Support"
+      }
+    },
+    "hero": {
+      "badge": "AI-Powered Note-Taking",
+      "demoMessage": "I feel like when learning React Server Components, the information is too fragmented to form a system.",
+      "description": "Capture every fleeting inspiration. EchoNote helps you transform fragmented information into clear actions and cognition through AI's deep organization and growth planning.",
+      "demoBadgeInsight": "Insight +3",
+      "demoBadgeMindmap": "Mindmap Generated",
+      "demoResponse": "I understand your concern. The core of RSC is changing 'component ownership'. I've generated a mind map for you and linked it to your notes about SSR from last week.",
+      "featureAIInsight": "AI Insight",
+      "featureAutoSync": "Auto Sync",
+      "featureZeroFriction": "Zero Friction",
+      "floatingBadge": "THOUGHT ORGANIZED",
+      "primaryButton": "Start Growing Now",
+      "secondaryButton": "Watch Demo Video",
+      "subtitle": "AI Helps You Grow",
+      "title": "Fragmented Recording"
+    }
+  },
   "language": {
     "en": "English",
     "label": "Language",

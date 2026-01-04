@@ -497,6 +497,98 @@
       "where": "在这里"
     }
   },
+  "landing": {
+    "cta": {
+      "benefit1": "AI 导师实时反馈",
+      "benefit2": "思维导图一键生成",
+      "benefit3": "零门槛碎片记录",
+      "benefit4": "跨平台自动同步",
+      "description": "让每一个闪念都成为成长的养料。加入 EchoNote，体验 AI 导师引领下的高效思维与规划。",
+      "primaryButton": "立即开始免费成长",
+      "secondaryButton": "路线图计划",
+      "title": "立即开启你的",
+      "titleHighlight": "认知进化之旅"
+    },
+    "demo": {
+      "title": "与你的成长",
+      "titleHighlight": "实时对话"
+    },
+    "features": {
+      "description": "我们将复杂的功能隐藏在简洁的界面之下，协助你构建属于自己的第二大脑。",
+      "feature1": {
+        "description": "AI 实时监控你的成长状态，提供深度的思维反馈与行动规划建议。",
+        "title": "AI 成长导师"
+      },
+      "feature2": {
+        "description": "通过 Concept Cards 和自动标签，将零散的碎片转化为系统的知识体系。",
+        "title": "多维知识整理"
+      },
+      "feature3": {
+        "description": "一键生成思维导图与周报，直观呈现你的认知轨迹与项目进展。",
+        "title": "思维可视化"
+      },
+      "feature4": {
+        "description": "像发微信一样简单。随时随地，零干扰捕捉你的每一个呼吸间的想法。",
+        "title": "极简记录体验"
+      },
+      "feature5": {
+        "description": "使用 #标签 自动组织分类，轻松管理海量笔记",
+        "title": "智能标签"
+      },
+      "feature6": {
+        "description": "强大的搜索引擎，瞬间找到你需要的任何内容",
+        "title": "全文搜索"
+      },
+      "feature7": {
+        "description": "时间线、看板、脑图等多种视图，不同角度看笔记",
+        "title": "多维视图"
+      },
+      "title": "系统化你的",
+      "titleHighlight": "碎片灵感"
+    },
+    "footer": {
+      "brand": "EchoNote",
+      "company": {
+        "about": "关于我们",
+        "blog": "博客",
+        "label": "公司",
+        "privacy": "隐私政策",
+        "terms": "服务条款"
+      },
+      "copyright": "© {{year}} EchoNote. Built for Cognitive Growth.",
+      "description": "让碎片化记录成为你成长的源动力。\n借助 AI 的深度整理与导师化引导，开启你的认知进化之旅。",
+      "product": {
+        "changelog": "更新日志",
+        "features": "功能特性",
+        "label": "产品",
+        "pricing": "定价",
+        "useCases": "使用案例"
+      },
+      "support": {
+        "api": "API 文档",
+        "community": "社区论坛",
+        "contact": "联系我们",
+        "docs": "帮助文档",
+        "label": "支持"
+      }
+    },
+    "hero": {
+      "badge": "AI-Powered Note-Taking",
+      "demoMessage": "感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。",
+      "description": "捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
+      "demoBadgeInsight": "Insight +3",
+      "demoBadgeMindmap": "Mindmap Generated",
+      "demoResponse": "理解你的困扰。RSC 的核心在于改变『组件所有权』。我为你生成了思维导图，并关联了你上周关于 SSR 的笔记。",
+      "featureAIInsight": "AI Insight",
+      "featureAutoSync": "Auto Sync",
+      "featureZeroFriction": "Zero Friction",
+      "floatingBadge": "THOUGHT ORGANIZED",
+      "primaryButton": "立即开始成长",
+      "secondaryButton": "观看演示视频",
+      "subtitle": "AI 助你成长",
+      "title": "碎片化记录"
+    }
+  },
   "language": {
     "en": "English",
     "label": "语言",

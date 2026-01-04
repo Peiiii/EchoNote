@@ -1,7 +1,9 @@
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export const CTASection = () => {
+  const { t } = useTranslation();
   return (
     <section className="px-6 py-32 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -17,28 +19,29 @@ export const CTASection = () => {
           
           <div className="relative z-10">
             <h2 className="text-5xl md:text-7xl lp-heading font-black tracking-tighter text-white mb-8 leading-tight">
-              立即开启你的<br />
-              <span className="lp-gradient-text">认知进化之旅</span>
+              {t("landing.cta.title")}
+              <br />
+              <span className="lp-gradient-text">{t("landing.cta.titleHighlight")}</span>
             </h2>
             <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-              让每一个闪念都成为成长的养料。加入 EchoNote，体验 AI 导师引领下的高效思维与规划。
+              {t("landing.cta.description")}
             </p>
  
             <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center mb-16">
               <button className="lp-button-primary px-12 py-5 rounded-full text-white font-bold text-xl shadow-2xl transition-all hover:scale-105 active:scale-95">
-                立即开始免费成长
+                {t("landing.cta.primaryButton")}
               </button>
               <button className="px-10 py-5 border border-white/10 text-slate-300 font-bold rounded-full text-xl hover:bg-white/5 transition-all">
-                路线图计划
+                {t("landing.cta.secondaryButton")}
               </button>
             </div>
  
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 border-t border-white/5 pt-12">
               {[
-                "AI 导师实时反馈",
-                "思维导图一键生成",
-                "零门槛碎片记录",
-                "跨平台自动同步"
+                t("landing.cta.benefit1"),
+                t("landing.cta.benefit2"),
+                t("landing.cta.benefit3"),
+                t("landing.cta.benefit4")
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center justify-center gap-3 text-slate-400">
                   <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">

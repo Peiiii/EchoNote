@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   id: string;
@@ -10,6 +11,7 @@ interface Message {
 }
 
 export const DemoSection = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     { id: "1", isUser: true, content: "刚刚读完了《深度工作》，感觉自己在任务规划上还有很大提升空间。想把里面的方法应用到下周的项目中。", timestamp: new Date() },
     { id: "2", isUser: false, content: "读得好！《深度工作》的核心在于保护『高价值产出』。我为你整理了一份下周的『深度工作实验方案』：\n\n1. **封锁时间**：每天上午 9-11 点关闭所有推送。\n2. **度量指标**：记录你的『深度时间』，而不是任务数量。\n3. **仪式感**：为进入状态设计一个专属动作。\n\n需要我帮你把这些加入到 OKR 规划中吗？", timestamp: new Date() },
@@ -63,7 +65,8 @@ export const DemoSection = () => {
             viewport={{ once: true }}
             className="text-5xl md:text-7xl lp-heading font-black tracking-tighter text-white"
           >
-            与你的成长<span className="lp-gradient-text">实时对话</span>
+            {t("landing.demo.title")}
+            <span className="lp-gradient-text">{t("landing.demo.titleHighlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
