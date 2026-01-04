@@ -8,6 +8,7 @@ import { ChannelEditField, logService } from "@/core/services/log.service";
 import { Channel } from "@/core/stores/notes-data.store";
 import { Edit3 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface EditChannelPopoverProps {
   channel: Channel;
@@ -15,6 +16,7 @@ interface EditChannelPopoverProps {
 }
 
 export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProps) => {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editName, setEditName] = useState(channel.name);
@@ -88,7 +90,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
       <RefinedPopover.Content align="center" side="bottom">
         <RefinedPopover.Header>
           <Edit3 className="w-4 h-4 text-primary/80" />
-          <div className="text-sm font-semibold text-foreground/90">Edit Thought Space</div>
+          <div className="text-sm font-semibold text-foreground/90">{t("channelManagement.editChannel.title")}</div>
         </RefinedPopover.Header>
 
         <RefinedPopover.Body>
@@ -96,7 +98,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             {/* Emoji selection */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Emoji
+                {t("channelManagement.editChannel.emoji")}
               </Label>
               <div className="flex items-center gap-2">
                 <EmojiPickerComponent value={editEmoji} onSelect={setEditEmoji}>
@@ -115,7 +117,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
                     onClick={() => setEditEmoji("")}
                     className="h-10 px-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                   >
-                    Clear
+                    {t("common.clear")}
                   </Button>
                 )}
               </div>
@@ -127,14 +129,14 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
                 htmlFor="channel-name"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Channel Name
+                {t("channelManagement.editChannel.channelName")}
               </Label>
               <Input
                 id="channel-name"
                 value={editName}
                 onChange={e => setEditName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter channel name"
+                placeholder={t("channelManagement.editChannel.channelNamePlaceholder")}
                 disabled={isLoading}
                 className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
               />
@@ -146,14 +148,14 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
                 htmlFor="channel-description"
                 className="text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Description
+                {t("channelManagement.editChannel.description")}
               </Label>
               <Input
                 id="channel-description"
                 value={editDescription}
                 onChange={e => setEditDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter channel description"
+                placeholder={t("channelManagement.editChannel.descriptionPlaceholder")}
                 disabled={isLoading}
                 className="h-10 px-3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg transition-colors duration-200 focus:border-slate-400 dark:focus:border-slate-500  hover:border-slate-300 dark:hover:border-slate-600"
               />
@@ -168,7 +170,7 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             onClick={handleCancel}
             disabled={isLoading}
           >
-            Cancel
+            {t("common.cancel")}
           </RefinedPopover.Button>
           <RefinedPopover.Button
             type="button"
@@ -179,10 +181,10 @@ export const EditChannelPopover = ({ channel, children }: EditChannelPopoverProp
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Saving...
+                {t("common.saving")}
               </div>
             ) : (
-              "Save"
+              t("common.save")
             )}
           </RefinedPopover.Button>
         </RefinedPopover.Actions>

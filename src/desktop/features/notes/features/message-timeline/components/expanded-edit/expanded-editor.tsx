@@ -92,7 +92,7 @@ export function ExpandedEditor({
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            Editing Thought
+            {t("notes.expandedEditor.editingThought")}
           </span>
         </div>
 
@@ -105,7 +105,7 @@ export function ExpandedEditor({
             className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
           >
             <Minimize2 className="w-3.5 h-3.5 mr-1.5" />
-            Collapse
+            {t("common.collapse")}
           </Button>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function ExpandedEditor({
           <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Editor</h3>
+                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">{t("notes.expandedEditor.editor")}</h3>
                 <div className="flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 p-0.5">
                   <Button
                     variant={editorMode === "markdown" ? "secondary" : "ghost"}
@@ -132,7 +132,7 @@ export function ExpandedEditor({
                     onClick={() => presenter.noteEditManager.setEditorMode("markdown")}
                     className="h-7 px-2"
                   >
-                    Markdown
+                    {t("notes.expandedEditor.markdown")}
                   </Button>
                   <Button
                     variant={editorMode === "wysiwyg" ? "secondary" : "ghost"}
@@ -140,12 +140,12 @@ export function ExpandedEditor({
                     onClick={() => presenter.noteEditManager.setEditorMode("wysiwyg")}
                     className="h-7 px-2"
                   >
-                    WYSIWYG
+                    {t("notes.expandedEditor.wysiwyg")}
                   </Button>
                 </div>
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500">
-                {localContent.length} characters
+                {t("notes.expandedEditor.characters", { count: localContent.length })}
               </div>
             </div>
           </div>
@@ -155,10 +155,10 @@ export function ExpandedEditor({
               <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <span className="font-medium">Unsaved draft available.</span>
+                    <span className="font-medium">{t("notes.expandedEditor.unsavedDraft")}</span>
                     {draftUpdatedAt && (
                       <span className="ml-2 text-xs text-amber-700/80 dark:text-amber-100/80">
-                        Saved {formatRelativeTime(new Date(draftUpdatedAt))}
+                        {t("notes.expandedEditor.saved", { time: formatRelativeTime(new Date(draftUpdatedAt)) })}
                       </span>
                     )}
                   </div>
@@ -168,14 +168,14 @@ export function ExpandedEditor({
                       className="h-8 rounded-md bg-amber-500 px-3 text-xs font-medium text-white transition-colors hover:bg-amber-600"
                       onClick={() => presenter.noteEditManager.applyDraft()}
                     >
-                      Restore draft
+                      {t("notes.expandedEditor.restoreDraft")}
                     </button>
                     <button
                       type="button"
                       className="h-8 rounded-md px-3 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 hover:text-amber-900 dark:text-amber-100 dark:hover:bg-amber-500/20"
                       onClick={() => presenter.noteEditManager.dismissDraftPrompt()}
                     >
-                      Dismiss
+                      {t("common.dismiss")}
                     </button>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export function ExpandedEditor({
                   value={localContent}
                   onChange={handleContentChange}
                   editable={!isSaving}
-                  placeholder="Write your thought..."
+                  placeholder={t("notes.expandedEditor.placeholder")}
                   variant="frameless"
                   className="h-full px-4 pt-2"
                 />

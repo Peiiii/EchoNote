@@ -8,8 +8,10 @@ import { useMessageInput } from "../message-input/hooks/use-message-input";
 import { Minimize2, Send } from "lucide-react";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 import { useCurrentChannel } from "@/desktop/features/notes/hooks/use-current-channel";
+import { useTranslation } from "react-i18next";
 
 export function ExpandedComposer() {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const { currentChannelId } = useNotesViewStore();
   const { message, handleMessageChange, handleSend } = useMessageInput();
@@ -43,8 +45,8 @@ export function ExpandedComposer() {
             }}
             disabled={!message.trim()}
             className="h-9 w-9 text-muted-foreground hover:text-foreground"
-            aria-label="Send"
-            title="Send"
+            aria-label={t("common.send")}
+            title={t("common.send")}
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -55,8 +57,8 @@ export function ExpandedComposer() {
             size="icon"
             onClick={() => setExpanded(false)}
             className="h-9 w-9"
-            aria-label="Collapse"
-            title="Collapse"
+            aria-label={t("common.collapse")}
+            title={t("common.collapse")}
           >
             <Minimize2 className="w-4 h-4" />
           </Button>

@@ -152,7 +152,7 @@ export function TagEditorPopover({
                   className="px-2"
                   aria-label={t('notes.tagEditor.confirm')}
                 >
-                  <span aria-hidden="true">✓</span>
+                  <span aria-hidden="true">{t('notes.tagEditor.checkmark')}</span>
                 </Button>
               </div>
             ) : (

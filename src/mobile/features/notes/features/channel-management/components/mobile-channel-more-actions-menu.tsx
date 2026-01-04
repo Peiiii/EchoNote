@@ -9,6 +9,7 @@ import {
 import { ConfigurableActionMenuContent } from "@/common/components/action-menu";
 import { useState } from "react";
 import { MobileEditChannelDialog } from "./mobile-edit-channel-dialog";
+import { useTranslation } from "react-i18next";
 
 interface MobileChannelMoreActionsMenuProps {
   channel: Channel;
@@ -19,6 +20,7 @@ export function MobileChannelMoreActionsMenu({
   channel,
   onDelete,
 }: MobileChannelMoreActionsMenuProps) {
+  const { t } = useTranslation();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
@@ -29,7 +31,7 @@ export function MobileChannelMoreActionsMenu({
             size="sm"
             variant="ghost"
             className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
-            title="More actions"
+            title={t("channelManagement.channelItem.moreActions")}
             onClick={e => e.stopPropagation()}
           >
             <MoreVertical className="h-3.5 w-3.5" />
@@ -49,7 +51,7 @@ export function MobileChannelMoreActionsMenu({
                   {
                     id: "edit",
                     icon: <Edit2 />,
-                    title: `Edit ${channel.name}`,
+                    title: t("channelManagement.channelItem.editChannel", { name: channel.name }),
                     onClick: () => setIsEditDialogOpen(true),
                   },
                 ],
@@ -60,7 +62,7 @@ export function MobileChannelMoreActionsMenu({
                   {
                     id: "delete",
                     icon: <Trash2 />,
-                    title: `Delete ${channel.name}`,
+                    title: t("channelManagement.channelItem.deleteChannel", { name: channel.name }),
                     onClick: onDelete,
                   },
                 ],

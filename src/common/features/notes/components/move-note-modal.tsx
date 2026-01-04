@@ -130,7 +130,7 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
               <span className="font-medium">{selectedChannel.name}</span>
               {selectedChannel.description && (
                 <span className="ml-1 text-slate-500 dark:text-slate-400">
-                  <span aria-hidden="true">—</span> {selectedChannel.description}
+                  <span aria-hidden="true">{t('notes.moveNoteModal.dashSeparator')}</span> {selectedChannel.description}
                 </span>
               )}
             </div>

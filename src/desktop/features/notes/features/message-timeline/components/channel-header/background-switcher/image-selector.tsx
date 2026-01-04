@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { BackgroundOption, generateRandomImages } from "./background-options";
 import { Plus, RefreshCw, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ImageSelectorProps {
   currentBackground?: string;
@@ -10,6 +11,7 @@ interface ImageSelectorProps {
 }
 
 export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSelectorProps) => {
+  const { t } = useTranslation();
   const [imageUrl, setImageUrl] = useState("");
   const [currentImages, setCurrentImages] = useState<BackgroundOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +39,7 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
 
     const customImageOption: BackgroundOption = {
       id: `custom-${Date.now()}`,
-      name: "Custom Image",
+      name: t("channelHeader.backgroundSwitcher.customImage"),
       type: "image",
       value: imageUrl.trim(),
       preview: imageUrl.trim(),
@@ -63,7 +65,7 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
     <div className="space-y-4">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xs font-medium text-muted-foreground">Random Images</h4>
+          <h4 className="text-xs font-medium text-muted-foreground">{t("channelHeader.backgroundSwitcher.randomImages")}</h4>
           <Button
             variant="ghost"
             size="sm"
@@ -122,11 +124,11 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
       </div>
 
       <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">Custom Image URL</h4>
+        <h4 className="text-xs font-medium text-muted-foreground mb-2">{t("channelHeader.backgroundSwitcher.customImageUrl")}</h4>
         <div className="space-y-2">
           <Input
             type="url"
-            placeholder="Enter image URL (jpg, png, gif, webp, svg)"
+            placeholder={t("channelHeader.backgroundSwitcher.imageUrlPlaceholder")}
             value={imageUrl}
             onChange={e => setImageUrl(e.target.value)}
             className="text-xs"
@@ -139,10 +141,10 @@ export const ImageSelector = ({ currentBackground, onBackgroundSelect }: ImageSe
             disabled={!imageUrl.trim() || !isValidImageUrl(imageUrl)}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Image
+            {t("channelHeader.backgroundSwitcher.addImage")}
           </Button>
           {imageUrl && !isValidImageUrl(imageUrl) && (
-            <p className="text-xs text-destructive">Please enter a valid image URL</p>
+            <p className="text-xs text-destructive">{t("channelHeader.backgroundSwitcher.invalidImageUrl")}</p>
           )}
         </div>
       </div>

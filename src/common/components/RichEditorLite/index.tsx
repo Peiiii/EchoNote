@@ -785,7 +785,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
               className="flex items-center gap-2"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200" aria-hidden="true">
-                ¶
+                {t('richEditor.symbols.paragraph')}
               </span>
               <span className="font-medium">{t('richEditor.text')}</span>
             </DropdownMenuItem>
@@ -797,7 +797,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
                 className="flex items-center gap-2"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200" aria-hidden="true">
-                  H{level}
+                  {t('richEditor.symbols.heading', { level })}
                 </span>
                 <span className="font-medium">{t('richEditor.heading', { level })}</span>
               </DropdownMenuItem>

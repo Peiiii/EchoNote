@@ -9,12 +9,14 @@ import {
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { Channel } from "@/core/stores/notes-data.store";
 import { MoreVertical, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ChannelMoreActionsMenuProps {
   channel: Channel;
 }
 
 export function ChannelMoreActionsMenu({ channel }: ChannelMoreActionsMenuProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   return (
     <DropdownMenu>
@@ -23,7 +25,7 @@ export function ChannelMoreActionsMenu({ channel }: ChannelMoreActionsMenuProps)
             size="sm"
             variant="ghost"
             className="h-6 w-6 p-0 hover:bg-slate-200 dark:hover:bg-slate-600"
-            title="More actions"
+            title={t("common.moreActions")}
             onClick={e => e.stopPropagation()}
           >
             <MoreVertical className="h-3 w-3" />
@@ -43,16 +45,15 @@ export function ChannelMoreActionsMenu({ channel }: ChannelMoreActionsMenuProps)
                   {
                     id: "delete",
                     icon: <Trash2 />,
-                    title: `Delete ${channel.name}`,
+                    title: t("channelManagement.deleteChannel.title", { channelName: channel.name }),
                     onClick: () =>
                       modal.confirm({
-                        title: "Delete Channel",
-                        description:
-                          `This will permanently delete the channel "${channel.name}" and all its messages. This action cannot be undone.`,
-                        okText: "Delete",
-                        okLoadingText: "Deleting...",
+                        title: t("channelManagement.deleteChannel.dialogTitle"),
+                        description: t("channelManagement.deleteChannel.description", { channelName: channel.name }),
+                        okText: t("common.delete"),
+                        okLoadingText: t("channelManagement.deleteChannel.deleting"),
                         okVariant: "destructive",
-                        cancelText: "Cancel",
+                        cancelText: t("common.cancel"),
                         onOk: async () => {
                           await presenter.channelManager.deleteChannel(channel.id);
                         },

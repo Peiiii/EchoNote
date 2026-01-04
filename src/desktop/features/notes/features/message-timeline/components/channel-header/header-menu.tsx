@@ -62,8 +62,8 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
             "group transition-all duration-200 flex-shrink-0",
             className
           )}
-          title="Menu"
-          aria-label="Menu"
+          title={t("header.menu.title")}
+          aria-label={t("header.menu.title")}
           onClick={e => e.stopPropagation()}
         >
           <Menu className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />

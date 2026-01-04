@@ -5,6 +5,7 @@ import { Plus, History, X } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { AIConversationInterface, AIConversationInterfaceRef } from "./ai-conversation-interface";
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface AIAssistantSidebarProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface AIAssistantSidebarProps {
 }
 
 export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSidebarProps) {
+  const { t } = useTranslation();
   const { userId } = useNotesDataStore();
   const convRef = useRef<AIConversationInterfaceRef>(null);
   const { currentConversation, createConversation } = useConversationState();
@@ -22,12 +24,12 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
   if (!isOpen) return null;
 
   const getTitle = () => {
-    if (uiView === "list") return "Conversations";
+    if (uiView === "list") return t("aiAssistant.sidebar.conversations");
     if (currentConversation)
       return titleGeneratingMap[currentConversation.id]
-        ? "Generating Title..."
-        : currentConversation.title || "AI Conversations";
-    return "AI Conversations";
+        ? t("aiAssistant.conversationList.generatingTitle")
+        : currentConversation.title || t("aiAssistant.sidebar.aiConversations");
+    return t("aiAssistant.sidebar.aiConversations");
   };
 
   return (
@@ -46,7 +48,7 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
                 if (!api) return;
                 if (api.isSinglePane()) api.showList();
               }}
-              aria-label="Conversations"
+              aria-label={t("aiAssistant.sidebar.conversations")}
             >
               <History className="w-5 h-5" />
             </Button>
@@ -54,13 +56,13 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
               variant="ghost"
               size="icon"
               onClick={() => {
-                if (userId) void createConversation(userId, "New Conversation");
+                if (userId) void createConversation(userId, t("aiAssistant.conversationList.newConversation"));
               }}
-              aria-label="New conversation"
+              aria-label={t("aiAssistant.sidebar.newConversation")}
             >
               <Plus className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+            <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("common.close")}>
               <X className="w-5 h-5" />
             </Button>
           </div>

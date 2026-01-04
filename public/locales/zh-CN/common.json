@@ -1,6 +1,7 @@
 {
   "agentTools": {
     "comparisonLayout": {
+      "arrowSeparator": "→",
       "loadingOriginal": "正在加载原始内容...",
       "loadingUpdated": "正在加载更新内容...",
       "original": "原始",
@@ -30,6 +31,7 @@
     },
     "grep": {
       "channel": "频道",
+      "channelLabel": "频道：",
       "channels": "频道",
       "command": "命令",
       "errorOccurred": "搜索时发生错误",
@@ -39,6 +41,7 @@
       "matchedNotes": "匹配的笔记：",
       "noMatches": "未找到匹配项",
       "note": "笔记",
+      "noteLabel": "笔记：",
       "ready": "准备搜索",
       "scope": "范围",
       "scopeNote": "范围由对话/UI 上下文强制执行，不属于 grep 命令的一部分。",
@@ -141,6 +144,11 @@
       "default": "默认",
       "selected": "已选择",
       "selectModel": "选择模型"
+    },
+    "sidebar": {
+      "aiConversations": "AI 对话",
+      "conversations": "对话",
+      "newConversation": "新对话"
     }
   },
   "auth": {
@@ -244,6 +252,10 @@
   },
   "channelHeader": {
     "aiAssistant": "AI 助手",
+    "backgroundSwitcher": {
+      "gradients": "渐变",
+      "solidColors": "纯色"
+    },
     "collapseHeader": "折叠标题",
     "editSpace": "编辑空间",
     "expandHeader": "展开标题",
@@ -258,7 +270,9 @@
   },
   "channelManagement": {
     "channelItem": {
-      "editChannel": "编辑频道"
+      "deleteChannel": "删除 {{name}}",
+      "editChannel": "编辑 {{name}}",
+      "moreActions": "更多操作"
     },
     "channelList": {
       "newSpace": "新建空间",
@@ -284,6 +298,51 @@
       "select": "选择",
       "title": "创建新思考空间",
       "untitled": "未命名"
+    },
+    "deleteChannel": {
+      "deleting": "删除中...",
+      "description": "这将永久删除频道 \"{{channelName}}\" 及其所有消息。此操作无法撤销。",
+      "dialogTitle": "删除频道",
+      "title": "删除 {{channelName}}"
+    },
+    "editChannel": {
+      "channelName": "频道名称",
+      "channelNamePlaceholder": "输入频道名称",
+      "description": "描述",
+      "descriptionPlaceholder": "输入描述",
+      "emoji": "表情符号",
+      "title": "编辑频道"
+    },
+    "publishSpace": {
+      "anyoneCanAdd": "任何人都可以添加消息",
+      "changing": "更改中...",
+      "collaborative": "协作",
+      "collaborativeDescription": "拥有链接的任何人都可以查看和添加消息",
+      "confirmChange": "确认更改",
+      "makeAccessible": "使此空间可供他人访问",
+      "mode": "模式",
+      "publish": "发布",
+      "publishedAppendOnly": "已发布（仅追加）",
+      "publishedReadOnly": "已发布（只读）",
+      "publishing": "发布中...",
+      "readOnly": "只读",
+      "readOnlyDescription": "拥有链接的任何人只能查看消息",
+      "shareLink": "分享链接",
+      "signInDescription": "请登录以发布此空间",
+      "signInTitle": "需要登录",
+      "signInToManageDescription": "请登录以管理此空间",
+      "signInToManageTitle": "需要登录",
+      "signInToPublish": "请登录以发布此空间",
+      "signInToUnpublish": "请登录以取消发布此空间",
+      "signInToUpdateMode": "请登录以更新共享模式",
+      "signInToUpdateModeDescription": "请登录以更新共享模式",
+      "signInToUpdateModeTitle": "需要登录",
+      "title": "发布空间",
+      "unpublish": "取消发布",
+      "unpublishDescription": "这将使空间再次变为私有。分享链接将不再有效。",
+      "unpublishing": "取消发布中...",
+      "unpublishTitle": "取消发布空间",
+      "viewOnly": "仅查看"
     }
   },
   "common": {
@@ -301,6 +360,7 @@
     "moreActions": "更多操作",
     "pressEscToClose": "按 <0>ESC</0> 关闭",
     "save": "保存",
+    "saving": "保存中...",
     "unknown": "未知",
     "viewLarger": "查看大图"
   },
@@ -371,9 +431,9 @@
     "image": {
       "close": "关闭图片编辑器",
       "insert": "插入",
-      "urlOrBase64Prompt": "",
+      "urlOrBase64Prompt": "图片 URL 或 base64",
       "urlPlaceholder": "图片 URL 或 base64",
-      "urlPrompt": ""
+      "urlPrompt": "图片 URL（留空以删除）"
     },
     "link": {
       "close": "关闭链接编辑器",
@@ -407,7 +467,8 @@
         "label": "主题",
         "light": "浅色",
         "system": "跟随系统"
-      }
+      },
+      "title": "菜单"
     }
   },
   "homepage": {
@@ -473,7 +534,7 @@
   },
   "mobile": {
     "settings": {
-      "title": ""
+      "title": "设置"
     }
   },
   "notes": {
@@ -485,6 +546,7 @@
     },
     "moveNoteModal": {
       "confirmMove": "确认移动",
+      "dashSeparator": "—",
       "description": "为此想法选择一个目标空间。同一线程中的任何回复都会一起移动。",
       "destinationSpace": "目标空间",
       "error": "移动笔记失败。请重试。",
@@ -503,6 +565,7 @@
       "title": "你的空间已准备就绪！"
     },
     "tagEditor": {
+      "checkmark": "✓",
       "confirm": "确认",
       "editPlaceholder": "编辑 \"{{tag}}\"",
       "editTags": "编辑标签",
@@ -537,6 +600,7 @@
       "placeholderCurrent": "搜索当前空间…"
     },
     "searchResults": {
+      "dotSeparator": "·",
       "noPreview": "（无预览）"
     }
   },
@@ -562,35 +626,39 @@
   "richEditor": {
     "heading": "标题 {{level}}",
     "slashCommands": {
-      "bulletedList": "",
-      "clearFormatting": "",
-      "codeBlock": "",
+      "bulletedList": "无序列表",
+      "clearFormatting": "清除格式",
+      "codeBlock": "代码块",
       "groups": {
-        "blocks": "",
-        "editing": "",
-        "headings": "",
-        "lists": "",
-        "mediaLinks": "",
-        "table": ""
+        "blocks": "块",
+        "editing": "编辑",
+        "headings": "标题",
+        "lists": "列表",
+        "mediaLinks": "媒体和链接",
+        "table": "表格"
       },
-      "heading1": "",
-      "heading2": "",
-      "heading3": "",
-      "horizontalRule": "",
-      "image": "",
-      "inlineCode": "",
-      "link": "",
-      "numberedList": "",
-      "quote": "",
-      "table": "",
-      "tableAddColumnLeft": "",
-      "tableAddColumnRight": "",
-      "tableAddRowAbove": "",
-      "tableAddRowBelow": "",
-      "tableDeleteColumn": "",
-      "tableDeleteRow": "",
-      "tableDeleteTable": "",
-      "taskList": ""
+      "heading1": "标题 1",
+      "heading2": "标题 2",
+      "heading3": "标题 3",
+      "horizontalRule": "水平线",
+      "image": "图片…",
+      "inlineCode": "行内代码",
+      "link": "链接…",
+      "numberedList": "有序列表",
+      "quote": "引用",
+      "table": "表格",
+      "tableAddColumnLeft": "表格：在左侧添加列",
+      "tableAddColumnRight": "表格：在右侧添加列",
+      "tableAddRowAbove": "表格：在上方添加行",
+      "tableAddRowBelow": "表格：在下方添加行",
+      "tableDeleteColumn": "表格：删除列",
+      "tableDeleteRow": "表格：删除行",
+      "tableDeleteTable": "表格：删除表格",
+      "taskList": "任务列表"
+    },
+    "symbols": {
+      "heading": "H{{level}}",
+      "paragraph": "¶"
     },
     "text": "文本"
   },

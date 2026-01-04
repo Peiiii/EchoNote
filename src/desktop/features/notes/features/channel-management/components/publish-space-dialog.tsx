@@ -18,6 +18,7 @@ import { cn } from "@/common/lib/utils";
 import { useAuthStore } from "@/core/stores/auth.store";
 import { openLoginModal } from "@/common/features/auth/open-login-modal";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface PublishSpaceDialogProps {
   channel: Channel;
@@ -30,6 +31,7 @@ export function PublishSpaceDialog({
   isOpen,
   onOpenChange,
 }: PublishSpaceDialogProps) {
+  const { t } = useTranslation();
   const { publishSpace, unpublishSpace, updatePublishMode } = useNotesDataStore();
   const currentUser = useAuthStore(s => s.currentUser);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,10 +53,10 @@ export function PublishSpaceDialog({
 
   const handlePublish = async () => {
     if (!currentUser) {
-      toast("Sign in to publish this space");
+      toast(t("channelManagement.publishSpace.signInToPublish"));
       openLoginModal({
-        title: "Sign in to publish",
-        description: "Publishing creates a shareable cloud link for this space.",
+        title: t("channelManagement.publishSpace.signInTitle"),
+        description: t("channelManagement.publishSpace.signInDescription"),
       });
       return;
     }
@@ -70,20 +72,20 @@ export function PublishSpaceDialog({
 
   const handleUnpublish = async () => {
     if (!currentUser) {
-      toast("Sign in to unpublish this space");
+      toast(t("channelManagement.publishSpace.signInToUnpublish"));
       openLoginModal({
-        title: "Sign in to manage publishing",
-        description: "Unpublishing is a cloud action and requires an account.",
+        title: t("channelManagement.publishSpace.signInToManageTitle"),
+        description: t("channelManagement.publishSpace.signInToManageDescription"),
       });
       return;
     }
     modal.confirm({
-      title: "Unpublish Space",
-      description: `This will make the space "${channel.name}" private. Anyone with the share link will no longer be able to access it.`,
-      okText: "Unpublish",
-      okLoadingText: "Unpublishing...",
+      title: t("channelManagement.publishSpace.unpublishTitle"),
+      description: t("channelManagement.publishSpace.unpublishDescription", { channelName: channel.name }),
+      okText: t("channelManagement.publishSpace.unpublish"),
+      okLoadingText: t("channelManagement.publishSpace.unpublishing"),
       okVariant: "destructive",
-      cancelText: "Cancel",
+      cancelText: t("common.cancel"),
       onOk: async () => {
         setIsLoading(true);
         try {
@@ -118,10 +120,10 @@ export function PublishSpaceDialog({
   const handleConfirmModeChange = async () => {
     if (!channel.shareToken || !hasModeChanged) return;
     if (!currentUser) {
-      toast("Sign in to update publish mode");
+      toast(t("channelManagement.publishSpace.signInToUpdateMode"));
       openLoginModal({
-        title: "Sign in to update publish mode",
-        description: "Updating publish mode is a cloud action and requires an account.",
+        title: t("channelManagement.publishSpace.signInToUpdateModeTitle"),
+        description: t("channelManagement.publishSpace.signInToUpdateModeDescription"),
       });
       return;
     }
@@ -144,19 +146,19 @@ export function PublishSpaceDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Publish Space</DialogTitle>
+          <DialogTitle>{t("channelManagement.publishSpace.title")}</DialogTitle>
           <DialogDescription>
             {channel.shareToken
               ? channel.shareMode === "append-only"
-                ? "Your space is published. Anyone with the link can view and add messages."
-                : "Your space is published. Anyone with the link can view messages."
-              : "Make this space accessible via a shareable link."}
+                ? t("channelManagement.publishSpace.publishedAppendOnly")
+                : t("channelManagement.publishSpace.publishedReadOnly")
+              : t("channelManagement.publishSpace.makeAccessible")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Mode</Label>
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("channelManagement.publishSpace.mode")}</Label>
             <div className="space-y-1">
               <div
                 onClick={() => handleModeSelect("read-only")}
@@ -171,10 +173,10 @@ export function PublishSpaceDialog({
                   >
                     <Lock className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-medium">Read-Only</span>
+                  <span className="text-sm font-medium">{t("channelManagement.publishSpace.readOnly")}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground/70">View only</span>
+                  <span className="text-xs text-muted-foreground/70">{t("channelManagement.publishSpace.viewOnly")}</span>
                 </div>
               </div>
               <div
@@ -190,24 +192,24 @@ export function PublishSpaceDialog({
                   >
                     <MessageSquare className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-medium">Collaborative</span>
+                  <span className="text-sm font-medium">{t("channelManagement.publishSpace.collaborative")}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground/70">Anyone can add</span>
+                  <span className="text-xs text-muted-foreground/70">{t("channelManagement.publishSpace.anyoneCanAdd")}</span>
                 </div>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-border/60">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {selectedMode === "read-only" 
-                  ? "Anyone with the link can view messages, but cannot add, modify, or delete them."
-                  : "Anyone with the link can view and add messages. Existing messages cannot be modified or deleted."}
+                  ? t("channelManagement.publishSpace.readOnlyDescription")
+                  : t("channelManagement.publishSpace.collaborativeDescription")}
               </p>
             </div>
           </div>
           {shouldShowLink && (
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Share Link</Label>
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("channelManagement.publishSpace.shareLink")}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value={shareUrl}
@@ -244,7 +246,7 @@ export function PublishSpaceDialog({
                       disabled={isLoading}
                       className="flex-1"
                     >
-                      Cancel
+                      {t("common.cancel")}
                     </Button>
                     <Button
                       type="button"
@@ -252,7 +254,7 @@ export function PublishSpaceDialog({
                       disabled={isLoading}
                       className="flex-1"
                     >
-                      {isLoading ? "Changing..." : "Confirm Change"}
+                      {isLoading ? t("channelManagement.publishSpace.changing") : t("channelManagement.publishSpace.confirmChange")}
                     </Button>
                   </div>
                 ) : (
@@ -263,7 +265,7 @@ export function PublishSpaceDialog({
                     disabled={isLoading}
                     className="w-full"
                   >
-                    {isLoading ? "Unpublishing..." : "Unpublish"}
+                    {isLoading ? t("channelManagement.publishSpace.unpublishing") : t("channelManagement.publishSpace.unpublish")}
                   </Button>
                 )
               ) : (
@@ -273,7 +275,7 @@ export function PublishSpaceDialog({
                   disabled={isLoading}
                   className="w-full"
                 >
-                  {isLoading ? "Publishing..." : "Publish"}
+                  {isLoading ? t("channelManagement.publishSpace.publishing") : t("channelManagement.publishSpace.publish")}
                 </Button>
               )}
             </DialogFooter>

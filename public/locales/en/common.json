@@ -1,6 +1,7 @@
 {
   "agentTools": {
     "comparisonLayout": {
+      "arrowSeparator": "→",
       "loadingOriginal": "Loading original content...",
       "loadingUpdated": "Loading updated content...",
       "original": "Original",
@@ -30,6 +31,7 @@
     },
     "grep": {
       "channel": "channel",
+      "channelLabel": "channel:",
       "channels": "channels",
       "command": "Command",
       "errorOccurred": "An error occurred while searching",
@@ -39,6 +41,7 @@
       "matchedNotes": "Matched notes:",
       "noMatches": "No matches found",
       "note": "note",
+      "noteLabel": "note:",
       "ready": "Ready to search",
       "scope": "scope",
       "scopeNote": "Scope is enforced by conversation/UI context and is not part of the grep command.",
@@ -141,6 +144,11 @@
       "default": "Default",
       "selected": "Selected",
       "selectModel": "Select Model"
+    },
+    "sidebar": {
+      "aiConversations": "AI Conversations",
+      "conversations": "Conversations",
+      "newConversation": "New Conversation"
     }
   },
   "auth": {
@@ -244,6 +252,10 @@
   },
   "channelHeader": {
     "aiAssistant": "AI Assistant",
+    "backgroundSwitcher": {
+      "gradients": "Gradients",
+      "solidColors": "Solid Colors"
+    },
     "collapseHeader": "Collapse header",
     "editSpace": "Edit space",
     "expandHeader": "Expand header",
@@ -258,7 +270,9 @@
   },
   "channelManagement": {
     "channelItem": {
-      "editChannel": "Edit channel"
+      "deleteChannel": "Delete {{name}}",
+      "editChannel": "Edit {{name}}",
+      "moreActions": "More actions"
     },
     "channelList": {
       "newSpace": "New space",
@@ -284,6 +298,51 @@
       "select": "Select",
       "title": "Create New Thought Space",
       "untitled": "Untitled"
+    },
+    "deleteChannel": {
+      "deleting": "Deleting...",
+      "description": "This will permanently delete the channel \"{{channelName}}\" and all its messages. This action cannot be undone.",
+      "dialogTitle": "Delete Channel",
+      "title": "Delete {{channelName}}"
+    },
+    "editChannel": {
+      "channelName": "Channel Name",
+      "channelNamePlaceholder": "Enter channel name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "emoji": "Emoji",
+      "title": "Edit Channel"
+    },
+    "publishSpace": {
+      "anyoneCanAdd": "Anyone can add messages",
+      "changing": "Changing...",
+      "collaborative": "Collaborative",
+      "collaborativeDescription": "Anyone with the link can view and add messages",
+      "confirmChange": "Confirm Change",
+      "makeAccessible": "Make this space accessible to others",
+      "mode": "Mode",
+      "publish": "Publish",
+      "publishedAppendOnly": "Published (Append Only)",
+      "publishedReadOnly": "Published (Read Only)",
+      "publishing": "Publishing...",
+      "readOnly": "Read Only",
+      "readOnlyDescription": "Anyone with the link can view messages only",
+      "shareLink": "Share Link",
+      "signInDescription": "Please sign in to publish this space",
+      "signInTitle": "Sign In Required",
+      "signInToManageDescription": "Please sign in to manage this space",
+      "signInToManageTitle": "Sign In Required",
+      "signInToPublish": "Please sign in to publish this space",
+      "signInToUnpublish": "Please sign in to unpublish this space",
+      "signInToUpdateMode": "Please sign in to update the sharing mode",
+      "signInToUpdateModeDescription": "Please sign in to update the sharing mode",
+      "signInToUpdateModeTitle": "Sign In Required",
+      "title": "Publish Space",
+      "unpublish": "Unpublish",
+      "unpublishDescription": "This will make the space private again. The share link will no longer work.",
+      "unpublishing": "Unpublishing...",
+      "unpublishTitle": "Unpublish Space",
+      "viewOnly": "View Only"
     }
   },
   "common": {
@@ -301,6 +360,7 @@
     "moreActions": "More actions",
     "pressEscToClose": "Press <0>ESC</0> to close",
     "save": "Save",
+    "saving": "Saving...",
     "unknown": "unknown",
     "viewLarger": "View larger"
   },
@@ -371,9 +431,9 @@
     "image": {
       "close": "Close image editor",
       "insert": "Insert",
-      "urlOrBase64Prompt": "",
+      "urlOrBase64Prompt": "Image URL or base64",
       "urlPlaceholder": "Image URL or base64",
-      "urlPrompt": ""
+      "urlPrompt": "Image URL (leave empty to remove)"
     },
     "link": {
       "close": "Close link editor",
@@ -407,7 +467,8 @@
         "label": "Theme",
         "light": "Light",
         "system": "System"
-      }
+      },
+      "title": "Menu"
     }
   },
   "homepage": {
@@ -473,7 +534,7 @@
   },
   "mobile": {
     "settings": {
-      "title": ""
+      "title": "Settings"
     }
   },
   "notes": {
@@ -485,6 +546,7 @@
     },
     "moveNoteModal": {
       "confirmMove": "Confirm move",
+      "dashSeparator": "—",
       "description": "Select a destination space for this thought. Any replies in the same thread move with it.",
       "destinationSpace": "Destination space",
       "error": "Failed to move note. Please try again.",
@@ -503,6 +565,7 @@
       "title": "Your space is ready!"
     },
     "tagEditor": {
+      "checkmark": "✓",
       "confirm": "Confirm",
       "editPlaceholder": "Edit \"{{tag}}\"",
       "editTags": "Edit Tags",
@@ -537,6 +600,7 @@
       "placeholderCurrent": "Search current space…"
     },
     "searchResults": {
+      "dotSeparator": "·",
       "noPreview": "(no preview)"
     }
   },
@@ -562,35 +626,39 @@
   "richEditor": {
     "heading": "Heading {{level}}",
     "slashCommands": {
-      "bulletedList": "",
-      "clearFormatting": "",
-      "codeBlock": "",
+      "bulletedList": "Bulleted list",
+      "clearFormatting": "Clear formatting",
+      "codeBlock": "Code block",
       "groups": {
-        "blocks": "",
-        "editing": "",
-        "headings": "",
-        "lists": "",
-        "mediaLinks": "",
-        "table": ""
+        "blocks": "Blocks",
+        "editing": "Editing",
+        "headings": "Headings",
+        "lists": "Lists",
+        "mediaLinks": "Media & Links",
+        "table": "Table"
       },
-      "heading1": "",
-      "heading2": "",
-      "heading3": "",
-      "horizontalRule": "",
-      "image": "",
-      "inlineCode": "",
-      "link": "",
-      "numberedList": "",
-      "quote": "",
-      "table": "",
-      "tableAddColumnLeft": "",
-      "tableAddColumnRight": "",
-      "tableAddRowAbove": "",
-      "tableAddRowBelow": "",
-      "tableDeleteColumn": "",
-      "tableDeleteRow": "",
-      "tableDeleteTable": "",
-      "taskList": ""
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "horizontalRule": "Horizontal rule",
+      "image": "Image…",
+      "inlineCode": "Inline code",
+      "link": "Link…",
+      "numberedList": "Numbered list",
+      "quote": "Quote",
+      "table": "Table",
+      "tableAddColumnLeft": "Table: add column left",
+      "tableAddColumnRight": "Table: add column right",
+      "tableAddRowAbove": "Table: add row above",
+      "tableAddRowBelow": "Table: add row below",
+      "tableDeleteColumn": "Table: delete column",
+      "tableDeleteRow": "Table: delete row",
+      "tableDeleteTable": "Table: delete table",
+      "taskList": "Task list"
+    },
+    "symbols": {
+      "heading": "H{{level}}",
+      "paragraph": "¶"
     },
     "text": "Text"
   },

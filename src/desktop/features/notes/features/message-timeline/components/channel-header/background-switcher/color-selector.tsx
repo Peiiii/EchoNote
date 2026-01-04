@@ -1,4 +1,5 @@
 import { BackgroundOption, gradientOptions, colorOptions } from "./background-options";
+import { useTranslation } from "react-i18next";
 
 interface ColorSelectorProps {
   currentBackground?: string;
@@ -6,6 +7,7 @@ interface ColorSelectorProps {
 }
 
 export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSelectorProps) => {
+  const { t } = useTranslation();
   const isCurrentBackground = (option: BackgroundOption) => {
     return currentBackground === option.value;
   };
@@ -13,7 +15,7 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">Gradients</h4>
+        <h4 className="text-xs font-medium text-muted-foreground mb-2">{t("channelHeader.backgroundSwitcher.gradients")}</h4>
         <div className="grid grid-cols-3 gap-2">
           {gradientOptions.map(option => (
             <button
@@ -42,7 +44,7 @@ export const ColorSelector = ({ currentBackground, onBackgroundSelect }: ColorSe
       </div>
 
       <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">Solid Colors</h4>
+        <h4 className="text-xs font-medium text-muted-foreground mb-2">{t("channelHeader.backgroundSwitcher.solidColors")}</h4>
         <div className="grid grid-cols-3 gap-2">
           {colorOptions.map(option => (
             <button

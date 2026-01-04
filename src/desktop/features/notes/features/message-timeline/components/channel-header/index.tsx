@@ -276,8 +276,8 @@ export const ChannelHeader = ({
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0 text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0"
-                    title="New space"
-                    aria-label="New space"
+                    title={t("channelHeader.newSpace")}
+                    aria-label={t("channelHeader.newSpace")}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -311,8 +311,8 @@ export const ChannelHeader = ({
                 variant="ghost"
                 size="sm"
                 className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-                title="Edit space"
-                aria-label="Edit space"
+                title={t("channelHeader.editSpace")}
+                aria-label={t("channelHeader.editSpace")}
                 onClick={e => e.stopPropagation()}
               >
                 <Edit2 className="h-4 w-4" />

@@ -47,7 +47,7 @@ export function SearchResults({
                 <span className="text-sm font-semibold text-foreground/80">
                   {channelName(r.channelId)}
                 </span>
-                <span className="text-xs text-foreground/50" aria-hidden="true">·</span>
+                <span className="text-xs text-foreground/50" aria-hidden="true">{t('noteSearch.searchResults.dotSeparator')}</span>
                 <span className="text-xs text-foreground/50">
                   {timeAgo}
                 </span>
