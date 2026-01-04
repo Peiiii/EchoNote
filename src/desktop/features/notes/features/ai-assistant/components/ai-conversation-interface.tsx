@@ -40,7 +40,7 @@ export const AIConversationInterface = forwardRef<
   const handleCreateConversation = useCallback(() => {
     if (!userId) return;
     // MVP v1: conversations are global; default context is provided by UI (current channel)
-    void createConversation(userId, "New Conversation");
+    void createConversation(userId, "");
   }, [userId, createConversation]);
 
   useImperativeHandle(

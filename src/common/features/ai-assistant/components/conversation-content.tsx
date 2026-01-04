@@ -35,7 +35,7 @@ export function ConversationContent({
   return (
     <AIConversationEmptyPane
       onCreate={() => {
-        if (userId) void createConversation(userId, "New Conversation");
+        if (userId) void createConversation(userId, "");
       }}
     />
   );

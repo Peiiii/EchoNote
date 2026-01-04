@@ -3,7 +3,10 @@ import { AIConversation, ConversationContextConfig } from "@/common/types/ai-con
 import { firebaseAIConversationService } from "@/common/services/firebase/firebase-ai-conversation.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import type { UIMessage } from "@agent-labs/agent-chat";
-import { handleAutoTitleSnapshot } from "@/common/features/ai-assistant/services/title-generator.service";
+import {
+  handleAutoTitleSnapshot,
+  isDefaultConversationTitle,
+} from "@/common/features/ai-assistant/services/title-generator.service";
 import { isGuestUserId } from "@/core/services/guest-id";
 import { localAIConversationService } from "@/common/services/local/local-ai-conversation.service";
 
@@ -29,13 +32,7 @@ function shouldGenerateTitleForConversation(
     return false;
   }
 
-  const isDefaultTitle =
-    !conversation.title ||
-    /^New Conversation/i.test(conversation.title) ||
-    conversation.title.startsWith("temp-") ||
-    conversation.title === "Generating title...";
-
-  return isDefaultTitle;
+  return isDefaultConversationTitle(conversation.title);
 }
 
 type State = {

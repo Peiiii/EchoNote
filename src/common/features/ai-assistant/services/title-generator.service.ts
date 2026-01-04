@@ -1,5 +1,5 @@
 import { generateText } from "@/common/services/ai/generate-text";
-import { i18n } from "@/common/i18n";
+import { i18n, SUPPORTED_LANGUAGES } from "@/common/i18n";
 
 type Inflight = { promise: Promise<string>; ts: number };
 
@@ -183,12 +183,23 @@ function shouldGenerateTitle(opts: AutoTitleSnapshotOptions): boolean {
 
   if (autoTitleDone[conversationId]) return false;
 
-  const isDefaultTitle =
-    !conversation.title ||
-    /^New Conversation/i.test(conversation.title) ||
-    conversation.title.startsWith("temp-");
+  return isDefaultConversationTitle(conversation.title);
+}
 
-  return isDefaultTitle;
+export function isDefaultConversationTitle(title: string | null | undefined): boolean {
+  const normalized = (title ?? "").trim();
+  if (!normalized) return true;
+  if (normalized.toLowerCase() === "new conversation") return true;
+  if (normalized.startsWith("temp-")) return true;
+
+  // Back-compat: historically we persisted localized placeholders.
+  // Treat any "new conversation" placeholder across supported languages as default.
+  const placeholders = new Set<string>();
+  for (const lng of SUPPORTED_LANGUAGES) {
+    placeholders.add(i18n.t("aiAssistant.conversationList.newConversation", { lng }));
+    placeholders.add(i18n.t("aiAssistant.conversationList.generatingTitle", { lng }));
+  }
+  return placeholders.has(normalized);
 }
 
 function extractUserText(messages: UIMessage[]): string {

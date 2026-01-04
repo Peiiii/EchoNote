@@ -56,7 +56,7 @@ export function AIAssistantSidebar({ isOpen, onClose, channelId }: AIAssistantSi
               variant="ghost"
               size="icon"
               onClick={() => {
-                if (userId) void createConversation(userId, t("aiAssistant.conversationList.newConversation"));
+                if (userId) void createConversation(userId, "");
               }}
               aria-label={t("aiAssistant.sidebar.newConversation")}
             >

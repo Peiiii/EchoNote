@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { useConversationState } from "@/common/features/ai-assistant/hooks/use-conversation-state";
 import { AIConversationMobile, MobileConversationRef } from "./ai-conversation-mobile";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { useTranslation } from "react-i18next";
 
 interface MobileAIAssistantProps {
   channelId: string;
@@ -11,7 +10,6 @@ interface MobileAIAssistantProps {
 }
 
 export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssistantProps) => {
-  const { t } = useTranslation();
   const { userId } = useNotesDataStore();
   const {
     conversations,
@@ -34,7 +32,7 @@ export const MobileAIAssistant = ({ channelId, isOpen, onClose }: MobileAIAssist
 
   const handleCreateConversation = () => {
     if (!userId) return;
-    void createConversation(userId, t('aiAssistant.conversationList.newConversation'));
+    void createConversation(userId, "");
   };
 
   if (!isOpen) return null;
