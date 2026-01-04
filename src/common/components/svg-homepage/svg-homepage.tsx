@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/common/components/ui/button";
 import { MessageSquare, Sparkles, Brain, TreePine, Lightbulb } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SVGHomepageProps {
   onGetStarted?: () => void;
@@ -8,6 +9,7 @@ interface SVGHomepageProps {
 }
 
 export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => {
+  const { t } = useTranslation();
   const [animationPhase, setAnimationPhase] = useState(0);
 
   useEffect(() => {
@@ -63,14 +65,14 @@ export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => 
             {/* Hero Text */}
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                <span className="block text-slate-800 dark:text-white">Where</span>
+                <span className="block text-slate-800 dark:text-white">{t('homepage.hero.where')}</span>
                 <span className="block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                  thoughts take root
+                  {t('homepage.hero.thoughtsTakeRoot')}
                 </span>
               </h1>
               
               <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg">
-                Transform your fleeting ideas into lasting insights with AI-powered conversations and intelligent note-taking.
+                {t('homepage.hero.description')}
               </p>
             </div>
 
@@ -78,15 +80,15 @@ export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => 
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                 <Brain className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <span>AI-powered conversations</span>
+                <span>{t('homepage.features.aiConversations')}</span>
               </div>
               <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                 <TreePine className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-                <span>Organized thought spaces</span>
+                <span>{t('homepage.features.organizedSpaces')}</span>
               </div>
               <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                 <Lightbulb className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-                <span>Intelligent insights</span>
+                <span>{t('homepage.features.intelligentInsights')}</span>
               </div>
             </div>
 
@@ -98,7 +100,7 @@ export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => 
                 onClick={onGetStarted}
               >
                 <Sparkles className="w-5 h-5 mr-2" />
-                Get Started
+                {t('homepage.cta.getStarted')}
               </Button>
               <Button 
                 variant="outline" 
@@ -106,7 +108,7 @@ export const SVGHomepage = ({ onGetStarted, onLearnMore }: SVGHomepageProps) => 
                 onClick={onLearnMore}
                 className="border-slate-300 dark:border-slate-600"
               >
-                Learn More
+                {t('homepage.cta.learnMore')}
               </Button>
             </div>
           </div>

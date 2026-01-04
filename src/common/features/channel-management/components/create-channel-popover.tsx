@@ -18,6 +18,7 @@ import { getRandomEmoji } from "@/common/utils/emoji";
 import { logService } from "@/core/services/log.service";
 import { Plus } from "lucide-react";
 import React, { useState, type ReactNode, isValidElement, cloneElement } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CreateChannelPopoverProps {
   trigger?: ReactNode;
@@ -32,13 +33,15 @@ export function CreateChannelPopover({
   trigger,
   variant = "popover",
   instantCreate = false,
-  defaultName = "Untitled",
+  defaultName,
 }: CreateChannelPopoverProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [emoji, setEmoji] = useState<string>(getRandomEmoji());
+  const untitledName = defaultName || t('channelManagement.createChannel.untitled');
 
   const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
     await presenter.channelManager.addChannel(channel);
@@ -63,7 +66,7 @@ export function CreateChannelPopover({
   // Instant create flow: create a space immediately without asking for inputs
   const handleInstantCreate = async () => {
     await handleAddChannel({
-      name: defaultName,
+      name: untitledName,
       description: "",
       emoji: undefined,
     });
@@ -101,18 +104,18 @@ export function CreateChannelPopover({
       onClick={instantCreate ? handleInstantCreate : undefined}
     >
       <Plus className="w-4 h-4 mr-2" />
-      New Space
+      {t('channelManagement.createChannel.newSpace')}
     </Button>
   );
 
   const formContent = (
     <div className="space-y-4 pb-2">
       <div className="space-y-2">
-        <Label htmlFor="emoji">Emoji</Label>
+        <Label htmlFor="emoji">{t('channelManagement.createChannel.emoji')}</Label>
         <div className="flex items-center gap-2">
           <EmojiPickerComponent onSelect={setEmoji}>
             <Button type="button" variant="outline" size="sm" className="h-10 w-16 text-sm">
-              {emoji || "Select"}
+              {emoji || t('channelManagement.createChannel.select')}
             </Button>
           </EmojiPickerComponent>
           {emoji && (
@@ -123,31 +126,31 @@ export function CreateChannelPopover({
               onClick={() => setEmoji("")}
               className="h-10 px-2 text-muted-foreground"
             >
-              Clear
+              {t('common.clear')}
             </Button>
           )}
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t('channelManagement.createChannel.name')}</Label>
         <Input
           id="name"
           value={name}
           onChange={e => setName(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Enter space name"
+          placeholder={t('channelManagement.createChannel.namePlaceholder')}
           required
           autoFocus={variant === "popover"}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Description (Optional)</Label>
+        <Label htmlFor="description">{t('channelManagement.createChannel.description')}</Label>
         {variant === "dialog" ? (
           <Textarea
             id="description"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="Describe what this space is for"
+            placeholder={t('channelManagement.createChannel.descriptionPlaceholder')}
             rows={3}
           />
         ) : (
@@ -156,7 +159,7 @@ export function CreateChannelPopover({
             value={description}
             onChange={e => setDescription(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe the theme of this space..."
+            placeholder={t('channelManagement.createChannel.descriptionPlaceholderShort')}
           />
         )}
       </div>
@@ -166,7 +169,7 @@ export function CreateChannelPopover({
   const actions = (
     <>
       <RefinedPopover.Button type="button" variant="outline" onClick={handleCancel}>
-        Cancel
+        {t('common.cancel')}
       </RefinedPopover.Button>
       <RefinedPopover.Button
         type="submit"
@@ -174,7 +177,7 @@ export function CreateChannelPopover({
         disabled={!name.trim()}
         onClick={handleSubmit}
       >
-        Create Space
+        {t('channelManagement.createChannel.createSpace')}
       </RefinedPopover.Button>
     </>
   );
@@ -203,9 +206,9 @@ export function CreateChannelPopover({
         <DialogTrigger asChild>{trigger ?? defaultTrigger}</DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create New Thought Space</DialogTitle>
+            <DialogTitle>{t('channelManagement.createChannel.title')}</DialogTitle>
             <DialogDescription>
-              Create a new space for organizing your thoughts and conversations.
+              {t('channelManagement.createChannel.descriptionText')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -223,7 +226,7 @@ export function CreateChannelPopover({
       <RefinedPopover.Content align="center" side="bottom">
         <RefinedPopover.Header>
           <Plus className="w-4 h-4 text-primary/80" />
-          <div className="text-sm font-semibold text-foreground/90">Create New Thought Space</div>
+          <div className="text-sm font-semibold text-foreground/90">{t('channelManagement.createChannel.title')}</div>
         </RefinedPopover.Header>
 
         <RefinedPopover.Body>{formContent}</RefinedPopover.Body>

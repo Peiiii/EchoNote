@@ -81,7 +81,57 @@
       "updatedContent": "Updated content"
     }
   },
+  "aiAssistant": {
+    "conversationList": {
+      "archiveConversation": "Archive conversation",
+      "archived": "Archived",
+      "archivedSuccess": "Conversation archived",
+      "deleteConfirm": "Delete this conversation?",
+      "deleteConversation": "Delete conversation",
+      "deletedSuccess": "Conversation deleted",
+      "deleteFailed": "Delete failed",
+      "filter": "Filter",
+      "generatingTitle": "Generating title...",
+      "loadMore": "Load more",
+      "newConversation": "New Conversation",
+      "noConversations": "No conversations yet",
+      "restoreConversation": "Restore conversation",
+      "restoredSuccess": "Conversation restored",
+      "searchPlaceholder": "Search conversations",
+      "showArchived": "Show archived"
+    },
+    "emptyPane": {
+      "description": "I can see all your notes in this space and help you manage them. Ask me to analyze, organize, create, or update your notes. I'll help you discover insights and connections in your thoughts.",
+      "example1": "What are the main themes in my notes?",
+      "example2": "Help me organize these ideas better",
+      "example3": "Create a summary note of key insights",
+      "startConversation": "Start Conversation",
+      "title": "AI Note Agent",
+      "tryAsking": "Try asking:"
+    }
+  },
   "auth": {
+    "emailPasswordForm": {
+      "alreadyHaveAccount": "Already have an account? Sign in",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating account...",
+      "dontHaveAccount": "Don't have an account? Sign up",
+      "emailPlaceholder": "Enter your email",
+      "forgotPassword": "Forgot your password?",
+      "passwordPlaceholder": "Enter your password",
+      "signIn": "Sign In",
+      "signingIn": "Signing in..."
+    },
+    "emailVerification": {
+      "backToSignIn": "Back to sign in",
+      "checkEmail": "Check your email",
+      "clickLink": "Click the link to complete registration.",
+      "resendIn": "Resend in {{seconds}}s",
+      "resendLink": "Resend link",
+      "sending": "Sending...",
+      "sentLink": "We've sent a verification link{{email}}"
+    },
     "login": {
       "descOrLocal": "Sign in for cloud sync and publishing, or try local mode first.",
       "description": "Sign in to enable cloud features like publishing and sync.",
@@ -92,6 +142,42 @@
       },
       "title": "Sign in",
       "titleOrLocal": "Sign in or try locally"
+    },
+    "loginButton": {
+      "hello": "Hello, {{name}}",
+      "signInWithGoogle": "Sign in with Google"
+    },
+    "loginCard": {
+      "errors": {
+        "confirmPassword": "Please confirm your password",
+        "fillAllFields": "Please fill in all fields",
+        "googleSignInFailed": "Google sign-in failed. Please try again.",
+        "networkError": "Network error. Please check your connection and try again.",
+        "passwordsNotMatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 6 characters long",
+        "popupBlocked": "Popup was blocked. Please allow popups and try again.",
+        "popupClosed": "Sign-in was cancelled. Please try again.",
+        "tooManyRequests": "Too many failed attempts. Please try again later."
+      }
+    },
+    "loginFooter": {
+      "agreement": "By continuing, you agree to the",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "progress": {
+      "authenticating": "Authenticating",
+      "checkInbox": "Check inbox",
+      "creating": "Creating",
+      "mayTakeMoment": "This may take a few moments",
+      "pleaseWait": "Please wait...",
+      "sendingLink": "Sending link",
+      "settingUp": "Setting up",
+      "verifying": "Verifying",
+      "welcome": "Welcome!"
+    },
+    "socialLogin": {
+      "continueWithGoogle": "Continue with Google"
     },
     "userProfile": {
       "manageAccount": "Click to manage account",
@@ -124,18 +210,88 @@
     "search": "Search",
     "studio": "Studio"
   },
+  "channelManagement": {
+    "createChannel": {
+      "createSpace": "",
+      "description": "",
+      "descriptionPlaceholder": "",
+      "descriptionPlaceholderShort": "",
+      "descriptionText": "",
+      "emoji": "",
+      "name": "",
+      "namePlaceholder": "",
+      "newSpace": "",
+      "select": "",
+      "title": "",
+      "untitled": ""
+    }
+  },
   "common": {
     "brand": "EN",
+    "cancel": "Cancel",
+    "clear": "",
     "clearSearch": "Clear search",
     "close": "Close",
     "closeViewer": "Close viewer",
     "copied": "Copied!",
+    "copy": "Copy",
+    "delete": "Delete",
     "loading": "Loading...",
     "loadingWorkspace": "Please wait while we prepare your workspace...",
     "moreActions": "More actions",
     "pressEscToClose": "Press <0>ESC</0> to close",
+    "save": "Save",
     "unknown": "unknown",
     "viewLarger": "View larger"
+  },
+  "components": {
+    "collapsibleSidebar": {
+      "examples": {
+        "basicSidebar": "",
+        "basicUsage": "",
+        "callbackContent": "",
+        "callbackItem": "",
+        "customItem": "",
+        "customStyled": "",
+        "customStyling": "",
+        "customStylingContent": "",
+        "customWidth": "",
+        "customWidthContent": "",
+        "description": "",
+        "mainContent": "",
+        "menuItem": "",
+        "title": "",
+        "wideMenuItem": "",
+        "wideSidebar": "",
+        "withCallback": "",
+        "withCallbackTitle": ""
+      }
+    }
+  },
+  "editor": {
+    "codeBlock": {
+      "plainText": "Plain text",
+      "recent": "Recent",
+      "searchLanguage": "Search language"
+    },
+    "image": {
+      "close": "Close image editor",
+      "insert": "Insert",
+      "urlPlaceholder": "Image URL or base64"
+    },
+    "link": {
+      "close": "Close link editor",
+      "textPlaceholder": "Link text",
+      "unlink": "Unlink",
+      "urlPlaceholder": "https://"
+    }
+  },
+  "feedback": {
+    "modal": {
+      "description": "",
+      "iframeTitle": "",
+      "title": ""
+    }
   },
   "header": {
     "menu": {
@@ -155,6 +311,22 @@
         "light": "Light",
         "system": "System"
       }
+    }
+  },
+  "homepage": {
+    "cta": {
+      "getStarted": "",
+      "learnMore": ""
+    },
+    "features": {
+      "aiConversations": "",
+      "intelligentInsights": "",
+      "organizedSpaces": ""
+    },
+    "hero": {
+      "description": "",
+      "thoughtsTakeRoot": "",
+      "where": ""
     }
   },
   "language": {

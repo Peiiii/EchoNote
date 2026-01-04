@@ -6,12 +6,14 @@ import { LoginFooter } from "./login-footer";
 import { SocialLogin } from "./social-login";
 import { AuthProgress } from "./auth-progress";
 import { AuthStep, AuthMessage, AuthProgress as AuthProgressEnum } from "@/common/types/auth.types";
+import { useTranslation } from "react-i18next";
 
 type LoginCardProps = {
   className?: string;
 };
 
 export const LoginCard = ({ className }: LoginCardProps) => {
+  const { t } = useTranslation();
   const {
     signInWithGoogle,
     signInWithEmail,
@@ -58,40 +60,40 @@ export const LoginCard = ({ className }: LoginCardProps) => {
       const firebaseError = error as { code?: string; message?: string };
       switch (firebaseError.code) {
         case "auth/popup-closed-by-user":
-          setError("Sign-in was cancelled. Please try again.");
+          setError(t('auth.loginCard.errors.popupClosed'));
           break;
         case "auth/popup-blocked":
-          setError("Popup was blocked. Please allow popups and try again.");
+          setError(t('auth.loginCard.errors.popupBlocked'));
           break;
         case "auth/network-request-failed":
-          setError("Network error. Please check your connection and try again.");
+          setError(t('auth.loginCard.errors.networkError'));
           break;
         case "auth/too-many-requests":
-          setError("Too many failed attempts. Please try again later.");
+          setError(t('auth.loginCard.errors.tooManyRequests'));
           break;
         default:
-          setError("Google sign-in failed. Please try again.");
+          setError(t('auth.loginCard.errors.googleSignInFailed'));
       }
     }
   };
 
   const handleEmailSubmit = async () => {
     if (!email || !password) {
-      setError("Please fill in all fields");
+      setError(t('auth.loginCard.errors.fillAllFields'));
       return;
     }
 
     if (isSignUp) {
       if (!confirmPassword) {
-        setError("Please confirm your password");
+        setError(t('auth.loginCard.errors.confirmPassword'));
         return;
       }
       if (password !== confirmPassword) {
-        setError("Passwords do not match");
+        setError(t('auth.loginCard.errors.passwordsNotMatch'));
         return;
       }
       if (password.length < 6) {
-        setError("Password must be at least 6 characters long");
+        setError(t('auth.loginCard.errors.passwordTooShort'));
         return;
       }
     }

@@ -81,7 +81,57 @@
       "updatedContent": "更新内容"
     }
   },
+  "aiAssistant": {
+    "conversationList": {
+      "archiveConversation": "归档对话",
+      "archived": "已归档",
+      "archivedSuccess": "对话已归档",
+      "deleteConfirm": "删除此对话？",
+      "deleteConversation": "删除对话",
+      "deletedSuccess": "对话已删除",
+      "deleteFailed": "删除失败",
+      "filter": "筛选",
+      "generatingTitle": "正在生成标题...",
+      "loadMore": "加载更多",
+      "newConversation": "新对话",
+      "noConversations": "还没有对话",
+      "restoreConversation": "恢复对话",
+      "restoredSuccess": "对话已恢复",
+      "searchPlaceholder": "搜索对话",
+      "showArchived": "显示已归档"
+    },
+    "emptyPane": {
+      "description": "我可以看到您在这个空间中的所有笔记，并帮助您管理它们。请我分析、整理、创建或更新您的笔记。我将帮助您发现想法中的见解和联系。",
+      "example1": "我的笔记中的主要主题是什么？",
+      "example2": "帮我更好地组织这些想法",
+      "example3": "创建关键见解的摘要笔记",
+      "startConversation": "开始对话",
+      "title": "AI 笔记助手",
+      "tryAsking": "试试问："
+    }
+  },
   "auth": {
+    "emailPasswordForm": {
+      "alreadyHaveAccount": "已有账户？登录",
+      "confirmPasswordPlaceholder": "确认您的密码",
+      "createAccount": "创建账户",
+      "creatingAccount": "正在创建账户...",
+      "dontHaveAccount": "还没有账户？注册",
+      "emailPlaceholder": "输入您的邮箱",
+      "forgotPassword": "忘记密码？",
+      "passwordPlaceholder": "输入您的密码",
+      "signIn": "登录",
+      "signingIn": "正在登录..."
+    },
+    "emailVerification": {
+      "backToSignIn": "返回登录",
+      "checkEmail": "检查您的邮箱",
+      "clickLink": "点击链接完成注册。",
+      "resendIn": "{{seconds}} 秒后重新发送",
+      "resendLink": "重新发送链接",
+      "sending": "发送中...",
+      "sentLink": "我们已发送验证链接{{email}}"
+    },
     "login": {
       "descOrLocal": "登录后可云同步、发布空间；也可以先用本地模式体验。",
       "description": "登录后可云同步、发布空间。",
@@ -92,6 +142,42 @@
       },
       "title": "登录",
       "titleOrLocal": "登录或本地体验"
+    },
+    "loginButton": {
+      "hello": "你好，{{name}}",
+      "signInWithGoogle": "使用 Google 登录"
+    },
+    "loginCard": {
+      "errors": {
+        "confirmPassword": "请确认您的密码",
+        "fillAllFields": "请填写所有字段",
+        "googleSignInFailed": "Google 登录失败。请重试。",
+        "networkError": "网络错误。请检查您的连接并重试。",
+        "passwordsNotMatch": "密码不匹配",
+        "passwordTooShort": "密码长度至少为 6 个字符",
+        "popupBlocked": "弹窗被阻止。请允许弹窗并重试。",
+        "popupClosed": "登录已取消。请重试。",
+        "tooManyRequests": "尝试次数过多。请稍后再试。"
+      }
+    },
+    "loginFooter": {
+      "agreement": "继续即表示您同意",
+      "privacy": "隐私政策",
+      "terms": "服务条款"
+    },
+    "progress": {
+      "authenticating": "正在验证",
+      "checkInbox": "检查收件箱",
+      "creating": "正在创建",
+      "mayTakeMoment": "这可能需要几秒钟",
+      "pleaseWait": "请稍候...",
+      "sendingLink": "正在发送链接",
+      "settingUp": "正在设置",
+      "verifying": "正在验证",
+      "welcome": "欢迎！"
+    },
+    "socialLogin": {
+      "continueWithGoogle": "使用 Google 继续"
     },
     "userProfile": {
       "manageAccount": "点击管理账户",
@@ -124,18 +210,88 @@
     "search": "搜索",
     "studio": "工作室"
   },
+  "channelManagement": {
+    "createChannel": {
+      "createSpace": "",
+      "description": "",
+      "descriptionPlaceholder": "",
+      "descriptionPlaceholderShort": "",
+      "descriptionText": "",
+      "emoji": "",
+      "name": "",
+      "namePlaceholder": "",
+      "newSpace": "",
+      "select": "",
+      "title": "",
+      "untitled": ""
+    }
+  },
   "common": {
     "brand": "EN",
+    "cancel": "取消",
+    "clear": "",
     "clearSearch": "清除搜索",
     "close": "关闭",
     "closeViewer": "关闭查看器",
     "copied": "已复制！",
+    "copy": "复制",
+    "delete": "删除",
     "loading": "加载中...",
     "loadingWorkspace": "请稍候，我们正在准备您的工作区...",
     "moreActions": "更多操作",
     "pressEscToClose": "按 <0>ESC</0> 关闭",
+    "save": "保存",
     "unknown": "未知",
     "viewLarger": "查看大图"
+  },
+  "components": {
+    "collapsibleSidebar": {
+      "examples": {
+        "basicSidebar": "",
+        "basicUsage": "",
+        "callbackContent": "",
+        "callbackItem": "",
+        "customItem": "",
+        "customStyled": "",
+        "customStyling": "",
+        "customStylingContent": "",
+        "customWidth": "",
+        "customWidthContent": "",
+        "description": "",
+        "mainContent": "",
+        "menuItem": "",
+        "title": "",
+        "wideMenuItem": "",
+        "wideSidebar": "",
+        "withCallback": "",
+        "withCallbackTitle": ""
+      }
+    }
+  },
+  "editor": {
+    "codeBlock": {
+      "plainText": "纯文本",
+      "recent": "最近使用",
+      "searchLanguage": "搜索语言"
+    },
+    "image": {
+      "close": "关闭图片编辑器",
+      "insert": "插入",
+      "urlPlaceholder": "图片 URL 或 base64"
+    },
+    "link": {
+      "close": "关闭链接编辑器",
+      "textPlaceholder": "链接文本",
+      "unlink": "取消链接",
+      "urlPlaceholder": "https://"
+    }
+  },
+  "feedback": {
+    "modal": {
+      "description": "",
+      "iframeTitle": "",
+      "title": ""
+    }
   },
   "header": {
     "menu": {
@@ -155,6 +311,22 @@
         "light": "浅色",
         "system": "跟随系统"
       }
+    }
+  },
+  "homepage": {
+    "cta": {
+      "getStarted": "",
+      "learnMore": ""
+    },
+    "features": {
+      "aiConversations": "",
+      "intelligentInsights": "",
+      "organizedSpaces": ""
+    },
+    "hero": {
+      "description": "",
+      "thoughtsTakeRoot": "",
+      "where": ""
     }
   },
   "language": {

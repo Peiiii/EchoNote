@@ -11,6 +11,7 @@ import {
 } from "@/common/components/ui/popover";
 import { useConversationStore } from "../stores/conversation.store";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ export function AIConversationList({
   currentConversationId,
   loading,
 }: ConversationListProps) {
+  const { t } = useTranslation();
   const {
     selectConversation,
     deleteConversation,
@@ -51,7 +53,7 @@ export function AIConversationList({
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search conversations"
+            placeholder={t('aiAssistant.conversationList.searchPlaceholder')}
             className="w-full h-9 px-3 rounded-lg border bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
           />
         </div>
@@ -60,7 +62,7 @@ export function AIConversationList({
             <button
               type="button"
               className="h-9 w-9 inline-flex items-center justify-center rounded-lg border bg-background hover:bg-accent transition-colors"
-              aria-label="Filter"
+              aria-label={t('aiAssistant.conversationList.filter')}
             >
               <Filter className="w-4 h-4" />
             </button>
@@ -77,7 +79,7 @@ export function AIConversationList({
               onClick={() => setShowArchived(!showArchived)}
               className="w-full h-8 px-3 rounded-md border bg-background text-sm flex items-center justify-between hover:bg-accent transition-colors"
             >
-              <span>Show archived</span>
+              <span>{t('aiAssistant.conversationList.showArchived')}</span>
               <span
                 className={
                   "inline-block w-4 h-4 rounded-sm border " +
@@ -91,9 +93,9 @@ export function AIConversationList({
 
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="p-4 text-center text-muted-foreground">Loading...</div>
+          <div className="p-4 text-center text-muted-foreground">{t('common.loading')}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground">No conversations yet</div>
+          <div className="p-4 text-center text-muted-foreground">{t('aiAssistant.conversationList.noConversations')}</div>
         ) : (
           <>
             {filtered.map(c => (
@@ -143,8 +145,8 @@ export function AIConversationList({
                               }}
                             >
                               {titleGeneratingMap[c.id]
-                                ? "Generating title..."
-                                : c.title || "New Conversation"}
+                                ? t('aiAssistant.conversationList.generatingTitle')
+                                : c.title || t('aiAssistant.conversationList.newConversation')}
                             </span>
                           )}
                         </span>
@@ -155,7 +157,7 @@ export function AIConversationList({
                       </div>
                       {c.isArchived && (
                         <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                          Archived
+                          {t('aiAssistant.conversationList.archived')}
                         </span>
                       )}
                     </div>
@@ -172,13 +174,13 @@ export function AIConversationList({
                           e.stopPropagation();
                           if (!c.isArchived) {
                             void updateConversation(userId, c.id, { isArchived: true });
-                            toast.success("Conversation archived");
+                            toast.success(t('aiAssistant.conversationList.archivedSuccess'));
                           } else {
                             void updateConversation(userId, c.id, { isArchived: false });
-                            toast.success("Conversation restored");
+                            toast.success(t('aiAssistant.conversationList.restoredSuccess'));
                           }
                         }}
-                        aria-label={c.isArchived ? "Restore conversation" : "Archive conversation"}
+                        aria-label={c.isArchived ? t('aiAssistant.conversationList.restoreConversation') : t('aiAssistant.conversationList.archiveConversation')}
                       >
                         <Archive className="w-4 h-4" />
                       </button>
@@ -196,7 +198,7 @@ export function AIConversationList({
                             onKeyDown={e => {
                               e.stopPropagation();
                             }}
-                            aria-label="Delete conversation"
+                            aria-label={t('aiAssistant.conversationList.deleteConversation')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -208,7 +210,7 @@ export function AIConversationList({
                           onClick={e => e.stopPropagation()}
                           onMouseDown={e => e.stopPropagation()}
                         >
-                          <div className="text-sm mb-2">Delete this conversation?</div>
+                          <div className="text-sm mb-2">{t('aiAssistant.conversationList.deleteConfirm')}</div>
                           <div className="flex justify-end gap-2">
                             <PopoverClose asChild>
                               <button
@@ -218,7 +220,7 @@ export function AIConversationList({
                                   e.stopPropagation();
                                 }}
                               >
-                                Cancel
+                                {t('common.cancel')}
                               </button>
                             </PopoverClose>
                             <PopoverClose asChild>
@@ -228,11 +230,11 @@ export function AIConversationList({
                                 onClick={e => {
                                   e.stopPropagation();
                                   void deleteConversation(userId, c.id)
-                                    .then(() => toast.success("Conversation deleted"))
-                                    .catch(() => toast.error("Delete failed"));
+                                    .then(() => toast.success(t('aiAssistant.conversationList.deletedSuccess')))
+                                    .catch(() => toast.error(t('aiAssistant.conversationList.deleteFailed')));
                                 }}
                               >
-                                Delete
+                                {t('common.delete')}
                               </button>
                             </PopoverClose>
                           </div>
@@ -253,7 +255,7 @@ export function AIConversationList({
                     void loadMoreConversations(userId);
                   }}
                 >
-                  {loadingMore ? "Loading…" : "Load more"}
+                  {loadingMore ? t('common.loading') : t('aiAssistant.conversationList.loadMore')}
                 </button>
               </div>
             )}

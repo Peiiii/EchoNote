@@ -1,6 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface EmailPasswordFormProps {
   email: string;
@@ -33,6 +34,7 @@ export const EmailPasswordForm = ({
   onPasswordReset,
   onSubmit,
 }: EmailPasswordFormProps) => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -47,7 +49,7 @@ export const EmailPasswordForm = ({
       <Input
         type="email"
         name="email"
-        placeholder="Enter your email"
+        placeholder={t('auth.emailPasswordForm.emailPlaceholder')}
         value={email}
         onChange={e => onEmailChange(e.target.value)}
         className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
@@ -59,7 +61,7 @@ export const EmailPasswordForm = ({
         <Input
           type={showPassword ? "text" : "password"}
           name="password"
-          placeholder="Enter your password"
+          placeholder={t('auth.emailPasswordForm.passwordPlaceholder')}
           value={password}
           onChange={e => onPasswordChange(e.target.value)}
           className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500  dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
@@ -105,7 +107,7 @@ export const EmailPasswordForm = ({
           <Input
             type={showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
-            placeholder="Confirm your password"
+            placeholder={t('auth.emailPasswordForm.confirmPasswordPlaceholder')}
             value={confirmPassword}
             onChange={e => onConfirmPasswordChange(e.target.value)}
             className="w-full h-12 text-sm rounded-xl border-slate-200 dark:border-slate-600 focus:border-slate-400 dark:focus:border-slate-500  dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 pr-10"
@@ -174,12 +176,12 @@ export const EmailPasswordForm = ({
         {isAuthenticating ? (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span>{isSignUp ? "Creating account..." : "Signing in..."}</span>
+            <span>{isSignUp ? t('auth.emailPasswordForm.creatingAccount') : t('auth.emailPasswordForm.signingIn')}</span>
           </div>
         ) : isSignUp ? (
-          "Create Account"
+          t('auth.emailPasswordForm.createAccount')
         ) : (
-          "Sign In"
+          t('auth.emailPasswordForm.signIn')
         )}
       </Button>
 
@@ -191,7 +193,7 @@ export const EmailPasswordForm = ({
           className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors underline underline-offset-2"
           disabled={isAuthenticating}
         >
-          {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+          {isSignUp ? t('auth.emailPasswordForm.alreadyHaveAccount') : t('auth.emailPasswordForm.dontHaveAccount')}
         </button>
       </div>
 
@@ -204,7 +206,7 @@ export const EmailPasswordForm = ({
             className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors underline underline-offset-2"
             disabled={isAuthenticating || !email}
           >
-            Forgot your password?
+            {t('auth.emailPasswordForm.forgotPassword')}
           </button>
         </div>
       )}

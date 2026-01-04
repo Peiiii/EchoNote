@@ -1,15 +1,18 @@
+import { useTranslation } from "react-i18next";
+
 export const LoginFooter = () => {
+  const { t } = useTranslation();
   return (
     <>
       <div className="mt-6 text-center">
         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          By continuing, you agree to the{" "}
+          {t('auth.loginFooter.agreement')}{" "}
           <button className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors font-medium">
-            Terms
+            {t('auth.loginFooter.terms')}
           </button>
           ,{" "}
           <button className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors font-medium">
-            Privacy
+            {t('auth.loginFooter.privacy')}
           </button>
           .
         </p>

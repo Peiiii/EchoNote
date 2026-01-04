@@ -26,6 +26,7 @@ import { htmlToMarkdown, markdownToHtml } from '@/common/utils/markdown-converte
 import SlashCommand, { type SlashOpenPayload, type SlashAction } from './extensions/slash-command'
 import { lowlight } from 'lowlight/lib/common'
 import HeadingToggle from './extensions/heading-toggle'
+import { useTranslation } from 'react-i18next'
 
 interface RichEditorLiteProps {
   value: string
@@ -75,6 +76,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
 ToolbarButton.displayName = 'ToolbarButton'
 
 export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', maxHeight, minHeight, enterSends = false, onSubmitEnter, hideToolbar, suspended = false }: RichEditorLiteProps) {
+  const { t } = useTranslation()
   // Create bubble menu element before editor initialization so the extension can mount.
   const bubbleEl = useMemo<HTMLElement>(() => {
     const el = document.createElement('div')
@@ -870,13 +872,13 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                 autoFocus
                 value={linkMenu.value}
                 onChange={(e) => setLinkMenu((s) => ({ ...s, value: e.target.value }))}
-                placeholder="https://"
+                placeholder={t('editor.link.urlPlaceholder')}
                 className="w-56 px-2 py-1 rounded border bg-transparent text-sm"
               />
               <input
                 value={linkMenu.text}
                 onChange={(e) => setLinkMenu((s) => ({ ...s, text: e.target.value }))}
-                placeholder="Link text"
+                placeholder={t('editor.link.textPlaceholder')}
                 className="w-40 px-2 py-1 rounded border bg-transparent text-sm"
               />
               <button
@@ -911,22 +913,22 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                   closeLinkMenu()
                 }}
               >
-                Save
+                {t('common.save')}
               </button>
               <button
                 type="button"
                 className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
                 onClick={() => { editor?.chain().focus().unsetLink().run(); closeLinkMenu() }}
               >
-                Unlink
+                {t('editor.link.unlink')}
               </button>
               <button
                 type="button"
                 className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
                 onClick={() => closeLinkMenu()}
-                aria-label="Close link editor"
+                aria-label={t('editor.link.close')}
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -951,7 +953,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                   }
                   if (e.key === 'Escape') closeImageMenu()
                 }}
-                placeholder="Image URL or base64"
+                placeholder={t('editor.image.urlPlaceholder')}
                 className="w-56 px-2 py-1 rounded border bg-transparent text-sm"
               />
               <button
@@ -963,15 +965,15 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
                   closeImageMenu()
                 }}
               >
-                Insert
+                {t('editor.image.insert')}
               </button>
               <button
                 type="button"
                 className="px-2 h-7 rounded text-xs bg-slate-100 dark:bg-slate-700"
                 onClick={() => closeImageMenu()}
-                aria-label="Close image editor"
+                aria-label={t('editor.image.close')}
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>

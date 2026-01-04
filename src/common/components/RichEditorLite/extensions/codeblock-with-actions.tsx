@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
   node: { attrs: { language?: string | null } }
@@ -38,6 +39,7 @@ function normalizeLanguage(input: string, all: string[]): string | null {
 let recentLangs: string[] = []
 
 const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) => {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [copied, setCopied] = useState(false)
@@ -104,14 +106,14 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
           className="px-2 h-6 rounded text-xs bg-slate-800/80 text-white hover:bg-slate-800"
           onClick={() => setOpen((v) => !v)}
         >
-          {current || 'Plain text'}
+          {current || t('editor.codeBlock.plainText')}
         </button>
         <button
           type="button"
           className="px-2 h-6 rounded text-xs bg-slate-800/80 text-white hover:bg-slate-800"
           onClick={copyCode}
         >
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? t('common.copied') : t('common.copy')}
         </button>
         {/* Line number toggle removed */}
       </div>
@@ -124,7 +126,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
           <div className="p-1">
             <input
               autoFocus
-              placeholder="Search language"
+              placeholder={t('editor.codeBlock.searchLanguage')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full px-2 py-1 rounded border bg-transparent text-sm"
@@ -133,7 +135,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
           <div className="max-h-64 overflow-auto">
             {recentLangs.length > 0 && (
               <>
-                <div className="px-2 py-1 text-xs text-slate-500">Recent</div>
+                <div className="px-2 py-1 text-xs text-slate-500">{t('editor.codeBlock.recent')}</div>
                 {recentLangs.map((lang) => (
                   <button
                     key={`recent-${lang}`}
@@ -150,7 +152,7 @@ const CodeBlockView: React.FC<Props> = ({ node, updateAttributes, extension }) =
               className="w-full text-left px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700"
               onClick={() => applyLanguage(null)}
             >
-              Plain text
+              {t('editor.codeBlock.plainText')}
             </button>
             {filtered.map((lang) => (
               <button
