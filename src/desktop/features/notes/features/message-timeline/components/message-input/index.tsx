@@ -3,7 +3,6 @@ import { ReplyIndicator } from "./components/reply-indicator";
 import { BottomActions } from "./components/bottom-actions";
 import { HeaderActions } from "./components/header-actions";
 import { useMessageInput } from "./hooks/use-message-input";
-import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { useInputCollapse } from "../../hooks/use-input-collapse";
 import { useRef, useState, useEffect } from "react";
 
@@ -20,21 +19,17 @@ export function MessageInput() {
     shortcutHint,
     handleCancelReply,
   } = useMessageInput();
-  const { sideView } = useUIStateStore();
-  const isFocusMode = !sideView;
   const { inputCollapsed } = useInputCollapse();
   const [isFocused, setIsFocused] = useState(false);
   const showShortcutHint = isFocused;
   
   // Outer container stays borderless so when collapsed nothing is visible
-  const containerClass = `sticky bottom-0 z-10 shrink-0 ${isFocusMode ? "pb-4" : ""}`;
+  const containerClass = "sticky bottom-0 z-10 shrink-0";
   const panelBase =
     "overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out will-change-[max-height,opacity,transform] origin-bottom";
   const panelOpen = "max-h-[180px] opacity-100 translate-y-0";
   const panelClosed = "max-h-0 opacity-0 translate-y-1 py-0";
-  const panelDecorOpen = isFocusMode
-    ? "rounded-xl border border-border/60 shadow-xs"
-    : "border-t border-border/60";
+  const panelDecorOpen = "border-t border-border/60";
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,7 +68,7 @@ export function MessageInput() {
 
           <HeaderActions />
 
-          <div className={`relative px-2 ${isFocusMode ? "pt-1" : "pt-0"}`}>
+          <div className="relative px-2 pt-0">
             <InputArea
               message={message}
               onMessageChange={handleMessageChange}
@@ -84,7 +79,7 @@ export function MessageInput() {
             />
           </div>
 
-          <div className={`px-2 ${isFocusMode ? "pb-1" : "pb-1"}`}>
+          <div className="px-2 pb-1">
             <BottomActions 
               onSend={handleSend} 
               canSend={!!message.trim() && !isAddingMessage} 

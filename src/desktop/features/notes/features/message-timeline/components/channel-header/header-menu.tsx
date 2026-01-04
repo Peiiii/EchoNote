@@ -2,14 +2,11 @@ import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
 import { useTheme } from "@/common/components/theme";
@@ -22,6 +19,9 @@ import { useAuthStore } from "@/core/stores/auth.store";
 import { LogIn, LogOut, Languages, Menu, MessageSquareText, Monitor, Moon, Sun } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { HeaderMenuItem } from "./header-menu-item";
+import { HeaderMenuRadioItem } from "./header-menu-radio-item";
+import { HeaderMenuSubTrigger } from "./header-menu-sub-trigger";
 
 type HeaderMenuTone = "light" | "dark";
 
@@ -77,69 +77,57 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
         <DropdownMenuSeparator />
 
         {user ? (
-          <DropdownMenuItem
-            className="cursor-pointer rounded-md"
-            disabled={isAuthenticating}
-            onSelect={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            <span>{t("header.menu.logout")}</span>
-          </DropdownMenuItem>
+          <HeaderMenuItem icon={LogOut} onSelect={handleLogout} disabled={isAuthenticating}>
+            {t("header.menu.logout")}
+          </HeaderMenuItem>
         ) : (
-          <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleLogin}>
-            <LogIn className="h-4 w-4" />
-            <span>{t("header.menu.login")}</span>
-          </DropdownMenuItem>
+          <HeaderMenuItem icon={LogIn} onSelect={handleLogin}>
+            {t("header.menu.login")}
+          </HeaderMenuItem>
         )}
 
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="cursor-pointer rounded-md">
-            {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            <span>{t("header.menu.theme.label")}</span>
-          </DropdownMenuSubTrigger>
+          <HeaderMenuSubTrigger icon={theme === "dark" ? Moon : Sun}>
+            {t("header.menu.theme.label")}
+          </HeaderMenuSubTrigger>
           <DropdownMenuSubContent className="min-w-[200px]">
             <DropdownMenuRadioGroup value={theme} onValueChange={v => setTheme(v as typeof theme)}>
-              <DropdownMenuRadioItem value="light">
-                <Sun className="h-4 w-4" />
-                <span>{t("header.menu.theme.light")}</span>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="dark">
-                <Moon className="h-4 w-4" />
-                <span>{t("header.menu.theme.dark")}</span>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="system">
-                <Monitor className="h-4 w-4" />
-                <span>{t("header.menu.theme.system")}</span>
-              </DropdownMenuRadioItem>
+              <HeaderMenuRadioItem icon={Sun} value="light">
+                {t("header.menu.theme.light")}
+              </HeaderMenuRadioItem>
+              <HeaderMenuRadioItem icon={Moon} value="dark">
+                {t("header.menu.theme.dark")}
+              </HeaderMenuRadioItem>
+              <HeaderMenuRadioItem icon={Monitor} value="system">
+                {t("header.menu.theme.system")}
+              </HeaderMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="cursor-pointer rounded-md">
-            <Languages className="h-4 w-4" />
-            <span>{t("header.menu.language.label")}</span>
-          </DropdownMenuSubTrigger>
+          <HeaderMenuSubTrigger icon={Languages}>
+            {t("header.menu.language.label")}
+          </HeaderMenuSubTrigger>
           <DropdownMenuSubContent className="min-w-[200px]">
             <DropdownMenuRadioGroup value={language} onValueChange={v => setLanguage(v as typeof language)}>
-              <DropdownMenuRadioItem value="en">
-                <span>{t("header.menu.language.english")}</span>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="zh-CN">
-                <span>{t("header.menu.language.chinese")}</span>
-              </DropdownMenuRadioItem>
+              <HeaderMenuRadioItem value="en">
+                {t("header.menu.language.english")}
+              </HeaderMenuRadioItem>
+              <HeaderMenuRadioItem value="zh-CN">
+                {t("header.menu.language.chinese")}
+              </HeaderMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={() => openFeedbackModal()}>
-          <MessageSquareText className="h-4 w-4" />
-          <span>{t("header.menu.feedback")}</span>
-        </DropdownMenuItem>
+        <HeaderMenuItem icon={MessageSquareText} onSelect={() => openFeedbackModal()}>
+          {t("header.menu.feedback")}
+        </HeaderMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
