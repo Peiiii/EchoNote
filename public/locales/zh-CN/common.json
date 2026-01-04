@@ -212,24 +212,24 @@
   },
   "channelManagement": {
     "createChannel": {
-      "createSpace": "",
-      "description": "",
-      "descriptionPlaceholder": "",
-      "descriptionPlaceholderShort": "",
-      "descriptionText": "",
-      "emoji": "",
-      "name": "",
-      "namePlaceholder": "",
-      "newSpace": "",
-      "select": "",
-      "title": "",
-      "untitled": ""
+      "createSpace": "创建空间",
+      "description": "描述（可选）",
+      "descriptionPlaceholder": "描述这个空间的用途",
+      "descriptionPlaceholderShort": "描述这个空间的主题...",
+      "descriptionText": "创建一个新空间来组织您的想法和对话。",
+      "emoji": "表情符号",
+      "name": "名称",
+      "namePlaceholder": "输入空间名称",
+      "newSpace": "新建空间",
+      "select": "选择",
+      "title": "创建新思考空间",
+      "untitled": "未命名"
     }
   },
   "common": {
     "brand": "EN",
     "cancel": "取消",
-    "clear": "",
+    "clear": "清除",
     "clearSearch": "清除搜索",
     "close": "关闭",
     "closeViewer": "关闭查看器",
@@ -247,24 +247,24 @@
   "components": {
     "collapsibleSidebar": {
       "examples": {
-        "basicSidebar": "",
-        "basicUsage": "",
-        "callbackContent": "",
-        "callbackItem": "",
-        "customItem": "",
-        "customStyled": "",
-        "customStyling": "",
-        "customStylingContent": "",
-        "customWidth": "",
-        "customWidthContent": "",
-        "description": "",
-        "mainContent": "",
-        "menuItem": "",
-        "title": "",
-        "wideMenuItem": "",
-        "wideSidebar": "",
-        "withCallback": "",
-        "withCallbackTitle": ""
+        "basicSidebar": "基础侧边栏",
+        "basicUsage": "基本用法",
+        "callbackContent": "内容区域。检查控制台以查看折叠状态变化。",
+        "callbackItem": "回调项 {{number}}",
+        "customItem": "自定义项 {{number}}",
+        "customStyled": "自定义样式",
+        "customStyling": "自定义样式",
+        "customStylingContent": "使用蓝色主题的自定义样式侧边栏的内容区域。",
+        "customWidth": "自定义宽度",
+        "customWidthContent": "自定义侧边栏宽度的内容区域（384px 而不是 320px）。",
+        "description": "在不同场景中使用 CollapsibleSidebar 组件的示例。",
+        "mainContent": "主要内容区域。可以折叠侧边栏以提供更多空间。",
+        "menuItem": "菜单项 {{number}}",
+        "title": "CollapsibleSidebar 示例",
+        "wideMenuItem": "宽菜单项 {{number}}",
+        "wideSidebar": "宽侧边栏",
+        "withCallback": "带状态回调",
+        "withCallbackTitle": "带回调"
       }
     }
   },
@@ -288,9 +288,9 @@
   },
   "feedback": {
     "modal": {
-      "description": "",
-      "iframeTitle": "",
-      "title": ""
+      "description": "在下方空间中分享您的想法，我们会定期查看",
+      "iframeTitle": "反馈空间",
+      "title": "产品反馈"
     }
   },
   "header": {
@@ -315,18 +315,18 @@
   },
   "homepage": {
     "cta": {
-      "getStarted": "",
-      "learnMore": ""
+      "getStarted": "开始使用",
+      "learnMore": "了解更多"
     },
     "features": {
-      "aiConversations": "",
-      "intelligentInsights": "",
-      "organizedSpaces": ""
+      "aiConversations": "AI 驱动的对话",
+      "intelligentInsights": "智能洞察",
+      "organizedSpaces": "有序的思考空间"
     },
     "hero": {
-      "description": "",
-      "thoughtsTakeRoot": "",
-      "where": ""
+      "description": "通过 AI 驱动的对话和智能笔记，将您的转瞬即逝的想法转化为持久的洞察。",
+      "thoughtsTakeRoot": "想法生根",
+      "where": "在这里"
     }
   },
   "language": {

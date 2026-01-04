@@ -212,24 +212,24 @@
   },
   "channelManagement": {
     "createChannel": {
-      "createSpace": "",
-      "description": "",
-      "descriptionPlaceholder": "",
-      "descriptionPlaceholderShort": "",
-      "descriptionText": "",
-      "emoji": "",
-      "name": "",
-      "namePlaceholder": "",
-      "newSpace": "",
-      "select": "",
-      "title": "",
-      "untitled": ""
+      "createSpace": "Create Space",
+      "description": "Description (Optional)",
+      "descriptionPlaceholder": "Describe what this space is for",
+      "descriptionPlaceholderShort": "Describe the theme of this space...",
+      "descriptionText": "Create a new space for organizing your thoughts and conversations.",
+      "emoji": "Emoji",
+      "name": "Name",
+      "namePlaceholder": "Enter space name",
+      "newSpace": "New Space",
+      "select": "Select",
+      "title": "Create New Thought Space",
+      "untitled": "Untitled"
     }
   },
   "common": {
     "brand": "EN",
     "cancel": "Cancel",
-    "clear": "",
+    "clear": "Clear",
     "clearSearch": "Clear search",
     "close": "Close",
     "closeViewer": "Close viewer",
@@ -247,24 +247,24 @@
   "components": {
     "collapsibleSidebar": {
       "examples": {
-        "basicSidebar": "",
-        "basicUsage": "",
-        "callbackContent": "",
-        "callbackItem": "",
-        "customItem": "",
-        "customStyled": "",
-        "customStyling": "",
-        "customStylingContent": "",
-        "customWidth": "",
-        "customWidthContent": "",
-        "description": "",
-        "mainContent": "",
-        "menuItem": "",
-        "title": "",
-        "wideMenuItem": "",
-        "wideSidebar": "",
-        "withCallback": "",
-        "withCallbackTitle": ""
+        "basicSidebar": "Basic Sidebar",
+        "basicUsage": "Basic Usage",
+        "callbackContent": "Content area. Check console for collapse state changes.",
+        "callbackItem": "Callback Item {{number}}",
+        "customItem": "Custom Item {{number}}",
+        "customStyled": "Custom Styled",
+        "customStyling": "Custom Styling",
+        "customStylingContent": "Content area with custom styled sidebar using blue theme.",
+        "customWidth": "Custom Width",
+        "customWidthContent": "Content area with custom sidebar width (384px instead of 320px).",
+        "description": "Examples of how to use the CollapsibleSidebar component in different scenarios.",
+        "mainContent": "Main content area. The sidebar can be collapsed to give more space.",
+        "menuItem": "Menu Item {{number}}",
+        "title": "CollapsibleSidebar Examples",
+        "wideMenuItem": "Wide Menu Item {{number}}",
+        "wideSidebar": "Wide Sidebar",
+        "withCallback": "With State Callback",
+        "withCallbackTitle": "With Callback"
       }
     }
   },
@@ -288,9 +288,9 @@
   },
   "feedback": {
     "modal": {
-      "description": "",
-      "iframeTitle": "",
-      "title": ""
+      "description": "Share your thoughts in the space below, we'll review them regularly",
+      "iframeTitle": "Feedback Space",
+      "title": "Product Feedback"
     }
   },
   "header": {
@@ -315,18 +315,18 @@
   },
   "homepage": {
     "cta": {
-      "getStarted": "",
-      "learnMore": ""
+      "getStarted": "Get Started",
+      "learnMore": "Learn More"
     },
     "features": {
-      "aiConversations": "",
-      "intelligentInsights": "",
-      "organizedSpaces": ""
+      "aiConversations": "AI-powered conversations",
+      "intelligentInsights": "Intelligent insights",
+      "organizedSpaces": "Organized thought spaces"
     },
     "hero": {
-      "description": "",
-      "thoughtsTakeRoot": "",
-      "where": ""
+      "description": "Transform your fleeting ideas into lasting insights with AI-powered conversations and intelligent note-taking.",
+      "thoughtsTakeRoot": "thoughts take root",
+      "where": "Where"
     }
   },
   "language": {
