@@ -13,6 +13,7 @@ import type { MindmapTreeNode } from "../types";
 import { useStudioStore } from "@/core/stores/studio.store";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/common/components/ui/dropdown-menu";
 import { generateMindmap } from "../services/mindmap.service";
+import { useTranslation } from "react-i18next";
 
 function useElementSize<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -444,6 +445,7 @@ function MindmapLR({
   onNodeClick?: (id: string) => void;
   activeNodePath?: Set<string>;
 }) {
+  const { t } = useTranslation();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
@@ -587,26 +589,26 @@ function MindmapLR({
       </svg>
       <div className="absolute bottom-3 right-3 flex flex-col gap-2">
         <div className="bg-white/90 dark:bg-slate-800/90 rounded-lg shadow border border-border/60 overflow-hidden flex flex-col">
-          <button onClick={() => onZoomBtn("in")} title="Zoom In" className="p-2 hover:bg-muted/60 transition-colors">
+          <button onClick={() => onZoomBtn("in")} title={t("studio.mindmap.zoomIn")} className="p-2 hover:bg-muted/60 transition-colors">
             <ZoomIn className="w-4 h-4" />
           </button>
           <div className="h-px bg-border/60" />
-          <button onClick={() => onZoomBtn("out")} title="Zoom Out" className="p-2 hover:bg-muted/60 transition-colors">
+          <button onClick={() => onZoomBtn("out")} title={t("studio.mindmap.zoomOut")} className="p-2 hover:bg-muted/60 transition-colors">
             <ZoomOut className="w-4 h-4" />
           </button>
           <div className="h-px bg-border/60" />
-          <button onClick={fitToView} title="Fit to View" className="p-2 hover:bg-muted/60 transition-colors">
+          <button onClick={fitToView} title={t("studio.mindmap.fitToView")} className="p-2 hover:bg-muted/60 transition-colors">
             <Focus className="w-4 h-4" />
           </button>
           <div className="h-px bg-border/60" />
-          <button onClick={onFullToggle} title={isFull ? "Exit Fullscreen" : "Enter Fullscreen"} className="p-2 hover:bg-muted/60 transition-colors">
+          <button onClick={onFullToggle} title={isFull ? t("studio.mindmap.exitFullscreen") : t("studio.mindmap.enterFullscreen")} className="p-2 hover:bg-muted/60 transition-colors">
             {isFull ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
         <button
           onClick={onRegenerate}
           disabled={isLoading}
-          title="Regenerate"
+          title={t("studio.mindmap.regenerate")}
           className="p-2 bg-white/90 dark:bg-slate-800/90 rounded-lg shadow border border-border/60 text-foreground hover:bg-muted/60 transition-colors disabled:opacity-50"
         >
           {isLoading ? (
@@ -768,9 +770,9 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
             className="h-7 px-2"
             onClick={() => setViewMode("mindmap")}
             disabled={!data.tree}
-            title={data.tree ? "Mindmap view" : "Mindmap tree not available for this item"}
+            title={data.tree ? t("studio.mindmap.mindmapView") : t("studio.mindmap.treeNotAvailable")}
           >
-            Mindmap
+            {t("studio.mindmap.mindmap")}
           </Button>
           <Button
             variant={viewMode === "graph" ? "secondary" : "ghost"}
@@ -778,31 +780,31 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
             className="h-7 px-2"
             onClick={() => setViewMode("graph")}
           >
-            Graph
+            {t("studio.mindmap.graph")}
           </Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" title="More options">
+            <Button variant="ghost" size="icon" className="h-7 w-7" title={t("studio.mindmap.moreOptions")}>
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44 p-1.5">
             <DropdownMenuItem className="cursor-pointer" onClick={resetLayout}>
               <RefreshCw className="w-4 h-4 mr-2" />
-              Reset Layout
+              {t("studio.mindmap.resetLayout")}
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" onClick={handleDownload}>
               <FileDown className="w-4 h-4 mr-2" />
-              Download JSON
+              {t("studio.mindmap.downloadJSON")}
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" onClick={downloadSVG}>
               <Download className="w-4 h-4 mr-2" />
-              Download SVG
+              {t("studio.mindmap.downloadSVG")}
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" onClick={downloadPNG}>
               <ImageDown className="w-4 h-4 mr-2" />
-              Download PNG
+              {t("studio.mindmap.downloadPNG")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -810,12 +812,11 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
           <div className="text-sm text-muted-foreground">
-            Mindmap Visualization{data.nodes.length > 0 ? ` · ${data.nodes.length} nodes, ${data.edges.length} links` : ""}
+            {t("studio.mindmap.visualization", { nodes: data.nodes.length, edges: data.edges.length })}
           </div>
           <div className="w-full h-96 border border-border/40 rounded-lg bg-background/60">
             {viewMode === "mindmap" && data.tree ? (
               <div className="w-full h-full">
-                {/* Prefer left-to-right XMind-like layout */}
                 <MindmapLR
                   data={data.tree}
                   onRegenerate={handleRegenerate}
@@ -824,11 +825,11 @@ export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: Mind
               </div>
             ) : viewMode === "mindmap" && !data.tree ? (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                No mindmap tree available. Try regenerating.
+                {t("studio.mindmap.noTreeAvailable")}
               </div>
             ) : data.nodes.length === 0 ? (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                No mindmap generated yet
+                {t("studio.mindmap.noMindmapGenerated")}
               </div>
             ) : (
               <div className="w-full h-full">

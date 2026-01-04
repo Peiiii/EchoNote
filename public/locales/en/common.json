@@ -140,6 +140,8 @@
       "tryAsking": "Try asking:"
     },
     "mobile": {
+      "backToChat": "Back to chat",
+      "newConversation": "New conversation",
       "showConversations": "Show conversations"
     },
     "modelSelector": {
@@ -320,6 +322,9 @@
       "description": "Description",
       "descriptionPlaceholder": "Enter description",
       "emoji": "Emoji",
+      "emojiPlaceholder": "Choose an emoji",
+      "name": "Name",
+      "namePlaceholder": "Enter space name",
       "title": "Edit Channel"
     },
     "publishSpace": {
@@ -364,6 +369,7 @@
     "collapse": "Collapse",
     "copied": "Copied!",
     "copy": "Copy",
+    "dash": "—",
     "delete": "Delete",
     "dismiss": "Dismiss",
     "loading": "Loading...",
@@ -399,148 +405,6 @@
         "withCallback": "With State Callback",
         "withCallbackTitle": "With Callback"
       }
-    }
-  },
-  "demo": {
-    "aiObjectDemo": {
-      "apiKeyWarning": "API key not configured. Please set VITE_DASHSCOPE_API_KEY in your environment.",
-      "defaultPrompt": "Create a todo item for: Review the project proposal",
-      "description": "Generate structured objects from natural language prompts using AI",
-      "generate": "Generate",
-      "generating": "Generating...",
-      "promptLabel": "Prompt",
-      "promptPlaceholder": "Enter your prompt here...",
-      "title": "AI Object Generation Demo"
-    },
-    "aiObjectDemoPage": {
-      "cardTitle": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "aiQuickTest": {
-      "apiKeyWarning": "VITE_DASHSCOPE_API_KEY not detected, please configure in local .env file",
-      "description": "Directly call DashScope (OpenAI compatible endpoint) from frontend for quick validation",
-      "generate": "Generate",
-      "generating": "Generating...",
-      "promptLabel": "Prompt",
-      "promptPlaceholder": "Enter your question...",
-      "systemLabel": "System Instruction (Optional)",
-      "systemPlaceholder": "System instruction (optional)",
-      "title": "AI Quick Test"
-    },
-    "aiQuickTestDemoPage": {
-      "cardTitle": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "chatPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "docsPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "page": {
-      "aboutDescription": "",
-      "aboutTitle": "",
-      "feature1": {
-        "description": "",
-        "title": ""
-      },
-      "feature2": {
-        "description": "",
-        "title": ""
-      },
-      "feature3": {
-        "description": "",
-        "title": ""
-      },
-      "feature4": {
-        "description": "",
-        "title": ""
-      },
-      "feature5": {
-        "description": "",
-        "title": ""
-      },
-      "startExperience": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "settingsPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "spaceChatDemoPage": {
-      "addCustomSpace": "",
-      "aiChatAssistant": "",
-      "createNewSpace": "",
-      "example": {
-        "personal": {
-          "goal": {
-            "content": "",
-            "title": ""
-          },
-          "habit": {
-            "content": "",
-            "title": ""
-          }
-        },
-        "study": {
-          "connection": {
-            "content": "",
-            "title": ""
-          },
-          "suggestion": {
-            "content": "",
-            "title": ""
-          }
-        },
-        "work": {
-          "progress": {
-            "content": "",
-            "title": ""
-          },
-          "summary": {
-            "content": "",
-            "title": ""
-          }
-        }
-      },
-      "feature1": {
-        "description": "",
-        "title": ""
-      },
-      "feature2": {
-        "description": "",
-        "title": ""
-      },
-      "feature3": {
-        "description": "",
-        "title": ""
-      },
-      "featureDescription": "",
-      "placeholder": "",
-      "selectSpace": "",
-      "space1": {
-        "description": "",
-        "name": ""
-      },
-      "space2": {
-        "description": "",
-        "name": ""
-      },
-      "space3": {
-        "description": "",
-        "name": ""
-      },
-      "subtitle": "",
-      "title": "",
-      "usageExamples": ""
     }
   },
   "desktop": {
@@ -642,15 +506,6 @@
       "secondaryButton": "Roadmap Plan",
       "title": "Start Your",
       "titleHighlight": "Cognitive Evolution Journey"
-    },
-    "demo": {
-      "aiStatus": "AI Status: Connected",
-      "channelName": "Growth Space / #Action-Plan",
-      "hint": "👆 Start typing your thoughts and experience how AI reshapes your cognition",
-      "inputPlaceholder": "Chat with your AI mentor...",
-      "subtitle": "No registration required, experience cognitive evolution guided by an AI mentor",
-      "title": "Real-time Dialogue with Your Growth",
-      "titleHighlight": "Real-time Dialogue"
     },
     "features": {
       "description": "We hide complex features behind a simple interface, helping you build your own second brain.",
@@ -773,6 +628,10 @@
     }
   },
   "mobile": {
+    "channelList": {
+      "newSpace": "New space",
+      "title": "Spaces"
+    },
     "header": {
       "channels": "Channels",
       "chat": "Chat",
@@ -782,7 +641,19 @@
     "settings": {
       "account": "Account",
       "appearance": "Appearance",
-      "title": "Settings"
+      "buildTime": "Build Time",
+      "data": "Data",
+      "debugInfoNote": "This debug information is only visible to developers and support staff.",
+      "debugInformation": "Debug Information",
+      "developer": "Developer",
+      "environment": "Environment",
+      "exportData": "Export Data",
+      "importData": "Import Data",
+      "mobile": "Mobile",
+      "platform": "Platform",
+      "production": "Production",
+      "title": "Settings",
+      "version": "Version"
     },
     "welcome": {
       "createFirstSpace": "Create Your First Space",
@@ -825,10 +696,18 @@
       "wysiwyg": "WYSIWYG"
     },
     "messageTimeline": {
+      "addMoreContent": "Add a bit more content to get meaningful sparks",
+      "closeAnalysis": "Close analysis",
       "collapse": "Collapse",
       "collapseCurrent": "Collapse current",
       "editMessage": "Edit Message",
+      "editPlaceholder": "Edit your message...",
       "editThoughtPlaceholder": "Edit your thought...",
+      "failed": "Failed: {{error}}",
+      "generate": "Generate",
+      "generating": "Generating...",
+      "generatingSparks": "Generating sparks...",
+      "noSparksYet": "No sparks yet",
       "openAIAssistant": "Open AI Assistant",
       "showComposer": "Show composer",
       "tagEnhanced": "Tag‑enhanced"
@@ -976,11 +855,62 @@
     "tryDifferentSearch": "Try a different search term"
   },
   "studio": {
+    "audioSummary": {
+      "content": "Audio Overview Content"
+    },
     "contextSelector": {
+      "mode": {
+        "all": "All spaces",
+        "auto": "Auto",
+        "none": "No spaces"
+      },
+      "multipleSpaces_one": "{{count}} space",
+      "multipleSpaces_other": "{{count}} spaces",
+      "noSpacesAvailable": "No spaces available",
+      "noSpacesFound": "No spaces found",
+      "noSpacesSelected": "No spaces selected",
+      "oneSpace": "1 space",
+      "searchPlaceholder": "Search spaces...",
       "title": "Context"
     },
+    "mindmap": {
+      "downloadJSON": "Download JSON",
+      "downloadPNG": "Download PNG",
+      "downloadSVG": "Download SVG",
+      "enterFullscreen": "Enter Fullscreen",
+      "exitFullscreen": "Exit Fullscreen",
+      "fitToView": "Fit to View",
+      "graph": "Graph",
+      "mindmap": "Mindmap",
+      "mindmapView": "Mindmap view",
+      "moreOptions": "More options",
+      "noMindmapGenerated": "No mindmap generated yet",
+      "noTreeAvailable": "No mindmap tree available. Try regenerating.",
+      "regenerate": "Regenerate",
+      "resetLayout": "Reset Layout",
+      "treeNotAvailable": "Mindmap tree not available for this item",
+      "visualization": "Mindmap Visualization{{nodes}}",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out"
+    },
     "recentItem": {
-      "failed": "Failed"
+      "delete": "Delete",
+      "failed": "Failed",
+      "generating": "Generating...",
+      "open": "Open",
+      "pin": "Pin",
+      "unpin": "Unpin"
+    },
+    "report": {
+      "basedOnSources_one": "Based on {{count}} source",
+      "basedOnSources_other": "Based on {{count}} sources",
+      "contentPlaceholder": "Report content will be displayed here in a structured format."
+    },
+    "wikiCard": {
+      "examples": "Examples",
+      "keyPoints": "Key Points",
+      "noCardsGenerated": "No concept cards generated yet",
+      "relatedConcepts": "Related Concepts"
     }
   },
   "thoughtRecord": {

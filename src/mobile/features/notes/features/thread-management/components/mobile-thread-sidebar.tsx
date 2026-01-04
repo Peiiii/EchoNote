@@ -27,7 +27,7 @@ export const MobileThreadSidebar = () => {
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Close"
+            aria-label={t("common.close")}
             className="h-8 w-8"
             onClick={() => presenter.closeThread()}
           >

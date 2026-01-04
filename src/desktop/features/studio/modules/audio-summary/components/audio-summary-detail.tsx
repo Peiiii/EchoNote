@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Play, Pause, Download, ArrowLeft } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
+import { useTranslation } from "react-i18next";
 
 interface AudioSummaryDetailProps {
   item: StudioContentItem;
@@ -10,6 +11,7 @@ interface AudioSummaryDetailProps {
 }
 
 export const AudioSummaryDetail = memo(function AudioSummaryDetail({ item, onClose }: AudioSummaryDetailProps) {
+  const { t } = useTranslation();
   const isPlaying = false;
   const handlePlay = () => {};
 
@@ -28,7 +30,7 @@ export const AudioSummaryDetail = memo(function AudioSummaryDetail({ item, onClo
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
-          <div className="text-sm text-muted-foreground">Audio Overview Content</div>
+          <div className="text-sm text-muted-foreground">{t("studio.audioSummary.content")}</div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handlePlay}>
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}

@@ -8,6 +8,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { MobileChannelItem } from "./mobile-channel-item";
 
 interface MobileChannelListProps {
@@ -15,6 +16,7 @@ interface MobileChannelListProps {
 }
 
 export function MobileChannelList({ isOpen }: MobileChannelListProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const channels = useNotesDataStore(state => state.channels);
   const currentChannelId = useNotesViewStore(state => state.currentChannelId);
@@ -32,7 +34,7 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
         <div className="flex flex-col h-full bg-background">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-foreground">Spaces</h3>
+              <h3 className="font-semibold text-foreground">{t("mobile.channelList.title")}</h3>
             </div>
             <div className="flex items-center gap-2">
               <CreateChannelPopover
@@ -42,8 +44,8 @@ export function MobileChannelList({ isOpen }: MobileChannelListProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    title="New space"
-                    aria-label="New space"
+                    title={t("mobile.channelList.newSpace")}
+                    aria-label={t("mobile.channelList.newSpace")}
                   >
                     <Plus className="w-4 h-4" />
                   </Button>

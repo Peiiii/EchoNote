@@ -97,7 +97,7 @@ export function MobileEditChannelDialog({
         <div className="space-y-4 py-4">
           {/* Emoji */}
           <div className="space-y-2">
-            <Label htmlFor="emoji">Emoji</Label>
+            <Label htmlFor="emoji">{t("channelManagement.editChannel.emoji")}</Label>
             <div className="flex items-center gap-2">
               <EmojiPickerComponent onSelect={setEditEmoji}>
                 <Button
@@ -113,7 +113,7 @@ export function MobileEditChannelDialog({
                 id="emoji"
                 value={editEmoji}
                 onChange={(e) => setEditEmoji(e.target.value)}
-                placeholder="Choose an emoji"
+                placeholder={t("channelManagement.editChannel.emojiPlaceholder")}
                 className="flex-1"
                 maxLength={2}
               />
@@ -122,12 +122,12 @@ export function MobileEditChannelDialog({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("channelManagement.editChannel.name")}</Label>
             <Input
               id="name"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              placeholder="Enter space name"
+              placeholder={t("channelManagement.editChannel.namePlaceholder")}
               onKeyDown={handleKeyDown}
               disabled={isLoading}
             />
@@ -135,12 +135,12 @@ export function MobileEditChannelDialog({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("channelManagement.editChannel.description")}</Label>
             <Textarea
               id="description"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Enter space description (optional)"
+              placeholder={t("channelManagement.editChannel.descriptionPlaceholder")}
               rows={3}
               disabled={isLoading}
             />
@@ -154,13 +154,13 @@ export function MobileEditChannelDialog({
             onClick={handleCancel}
             disabled={isLoading}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleSave}
             disabled={isLoading || !editName.trim()}
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isLoading ? t("common.saving") : t("common.save")}
           </Button>
         </div>
       </DialogContent>

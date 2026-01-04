@@ -59,12 +59,12 @@ export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) =
 
         {/* Data Section */}
         <div className="space-y-3">
-          <div className="text-sm font-medium text-foreground">Data</div>
+          <div className="text-sm font-medium text-foreground">{t("mobile.settings.data")}</div>
           <Button variant="outline" className="w-full justify-start">
-            Export Data
+            {t("mobile.settings.exportData")}
           </Button>
           <Button variant="outline" className="w-full justify-start">
-            Import Data
+            {t("mobile.settings.importData")}
           </Button>
         </div>
 
@@ -72,40 +72,40 @@ export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) =
         <div className="space-y-3">
           <div className="text-sm font-medium text-foreground flex items-center gap-2">
             <Code className="w-4 h-4" />
-            Developer
+            {t("mobile.settings.developer")}
           </div>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full justify-start">
                 <Info className="w-4 h-4 mr-2" />
-                Debug Information
+                {t("mobile.settings.debugInformation")}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Debug Information</DialogTitle>
+                <DialogTitle>{t("mobile.settings.debugInformation")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Version:</span>
+                    <span className="font-medium">{t("mobile.settings.version")}:</span>
                     <div className="text-muted-foreground">v1.0.5</div>
                   </div>
                   <div>
-                    <span className="font-medium">Build Time:</span>
+                    <span className="font-medium">{t("mobile.settings.buildTime")}:</span>
                     <div className="text-muted-foreground">{new Date().toLocaleString()}</div>
                   </div>
                   <div>
-                    <span className="font-medium">Environment:</span>
-                    <div className="text-muted-foreground">Production</div>
+                    <span className="font-medium">{t("mobile.settings.environment")}:</span>
+                    <div className="text-muted-foreground">{t("mobile.settings.production")}</div>
                   </div>
                   <div>
-                    <span className="font-medium">Platform:</span>
-                    <div className="text-muted-foreground">Mobile</div>
+                    <span className="font-medium">{t("mobile.settings.platform")}:</span>
+                    <div className="text-muted-foreground">{t("mobile.settings.mobile")}</div>
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground border-t pt-3">
-                  This debug information is only visible to developers and support staff.
+                  {t("mobile.settings.debugInfoNote")}
                 </div>
               </div>
             </DialogContent>

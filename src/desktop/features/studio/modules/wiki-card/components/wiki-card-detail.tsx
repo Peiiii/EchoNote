@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { ConceptCardsData } from "../types";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface WikiCardDetailProps {
   item: StudioContentItem;
@@ -12,6 +13,7 @@ interface WikiCardDetailProps {
 }
 
 export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: WikiCardDetailProps) {
+  const { t } = useTranslation();
   const data = item.data as ConceptCardsData | undefined;
   const cards = data?.cards || [];
 
@@ -34,7 +36,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
         <div className="p-4 space-y-4">
           {cards.length === 0 ? (
             <div className="text-sm text-muted-foreground text-center py-8">
-              No concept cards generated yet
+              {t("studio.wikiCard.noCardsGenerated")}
             </div>
           ) : (
             cards.map((card, cardIndex) => {
@@ -65,7 +67,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                   {card.keyPoints.length > 0 && (
                     <div className="mb-4">
                       <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-2 uppercase tracking-wide">
-                        Key Points
+                        {t("studio.wikiCard.keyPoints")}
                       </div>
                       <ul className="space-y-1.5">
                         {card.keyPoints.map((point, idx) => (
@@ -74,7 +76,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                             className="text-sm text-foreground/85 flex items-start gap-2.5"
                           >
                             <span className="text-amber-600 dark:text-amber-400 mt-0.5 font-semibold">
-                              •
+                              {t("common.separator")}
                             </span>
                             <span>{point}</span>
                           </li>
@@ -86,7 +88,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                   {card.examples.length > 0 && (
                     <div className="mb-4">
                       <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-2 uppercase tracking-wide">
-                        Examples
+                        {t("studio.wikiCard.examples")}
                       </div>
                       <ul className="space-y-1.5">
                         {card.examples.map((example, idx) => (
@@ -95,7 +97,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                             className="text-sm text-foreground/85 flex items-start gap-2.5"
                           >
                             <span className="text-amber-600 dark:text-amber-400 mt-0.5 font-semibold">
-                              —
+                              {t("common.dash")}
                             </span>
                             <span>{example}</span>
                           </li>
@@ -107,7 +109,7 @@ export const WikiCardDetail = memo(function WikiCardDetail({ item, onClose }: Wi
                   {card.relatedConcepts.length > 0 && (
                     <div>
                       <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-2 uppercase tracking-wide">
-                        Related Concepts
+                        {t("studio.wikiCard.relatedConcepts")}
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {card.relatedConcepts.map((concept, idx) => (

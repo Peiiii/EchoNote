@@ -80,16 +80,16 @@ export function MobileThoughtRecordSparks({
                   {isGenerating ? (
                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                       <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                      Generating sparks...
+                      {t("notes.messageTimeline.generatingSparks")}
                     </div>
                   ) : error ? (
-                    <div className="text-xs text-red-500">Failed: {error}</div>
+                    <div className="text-xs text-red-500">{t("notes.messageTimeline.failed", { error })}</div>
                   ) : contentTooShort ? (
                     <div className="text-xs text-slate-500 dark:text-slate-400">
-                      Add a bit more content to get meaningful sparks
+                      {t("notes.messageTimeline.addMoreContent")}
                     </div>
                   ) : (
-                    <div className="text-xs text-slate-500 dark:text-slate-400">No sparks yet</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{t("notes.messageTimeline.noSparksYet")}</div>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -99,12 +99,12 @@ export function MobileThoughtRecordSparks({
                     onClick={generate}
                     disabled={isGenerating || contentTooShort}
                   >
-                    {isGenerating ? "Generating..." : "Generate"}
+                    {isGenerating ? t("notes.messageTimeline.generating") : t("notes.messageTimeline.generate")}
                   </Button>
                   <button
                     onClick={onToggleAnalysis}
                     className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
-                    title="Close analysis"
+                    title={t("notes.messageTimeline.closeAnalysis")}
                   >
                     <X className="w-4 h-4" />
                   </button>

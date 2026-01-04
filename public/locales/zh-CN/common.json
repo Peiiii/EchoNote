@@ -140,6 +140,8 @@
       "tryAsking": "试试问："
     },
     "mobile": {
+      "backToChat": "返回聊天",
+      "newConversation": "新对话",
       "showConversations": "显示对话"
     },
     "modelSelector": {
@@ -320,6 +322,9 @@
       "description": "描述",
       "descriptionPlaceholder": "输入描述",
       "emoji": "表情符号",
+      "emojiPlaceholder": "选择一个表情符号",
+      "name": "名称",
+      "namePlaceholder": "输入空间名称",
       "title": "编辑频道"
     },
     "publishSpace": {
@@ -364,6 +369,7 @@
     "collapse": "折叠",
     "copied": "已复制！",
     "copy": "复制",
+    "dash": "—",
     "delete": "删除",
     "dismiss": "忽略",
     "loading": "加载中...",
@@ -399,148 +405,6 @@
         "withCallback": "带状态回调",
         "withCallbackTitle": "带回调"
       }
-    }
-  },
-  "demo": {
-    "aiObjectDemo": {
-      "apiKeyWarning": "未配置 API 密钥。请在环境变量中设置 VITE_DASHSCOPE_API_KEY。",
-      "defaultPrompt": "创建一个待办事项：审查项目提案",
-      "description": "使用 AI 从自然语言提示生成结构化对象",
-      "generate": "生成",
-      "generating": "生成中...",
-      "promptLabel": "提示",
-      "promptPlaceholder": "在此输入您的提示...",
-      "title": "AI 对象生成演示"
-    },
-    "aiObjectDemoPage": {
-      "cardTitle": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "aiQuickTest": {
-      "apiKeyWarning": "未检测到 VITE_DASHSCOPE_API_KEY，请在本地 .env 文件中配置",
-      "description": "从前端直接调用 DashScope（OpenAI 兼容端点）进行快速验证",
-      "generate": "生成",
-      "generating": "生成中...",
-      "promptLabel": "提示词",
-      "promptPlaceholder": "输入您的问题...",
-      "systemLabel": "系统指令（可选）",
-      "systemPlaceholder": "系统指令（可选）",
-      "title": "AI 快速测试"
-    },
-    "aiQuickTestDemoPage": {
-      "cardTitle": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "chatPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "docsPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "page": {
-      "aboutDescription": "",
-      "aboutTitle": "",
-      "feature1": {
-        "description": "",
-        "title": ""
-      },
-      "feature2": {
-        "description": "",
-        "title": ""
-      },
-      "feature3": {
-        "description": "",
-        "title": ""
-      },
-      "feature4": {
-        "description": "",
-        "title": ""
-      },
-      "feature5": {
-        "description": "",
-        "title": ""
-      },
-      "startExperience": "",
-      "subtitle": "",
-      "title": ""
-    },
-    "settingsPage": {
-      "content": "",
-      "description": "",
-      "title": ""
-    },
-    "spaceChatDemoPage": {
-      "addCustomSpace": "",
-      "aiChatAssistant": "",
-      "createNewSpace": "",
-      "example": {
-        "personal": {
-          "goal": {
-            "content": "",
-            "title": ""
-          },
-          "habit": {
-            "content": "",
-            "title": ""
-          }
-        },
-        "study": {
-          "connection": {
-            "content": "",
-            "title": ""
-          },
-          "suggestion": {
-            "content": "",
-            "title": ""
-          }
-        },
-        "work": {
-          "progress": {
-            "content": "",
-            "title": ""
-          },
-          "summary": {
-            "content": "",
-            "title": ""
-          }
-        }
-      },
-      "feature1": {
-        "description": "",
-        "title": ""
-      },
-      "feature2": {
-        "description": "",
-        "title": ""
-      },
-      "feature3": {
-        "description": "",
-        "title": ""
-      },
-      "featureDescription": "",
-      "placeholder": "",
-      "selectSpace": "",
-      "space1": {
-        "description": "",
-        "name": ""
-      },
-      "space2": {
-        "description": "",
-        "name": ""
-      },
-      "space3": {
-        "description": "",
-        "name": ""
-      },
-      "subtitle": "",
-      "title": "",
-      "usageExamples": ""
     }
   },
   "desktop": {
@@ -642,15 +506,6 @@
       "secondaryButton": "路线图计划",
       "title": "立即开启你的",
       "titleHighlight": "认知进化之旅"
-    },
-    "demo": {
-      "aiStatus": "AI 状态：已连接",
-      "channelName": "成长空间 / #行动计划",
-      "hint": "👆 立即输入你的想法，体验 AI 如何重塑你的认知",
-      "inputPlaceholder": "与你的 AI 导师对话...",
-      "subtitle": "无需注册，直接感受 AI 导师引领的认知进化",
-      "title": "与你的成长",
-      "titleHighlight": "实时对话"
     },
     "features": {
       "description": "我们将复杂的功能隐藏在简洁的界面之下，协助你构建属于自己的第二大脑。",
@@ -773,6 +628,10 @@
     }
   },
   "mobile": {
+    "channelList": {
+      "newSpace": "新建空间",
+      "title": "空间"
+    },
     "header": {
       "channels": "频道",
       "chat": "聊天",
@@ -782,7 +641,19 @@
     "settings": {
       "account": "账户",
       "appearance": "外观",
-      "title": "设置"
+      "buildTime": "构建时间",
+      "data": "数据",
+      "debugInfoNote": "此调试信息仅对开发人员和支持人员可见。",
+      "debugInformation": "调试信息",
+      "developer": "开发者",
+      "environment": "环境",
+      "exportData": "导出数据",
+      "importData": "导入数据",
+      "mobile": "移动端",
+      "platform": "平台",
+      "production": "生产环境",
+      "title": "设置",
+      "version": "版本"
     },
     "welcome": {
       "createFirstSpace": "创建您的第一个空间",
@@ -825,10 +696,18 @@
       "wysiwyg": "所见即所得"
     },
     "messageTimeline": {
+      "addMoreContent": "添加更多内容以获得有意义的灵感",
+      "closeAnalysis": "关闭分析",
       "collapse": "折叠",
       "collapseCurrent": "折叠当前",
       "editMessage": "编辑消息",
+      "editPlaceholder": "编辑你的消息...",
       "editThoughtPlaceholder": "编辑您的想法...",
+      "failed": "失败：{{error}}",
+      "generate": "生成",
+      "generating": "生成中...",
+      "generatingSparks": "生成灵感中...",
+      "noSparksYet": "暂无灵感",
       "openAIAssistant": "打开 AI 助手",
       "showComposer": "显示编辑器",
       "tagEnhanced": "标签增强"
@@ -976,11 +855,62 @@
     "tryDifferentSearch": "尝试其他搜索词"
   },
   "studio": {
+    "audioSummary": {
+      "content": "音频概览内容"
+    },
     "contextSelector": {
+      "mode": {
+        "all": "所有空间",
+        "auto": "自动",
+        "none": "无空间"
+      },
+      "multipleSpaces_one": "{{count}} 个空间",
+      "multipleSpaces_other": "{{count}} 个空间",
+      "noSpacesAvailable": "没有可用空间",
+      "noSpacesFound": "未找到空间",
+      "noSpacesSelected": "未选择空间",
+      "oneSpace": "1 个空间",
+      "searchPlaceholder": "搜索空间...",
       "title": "上下文"
     },
+    "mindmap": {
+      "downloadJSON": "下载 JSON",
+      "downloadPNG": "下载 PNG",
+      "downloadSVG": "下载 SVG",
+      "enterFullscreen": "进入全屏",
+      "exitFullscreen": "退出全屏",
+      "fitToView": "适应视图",
+      "graph": "图表",
+      "mindmap": "思维导图",
+      "mindmapView": "思维导图视图",
+      "moreOptions": "更多选项",
+      "noMindmapGenerated": "尚未生成思维导图",
+      "noTreeAvailable": "没有可用的思维导图树。请尝试重新生成。",
+      "regenerate": "重新生成",
+      "resetLayout": "重置布局",
+      "treeNotAvailable": "此项目没有可用的思维导图树",
+      "visualization": "思维导图可视化{{nodes}}",
+      "zoomIn": "放大",
+      "zoomOut": "缩小"
+    },
     "recentItem": {
-      "failed": "失败"
+      "delete": "删除",
+      "failed": "失败",
+      "generating": "生成中...",
+      "open": "打开",
+      "pin": "固定",
+      "unpin": "取消固定"
+    },
+    "report": {
+      "basedOnSources_one": "基于 {{count}} 个来源",
+      "basedOnSources_other": "基于 {{count}} 个来源",
+      "contentPlaceholder": "报告内容将在此处以结构化格式显示。"
+    },
+    "wikiCard": {
+      "examples": "示例",
+      "keyPoints": "关键点",
+      "noCardsGenerated": "尚未生成概念卡片",
+      "relatedConcepts": "相关概念"
     }
   },
   "thoughtRecord": {

@@ -119,7 +119,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                   {item.status === "generating" && (
                     <div className="flex items-center gap-1 text-[11px] text-primary/70">
                       <div className="w-2 h-2 rounded-full bg-primary/60 animate-pulse" />
-                      <span>Generating...</span>
+                      <span>{t("studio.recentItem.generating")}</span>
                     </div>
                   )}
                 </div>
@@ -139,7 +139,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                 size="icon"
                 variant="ghost"
                 className="h-7 w-7"
-                title={item.pinned ? "Unpin" : "Pin"}
+                title={item.pinned ? t("studio.recentItem.unpin") : t("studio.recentItem.pin")}
                 onClick={(e) => {
                   e.stopPropagation();
                   onTogglePin(item);
@@ -175,7 +175,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                     className="cursor-pointer"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Open
+                    {t("studio.recentItem.open")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={(e) => {
@@ -185,7 +185,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                     className="text-destructive cursor-pointer focus:text-destructive"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
+                    {t("studio.recentItem.delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

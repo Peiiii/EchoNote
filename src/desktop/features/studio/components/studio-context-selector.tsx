@@ -59,15 +59,15 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
   );
 
   const getLabel = () => {
-    if (currentMode === "all") return "All spaces";
-    if (currentMode === "none") return "No spaces";
-    if (currentMode === "auto") return "Auto";
-    if (currentChannelIds.length === 0) return "No spaces selected";
+    if (currentMode === "all") return t("studio.contextSelector.mode.all");
+    if (currentMode === "none") return t("studio.contextSelector.mode.none");
+    if (currentMode === "auto") return t("studio.contextSelector.mode.auto");
+    if (currentChannelIds.length === 0) return t("studio.contextSelector.noSpacesSelected");
     if (currentChannelIds.length === 1) {
       const ch = channels.find((c) => c.id === currentChannelIds[0]);
-      return ch?.name || "1 space";
+      return ch?.name || t("studio.contextSelector.oneSpace");
     }
-    return `${currentChannelIds.length} spaces`;
+    return t("studio.contextSelector.multipleSpaces", { count: currentChannelIds.length });
   };
 
   return (
@@ -90,7 +90,7 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
               className="w-full justify-start"
               onClick={() => setMode("auto")}
             >
-              Auto
+              {t("studio.contextSelector.mode.auto")}
             </Button>
             <Button
               variant={currentMode === "all" ? "default" : "ghost"}
@@ -98,7 +98,7 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
               className="w-full justify-start"
               onClick={() => setMode("all")}
             >
-              All spaces
+              {t("studio.contextSelector.mode.all")}
             </Button>
             <Button
               variant={currentMode === "none" ? "default" : "ghost"}
@@ -106,14 +106,14 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
               className="w-full justify-start"
               onClick={() => setMode("none")}
             >
-              No spaces
+              {t("studio.contextSelector.mode.none")}
             </Button>
             <div className="border-t pt-2 mt-2">
               <div className="flex items-center gap-2 px-2 mb-2">
                 <Search className="w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search spaces..."
+                  placeholder={t("studio.contextSelector.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent border-0 outline-none text-sm"
@@ -122,7 +122,7 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
               <div className="max-h-48 overflow-y-auto">
                 {filteredChannels.length === 0 ? (
                   <div className="text-center py-4 text-sm text-muted-foreground">
-                    {searchQuery ? "No spaces found" : "No spaces available"}
+                    {searchQuery ? t("studio.contextSelector.noSpacesFound") : t("studio.contextSelector.noSpacesAvailable")}
                   </div>
                 ) : (
                   <div className="space-y-1">

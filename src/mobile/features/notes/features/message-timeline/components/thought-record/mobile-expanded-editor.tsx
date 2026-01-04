@@ -68,7 +68,7 @@ export const MobileExpandedEditor = ({
             disabled={isSaving}
             className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleSave}
@@ -80,7 +80,7 @@ export const MobileExpandedEditor = ({
                 : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
             }`}
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? t("common.saving") : t("common.save")}
           </Button>
         </div>
       </div>
@@ -91,7 +91,7 @@ export const MobileExpandedEditor = ({
           ref={textareaRef}
           value={editContent}
           onChange={handleContentChange}
-          placeholder="Edit your message..."
+          placeholder={t("notes.messageTimeline.editPlaceholder")}
           className="w-full h-full resize-none text-sm leading-relaxed border border-input rounded-lg p-3 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           autoFocus
         />

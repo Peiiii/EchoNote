@@ -116,7 +116,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 variant="ghost"
                 size="icon"
                 onClick={() => showChat()}
-                aria-label="Back to chat"
+                aria-label={t("aiAssistant.mobile.backToChat")}
                 className="h-8 w-8 flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -130,7 +130,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
             <Button
               variant="ghost"
               size="icon"
-              aria-label="New conversation"
+              aria-label={t("aiAssistant.mobile.newConversation")}
               className="h-8 w-8"
               onClick={() => {
                 onCreate();
@@ -143,11 +143,11 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label="Close"
+                aria-label={t("common.close")}
                 className="h-8 w-8"
                 onClick={onClose}
               >
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{t("common.close")}</span>
                 {/* Using the same icon size as default sheet close */}
                 <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden>
                   <path

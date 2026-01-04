@@ -3,6 +3,7 @@ import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Download, ArrowLeft } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
+import { useTranslation } from "react-i18next";
 
 interface ReportDetailProps {
   item: StudioContentItem;
@@ -10,6 +11,7 @@ interface ReportDetailProps {
 }
 
 export const ReportDetail = memo(function ReportDetail({ item, onClose }: ReportDetailProps) {
+  const { t } = useTranslation();
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/40 flex-shrink-0">
@@ -30,9 +32,9 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
         <div className="p-4">
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <h1>{item.title}</h1>
-            <p className="text-sm text-muted-foreground">Based on {item.contextChannelIds.length} source(s)</p>
+            <p className="text-sm text-muted-foreground">{t("studio.report.basedOnSources", { count: item.contextChannelIds.length })}</p>
             <div className="mt-6">
-              <p>Report content will be displayed here in a structured format.</p>
+              <p>{t("studio.report.contentPlaceholder")}</p>
             </div>
           </div>
         </div>
