@@ -19,7 +19,11 @@
   - `public/locales/zh-CN/common.json`
 - 自动化：
   - 提取：`pnpm i18n:extract`（i18next-parser，会把代码里的 key 合并进 JSON）
+  - 提取校验（CI/门禁用）：`pnpm i18n:extract:check`（如果提取会修改 `public/locales` 则失败）
   - 校验：`pnpm i18n:check`（严格检查两种语言 key 对齐、value 非空）
+- 自查硬编码（强烈建议 AI 每次都跑）：
+  - 仅检查本次改动文件：`pnpm i18n:lint`
+  - 全量扫描（作为最终门禁）：`pnpm i18n:lint:all`
 - 硬编码检测（渐进启用，当前是 warn）：
   - ESLint 规则：`local/no-hardcoded-ui-text`
   - 当前生效范围：`src/landing/**` + `src/common/features/auth/**`（见 `eslint.config.js`）
@@ -101,6 +105,19 @@ pnpm build
 - 说明你漏改了 JSX 文案或文案属性
 - 继续改，直到 warning 消失（后续可以把 warn 升级为 error，作为 CI 门禁）
 
+如果你只想对“本次改动”做硬编码自查（推荐 AI 用这个避免噪音）：
+
+```bash
+pnpm i18n:lint
+```
+
+当你准备把 i18n 当成“不可回退”的工程规范时，用全量门禁：
+
+```bash
+pnpm i18n:lint:all
+pnpm i18n:ci
+```
+
 ## 常见误区（必须避免）
 
 - 把 `className/variant/id/path` 之类的“非文案字符串”也改成 i18n（不需要，且会让代码变复杂）。
@@ -113,4 +130,3 @@ pnpm build
 1. 先把 `src/landing/**` 与 `src/common/features/auth/**` 的硬编码清零（因为已经有 lint 提醒）。
 2. 然后逐步扩大 ESLint 规则范围到 `src/**`，最后把 warn 升级为 error（杜绝回归）。
 3. 当 key 数量足够大时再拆 namespace（避免早期过度工程）。
-

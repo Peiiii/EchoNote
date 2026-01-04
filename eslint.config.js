@@ -16,6 +16,9 @@ export default tseslint.config([
       reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
     ],
+    plugins: {
+      local: localRules,
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -31,14 +34,12 @@ export default tseslint.config([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      "local/no-hardcoded-ui-text": "off",
     },
   },
   // i18n adoption guardrail (incremental): detect hardcoded UI copy in JSX for high-signal surfaces first.
   {
     files: ["src/landing/**/*.{ts,tsx}", "src/common/features/auth/**/*.{ts,tsx}"],
-    plugins: {
-      local: localRules,
-    },
     rules: {
       "local/no-hardcoded-ui-text": "warn",
     },
