@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/common/components/ui/button";
 import { RefinedPopover } from "@/common/components/refined-popover";
 import { Palette, Palette as ColorIcon, Image as ImageIcon, X } from "lucide-react";
@@ -13,6 +14,7 @@ export function BackgroundSwitcher({
   onRemoveBackground,
   buttonClassName = "h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105",
 }: BackgroundSwitcherProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"colors" | "images">("colors");
   const [originalBackground, setOriginalBackground] = useState<
@@ -51,7 +53,7 @@ export function BackgroundSwitcher({
   return (
     <RefinedPopover open={isOpen} onOpenChange={handleOpenChange}>
       <RefinedPopover.Trigger asChild>
-        <Button variant="ghost" size="sm" className={buttonClassName} title="Change background">
+        <Button variant="ghost" size="sm" className={buttonClassName} title={t("backgroundSwitcher.changeBackground")}>
           <Palette className="h-4 w-4" />
         </Button>
       </RefinedPopover.Trigger>
@@ -65,13 +67,13 @@ export function BackgroundSwitcher({
       >
         <RefinedPopover.Header>
           <Palette className="w-4 h-4 text-primary/80" />
-          <div className="text-sm font-semibold text-foreground/90">Background</div>
+          <div className="text-sm font-semibold text-foreground/90">{t("backgroundSwitcher.background")}</div>
           <RefinedPopover.Button
             variant="ghost"
             size="sm"
             className="h-6 w-6 p-0 ml-auto"
             onClick={() => setIsOpen(false)}
-            title="Close"
+            title={t("backgroundSwitcher.close")}
           >
             <X className="h-3 w-3" />
           </RefinedPopover.Button>
@@ -86,7 +88,7 @@ export function BackgroundSwitcher({
               onClick={() => setActiveTab("colors")}
             >
               <ColorIcon className="h-4 w-4 mr-2" />
-              Colors
+              {t("backgroundSwitcher.colors")}
             </RefinedPopover.Button>
             <RefinedPopover.Button
               variant={activeTab === "images" ? "default" : "outline"}
@@ -95,7 +97,7 @@ export function BackgroundSwitcher({
               onClick={() => setActiveTab("images")}
             >
               <ImageIcon className="h-4 w-4 mr-2" />
-              Images
+              {t("backgroundSwitcher.images")}
             </RefinedPopover.Button>
           </div>
 
@@ -116,7 +118,7 @@ export function BackgroundSwitcher({
           <div className="mt-4 pt-3 border-t border-border">
             <div className="flex flex-col space-y-2">
               <p className="text-xs text-muted-foreground text-center">
-                Choose a background to personalize your channel
+                {t("backgroundSwitcher.description")}
               </p>
               <div className="flex justify-center">
                 <RefinedPopover.Button
@@ -124,9 +126,9 @@ export function BackgroundSwitcher({
                   size="sm"
                   className="h-6 px-3 text-xs"
                   onClick={handleResetBackground}
-                  title="Reset to original background"
+                  title={t("backgroundSwitcher.resetToOriginal")}
                 >
-                  Reset
+                  {t("backgroundSwitcher.reset")}
                 </RefinedPopover.Button>
               </div>
             </div>

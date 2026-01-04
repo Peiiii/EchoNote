@@ -32,6 +32,30 @@
       "feedback": "反馈"
     }
   },
+  "channelHeader": {
+    "expandSidebar": "展开侧边栏",
+    "newSpace": "新建空间",
+    "editSpace": "编辑空间",
+    "moreActions": "更多操作",
+    "manageSharing": "管理分享",
+    "publishSpace": "发布空间",
+    "collapseHeader": "折叠标题",
+    "expandHeader": "展开标题",
+    "search": "搜索",
+    "studio": "工作室",
+    "aiAssistant": "AI 助手",
+    "messages": "条消息"
+  },
+  "backgroundSwitcher": {
+    "changeBackground": "更换背景",
+    "background": "背景",
+    "close": "关闭",
+    "colors": "颜色",
+    "images": "图片",
+    "description": "选择背景以个性化您的频道",
+    "resetToOriginal": "重置为原始背景",
+    "reset": "重置"
+  },
   "language": {
     "en": "English",
     "label": "语言",

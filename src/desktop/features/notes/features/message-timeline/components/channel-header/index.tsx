@@ -32,6 +32,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BackgroundSwitcher } from "./background-switcher";
 import { ChannelDropdownSelector } from "./channel-dropdown-selector";
 import { EditChannelPopover } from "../../../channel-management/components/edit-channel-popover";
@@ -80,6 +81,7 @@ export const ChannelHeader = ({
   className = "",
   defaultCollapsed = false,
 }: ChannelHeaderProps) => {
+  const { t } = useTranslation();
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
   const presenter = useDesktopPresenterContext();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -183,7 +185,7 @@ export const ChannelHeader = ({
             size="sm"
             onClick={handleExpandSidebar}
             className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
-            title="Expand sidebar"
+            title={t("channelHeader.expandSidebar")}
           >
             <PanelLeft className="h-4 w-4" />
           </Button>
@@ -194,8 +196,8 @@ export const ChannelHeader = ({
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0"
-                title="New space"
-                aria-label="New space"
+                title={t("channelHeader.newSpace")}
+                aria-label={t("channelHeader.newSpace")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -218,8 +220,8 @@ export const ChannelHeader = ({
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105 flex-shrink-0"
-              title="Edit space"
-              aria-label="Edit space"
+              title={t("channelHeader.editSpace")}
+              aria-label={t("channelHeader.editSpace")}
               onClick={e => e.stopPropagation()}
             >
               <Edit2 className="h-4 w-4" />
@@ -262,7 +264,7 @@ export const ChannelHeader = ({
                 size="sm"
                 onClick={handleExpandSidebar}
                 className="h-8 w-8 p-0 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 hover:scale-105 flex-shrink-0 animate-in fade-in slide-in-from-left-2 duration-300"
-                title="Expand sidebar"
+                title={t("channelHeader.expandSidebar")}
               >
                 <PanelLeft className="h-4 w-4" />
               </Button>
@@ -322,7 +324,7 @@ export const ChannelHeader = ({
             size="sm"
             className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
             onClick={() => openQuickSearchModal()}
-            title="Search"
+            title={t("channelHeader.search")}
           >
             <Search className="h-4 w-4" />
           </Button>
@@ -350,12 +352,12 @@ export const ChannelHeader = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-105"
-                title="More actions"
-                aria-label="More actions"
+                className="group text-white hover:bg-white/20 transition-all duration-200"
+                title={t("channelHeader.moreActions")}
+                aria-label={t("channelHeader.moreActions")}
                 onClick={e => e.stopPropagation()}
               >
-                <MoreVertical className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
@@ -363,11 +365,11 @@ export const ChannelHeader = ({
                 icon={channel.shareToken ? Share2 : Globe}
                 onSelect={() => setIsPublishDialogOpen(true)}
               >
-                {channel.shareToken ? "Manage sharing" : "Publish space"}
+                {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
               </HeaderMenuItem>
               <DropdownMenuSeparator />
               <HeaderMenuItem icon={ChevronUp} onSelect={handleToggle}>
-                Collapse header
+                {t("channelHeader.collapseHeader")}
               </HeaderMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -382,7 +384,7 @@ export const ChannelHeader = ({
           >
             <MessageSquare className="h-3 w-3 mr-1.5" />
             <span className="font-medium">{channel.messageCount}</span>
-            <span className="ml-1 text-xs opacity-90">messages</span>
+            <span className="ml-1 text-xs opacity-90">{t("channelHeader.messages")}</span>
           </Badge>
 
           {channel.lastMessageTime && (
@@ -406,7 +408,7 @@ export const ChannelHeader = ({
             onClick={() => presenter.openAIAssistant()}
           >
             <Bot className="h-4 w-4 mr-2" />
-            <span className="font-medium">AI Assistant</span>
+            <span className="font-medium">{t("channelHeader.aiAssistant")}</span>
           </Button>
         </div>
       </div>
@@ -433,7 +435,7 @@ export const ChannelHeader = ({
               size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={() => openQuickSearchModal()}
-              title="Search"
+              title={t("channelHeader.search")}
             >
               <Search className="h-4 w-4" />
             </Button>
@@ -450,7 +452,7 @@ export const ChannelHeader = ({
               size="sm"
               className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
               onClick={() => presenter.openStudio()}
-              title="Studio"
+              title={t("channelHeader.studio")}
             >
               <Sparkles className="h-4 w-4" />
             </Button>
@@ -469,12 +471,12 @@ export const ChannelHeader = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+                  className="group h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
                   title="More actions"
                   aria-label="More actions"
                   onClick={e => e.stopPropagation()}
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
@@ -482,11 +484,11 @@ export const ChannelHeader = ({
                   icon={channel.shareToken ? Share2 : Globe}
                   onSelect={() => setIsPublishDialogOpen(true)}
                 >
-                  {channel.shareToken ? "Manage sharing" : "Publish space"}
+                  {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
                 </HeaderMenuItem>
                 <DropdownMenuSeparator />
                 <HeaderMenuItem icon={ChevronDown} onSelect={handleToggle}>
-                  Expand header
+                  {t("channelHeader.expandHeader")}
                 </HeaderMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

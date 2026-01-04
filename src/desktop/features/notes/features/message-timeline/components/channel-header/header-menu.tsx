@@ -59,14 +59,14 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
           size="sm"
           className={cn(
             triggerClassName,
-            "transition-all duration-200 hover:scale-105 flex-shrink-0",
+            "group transition-all duration-200 flex-shrink-0",
             className
           )}
           title="Menu"
           aria-label="Menu"
           onClick={e => e.stopPropagation()}
         >
-          <Menu className="h-4 w-4" />
+          <Menu className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
         </Button>
       </DropdownMenuTrigger>
 
