@@ -412,6 +412,11 @@
       "promptPlaceholder": "在此输入您的提示...",
       "title": "AI 对象生成演示"
     },
+    "aiObjectDemoPage": {
+      "cardTitle": "",
+      "subtitle": "",
+      "title": ""
+    },
     "aiQuickTest": {
       "apiKeyWarning": "未检测到 VITE_DASHSCOPE_API_KEY，请在本地 .env 文件中配置",
       "description": "从前端直接调用 DashScope（OpenAI 兼容端点）进行快速验证",
@@ -422,6 +427,120 @@
       "systemLabel": "系统指令（可选）",
       "systemPlaceholder": "系统指令（可选）",
       "title": "AI 快速测试"
+    },
+    "aiQuickTestDemoPage": {
+      "cardTitle": "",
+      "subtitle": "",
+      "title": ""
+    },
+    "chatPage": {
+      "content": "",
+      "description": "",
+      "title": ""
+    },
+    "docsPage": {
+      "content": "",
+      "description": "",
+      "title": ""
+    },
+    "page": {
+      "aboutDescription": "",
+      "aboutTitle": "",
+      "feature1": {
+        "description": "",
+        "title": ""
+      },
+      "feature2": {
+        "description": "",
+        "title": ""
+      },
+      "feature3": {
+        "description": "",
+        "title": ""
+      },
+      "feature4": {
+        "description": "",
+        "title": ""
+      },
+      "feature5": {
+        "description": "",
+        "title": ""
+      },
+      "startExperience": "",
+      "subtitle": "",
+      "title": ""
+    },
+    "settingsPage": {
+      "content": "",
+      "description": "",
+      "title": ""
+    },
+    "spaceChatDemoPage": {
+      "addCustomSpace": "",
+      "aiChatAssistant": "",
+      "createNewSpace": "",
+      "example": {
+        "personal": {
+          "goal": {
+            "content": "",
+            "title": ""
+          },
+          "habit": {
+            "content": "",
+            "title": ""
+          }
+        },
+        "study": {
+          "connection": {
+            "content": "",
+            "title": ""
+          },
+          "suggestion": {
+            "content": "",
+            "title": ""
+          }
+        },
+        "work": {
+          "progress": {
+            "content": "",
+            "title": ""
+          },
+          "summary": {
+            "content": "",
+            "title": ""
+          }
+        }
+      },
+      "feature1": {
+        "description": "",
+        "title": ""
+      },
+      "feature2": {
+        "description": "",
+        "title": ""
+      },
+      "feature3": {
+        "description": "",
+        "title": ""
+      },
+      "featureDescription": "",
+      "placeholder": "",
+      "selectSpace": "",
+      "space1": {
+        "description": "",
+        "name": ""
+      },
+      "space2": {
+        "description": "",
+        "name": ""
+      },
+      "space3": {
+        "description": "",
+        "name": ""
+      },
+      "subtitle": "",
+      "title": "",
+      "usageExamples": ""
     }
   },
   "desktop": {
