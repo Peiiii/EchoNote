@@ -9,6 +9,7 @@ import { HashRouter } from "react-router-dom";
 import { TooltipProvider } from "./common/components/ui/tooltip.tsx";
 import { initializeGitHubAuth } from "@/common/services/github-auth.service";
 import { GITHUB_CONFIG, checkDevelopmentConfig } from "@/common/config/github.config";
+import { initI18n } from "@/common/i18n";
 
 // 初始化GitHub认证服务
 try {
@@ -27,6 +28,9 @@ try {
 
 // 检查开发环境配置
 checkDevelopmentConfig();
+
+// Initialize i18n catalogs before rendering to avoid flashing keys.
+await initI18n();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

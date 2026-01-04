@@ -4,6 +4,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import { globalIgnores } from "eslint/config";
+import localRules from "./eslint-rules/index.js";
 
 export default tseslint.config([
   globalIgnores(["dist", "dev-dist", "src/common/components/RichEditor/**"]),
@@ -30,6 +31,16 @@ export default tseslint.config([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  // i18n adoption guardrail (incremental): detect hardcoded UI copy in JSX for high-signal surfaces first.
+  {
+    files: ["src/landing/**/*.{ts,tsx}", "src/common/features/auth/**/*.{ts,tsx}"],
+    plugins: {
+      local: localRules,
+    },
+    rules: {
+      "local/no-hardcoded-ui-text": "warn",
     },
   },
 ]);

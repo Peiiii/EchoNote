@@ -1,0 +1,20 @@
+{
+  "auth": {
+    "login": {
+      "descOrLocal": "Sign in for cloud sync and publishing, or try local mode first.",
+      "description": "Sign in to enable cloud features like publishing and sync.",
+      "local": {
+        "button": "Try local mode",
+        "hintDesc": "You can try local mode (data stays on this device; no cloud sync).",
+        "hintTitle": "No data yet?"
+      },
+      "title": "Sign in",
+      "titleOrLocal": "Sign in or try locally"
+    }
+  },
+  "language": {
+    "en": "English",
+    "label": "Language",
+    "zhCN": "中文"
+  }
+}
