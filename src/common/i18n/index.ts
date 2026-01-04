@@ -16,9 +16,21 @@ const normalizeLanguage = (input: string | null | undefined): AppLanguage => {
 };
 
 const detectInitialLanguage = (): AppLanguage => {
+  if (typeof window === "undefined") return "en";
+
   try {
     const stored = localStorage.getItem(LANG_STORAGE_KEY);
-    if (stored) return normalizeLanguage(stored);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.state && parsed.state.language) {
+          return normalizeLanguage(parsed.state.language);
+        }
+      } catch {
+        const normalized = normalizeLanguage(stored);
+        if (normalized) return normalized;
+      }
+    }
   } catch {
     // ignore
   }
@@ -41,7 +53,6 @@ export const initI18n = (): Promise<void> => {
       lng: initialLanguage,
       fallbackLng: "en",
       supportedLngs: [...SUPPORTED_LANGUAGES],
-      nonExplicitSupportedLngs: true,
 
       ns: ["common"],
       defaultNS: "common",
@@ -56,17 +67,23 @@ export const initI18n = (): Promise<void> => {
 
       returnNull: false,
     })
-    .then(() => {
+    .then(async () => {
       if (typeof window === "undefined") return;
-      const persist = (lng: string) => {
-        try {
-          localStorage.setItem(LANG_STORAGE_KEY, normalizeLanguage(lng));
-        } catch {
-          // ignore
-        }
-      };
-      persist(i18n.resolvedLanguage ?? i18n.language);
-      i18n.on("languageChanged", persist);
+      
+      const { syncLanguageFromI18n, useLanguageStore } = await import("@/core/stores/language.store");
+      
+      const storeLanguage = useLanguageStore.getState().language;
+      const i18nLanguage = i18n.resolvedLanguage ?? i18n.language;
+      
+      if (storeLanguage && storeLanguage !== i18nLanguage) {
+        i18n.changeLanguage(storeLanguage);
+      } else {
+        syncLanguageFromI18n(i18nLanguage);
+      }
+      
+      i18n.on("languageChanged", (lng: string) => {
+        syncLanguageFromI18n(lng);
+      });
     });
 
   return initPromise;

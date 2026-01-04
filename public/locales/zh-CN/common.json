@@ -12,6 +12,26 @@
       "titleOrLocal": "登录或本地体验"
     }
   },
+  "header": {
+    "menu": {
+      "account": "账户",
+      "guestMode": "访客模式",
+      "login": "登录",
+      "logout": "退出登录",
+      "theme": {
+        "label": "主题",
+        "light": "浅色",
+        "dark": "深色",
+        "system": "跟随系统"
+      },
+      "language": {
+        "chinese": "中文",
+        "english": "English",
+        "label": "语言"
+      },
+      "feedback": "反馈"
+    }
+  },
   "language": {
     "en": "English",
     "label": "语言",

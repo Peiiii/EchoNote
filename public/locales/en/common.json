@@ -12,6 +12,26 @@
       "titleOrLocal": "Sign in or try locally"
     }
   },
+  "header": {
+    "menu": {
+      "account": "Account",
+      "guestMode": "Guest mode",
+      "login": "Login",
+      "logout": "Logout",
+      "theme": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "language": {
+        "chinese": "中文",
+        "english": "English",
+        "label": "Language"
+      },
+      "feedback": "Feedback"
+    }
+  },
   "language": {
     "en": "English",
     "label": "Language",
