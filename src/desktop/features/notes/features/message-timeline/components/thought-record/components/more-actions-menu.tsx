@@ -1,5 +1,6 @@
 import { Message } from "@/core/stores/notes-data.store";
 import { Copy, Edit, FileText, Flag, FolderSymlink, Share2, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ConfigurableActionMenu, ActionMenuGroupConfig } from "@/common/components/action-menu";
 
 interface MoreActionsMenuProps {
@@ -21,6 +22,7 @@ export function MoreActionsMenu({
   onReport,
   onMove,
 }: MoreActionsMenuProps) {
+  const { t } = useTranslation();
   const handleCopy = () => {
     if (onCopy) {
       onCopy();
@@ -40,8 +42,8 @@ export function MoreActionsMenu({
             {
               id: "edit",
               icon: <Edit />,
-              title: "Edit thought",
-              description: "Modify this thought",
+              title: t("thoughtRecord.actions.edit"),
+              description: t("thoughtRecord.actions.editDescription"),
               onClick: onEdit,
               variant: "default" as const,
             },
@@ -50,7 +52,7 @@ export function MoreActionsMenu({
         {
           id: "copy",
           icon: <Copy />,
-          title: "Copy content",
+          title: t("thoughtRecord.actions.copy"),
           onClick: handleCopy,
           variant: "default" as const,
         },
@@ -59,8 +61,8 @@ export function MoreActionsMenu({
             {
               id: "share",
               icon: <Share2 />,
-              title: "Share thought",
-              description: "Share with others",
+              title: t("thoughtRecord.actions.share"),
+              description: t("thoughtRecord.actions.shareDescription"),
               onClick: onShare,
               variant: "default" as const,
             },
@@ -71,7 +73,7 @@ export function MoreActionsMenu({
             {
               id: "move",
               icon: <FolderSymlink />,
-              title: "Move to space",
+              title: t("thoughtRecord.actions.move"),
               onClick: onMove,
               variant: "default" as const,
             },
@@ -80,7 +82,7 @@ export function MoreActionsMenu({
         {
           id: "delete",
           icon: <Trash2 />,
-          title: "Delete thought",
+          title: t("thoughtRecord.actions.delete"),
           onClick: onDelete,
           variant: "default" as const,
         },
@@ -88,13 +90,13 @@ export function MoreActionsMenu({
     },
     {
       id: "secondary",
-      title: "Statistics",
+      title: t("thoughtRecord.menu.statistics"),
       variant: "default",
       items: [
         {
           id: "word-count",
           icon: <FileText />,
-          title: `${message.content.length} characters`,
+          title: t("thoughtRecord.menu.characters", { count: message.content.length }),
           onClick: () => {},
           disabled: true,
         },
@@ -102,15 +104,15 @@ export function MoreActionsMenu({
     },
     {
       id: "advanced",
-      title: "Advanced",
+      title: t("thoughtRecord.menu.advanced"),
       variant: "default",
       items: onReport
         ? [
             {
               id: "report",
               icon: <Flag />,
-              title: "Report",
-              description: "Report inappropriate content",
+              title: t("thoughtRecord.actions.report"),
+              description: t("thoughtRecord.actions.reportDescription"),
               onClick: onReport,
               variant: "warning" as const,
             },

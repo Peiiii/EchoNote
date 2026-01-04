@@ -1,4 +1,5 @@
 import { Bookmark, Edit2, Eye, Lightbulb, MessageCircle, FileText, Type } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ActionButton } from "./action-button";
 import { MoreActionsMenu } from "./more-actions-menu";
 import { ActionButtonsProps } from "../types";
@@ -21,6 +22,7 @@ export function ActionButtons({
   hasDraft = false,
   draftEntry = null,
 }: ActionButtonsProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const currentChannelId = useNotesViewStore(s => s.currentChannelId) || "";
   const handleDelete = async () => {
@@ -28,12 +30,12 @@ export function ActionButtons({
       message.content.length > 100 ? `${message.content.substring(0, 100)}...` : message.content;
 
     modal.confirm({
-      title: "Delete Thought",
-      description: `This will move the thought to trash.\n\n"${messagePreview}"\n\nThis action cannot be undone.`,
-      okText: "Delete",
-      okLoadingText: "Deleting...",
+      title: t("thoughtRecord.delete.title"),
+      description: t("thoughtRecord.delete.description", { preview: messagePreview }),
+      okText: t("thoughtRecord.delete.confirm"),
+      okLoadingText: t("thoughtRecord.delete.deleting"),
       okVariant: "destructive",
-      cancelText: "Cancel",
+      cancelText: t("thoughtRecord.delete.cancel"),
       onOk: async () => {
         try {
           await presenter.noteManager.deleteMessage({
@@ -42,8 +44,8 @@ export function ActionButtons({
             channelId: currentChannelId!,
           });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
-          alert(`❌ Failed to delete the message.\n\nError: ${errorMessage}\n\nPlease try again.`);
+          const errorMessage = error instanceof Error ? error.message : t("thoughtRecord.delete.unknownError");
+          alert(t("thoughtRecord.delete.error", { error: errorMessage }));
         }
       },
     });
@@ -94,26 +96,26 @@ export function ActionButtons({
       };
 
       modal.show({
-        title: "Unsaved draft available",
+        title: t("thoughtRecord.draft.available"),
         content: (
           <div className="space-y-4">
             <div className="text-sm text-slate-600 dark:text-slate-300">
-              {lastSaved ? `We kept a draft saved ${lastSaved}.` : "We kept an unsaved draft for you."}
+              {lastSaved ? t("thoughtRecord.draft.savedMessage", { time: lastSaved }) : t("thoughtRecord.draft.unsavedMessage")}
               <br />
-              Choose how you want to continue.
+              {t("thoughtRecord.draft.choose")}
             </div>
             <div className="max-h-48 overflow-y-auto rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm">
               <MarkdownContent content={draftEntry.content} />
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
               <Button variant="ghost" size="sm" onClick={openWithoutRestore} className="sm:order-1">
-                Ignore draft
+                {t("thoughtRecord.draft.ignore")}
               </Button>
               <Button variant="ghost" size="sm" onClick={discardDraft} className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-500/20 sm:order-0">
-                Discard draft
+                {t("thoughtRecord.draft.discard")}
               </Button>
               <Button size="sm" onClick={restoreDraft} className="bg-blue-600 text-white hover:bg-blue-700 sm:order-2">
-                Restore draft
+                {t("thoughtRecord.draft.restore")}
               </Button>
             </div>
           </div>
@@ -133,7 +135,7 @@ export function ActionButtons({
       {
         icon: Type,
         onClick: () => onEditorModeChange("markdown"),
-        title: "Markdown mode",
+        title: t("thoughtRecord.editor.markdownMode"),
         disabled: false,
         enabled: true,
         active: editorMode === "markdown",
@@ -141,7 +143,7 @@ export function ActionButtons({
       {
         icon: FileText,
         onClick: () => onEditorModeChange("wysiwyg"),
-        title: "WYSIWYG mode",
+        title: t("thoughtRecord.editor.wysiwygMode"),
         disabled: false,
         enabled: true,
         active: editorMode === "wysiwyg",
@@ -150,7 +152,7 @@ export function ActionButtons({
     {
       icon: Edit2,
       onClick: handleEdit,
-      title: hasDraft ? "Edit thought (draft available)" : "Edit thought",
+      title: hasDraft ? t("thoughtRecord.actions.editWithDraft") : t("thoughtRecord.actions.edit"),
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.edit.enabled,
       indicator: hasDraft,
@@ -158,28 +160,28 @@ export function ActionButtons({
     {
       icon: Lightbulb,
       onClick: onToggleAnalysis,
-      title: "Toggle sparks",
+      title: t("thoughtRecord.actions.toggleSparks"),
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.sparks.enabled,
     },
     {
       icon: Eye,
       onClick: undefined,
-      title: "View details",
+      title: t("thoughtRecord.actions.viewDetails"),
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.viewDetails.enabled,
     },
     {
       icon: Bookmark,
       onClick: undefined,
-      title: "Bookmark",
+      title: t("thoughtRecord.actions.bookmark"),
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.bookmark.enabled,
     },
     {
       icon: MessageCircle,
       onClick: onReply,
-      title: "Reply to thought",
+      title: t("thoughtRecord.actions.reply"),
       disabled: isEditing,
       enabled: getFeaturesConfig().channel.thoughtRecord.reply.enabled,
     },

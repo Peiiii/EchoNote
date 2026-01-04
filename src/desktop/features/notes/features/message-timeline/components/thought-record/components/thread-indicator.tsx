@@ -1,4 +1,5 @@
 import { MessageCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 
 interface ThreadIndicatorProps {
@@ -7,7 +8,8 @@ interface ThreadIndicatorProps {
 }
 
 export function ThreadIndicator({ threadCount, messageId }: ThreadIndicatorProps) {
-  const displayText = threadCount > 0 ? `${threadCount} replies` : "Start discussion";
+  const { t } = useTranslation();
+  const displayText = threadCount > 0 ? t("thoughtRecord.thread.replies", { count: threadCount }) : t("thoughtRecord.thread.startDiscussion");
   const presenter = useDesktopPresenterContext();
   const handleOpenThread = () => {
     presenter.openThread({ messageId });

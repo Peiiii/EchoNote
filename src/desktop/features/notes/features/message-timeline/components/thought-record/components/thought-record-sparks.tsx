@@ -2,6 +2,7 @@ import { Button } from "@/common/components/ui/button";
 import { Message } from "@/core/stores/notes-data.store";
 import { useSparks } from "@/common/features/notes/hooks/use-sparks";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 
 interface ThoughtRecordSparksProps {
@@ -21,6 +22,7 @@ export function ThoughtRecordSparks({
   enableContextEnhancement = true,
   mode = "stream",
 }: ThoughtRecordSparksProps) {
+  const { t } = useTranslation();
   const aiAnalysis = message.aiAnalysis;
   const hasSparksPersisted = !!(aiAnalysis && aiAnalysis.insights && aiAnalysis.insights.length > 0);
   const {
@@ -52,23 +54,23 @@ export function ThoughtRecordSparks({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Creative Sparks
+                {t("thoughtRecord.sparks.title")}
               </span>
               {hasTagContext && (
                 <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
-                  Tag-enhanced
+                  {t("thoughtRecord.sparks.tagEnhanced")}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={generate} disabled={isGenerating}>
-                {isGenerating ? "Generating..." : "Generate Sparks"}
+                {isGenerating ? t("thoughtRecord.sparks.generating") : t("thoughtRecord.sparks.generate")}
               </Button>
               {onClose && (
                 <button
                   onClick={onClose}
                   className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
-                  title="Close analysis"
+                  title={t("thoughtRecord.sparks.close")}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -80,23 +82,23 @@ export function ThoughtRecordSparks({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Creative Sparks
+                  {t("thoughtRecord.sparks.title")}
                 </span>
                 {hasTagContext && (
                   <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
-                    Tag-enhanced
+                    {t("thoughtRecord.sparks.tagEnhanced")}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-2">
                 <Button onClick={regenerate} variant="outline" disabled={isGenerating}>
-                  {isGenerating ? "Generating..." : "Regenerate"}
+                  {isGenerating ? t("thoughtRecord.sparks.generating") : t("thoughtRecord.sparks.regenerate")}
                 </Button>
                 {onClose && (
                   <button
                     onClick={onClose}
                     className="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all duration-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60"
-                    title="Close analysis"
+                    title={t("thoughtRecord.sparks.close")}
                   >
                     <X className="w-4 h-4" />
                   </button>

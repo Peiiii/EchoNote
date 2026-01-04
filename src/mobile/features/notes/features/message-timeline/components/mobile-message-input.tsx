@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
 import { ArrowUp } from "lucide-react";
@@ -19,6 +20,7 @@ export const MobileMessageInput = ({
   isSending = false,
   className = "",
 }: MobileMessageInputProps) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Mobile default: single-row minimalist input, actions hidden by design
@@ -63,7 +65,7 @@ export const MobileMessageInput = ({
       {isReplyMode && (
         <div className="flex items-center justify-between bg-muted/50 rounded-xl px-3 py-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Replying to message</span>
+            <span>{t("messageInput.mobile.replying")}</span>
           </div>
           <Button
             variant="ghost"
@@ -71,7 +73,7 @@ export const MobileMessageInput = ({
             onClick={onCancelReply}
             className="h-7 px-3 text-xs rounded-lg"
           >
-            Cancel
+            {t("messageInput.mobile.cancel")}
           </Button>
         </div>
       )}
@@ -84,7 +86,7 @@ export const MobileMessageInput = ({
             value={message}
             onChange={e => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="What's on your mind?"
+            placeholder={t("messageInput.placeholder.default")}
             className="min-h-[48px] max-h-[120px] resize-none bg-transparent shadow-none focus:shadow-none focus:outline-none transition-all duration-200 text-base placeholder:text-muted-foreground/60 border-0 pl-0 pr-12 py-2"
             rows={1}
           />
@@ -96,7 +98,7 @@ export const MobileMessageInput = ({
               className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-150 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 ${
                 !message.trim() || isSending ? "opacity-40 cursor-not-allowed hover:bg-transparent" : ""
               }`}
-              aria-label="Send"
+              aria-label={t("messageInput.mobile.send")}
             >
               {isSending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>

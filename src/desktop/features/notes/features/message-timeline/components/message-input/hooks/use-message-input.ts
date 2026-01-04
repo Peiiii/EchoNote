@@ -4,10 +4,12 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { logService, NoteType } from "@/core/services/log.service";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useComposerStateStore } from "@/core/stores/composer-state.store";
 import { isMac } from "@/common/lib/keyboard-shortcuts";
 
 export function useMessageInput() {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { currentChannelId, isAddingMessage } = useNotesViewStore();
@@ -94,9 +96,9 @@ export function useMessageInput() {
   const placeholder = useMemo(
     () =>
       replyToMessage
-        ? "Reply to this message..."
-        : "What's on your mind...",
-    [replyToMessage]
+        ? t("messageInput.placeholder.reply")
+        : t("messageInput.placeholder.default"),
+    [replyToMessage, t]
   );
 
   const shortcutHint = useMemo(() => {

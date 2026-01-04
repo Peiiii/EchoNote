@@ -1,4 +1,5 @@
 import { ArrowUp, FileText, Image, Mic, MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ToolbarButton } from "./toolbar-button";
 import { getFeaturesConfig } from "@/core/config/features.config";
 
@@ -9,16 +10,17 @@ interface BottomActionsProps {
 }
 
 export function BottomActions({ onSend, canSend, shortcutHint }: BottomActionsProps) {
+  const { t } = useTranslation();
   const leftButtons: Array<{
     icon: React.ComponentType<{ className?: string }>;
     title: string;
     onClick?: () => void;
     enabled: boolean;
   }> = [
-    { icon: Image, title: "Image", onClick: undefined, enabled: getFeaturesConfig().channel.input.image.enabled },
-    { icon: FileText, title: "File", onClick: undefined, enabled: getFeaturesConfig().channel.input.file.enabled },
-    { icon: Mic, title: "Voice", onClick: undefined, enabled: getFeaturesConfig().channel.input.voice.enabled },
-    { icon: MoreHorizontal, title: "More", onClick: undefined, enabled: getFeaturesConfig().channel.input.more.enabled },
+    { icon: Image, title: t("messageInput.bottom.image"), onClick: undefined, enabled: getFeaturesConfig().channel.input.image.enabled },
+    { icon: FileText, title: t("messageInput.bottom.file"), onClick: undefined, enabled: getFeaturesConfig().channel.input.file.enabled },
+    { icon: Mic, title: t("messageInput.bottom.voice"), onClick: undefined, enabled: getFeaturesConfig().channel.input.voice.enabled },
+    { icon: MoreHorizontal, title: t("messageInput.bottom.more"), onClick: undefined, enabled: getFeaturesConfig().channel.input.more.enabled },
   ].filter(b => b.enabled);
 
   return (
@@ -30,7 +32,7 @@ export function BottomActions({ onSend, canSend, shortcutHint }: BottomActionsPr
       </div>
       <div className="flex items-center gap-2">
         {shortcutHint && (
-          <span className="text-xs text-slate-500 dark:text-slate-400">{shortcutHint} to send</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">{t("messageInput.bottom.sendHint", { shortcut: shortcutHint })}</span>
         )}
         <button
           onClick={onSend}
@@ -38,7 +40,7 @@ export function BottomActions({ onSend, canSend, shortcutHint }: BottomActionsPr
           className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-150 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 ${
             !canSend ? "opacity-40 cursor-not-allowed hover:bg-transparent" : ""
           }`}
-          aria-label="Send note"
+          aria-label={t("messageInput.bottom.sendNote")}
         >
           <ArrowUp className="w-4 h-4" />
         </button>

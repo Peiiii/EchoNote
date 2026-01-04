@@ -12,53 +12,154 @@
       "titleOrLocal": "Sign in or try locally"
     }
   },
+  "backgroundSwitcher": {
+    "background": "Background",
+    "changeBackground": "Change background",
+    "close": "Close",
+    "colors": "Colors",
+    "description": "Choose a background to personalize your channel",
+    "images": "Images",
+    "reset": "Reset",
+    "resetToOriginal": "Reset to original background"
+  },
+  "channelHeader": {
+    "aiAssistant": "AI Assistant",
+    "collapseHeader": "Collapse header",
+    "editSpace": "Edit space",
+    "expandHeader": "Expand header",
+    "expandSidebar": "Expand sidebar",
+    "manageSharing": "Manage sharing",
+    "messages": "messages",
+    "moreActions": "More actions",
+    "newSpace": "New space",
+    "publishSpace": "Publish space",
+    "search": "Search",
+    "studio": "Studio"
+  },
   "header": {
     "menu": {
       "account": "Account",
+      "feedback": "Feedback",
       "guestMode": "Guest mode",
-      "login": "Login",
-      "logout": "Logout",
-      "theme": {
-        "label": "Theme",
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
-      },
       "language": {
         "chinese": "中文",
         "english": "English",
         "label": "Language"
       },
-      "feedback": "Feedback"
+      "login": "Login",
+      "logout": "Logout",
+      "theme": {
+        "dark": "Dark",
+        "label": "Theme",
+        "light": "Light",
+        "system": "System"
+      }
     }
-  },
-  "channelHeader": {
-    "expandSidebar": "Expand sidebar",
-    "newSpace": "New space",
-    "editSpace": "Edit space",
-    "moreActions": "More actions",
-    "manageSharing": "Manage sharing",
-    "publishSpace": "Publish space",
-    "collapseHeader": "Collapse header",
-    "expandHeader": "Expand header",
-    "search": "Search",
-    "studio": "Studio",
-    "aiAssistant": "AI Assistant",
-    "messages": "messages"
-  },
-  "backgroundSwitcher": {
-    "changeBackground": "Change background",
-    "background": "Background",
-    "close": "Close",
-    "colors": "Colors",
-    "images": "Images",
-    "description": "Choose a background to personalize your channel",
-    "resetToOriginal": "Reset to original background",
-    "reset": "Reset"
   },
   "language": {
     "en": "English",
     "label": "Language",
     "zhCN": "中文"
+  },
+  "messageInput": {
+    "bottom": {
+      "file": "File",
+      "image": "Image",
+      "more": "More",
+      "sendHint": "{{shortcut}} to send",
+      "sendNote": "Send note",
+      "voice": "Voice"
+    },
+    "header": {
+      "expandComposer": "Expand composer",
+      "hideComposer": "Hide composer",
+      "showComposer": "Show composer"
+    },
+    "mobile": {
+      "cancel": "Cancel",
+      "replying": "Replying to message",
+      "send": "Send"
+    },
+    "placeholder": {
+      "default": "What's on your mind...",
+      "reply": "Reply to this message..."
+    },
+    "reply": {
+      "label": "Reply:"
+    }
+  },
+  "thoughtRecord": {
+    "actions": {
+      "bookmark": "Bookmark",
+      "copy": "Copy content",
+      "delete": "Delete thought",
+      "edit": "Edit thought",
+      "editDescription": "Modify this thought",
+      "editWithDraft": "Edit thought (draft available)",
+      "move": "Move to space",
+      "reply": "Reply to thought",
+      "report": "Report",
+      "reportDescription": "Report inappropriate content",
+      "share": "Share thought",
+      "shareDescription": "Share with others",
+      "toggleSparks": "Toggle sparks",
+      "viewDetails": "View details"
+    },
+    "delete": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "This will move the thought to trash.\n\n\"{{preview}}\"\n\nThis action cannot be undone.",
+      "error": "❌ Failed to delete the message.\n\nError: {{error}}\n\nPlease try again.",
+      "title": "Delete Thought",
+      "unknownError": "Unknown error"
+    },
+    "draft": {
+      "available": "Unsaved draft available",
+      "choose": "Choose how you want to continue.",
+      "discard": "Discard draft",
+      "dismiss": "Dismiss",
+      "found": "We found an unsaved draft.",
+      "ignore": "Ignore draft",
+      "restore": "Restore draft",
+      "saved": "Saved {{time}}",
+      "savedMessage": "We kept a draft saved {{time}}.",
+      "unsavedMessage": "We kept an unsaved draft for you."
+    },
+    "editor": {
+      "cancel": "Cancel",
+      "expand": "Expand",
+      "markdownMode": "Markdown mode",
+      "placeholder": "Edit your thought...",
+      "save": "Save",
+      "saving": "Saving...",
+      "shortcuts": {
+        "toCancel": "to cancel",
+        "toSave": "to save"
+      },
+      "wysiwygMode": "WYSIWYG mode"
+    },
+    "menu": {
+      "advanced": "Advanced",
+      "characters": "{{count}} characters",
+      "statistics": "Statistics"
+    },
+    "sparks": {
+      "close": "Close analysis",
+      "count": "{{count}} sparks",
+      "generate": "Generate Sparks",
+      "generating": "Generating...",
+      "regenerate": "Regenerate",
+      "tagEnhanced": "Tag-enhanced",
+      "title": "Creative Sparks"
+    },
+    "tags": {
+      "add": "Add tags",
+      "count": "{{count}} tags"
+    },
+    "thread": {
+      "replies": "{{count}} replies",
+      "startDiscussion": "Start discussion"
+    }
   }
 }

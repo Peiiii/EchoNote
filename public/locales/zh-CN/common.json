@@ -12,53 +12,154 @@
       "titleOrLocal": "登录或本地体验"
     }
   },
+  "backgroundSwitcher": {
+    "background": "背景",
+    "changeBackground": "更换背景",
+    "close": "关闭",
+    "colors": "颜色",
+    "description": "选择背景以个性化您的频道",
+    "images": "图片",
+    "reset": "重置",
+    "resetToOriginal": "重置为原始背景"
+  },
+  "channelHeader": {
+    "aiAssistant": "AI 助手",
+    "collapseHeader": "折叠标题",
+    "editSpace": "编辑空间",
+    "expandHeader": "展开标题",
+    "expandSidebar": "展开侧边栏",
+    "manageSharing": "管理分享",
+    "messages": "条消息",
+    "moreActions": "更多操作",
+    "newSpace": "新建空间",
+    "publishSpace": "发布空间",
+    "search": "搜索",
+    "studio": "工作室"
+  },
   "header": {
     "menu": {
       "account": "账户",
+      "feedback": "反馈",
       "guestMode": "访客模式",
-      "login": "登录",
-      "logout": "退出登录",
-      "theme": {
-        "label": "主题",
-        "light": "浅色",
-        "dark": "深色",
-        "system": "跟随系统"
-      },
       "language": {
         "chinese": "中文",
         "english": "English",
         "label": "语言"
       },
-      "feedback": "反馈"
+      "login": "登录",
+      "logout": "退出登录",
+      "theme": {
+        "dark": "深色",
+        "label": "主题",
+        "light": "浅色",
+        "system": "跟随系统"
+      }
     }
-  },
-  "channelHeader": {
-    "expandSidebar": "展开侧边栏",
-    "newSpace": "新建空间",
-    "editSpace": "编辑空间",
-    "moreActions": "更多操作",
-    "manageSharing": "管理分享",
-    "publishSpace": "发布空间",
-    "collapseHeader": "折叠标题",
-    "expandHeader": "展开标题",
-    "search": "搜索",
-    "studio": "工作室",
-    "aiAssistant": "AI 助手",
-    "messages": "条消息"
-  },
-  "backgroundSwitcher": {
-    "changeBackground": "更换背景",
-    "background": "背景",
-    "close": "关闭",
-    "colors": "颜色",
-    "images": "图片",
-    "description": "选择背景以个性化您的频道",
-    "resetToOriginal": "重置为原始背景",
-    "reset": "重置"
   },
   "language": {
     "en": "English",
     "label": "语言",
     "zhCN": "中文"
+  },
+  "messageInput": {
+    "bottom": {
+      "file": "文件",
+      "image": "图片",
+      "more": "更多",
+      "sendHint": "按 {{shortcut}} 发送",
+      "sendNote": "发送笔记",
+      "voice": "语音"
+    },
+    "header": {
+      "expandComposer": "展开编辑器",
+      "hideComposer": "隐藏编辑器",
+      "showComposer": "显示编辑器"
+    },
+    "mobile": {
+      "cancel": "取消",
+      "replying": "正在回复消息",
+      "send": "发送"
+    },
+    "placeholder": {
+      "default": "你在想什么...",
+      "reply": "回复这条消息..."
+    },
+    "reply": {
+      "label": "回复："
+    }
+  },
+  "thoughtRecord": {
+    "actions": {
+      "bookmark": "收藏",
+      "copy": "复制内容",
+      "delete": "删除笔记",
+      "edit": "编辑笔记",
+      "editDescription": "修改此笔记",
+      "editWithDraft": "编辑笔记（有草稿）",
+      "move": "移动到空间",
+      "reply": "回复笔记",
+      "report": "举报",
+      "reportDescription": "举报不当内容",
+      "share": "分享笔记",
+      "shareDescription": "与他人分享",
+      "toggleSparks": "切换灵感",
+      "viewDetails": "查看详情"
+    },
+    "delete": {
+      "cancel": "取消",
+      "confirm": "删除",
+      "deleting": "删除中...",
+      "description": "这将把笔记移到回收站。\n\n\"{{preview}}\"\n\n此操作无法撤销。",
+      "error": "❌ 删除消息失败。\n\n错误：{{error}}\n\n请重试。",
+      "title": "删除笔记",
+      "unknownError": "未知错误"
+    },
+    "draft": {
+      "available": "有未保存的草稿",
+      "choose": "请选择如何继续。",
+      "discard": "丢弃草稿",
+      "dismiss": "忽略",
+      "found": "我们发现了一个未保存的草稿。",
+      "ignore": "忽略草稿",
+      "restore": "恢复草稿",
+      "saved": "已保存 {{time}}",
+      "savedMessage": "我们保存了一个草稿，保存时间为 {{time}}。",
+      "unsavedMessage": "我们为您保存了一个未保存的草稿。"
+    },
+    "editor": {
+      "cancel": "取消",
+      "expand": "展开",
+      "markdownMode": "Markdown 模式",
+      "placeholder": "编辑您的笔记...",
+      "save": "保存",
+      "saving": "保存中...",
+      "shortcuts": {
+        "toCancel": "取消",
+        "toSave": "保存"
+      },
+      "wysiwygMode": "所见即所得模式"
+    },
+    "menu": {
+      "advanced": "高级",
+      "characters": "{{count}} 个字符",
+      "statistics": "统计"
+    },
+    "sparks": {
+      "close": "关闭分析",
+      "count": "{{count}} 个灵感",
+      "generate": "生成灵感",
+      "generating": "生成中...",
+      "regenerate": "重新生成",
+      "tagEnhanced": "标签增强",
+      "title": "创意灵感"
+    },
+    "tags": {
+      "add": "添加标签",
+      "count": "{{count}} 个标签"
+    },
+    "thread": {
+      "replies": "{{count}} 条回复",
+      "startDiscussion": "开始讨论"
+    }
   }
 }

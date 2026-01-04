@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { EditorToolbar } from "@/common/components/editor-toolbar";
 import { Check, X, Loader2, Maximize2 } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
@@ -24,6 +25,7 @@ export function InlineEditor({
   onEditorModeChange: _onEditorModeChange,
   className,
 }: InlineEditorProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const [localContent, setLocalContent] = useState(content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -91,10 +93,10 @@ export function InlineEditor({
         <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="font-medium">We found an unsaved draft.</span>
+              <span className="font-medium">{t("thoughtRecord.draft.found")}</span>
               {draftUpdatedAt && (
                 <span className="ml-2 text-xs text-amber-700/80 dark:text-amber-100/80">
-                  Saved {formatRelativeTime(new Date(draftUpdatedAt))}
+                  {t("thoughtRecord.draft.saved", { time: formatRelativeTime(new Date(draftUpdatedAt)) })}
                 </span>
               )}
             </div>
@@ -104,14 +106,14 @@ export function InlineEditor({
                 className="h-8 rounded-md bg-amber-500 px-3 text-xs font-medium text-white transition-colors hover:bg-amber-600"
                 onClick={() => presenter.noteEditManager.applyDraft()}
               >
-                Restore draft
+                {t("thoughtRecord.draft.restore")}
               </button>
               <button
                 type="button"
                 className="h-8 rounded-md px-3 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 hover:text-amber-900 dark:text-amber-100 dark:hover:bg-amber-500/20"
                 onClick={() => presenter.noteEditManager.dismissDraftPrompt()}
               >
-                Dismiss
+                {t("thoughtRecord.draft.dismiss")}
               </button>
             </div>
           </div>
@@ -125,7 +127,7 @@ export function InlineEditor({
             value={localContent}
             onChange={e => handleContentChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Edit your thought..."
+            placeholder={t("thoughtRecord.editor.placeholder")}
             className="w-full min-h-[200px] max-h-[400px] resize-none bg-transparent border-0 rounded-none py-3 text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
             disabled={isSaving}
             style={{ caretColor: "#3b82f6" }}
@@ -136,7 +138,7 @@ export function InlineEditor({
               value={localContent}
               onChange={handleContentChange}
               editable={!isSaving}
-              placeholder="Edit your thought..."
+              placeholder={t("thoughtRecord.editor.placeholder")}
               variant="frameless"
               compactToolbar
               minHeight={200}
@@ -154,18 +156,18 @@ export function InlineEditor({
           <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700">
             {SHORTCUTS.SAVE}
           </kbd>
-          <span className="ml-2">to save,</span>
+          <span className="ml-2">{t("thoughtRecord.editor.shortcuts.toSave")},</span>
           <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700 ml-2">
             {SHORTCUTS.CANCEL}
           </kbd>
-          <span className="ml-2">to cancel</span>
+          <span className="ml-2">{t("thoughtRecord.editor.shortcuts.toCancel")}</span>
         </div>
 
         {/* Right side - Action buttons */}
         <EditorToolbar
           rightActions={[
             {
-              label: "Expand",
+              label: t("thoughtRecord.editor.expand"),
               onClick: () => presenter.noteEditManager.switchToExpandedMode(),
               disabled: isSaving,
               icon: <Maximize2 className="w-3.5 h-3.5 mr-1.5" />,
@@ -173,7 +175,7 @@ export function InlineEditor({
                 "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800",
             },
             {
-              label: "Cancel",
+              label: t("thoughtRecord.editor.cancel"),
               onClick: () => presenter.noteEditManager.cancel(),
               disabled: isSaving,
               icon: <X className="w-3.5 h-3.5 mr-1.5" />,
@@ -181,7 +183,7 @@ export function InlineEditor({
                 "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800",
             },
             {
-              label: isSaving ? "Saving..." : "Save",
+              label: isSaving ? t("thoughtRecord.editor.saving") : t("thoughtRecord.editor.save"),
               onClick: () => presenter.noteEditManager.save(),
               disabled: isSaving || !localContent.trim(),
               icon: isSaving ? (

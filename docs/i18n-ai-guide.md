@@ -23,10 +23,12 @@
   - 校验：`pnpm i18n:check`（严格检查两种语言 key 对齐、value 非空）
 - 自查硬编码（强烈建议 AI 每次都跑）：
   - 仅检查本次改动文件：`pnpm i18n:lint`
+    - 说明：基于 `git diff`（含未暂存/已暂存/未跟踪文件），也可传入文件列表：`pnpm i18n:lint -- src/a.tsx src/b.tsx`
   - 全量扫描（作为最终门禁）：`pnpm i18n:lint:all`
 - 硬编码检测（渐进启用，当前是 warn）：
   - ESLint 规则：`local/no-hardcoded-ui-text`
   - 当前生效范围：`src/landing/**` + `src/common/features/auth/**`（见 `eslint.config.js`）
+  - 覆盖面：只检查 JSX 里的文案（JSXText + `title/label/placeholder/alt/aria-*` 等属性），不覆盖 toast/日志/业务字符串
 
 ## Key 命名规范（必须一致）
 
