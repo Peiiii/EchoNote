@@ -212,9 +212,9 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
                 <div className="text-xs text-gray-500 dark:text-gray-400">
                   {t("agentTools.grep.noteLabel")} <code>{m.noteId}</code>
                   {" "}
-                  <span aria-hidden="true">•</span> {t("agentTools.grep.channelLabel")} <code>{m.channelId}</code>
+                  <span aria-hidden="true">{t("common.separator")}</span> {t("agentTools.grep.channelLabel")} <code>{m.channelId}</code>
                   {" "}
-                  <span aria-hidden="true">•</span> {m.timestamp}
+                  <span aria-hidden="true">{t("common.separator")}</span> {m.timestamp}
                 </div>
                 <div className="font-mono text-sm">
                   {m.contexts.map((c, idx) => (

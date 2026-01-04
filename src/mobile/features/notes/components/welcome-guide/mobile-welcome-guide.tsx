@@ -10,9 +10,9 @@ export const MobileWelcomeGuide = () => {
   const handleCreateFirstChannel = async () => {
     try {
       await addChannel({
-        name: "My First Space",
+        name: t("mobile.welcome.firstSpaceName"),
         emoji: "🚀",
-        description: "Start your journey here",
+        description: t("mobile.welcome.firstSpaceDescription"),
       });
     } catch (error) {
       console.error("Failed to create first channel:", error);
@@ -40,9 +40,9 @@ export const MobileWelcomeGuide = () => {
               <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-foreground">Organize Thoughts</h3>
+              <h3 className="text-sm font-medium text-foreground">{t("mobile.welcome.feature1.title")}</h3>
               <p className="text-xs text-muted-foreground">
-                Create dedicated spaces for different topics
+                {t("mobile.welcome.feature1.description")}
               </p>
             </div>
           </div>
@@ -52,8 +52,8 @@ export const MobileWelcomeGuide = () => {
               <Bot className="w-4 h-4 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-foreground">AI Assistant</h3>
-              <p className="text-xs text-muted-foreground">Get help from AI to explore ideas</p>
+              <h3 className="text-sm font-medium text-foreground">{t("mobile.welcome.feature2.title")}</h3>
+              <p className="text-xs text-muted-foreground">{t("mobile.welcome.feature2.description")}</p>
             </div>
           </div>
 
@@ -62,9 +62,9 @@ export const MobileWelcomeGuide = () => {
               <Lightbulb className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-foreground">Spark Ideas</h3>
+              <h3 className="text-sm font-medium text-foreground">{t("mobile.welcome.feature3.title")}</h3>
               <p className="text-xs text-muted-foreground">
-                Capture inspiration and brainstorm solutions
+                {t("mobile.welcome.feature3.description")}
               </p>
             </div>
           </div>
@@ -78,10 +78,10 @@ export const MobileWelcomeGuide = () => {
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Create Your First Space
+            {t("mobile.welcome.createFirstSpace")}
           </Button>
           <p className="text-xs text-muted-foreground">
-            You can create more spaces later from the menu
+            {t("mobile.welcome.createMoreHint")}
           </p>
         </div>
       </div>

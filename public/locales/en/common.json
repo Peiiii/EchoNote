@@ -373,6 +373,7 @@
     "save": "Save",
     "saving": "Saving...",
     "send": "Send",
+    "separator": "•",
     "unknown": "unknown",
     "viewLarger": "View larger"
   },
@@ -410,6 +411,17 @@
       "promptLabel": "Prompt",
       "promptPlaceholder": "Enter your prompt here...",
       "title": "AI Object Generation Demo"
+    },
+    "aiQuickTest": {
+      "apiKeyWarning": "VITE_DASHSCOPE_API_KEY not detected, please configure in local .env file",
+      "description": "Directly call DashScope (OpenAI compatible endpoint) from frontend for quick validation",
+      "generate": "Generate",
+      "generating": "Generating...",
+      "promptLabel": "Prompt",
+      "promptPlaceholder": "Enter your question...",
+      "systemLabel": "System Instruction (Optional)",
+      "systemPlaceholder": "System instruction (optional)",
+      "title": "AI Quick Test"
     }
   },
   "desktop": {
@@ -654,7 +666,23 @@
       "title": "Settings"
     },
     "welcome": {
+      "createFirstSpace": "Create Your First Space",
+      "createMoreHint": "You can create more spaces later from the menu",
       "description": "Your personal space for thoughts, ideas, and AI-powered conversations. Create your first thought space to get started.",
+      "feature1": {
+        "description": "Create dedicated spaces for different topics",
+        "title": "Organize Thoughts"
+      },
+      "feature2": {
+        "description": "Get help from AI to explore ideas",
+        "title": "AI Assistant"
+      },
+      "feature3": {
+        "description": "Capture inspiration and brainstorm solutions",
+        "title": "Spark Ideas"
+      },
+      "firstSpaceDescription": "Start your journey here",
+      "firstSpaceName": "My First Space",
       "title": "Welcome to StillRoot"
     }
   },

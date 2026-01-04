@@ -373,6 +373,7 @@
     "save": "保存",
     "saving": "保存中...",
     "send": "发送",
+    "separator": "•",
     "unknown": "未知",
     "viewLarger": "查看大图"
   },
@@ -410,6 +411,17 @@
       "promptLabel": "提示",
       "promptPlaceholder": "在此输入您的提示...",
       "title": "AI 对象生成演示"
+    },
+    "aiQuickTest": {
+      "apiKeyWarning": "未检测到 VITE_DASHSCOPE_API_KEY，请在本地 .env 文件中配置",
+      "description": "从前端直接调用 DashScope（OpenAI 兼容端点）进行快速验证",
+      "generate": "生成",
+      "generating": "生成中...",
+      "promptLabel": "提示词",
+      "promptPlaceholder": "输入您的问题...",
+      "systemLabel": "系统指令（可选）",
+      "systemPlaceholder": "系统指令（可选）",
+      "title": "AI 快速测试"
     }
   },
   "desktop": {
@@ -654,7 +666,23 @@
       "title": "设置"
     },
     "welcome": {
+      "createFirstSpace": "创建您的第一个空间",
+      "createMoreHint": "您稍后可以从菜单中创建更多空间",
       "description": "您的个人空间，用于记录想法、灵感和 AI 对话。创建您的第一个想法空间开始使用。",
+      "feature1": {
+        "description": "为不同主题创建专属空间",
+        "title": "整理想法"
+      },
+      "feature2": {
+        "description": "通过 AI 助手探索想法",
+        "title": "AI 助手"
+      },
+      "feature3": {
+        "description": "捕捉灵感并头脑风暴解决方案",
+        "title": "激发灵感"
+      },
+      "firstSpaceDescription": "从这里开始您的旅程",
+      "firstSpaceName": "我的第一个空间",
       "title": "欢迎使用 StillRoot"
     }
   },
