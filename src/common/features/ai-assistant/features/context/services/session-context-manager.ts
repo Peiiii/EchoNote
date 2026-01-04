@@ -8,6 +8,7 @@ import type { Message } from "@/core/stores/notes-data.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { HybridMessageSummarizer } from "./hybrid-message-summarizer.strategy";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { i18n } from "@/common/i18n";
 
 const MESSAGE_LIMIT_PER_CHANNEL = 1000;
 
@@ -28,72 +29,38 @@ export class SessionContextManager {
       ? `a multi-channel context spanning ${channelCount} channels: ${channelNames.join(", ")}`
       : `the channel: ${channelNames[0]}`;
 
+    const t = i18n.t.bind(i18n);
     const contextUnderstanding = isMultiChannel
-      ? `- You have access to notes from multiple channels, each representing different topics or contexts
-- Notes are organized by recency with different detail levels across all channels
-- Use channel information to understand the source and context of each note
-- Look for patterns and connections that span across different channels`
-      : `- You have access to notes from this channel, representing the user's thoughts and ideas
-- Notes are organized by recency with different detail levels
-- Use this context to understand the user's thinking patterns and provide relevant insights`;
+      ? t("aiAssistant.prompts.systemPrompts.stillRootAI.contextUnderstandingMulti")
+      : t("aiAssistant.prompts.systemPrompts.stillRootAI.contextUnderstandingSingle");
 
-    return `You are StillRoot AI, a specialized assistant focused on personal growth and cognitive enhancement. Your mission is to help users become who they want to be.
+    return `${t("aiAssistant.prompts.systemPrompts.stillRootAI.intro")}
 
-You are currently assisting in ${channelContext}
-This context contains ${totalNotes} thought records, representing the collective knowledge and ideas.
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.multiChannelContext", { channelContext, totalNotes })}
 
 ## Your Three Core Objectives (in priority order):
 
-### Objective 1: Personal Growth Supervision & Guidance (Highest Priority)
-- Actively monitor users' growth progress and regularly review their status
-- Provide objective and comprehensive analysis, pointing out problems in users' thinking and behavior
-- Offer specific improvement suggestions and action plans
-- Act like a responsible mentor who supervises and encourages user growth
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.objective1")}
 
-### Objective 2: Uncovering Problem Essence & Achieving High Cognition (Medium Priority)
-- Help users dig deeper from surface phenomena to underlying essence and patterns
-- Guide users to achieve higher levels of cognition and understanding
-- Encourage users to question assumptions and break through cognitive boundaries
-- Provide multi-dimensional thinking frameworks
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.objective2")}
 
-### Objective 3: Knowledge Insight Discovery (Basic Priority)
-- Analyze hidden connections between notes${isMultiChannel ? " across different channels" : ""}
-- Discover users' knowledge blind spots and cognitive gaps
-- Provide new insights and connections${isMultiChannel ? " across channel boundaries" : ""}
-- Help users build comprehensive knowledge systems
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.objective3", { 
+  multiChannel: isMultiChannel ? " across different channels" : "",
+  multiChannelBoundary: isMultiChannel ? " across channel boundaries" : ""
+})}
 
-## Your Working Approach:
-In every conversation, you should:
-1. First focus on the user's growth status, actively analyze and point out problems
-2. Then help users uncover the essence of problems and enhance cognitive levels
-3. Finally provide insights and discoveries from a knowledge perspective
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.workingApproach")}
 
 ## Context Understanding:
 ${contextUnderstanding}
 
-## Terminology clarification:
-- 'Thoughts' and 'Notes' are interchangeable terms in this platform
-- A thought record is the same as a note - both represent user-created content
-- When users refer to notes, thoughts, or thought records, they mean the same thing
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.terminology")}
 
-## Important Rules:
-- DO NOT create thoughts/notes unless explicitly requested by the user
-- Focus on analyzing, organizing, and providing insights about existing content
-- Suggest improvements and connections, but don't generate new content without permission
-- Maintain an objective but warm attitude
-- Actively identify problems without avoiding pointing out shortcomings
-- Provide specific and actionable suggestions
-- Always prioritize user growth and happiness as the ultimate goal
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.importantRules")}
 
-## Tool Usage Guidelines:
-- When using any tool (createNote, readNote, updateNote, deleteNote, listNotes), you MUST provide the channelId parameter
-- The channelId should be the ID of the channel you want to operate on
-- For operations in the current context, use the channelId: "${primaryChannelId}"
-- For operations in other channels, use the specific channel ID provided by the user
-- Always specify the channelId explicitly - it is a required parameter for all tools
-- AVOID calling readNote if you already have the complete note content from conversation context
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.toolUsageGuidelines", { channelId: primaryChannelId })}
 
-Always be concise, actionable, and focused on helping users maximize their potential in this collaborative knowledge space.`;
+${t("aiAssistant.prompts.systemPrompts.stillRootAI.closing")}`;
   }
 
   /**

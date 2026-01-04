@@ -1,4 +1,5 @@
 import { generateText } from "@/common/services/ai/generate-text";
+import { i18n } from "@/common/i18n";
 
 type Inflight = { promise: Promise<string>; ts: number };
 
@@ -122,8 +123,7 @@ Content: ${text}`;
   private async callAIService(prompt: string): Promise<string> {
     return await generateText({
       prompt,
-      system:
-        "You are a helpful assistant that generates concise, descriptive titles for conversations.",
+      system: i18n.t("aiAssistant.prompts.systemPrompts.defaultTitleGenerator"),
       temperature: 0.3,
     });
   }

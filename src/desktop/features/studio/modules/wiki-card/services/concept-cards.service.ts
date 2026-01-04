@@ -2,6 +2,7 @@ import { generateObject } from "@/common/services/ai/generate-object";
 import { ConceptCardsData, ConceptCard } from "../types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { i18n } from "@/common/i18n";
 
 const conceptCardSchema = {
   type: "object",
@@ -101,26 +102,16 @@ export async function generateConceptCards(
     })
     .join("\n\n---\n\n");
 
-  const systemPrompt = `You are an expert knowledge organizer. Your task is to extract and organize key concepts from the user's notes into structured concept cards (like Wikipedia entries).
+  const t = i18n.t.bind(i18n);
+  const systemPrompt = `${t("aiAssistant.prompts.systemPrompts.conceptCards.role")}
 
-First, generate a concise title (2-5 words) that summarizes the overall theme or domain of these concept cards. This title should capture the essence of the knowledge collection.
+${t("aiAssistant.prompts.systemPrompts.conceptCards.instructions")}
 
-Then, create concept cards where each card should:
-1. Have a clear, concise title
-2. Include a comprehensive definition
-3. List 3-5 key points about the concept
-4. Identify 2-4 related concepts
-5. Provide 1-3 concrete examples
+${t("aiAssistant.prompts.systemPrompts.conceptCards.focus")}
 
-Focus on concepts that are:
-- Important and recurring themes mentioned in the notes
-- Core ideas that define the topics discussed
-- Concepts that would help someone understand the domain covered in these notes
-- Ideas that connect multiple notes together
+${t("aiAssistant.prompts.systemPrompts.conceptCards.languageNote", { language: detectedLanguage })}
 
-IMPORTANT: Generate everything in ${detectedLanguage} language. The overall title, all card titles, definitions, key points, related concepts, and examples must be in ${detectedLanguage}.
-
-Generate 5-10 concept cards that best represent the knowledge in these notes.`;
+${t("aiAssistant.prompts.systemPrompts.conceptCards.count")}`;
 
   const userPrompt = `Based on the following notes from spaces: ${channelNames}
 

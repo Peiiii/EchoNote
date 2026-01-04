@@ -628,6 +628,7 @@ interface MindmapDetailProps {
 }
 
 export const MindmapDetail = memo(function MindmapDetail({ item, onClose }: MindmapDetailProps) {
+  const { t } = useTranslation();
   const data = (item.data as MindmapData | undefined) || {
     title: item.title,
     nodes: [],

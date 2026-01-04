@@ -2,6 +2,7 @@ import { generateObject } from "@/common/services/ai/generate-object";
 import { MindmapData, MindmapTreeNode } from "../types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
+import { i18n } from "@/common/i18n";
 
 const mindmapSchema = {
   type: "object",
@@ -114,21 +115,14 @@ export async function generateMindmap(channelIds: string[]): Promise<MindmapData
     })
     .join("\n\n---\n\n");
 
-  const systemPrompt = `You are a knowledge organizer. Build two complementary structures from notes:
+  const t = i18n.t.bind(i18n);
+  const systemPrompt = `${t("aiAssistant.prompts.systemPrompts.mindmap.role")}
 
-1) A graph representation (for free-form exploration):
-   - nodes: 12–30 key concepts (unique id + label)
-   - edges: 15–50 relations (source -> target)
-   - optional: node importance (1–5), edge weight (0.5–2.0)
+${t("aiAssistant.prompts.systemPrompts.mindmap.graphDescription")}
 
-2) A hierarchical mindmap (for XMind-like view):
-   - tree: a single root topic with nested children (3–5 branches per level is ideal)
-   - keep tree labels concise (2–4 words) and avoid duplicates
+${t("aiAssistant.prompts.systemPrompts.mindmap.treeDescription")}
 
-Constraints:
-- Everything must be in ${detectedLanguage}
-- Normalize concept labels and merge duplicates
-- Prefer recurring and connective concepts as higher-level topics
+${t("aiAssistant.prompts.systemPrompts.mindmap.constraints", { language: detectedLanguage })}
 `;
 
   const userPrompt = `Build a mindmap from the following notes from spaces: ${channelNames}

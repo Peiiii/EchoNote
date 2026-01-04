@@ -15,6 +15,7 @@ import { useMemoizedFn } from "ahooks";
 import { isEqual } from "lodash-es";
 import { useEffect, useMemo, useRef } from "react";
 import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
+import { i18n } from "@/common/i18n";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
 import { createContextSelectorExtension } from "../extensions/context-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
@@ -264,27 +265,27 @@ function getChannelPrompts(_channelId: string) {
   return [
     {
       id: "prompt-1",
-      prompt: "Analyze my recent notes",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.analyzeNotes"),
     },
     {
       id: "prompt-2",
-      prompt: "Summarize my thoughts",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.summarizeThoughts"),
     },
     {
       id: "prompt-3",
-      prompt: "What patterns do you see?",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.findPatterns"),
     },
     {
       id: "prompt-4",
-      prompt: "Help me organize these ideas",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.organizeIdeas"),
     },
     {
       id: "prompt-5",
-      prompt: "What am I missing?",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.whatMissing"),
     },
     {
       id: "prompt-6",
-      prompt: "Suggest improvements",
+      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.suggestImprovements"),
     },
   ];
 }

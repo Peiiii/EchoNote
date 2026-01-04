@@ -1,4 +1,5 @@
 import { openai, defaultModelId } from "./client";
+import { i18n } from "@/common/i18n";
 
 export type GenerateTextOptions = {
   prompt: string;
@@ -14,7 +15,7 @@ export async function generateText({
   const completion = await openai.chat.completions.create({
     model: defaultModelId,
     messages: [
-      { role: "system", content: system ?? "You are a helpful assistant." },
+      { role: "system", content: system ?? i18n.t("aiAssistant.prompts.systemPrompts.defaultAssistant") },
       { role: "user", content: prompt },
     ],
     temperature: typeof temperature === "number" ? temperature : 0.7,

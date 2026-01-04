@@ -1,4 +1,5 @@
 import { openai, defaultModelId } from "./client";
+import { i18n } from "@/common/i18n";
 
 export type GenerateObjectOptions = {
   schema: Record<string, unknown>; // JSON Schema object
@@ -21,7 +22,7 @@ export async function generateObject<T = unknown>({
     const completion = await openai.chat.completions.create({
       model: defaultModelId,
       messages: [
-        { role: "system", content: system || "You are a helpful assistant." },
+        { role: "system", content: system || i18n.t("aiAssistant.prompts.systemPrompts.defaultAssistant") },
         { role: "user", content: prompt },
       ],
       temperature: typeof temperature === "number" ? temperature : 0.3,
@@ -46,7 +47,7 @@ export async function generateObject<T = unknown>({
 
   const systemPrefix =
     system ||
-    "You are a helpful assistant that generates structured data according to specifications.";
+    i18n.t("aiAssistant.prompts.systemPrompts.defaultStructuredData");
 
   try {
     const completion = await openai.chat.completions.create({
@@ -86,11 +87,7 @@ export async function generateObject<T = unknown>({
 
     const schemaDescription = JSON.stringify(schema, null, 2);
 
-    const systemPrefix = `You are a strict JSON generator. Return ONLY valid JSON that conforms to the following JSON schema:
-
-${schemaDescription}
-
-IMPORTANT: Your response must be a valid JSON object that matches this schema exactly.`;
+    const systemPrefix = i18n.t("aiAssistant.prompts.systemPrompts.defaultJSONGenerator", { schema: schemaDescription });
 
     const userSuffix = `\n\nRequired output format: A single JSON object that matches the schema above. No markdown, no comments, no additional text.`;
 
