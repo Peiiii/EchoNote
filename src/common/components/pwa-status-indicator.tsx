@@ -1,8 +1,10 @@
 import { usePWA } from "@/common/hooks/use-pwa";
 import { Badge } from "@/common/components/ui/badge";
 import { WifiOff, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const PWAStatusIndicator = () => {
+  const { t } = useTranslation();
   const { isInstalled, isOnline, isUpdateAvailable } = usePWA();
 
   // Only show status indicators for important states
@@ -15,14 +17,14 @@ export const PWAStatusIndicator = () => {
       {!isOnline && (
         <Badge variant="destructive" className="flex items-center gap-1">
           <WifiOff className="h-3 w-3" />
-          Offline
+          {t("pwa.status.offline")}
         </Badge>
       )}
 
       {isUpdateAvailable && (
         <Badge variant="default" className="flex items-center gap-1">
           <RefreshCw className="h-3 w-3" />
-          Update Available
+          {t("pwa.status.updateAvailable")}
         </Badge>
       )}
     </div>

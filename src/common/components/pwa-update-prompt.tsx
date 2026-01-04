@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/common/components/ui/card";
 import { RefreshCw, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const PWAUpdatePrompt = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -57,6 +58,8 @@ export const PWAUpdatePrompt = () => {
     setUpdateAvailable(false);
   };
 
+  const { t } = useTranslation();
+
   if (!updateAvailable) {
     return null;
   }
@@ -68,15 +71,14 @@ export const PWAUpdatePrompt = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <RefreshCw className="h-5 w-5" />
-              Update Available
+              {t("pwa.update.title")}
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={handleDismiss} className="h-6 w-6 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
           <CardDescription>
-            A new version of StillRoot is available. Update now for the latest features and
-            improvements.
+            {t("pwa.update.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
@@ -85,14 +87,14 @@ export const PWAUpdatePrompt = () => {
               {isUpdating ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
+                  {t("pwa.update.updating")}
                 </>
               ) : (
-                "Update Now"
+                t("pwa.update.button")
               )}
             </Button>
             <Button variant="outline" onClick={handleDismiss}>
-              Later
+              {t("pwa.update.later")}
             </Button>
           </div>
         </CardContent>

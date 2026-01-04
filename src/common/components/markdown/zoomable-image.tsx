@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Maximize2 } from "lucide-react";
 import { ImageViewer } from "@/common/components/ui/image-viewer";
+import { useTranslation } from "react-i18next";
 
 interface ZoomableImageProps {
   src?: string;
@@ -9,6 +10,7 @@ interface ZoomableImageProps {
 }
 
 export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [errored, setErrored] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -69,7 +71,7 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
           <button
             type="button"
             className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded bg-black/50 text-white transition-opacity duration-200"
-            title="View larger"
+            title={t("common.viewLarger")}
             onClick={() => setOpen(true)}
           >
             <Maximize2 className="w-3 h-3" />

@@ -36,6 +36,15 @@
     "search": "搜索",
     "studio": "工作室"
   },
+  "common": {
+    "close": "关闭",
+    "closeViewer": "关闭查看器",
+    "loading": "加载中...",
+    "loadingWorkspace": "请稍候，我们正在准备您的工作区...",
+    "moreActions": "更多操作",
+    "pressEscToClose": "按 <0>ESC</0> 关闭",
+    "viewLarger": "查看大图"
+  },
   "header": {
     "menu": {
       "account": "账户",
@@ -86,6 +95,25 @@
     },
     "reply": {
       "label": "回复："
+    }
+  },
+  "pwa": {
+    "install": {
+      "button": "安装应用",
+      "description": "安装 StillRoot 以获得更好的体验，包括离线访问和更快的加载速度。",
+      "later": "稍后再说",
+      "title": "安装 StillRoot"
+    },
+    "status": {
+      "offline": "离线",
+      "updateAvailable": "有可用更新"
+    },
+    "update": {
+      "button": "立即更新",
+      "description": "StillRoot 有新版本可用。立即更新以获取最新功能和改进。",
+      "later": "稍后",
+      "title": "有可用更新",
+      "updating": "更新中..."
     }
   },
   "thoughtRecord": {
@@ -142,11 +170,15 @@
     "menu": {
       "advanced": "高级",
       "characters": "{{count}} 个字符",
+      "characters_one": "1 个字符",
+      "characters_other": "{{count}} 个字符",
       "statistics": "统计"
     },
     "sparks": {
       "close": "关闭分析",
       "count": "{{count}} 个灵感",
+      "count_one": "1 个灵感",
+      "count_other": "{{count}} 个灵感",
       "generate": "生成灵感",
       "generating": "生成中...",
       "regenerate": "重新生成",
@@ -155,10 +187,14 @@
     },
     "tags": {
       "add": "添加标签",
-      "count": "{{count}} 个标签"
+      "count": "{{count}} 个标签",
+      "count_one": "1 个标签",
+      "count_other": "{{count}} 个标签"
     },
     "thread": {
       "replies": "{{count}} 条回复",
+      "replies_one": "1 条回复",
+      "replies_other": "{{count}} 条回复",
       "startDiscussion": "开始讨论"
     }
   }

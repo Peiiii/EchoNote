@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface LoadingProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -136,11 +137,13 @@ interface FullScreenLoadingProps {
 }
 
 export const FullScreenLoading: React.FC<FullScreenLoadingProps> = ({
-  text = "Loading...",
+  text,
   variant = "default",
   size = "lg",
   className,
 }) => {
+  const { t } = useTranslation();
+  const loadingText = text || t("common.loading");
   return (
     <div
       className={cn(
@@ -158,11 +161,11 @@ export const FullScreenLoading: React.FC<FullScreenLoadingProps> = ({
         </div>
 
         {/* Loading Animation */}
-        <Loading variant={variant} size={size} text={text} />
+        <Loading variant={variant} size={size} text={loadingText} />
 
         {/* Subtle Text */}
         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-          Please wait while we prepare your workspace...
+          {t("common.loadingWorkspace")}
         </p>
       </div>
     </div>
@@ -175,9 +178,12 @@ export const InlineLoading: React.FC<Omit<LoadingProps, "size">> = props => (
 );
 
 // 按钮 Loading 组件
-export const ButtonLoading: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={cn("flex items-center space-x-2", className)}>
-    <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-    <span>Loading...</span>
-  </div>
-);
+export const ButtonLoading: React.FC<{ className?: string }> = ({ className }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={cn("flex items-center space-x-2", className)}>
+      <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      <span>{t("common.loading")}</span>
+    </div>
+  );
+};

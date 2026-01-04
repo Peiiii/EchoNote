@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/common/components/ui/card";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -82,6 +83,8 @@ export const PWAInstallPrompt = () => {
     localStorage.setItem("pwa-install-dismissed", "true");
   };
 
+  const { t } = useTranslation();
+
   // Don't show if already installed or previously dismissed
   if (
     isInstalled ||
@@ -96,22 +99,22 @@ export const PWAInstallPrompt = () => {
       <Card className="border-2 border-blue-500 shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Install StillRoot</CardTitle>
+            <CardTitle className="text-lg">{t("pwa.install.title")}</CardTitle>
             <Button variant="ghost" size="sm" onClick={handleDismiss} className="h-6 w-6 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
           <CardDescription>
-            Install StillRoot for a better experience with offline access and faster loading.
+            {t("pwa.install.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex gap-2">
             <Button onClick={handleInstallClick} className="flex-1">
-              Install App
+              {t("pwa.install.button")}
             </Button>
             <Button variant="outline" onClick={handleDismiss}>
-              Maybe Later
+              {t("pwa.install.later")}
             </Button>
           </div>
         </CardContent>

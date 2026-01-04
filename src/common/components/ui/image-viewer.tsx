@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Download, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
 import { useZoom } from "@/common/hooks/use-zoom";
+import { useTranslation, Trans } from "react-i18next";
 
 interface ImageViewerProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export function ImageViewer({
   onDownload,
   showDownload = true,
 }: ImageViewerProps) {
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -156,13 +158,13 @@ export function ImageViewer({
       <div
         className="absolute inset-0 -z-10"
         onClick={onClose}
-        aria-label="Close viewer"
+        aria-label={t("common.closeViewer")}
       />
 
       <div className={`absolute top-16 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2 text-white/60 text-xs transition-all duration-500 ${
         showHint ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
       }`}>
-        Press <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-xs font-mono">ESC</kbd> to close
+        <Trans i18nKey="common.pressEscToClose" components={{ kbd: <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-xs font-mono" /> }} />
       </div>
 
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">

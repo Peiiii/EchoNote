@@ -7,6 +7,7 @@ import {
 import { Button } from "@/common/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface ActionMenuProps {
   children: ReactNode;
@@ -29,6 +30,7 @@ export function ActionMenu({
   width = "md",
   alwaysVisible = false,
 }: ActionMenuProps) {
+  const { t } = useTranslation();
   const widthClasses = {
     sm: "w-44",
     md: "w-52",
@@ -50,7 +52,7 @@ export function ActionMenu({
       )}
     >
       <MoreHorizontal className="h-4 w-4" />
-      <span className="sr-only">More actions</span>
+      <span className="sr-only">{t("common.moreActions")}</span>
     </Button>
   );
 

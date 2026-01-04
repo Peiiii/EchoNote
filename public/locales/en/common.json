@@ -36,6 +36,15 @@
     "search": "Search",
     "studio": "Studio"
   },
+  "common": {
+    "close": "Close",
+    "closeViewer": "Close viewer",
+    "loading": "Loading...",
+    "loadingWorkspace": "Please wait while we prepare your workspace...",
+    "moreActions": "More actions",
+    "pressEscToClose": "Press <0>ESC</0> to close",
+    "viewLarger": "View larger"
+  },
   "header": {
     "menu": {
       "account": "Account",
@@ -86,6 +95,25 @@
     },
     "reply": {
       "label": "Reply:"
+    }
+  },
+  "pwa": {
+    "install": {
+      "button": "Install App",
+      "description": "Install StillRoot for a better experience with offline access and faster loading.",
+      "later": "Maybe Later",
+      "title": "Install StillRoot"
+    },
+    "status": {
+      "offline": "Offline",
+      "updateAvailable": "Update Available"
+    },
+    "update": {
+      "button": "Update Now",
+      "description": "A new version of StillRoot is available. Update now for the latest features and improvements.",
+      "later": "Later",
+      "title": "Update Available",
+      "updating": "Updating..."
     }
   },
   "thoughtRecord": {
@@ -142,11 +170,15 @@
     "menu": {
       "advanced": "Advanced",
       "characters": "{{count}} characters",
+      "characters_one": "1 character",
+      "characters_other": "{{count}} characters",
       "statistics": "Statistics"
     },
     "sparks": {
       "close": "Close analysis",
       "count": "{{count}} sparks",
+      "count_one": "1 spark",
+      "count_other": "{{count}} sparks",
       "generate": "Generate Sparks",
       "generating": "Generating...",
       "regenerate": "Regenerate",
@@ -155,10 +187,14 @@
     },
     "tags": {
       "add": "Add tags",
-      "count": "{{count}} tags"
+      "count": "{{count}} tags",
+      "count_one": "1 tag",
+      "count_other": "{{count}} tags"
     },
     "thread": {
       "replies": "{{count}} replies",
+      "replies_one": "1 reply",
+      "replies_other": "{{count}} replies",
       "startDiscussion": "Start discussion"
     }
   }
