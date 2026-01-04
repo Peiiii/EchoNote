@@ -4,7 +4,7 @@ import { useNotesViewStore } from "./notes-view.store";
 import { channelMessageService } from "@/core/services/channel-message.service";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { getStorageProvider } from "@/core/storage/provider";
-import { getOrCreateGuestUserId } from "@/core/services/guest-id";
+import { getExistingGuestUserId, getOrCreateGuestUserId } from "@/core/services/guest-id";
 import type { Cursor } from "@/core/storage/types";
 import type { Message, Channel } from "@/core/types/notes";
 
@@ -62,7 +62,7 @@ export interface NotesDataState {
 
   // Firebase integration
   initFirebaseListeners: (userId: string) => Promise<void>;
-  initGuestWorkspace: () => Promise<void>;
+  initGuestWorkspace: (options?: { autoCreateDefaultSpace?: boolean }) => Promise<void>;
   cleanupListeners: () => void;
   fetchInitialData: (userId: string) => Promise<void>;
   validateAndCleanupCurrentChannel: (channels: Channel[]) => void;
@@ -448,9 +448,29 @@ export const useNotesDataStore = create<NotesDataState>()((set, get) => ({
     set({ unsubscribeChannels });
   },
 
-  initGuestWorkspace: async () => {
+  initGuestWorkspace: async (options?: { autoCreateDefaultSpace?: boolean }) => {
+    const existedGuestId = getExistingGuestUserId();
     const guestUserId = getOrCreateGuestUserId();
     await get().initFirebaseListeners(guestUserId);
+
+    // If the user explicitly chose the local experience and this is their first guest workspace,
+    // create a default space so they can start immediately without extra clicks.
+    // (We still verify storage to avoid duplicates if init is triggered twice.)
+    const shouldAutoCreate = !!options?.autoCreateDefaultSpace && !existedGuestId;
+    if (shouldAutoCreate) {
+      try {
+        const existingChannels = await getStorageProvider().notes.listChannels(guestUserId);
+        if (existingChannels.length === 0) {
+          await get().addChannel({
+            name: "My First Space",
+            emoji: "🚀",
+            description: "Start your journey here",
+          });
+        }
+      } catch (error) {
+        console.warn("[guest] failed to auto-create default space", error);
+      }
+    }
   },
 
   cleanupListeners: () => {

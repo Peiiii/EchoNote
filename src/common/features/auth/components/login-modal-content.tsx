@@ -27,7 +27,7 @@ export function LoginModalContent({ allowGuest }: { allowGuest?: boolean }) {
               variant="ghost"
               className="h-8 px-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
               onClick={async () => {
-                await initGuestWorkspace();
+                await initGuestWorkspace({ autoCreateDefaultSpace: true });
                 modal.close();
               }}
             >
