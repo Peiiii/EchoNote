@@ -513,6 +513,11 @@
       "titleHighlight": "Cognitive Evolution Journey"
     },
     "demo": {
+      "aiStatus": "AI Status: Connected",
+      "channelName": "Growth Space / #Action-Plan",
+      "hint": "👆 Start typing your thoughts and experience how AI reshapes your cognition",
+      "inputPlaceholder": "Chat with your AI mentor...",
+      "subtitle": "No registration required, experience cognitive evolution guided by an AI mentor",
       "title": "Real-time Dialogue with Your Growth",
       "titleHighlight": "Real-time Dialogue"
     },

@@ -513,6 +513,11 @@
       "titleHighlight": "认知进化之旅"
     },
     "demo": {
+      "aiStatus": "AI 状态：已连接",
+      "channelName": "成长空间 / #行动计划",
+      "hint": "👆 立即输入你的想法，体验 AI 如何重塑你的认知",
+      "inputPlaceholder": "与你的 AI 导师对话...",
+      "subtitle": "无需注册，直接感受 AI 导师引领的认知进化",
       "title": "与你的成长",
       "titleHighlight": "实时对话"
     },

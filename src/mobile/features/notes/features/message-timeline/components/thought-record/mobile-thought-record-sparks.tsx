@@ -21,6 +21,7 @@ export function MobileThoughtRecordSparks({
   className,
   autoGenerate = false,
 }: MobileThoughtRecordSparksProps) {
+  const { t } = useTranslation();
   const aiAnalysis = message.aiAnalysis;
   const {
     isGenerating,

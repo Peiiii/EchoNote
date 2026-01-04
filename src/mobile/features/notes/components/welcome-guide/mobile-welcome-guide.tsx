@@ -1,6 +1,7 @@
 import { Button } from "@/common/components/ui/button";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, FileText, Lightbulb, Plus, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const MobileWelcomeGuide = () => {
   const { t } = useTranslation();

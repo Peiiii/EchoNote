@@ -30,6 +30,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
     { conversations, currentConversationId, loading, onCreate, channelId, onClose },
     ref
   ) {
+    const { t } = useTranslation();
     const view = useConversationStore(s => s.uiView);
     const showList = useConversationStore(s => s.showList);
     const showChat = useConversationStore(s => s.showChat);

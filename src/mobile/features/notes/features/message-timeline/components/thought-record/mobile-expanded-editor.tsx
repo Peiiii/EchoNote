@@ -21,6 +21,7 @@ export const MobileExpandedEditor = ({
   onCollapse,
   isSaving,
 }: MobileExpandedEditorProps) => {
+  const { t } = useTranslation();
   const editContent = useEditStateStore(s => s.editContent);
   const updateContent = useEditStateStore(s => s.updateContent);
   const hasChanges = editContent.trim() !== originalContent.trim();

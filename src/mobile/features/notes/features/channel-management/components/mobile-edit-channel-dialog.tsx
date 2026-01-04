@@ -21,6 +21,7 @@ export function MobileEditChannelDialog({
   isOpen,
   onOpenChange,
 }: MobileEditChannelDialogProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const [editName, setEditName] = useState(channel.name);
   const [editDescription, setEditDescription] = useState(channel.description || "");

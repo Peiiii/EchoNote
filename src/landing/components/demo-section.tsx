@@ -74,7 +74,7 @@ export const DemoSection = () => {
             transition={{ delay: 0.1 }}
             className="mt-6 text-xl text-slate-400 font-medium"
           >
-            无需注册，直接感受 AI 导师引领的认知进化
+            {t("landing.demo.subtitle")}
           </motion.p>
         </div>
 
@@ -94,11 +94,11 @@ export const DemoSection = () => {
                     <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
                     <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
                   </div>
-                  <span className="text-sm font-bold text-slate-400 tracking-widest uppercase">Growth Space / #Action-Plan</span>
+                  <span className="text-sm font-bold text-slate-400 tracking-widest uppercase">{t("landing.demo.channelName")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                   <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">AI Status: Connected</span>
+                   <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{t("landing.demo.aiStatus")}</span>
                 </div>
               </div>
             </div>
@@ -164,7 +164,7 @@ export const DemoSection = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="与你的 AI 导师对话..."
+                  placeholder={t("landing.demo.inputPlaceholder")}
                   className="flex-1 rounded-2xl border border-white/10 bg-slate-900/50 px-6 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                 />
                 <button
@@ -184,7 +184,7 @@ export const DemoSection = () => {
           </div>
  
           <p className="mt-8 text-center text-sm text-slate-500 font-bold uppercase tracking-widest">
-            👆 立即输入你的想法，体验 AI 如何重塑你的认知
+            {t("landing.demo.hint")}
           </p>
         </motion.div>
       </div>

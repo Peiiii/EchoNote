@@ -27,6 +27,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
   onDelete,
   onTogglePin,
 }: StudioRecentItemProps) {
+  const { t } = useTranslation();
   const module = getStudioModule(item.moduleId);
   const Icon = module?.icon;
   const [isHovered, setIsHovered] = useState(false);
