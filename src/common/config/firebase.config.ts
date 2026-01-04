@@ -83,9 +83,11 @@ export class FirebaseConfig {
   private analytics: Analytics | null = null;
   private db: Firestore = db;
   private region: string = tryLoadRegionFromLocalStorage(CN_REGION);
+  private readonly hadCachedRegionAtBoot: boolean = localStorage.getItem("region") !== null;
+  private readonly regionInitPromise: Promise<void>;
   private constructor() {
     this.getAuth();
-    this.validateRegionAndMaybeReloadPage();
+    this.regionInitPromise = this.validateRegionAndMaybeReloadPage();
   }
 
   static getInstance(): FirebaseConfig {
@@ -113,24 +115,43 @@ export class FirebaseConfig {
   }
 
   private async fetchRegion(): Promise<string> {
-    let country = "";
+    let country = this.region;
     try {
       const response = await fetch(`${PROXY_URL_AUTH}/api/location`);
       if (response.ok) {
         country = (await response.json()).country || "XX";
       }
     } catch (e) {
-      console.error("Failed to fetch user country, using restricted auth.", e);
+      console.error("Failed to fetch user country, keeping existing region.", e);
     }
     return country;
   }
 
   private async validateRegionAndMaybeReloadPage(): Promise<void> {
-    const region = await this.fetchRegion();
-    saveRegionToLocalStorage(region);
-    if (region !== this.region) {
-      window.location.reload();
+    try {
+      const region = await this.fetchRegion();
+      if (!region) return;
+      saveRegionToLocalStorage(region);
+      if (region !== this.region) {
+        this.region = region;
+        window.location.reload();
+      }
+    } catch (error) {
+      console.warn("[FirebaseConfig] validateRegion failed, skipping reload", error);
     }
+  }
+
+  /**
+   * For first-time visitors with no cached region, region detection may trigger a reload to swap auth strategy.
+   * UI code can await this to avoid showing a login modal that will immediately be replaced.
+   */
+  hasCachedRegion(): boolean {
+    return this.hadCachedRegionAtBoot;
+  }
+
+  whenRegionReadyForUi(): Promise<void> {
+    if (this.hadCachedRegionAtBoot) return Promise.resolve();
+    return this.regionInitPromise;
   }
 
   getAuth(): Auth {
