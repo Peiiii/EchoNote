@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { DateDivider } from "./date-divider";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
+import { useTranslation } from "react-i18next";
 // removed global collapse bus usage
 
 interface MessageTimelineProps {
@@ -41,6 +42,7 @@ export const MessageTimeline = ({
   messages,
   onScroll,
 }: MessageTimelineProps) => {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const sideView = useUIStateStore(s => s.sideView);
   const channelId = useNotesViewStore(s => s.currentChannelId);
@@ -286,7 +288,7 @@ export const MessageTimeline = ({
                 presenter.openAIAssistant();
               }}
               isVisible={sideView !== SideViewEnum.AI_ASSISTANT}
-              ariaLabel="Open AI Assistant"
+              ariaLabel={t('notes.messageTimeline.openAIAssistant')}
             >
               <Bot className="h-4 w-4" />
             </FloatingActionButton>
@@ -314,7 +316,7 @@ export const MessageTimeline = ({
         >
           {showComposerFab && (
             <div className="pointer-events-auto">
-              <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
+              <FloatingActionButton onClick={handleExpandInput} ariaLabel={t('notes.messageTimeline.showComposer')}>
                 <Pencil className="h-4 w-4" />
               </FloatingActionButton>
             </div>
@@ -334,10 +336,10 @@ export const MessageTimeline = ({
               variant="secondary"
               className="h-8 rounded-full px-2.5 shadow-lg flex items-center gap-1 hover:bg-secondary"
               onClick={collapseCurrent}
-              aria-label="Collapse current"
+              aria-label={t('notes.messageTimeline.collapseCurrent')}
             >
               <ChevronUp className="h-4 w-4" />
-              <span className="text-xs leading-none">Collapse</span>
+              <span className="text-xs leading-none">{t('notes.messageTimeline.collapse')}</span>
             </Button>
           </div>
         )}

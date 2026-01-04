@@ -98,6 +98,7 @@ export function TagList({
   truncate = false,
   maxWidth = "80px",
 }: TagListProps) {
+  const { t } = useTranslation();
   const displayTags = maxTags ? tags.slice(0, maxTags) : tags;
   const remainingCount = maxTags && tags.length > maxTags ? tags.length - maxTags : 0;
 
@@ -121,7 +122,7 @@ export function TagList({
         />
       ))}
       {remainingCount > 0 && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">+{remainingCount} more</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{t('notes.tagList.more', { count: remainingCount })}</span>
       )}
     </div>
   );

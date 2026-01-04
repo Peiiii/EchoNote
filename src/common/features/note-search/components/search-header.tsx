@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { Search as SearchIcon, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SearchHeaderProps {
   q: string;
@@ -16,6 +17,7 @@ export function SearchHeader({
   setScope,
   indexing,
 }: SearchHeaderProps) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function SearchHeader({
             <input
               ref={inputRef}
               type="text"
-              placeholder={scope === "current" ? "Search current space…" : "Search all spaces…"}
+              placeholder={scope === "current" ? t('noteSearch.searchHeader.placeholderCurrent') : t('noteSearch.searchHeader.placeholderAll')}
               value={q}
               onChange={e => setQ(e.target.value)}
               className="w-full h-auto py-2 pl-7 pr-9 bg-transparent border-0 text-base placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 transition-all duration-200"
@@ -44,7 +46,7 @@ export function SearchHeader({
               <button
                 className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 inline-flex items-center justify-center rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setQ("")}
-                aria-label="Clear search"
+                aria-label={t('common.clearSearch')}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -62,7 +64,7 @@ export function SearchHeader({
               }`}
               onClick={() => setScope("current")}
             >
-              Current
+              {t('noteSearch.searchHeader.current')}
             </button>
             <button
               role="radio"
@@ -74,7 +76,7 @@ export function SearchHeader({
               }`}
               onClick={() => setScope("all")}
             >
-              All
+              {t('noteSearch.searchHeader.all')}
             </button>
           </div>
         </div>
@@ -85,7 +87,7 @@ export function SearchHeader({
               <div className="h-full bg-primary animate-pulse" style={{ width: "30%" }} />
             </div>
             <span className="text-xs text-muted-foreground/60 whitespace-nowrap">
-              Indexing…
+              {t('noteSearch.searchHeader.indexing')}
             </span>
           </div>
         )}

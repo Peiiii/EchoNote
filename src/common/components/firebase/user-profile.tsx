@@ -60,9 +60,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                 className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={user.photoURL || undefined} alt="User avatar" />
+                  <AvatarImage src={user.photoURL || undefined} alt={t('auth.userProfile.avatarAlt')} />
                   <AvatarFallback className="text-xs">
-                    {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
+                    {user.displayName?.charAt(0) || user.email?.charAt(0) || t('auth.userProfile.avatarFallback')}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -72,9 +72,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                 {/* User Info */}
                 <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-slate-700">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.photoURL || undefined} alt="User avatar" />
+                    <AvatarImage src={user.photoURL || undefined} alt={t('auth.userProfile.avatarAlt')} />
                     <AvatarFallback>
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
+                      {user.displayName?.charAt(0) || user.email?.charAt(0) || t('auth.userProfile.avatarFallback')}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">

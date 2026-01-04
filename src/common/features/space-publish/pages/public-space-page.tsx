@@ -6,8 +6,10 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { PublicMessageTimeline } from "../components/public-message-timeline";
 import { Send, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function PublicSpacePage() {
+  const { t } = useTranslation();
   const { shareToken } = useParams<{ shareToken: string }>();
   const [channel, setChannel] = useState<{ channel: Channel; userId: string } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -19,7 +21,7 @@ export function PublicSpacePage() {
 
   useEffect(() => {
     if (!shareToken) {
-      setError("Invalid share token");
+      setError(t('spacePublish.publicSpacePage.invalidToken'));
       setLoading(false);
       return;
     }
@@ -30,7 +32,7 @@ export function PublicSpacePage() {
         const result = await firebaseNotesService.findChannelByShareToken(shareToken);
 
         if (!result) {
-          setError("Space not found");
+          setError(t('spacePublish.publicSpacePage.spaceNotFound'));
           setLoading(false);
           return;
         }
@@ -46,14 +48,14 @@ export function PublicSpacePage() {
         setMessages(messagesResult.messages);
       } catch (err) {
         console.error("Error loading public space:", err);
-        setError("Failed to load space");
+        setError(t('spacePublish.publicSpacePage.failedToLoad'));
       } finally {
         setLoading(false);
       }
     };
 
     loadSpace();
-  }, [shareToken]);
+  }, [shareToken, t]);
 
   const loadMessages = async () => {
     if (!shareToken || !channel) return;
@@ -92,7 +94,7 @@ export function PublicSpacePage() {
       }
     } catch (err) {
       console.error("Error sending message:", err);
-      alert(err instanceof Error ? err.message : "Failed to send message");
+      alert(err instanceof Error ? err.message : t('spacePublish.publicSpacePage.failedToSend'));
     } finally {
       setIsSending(false);
     }
@@ -124,8 +126,8 @@ export function PublicSpacePage() {
             <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-primary/40 rounded-full animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-foreground">Loading space</p>
-            <p className="text-xs text-muted-foreground">Please wait a moment...</p>
+            <p className="text-sm font-medium text-foreground">{t('spacePublish.publicSpacePage.loadingSpace')}</p>
+            <p className="text-xs text-muted-foreground">{t('spacePublish.publicSpacePage.pleaseWait')}</p>
           </div>
         </div>
       </div>
@@ -142,8 +144,8 @@ export function PublicSpacePage() {
             </svg>
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Space Not Found</h1>
-            <p className="text-muted-foreground">{error || "This space is not available or has been removed."}</p>
+            <h1 className="text-2xl font-bold">{t('spacePublish.publicSpacePage.spaceNotFoundTitle')}</h1>
+            <p className="text-muted-foreground">{error || t('spacePublish.publicSpacePage.spaceNotAvailable')}</p>
           </div>
         </div>
       </div>
@@ -187,7 +189,7 @@ export function PublicSpacePage() {
                   value={messageContent}
                   onChange={(e) => setMessageContent(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type your message... (Ctrl/Cmd+Enter to send)"
+                  placeholder={t('spacePublish.publicSpacePage.messagePlaceholder')}
                   className="min-h-[80px] max-h-[200px] resize-none w-full bg-background border border-border/60 rounded-lg focus:border-border transition-colors pr-12"
                   disabled={isSending}
                 />
@@ -195,7 +197,7 @@ export function PublicSpacePage() {
                   onClick={handleSendMessage}
                   disabled={!messageContent.trim() || isSending}
                   className="absolute bottom-2 right-2 w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-150 text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                  aria-label="Send message"
+                  aria-label={t('spacePublish.publicSpacePage.sendMessage')}
                 >
                   {isSending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

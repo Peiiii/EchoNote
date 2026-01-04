@@ -2,19 +2,21 @@ import { cn } from "@/common/lib/utils";
 import { useSetupApp } from "@/core/hooks/use-setup-app";
 import type { ExtensionDefinition } from "@cardos/extension";
 import { DesktopPluginRouter } from "./components/desktop-plugin-router";
+import { useTranslation } from "react-i18next";
 
 export interface DesktopSetupAppProps {
   extensions: ExtensionDefinition[];
 }
 
 export const DesktopSetupApp = (props: DesktopSetupAppProps) => {
+  const { t } = useTranslation();
   const { extensions } = props;
   const { initialized } = useSetupApp({
     extensions,
   });
 
   return !initialized ? (
-    <div>Loading...</div>
+    <div>{t('common.loading')}</div>
   ) : (
     <div className="fixed inset-0 flex flex-col">
       <div className={cn("flex flex-col h-full")}>

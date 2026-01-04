@@ -3,16 +3,18 @@ import { openLoginModal } from "@/common/features/auth/open-login-modal";
 import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const ChannelListEmptyState = () => {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const userId = useNotesDataStore(s => s.userId);
 
   const handleAddChannel = async (channel: { name: string; description: string; emoji?: string }) => {
     if (!userId) {
       openLoginModal({
-        title: "登录或本地体验",
-        description: "登录后可云同步、发布空间；也可以先用本地模式体验并创建空间。",
+        title: t('auth.login.titleOrLocal'),
+        description: t('auth.login.descOrLocal'),
         allowGuest: true,
       });
       return;
@@ -29,21 +31,21 @@ export const ChannelListEmptyState = () => {
       <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
         <Plus className="w-8 h-8 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold text-foreground mb-2">No spaces yet</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{t('channelManagement.channelListEmptyState.title')}</h3>
       <p className="text-muted-foreground text-sm mb-4 max-w-xs">
-        Create your first thought space to start organizing your ideas and thoughts.
+        {t('channelManagement.channelListEmptyState.description')}
       </p>
       <button
         onClick={() =>
           handleAddChannel({
-            name: "My First Space",
+            name: t('desktop.welcomeGuide.firstSpaceName'),
             emoji: "🚀",
-            description: "Start your journey here",
+            description: t('desktop.welcomeGuide.firstSpaceDescription'),
           })
         }
         className="text-sm text-primary hover:text-primary/80 font-medium"
       >
-        Create your first space
+        {t('channelManagement.channelListEmptyState.createFirstSpace')}
       </button>
     </div>
   );

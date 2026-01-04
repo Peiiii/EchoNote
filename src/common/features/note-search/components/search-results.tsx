@@ -1,6 +1,7 @@
 import { type NoteSearchMatch } from "@/common/features/note-search/services/note-search.service";
 import { Highlight } from "./search-highlight";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface SearchResultsProps {
   results: NoteSearchMatch[];
@@ -19,6 +20,7 @@ export function SearchResults({
   channelName,
   q,
 }: SearchResultsProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 py-2">
       {results.map((r, idx) => {
@@ -51,7 +53,7 @@ export function SearchResults({
                 </span>
               </div>
               <div className="text-sm text-foreground/70 leading-relaxed">
-                {r.snippet ? <Highlight text={r.snippet} query={q} /> : "(no preview)"}
+                {r.snippet ? <Highlight text={r.snippet} query={q} /> : t('noteSearch.searchResults.noPreview')}
               </div>
             </div>
         </button>

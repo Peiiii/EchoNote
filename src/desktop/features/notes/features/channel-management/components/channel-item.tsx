@@ -4,6 +4,7 @@ import { Edit2 } from "lucide-react";
 import { getChannelIcon } from "./channel-icons";
 import { ChannelMoreActionsMenu } from "./channel-more-actions-menu";
 import { EditChannelPopover } from "./edit-channel-popover";
+import { useTranslation } from "react-i18next";
 
 interface ChannelItemProps {
   channel: Channel;
@@ -12,6 +13,7 @@ interface ChannelItemProps {
 }
 
 export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) => {
+  const { t } = useTranslation();
   const hasDescription = !!(channel.description && channel.description.trim());
 
   return (
@@ -65,7 +67,7 @@ export const ChannelItem = ({ channel, isActive, onClick }: ChannelItemProps) =>
                         size="sm"
                         variant="ghost"
                         className="h-6 w-6 p-0 hover:bg-slate-200 dark:hover:bg-slate-700"
-                        title="Edit channel"
+                        title={t('channelManagement.channelItem.editChannel')}
                         onClick={e => e.stopPropagation()}
                       >
                         <Edit2 className="h-3.5 w-3.5" />

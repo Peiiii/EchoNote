@@ -6,6 +6,7 @@ import { Input } from "@/common/components/ui/input";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface MoveNoteModalProps {
   fromChannelId: string;
@@ -13,6 +14,7 @@ interface MoveNoteModalProps {
 }
 
 export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
+  const { t } = useTranslation();
   const channels = useNotesDataStore(state => state.channels);
   const [search, setSearch] = useState("");
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
       modal.close();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to move note. Please try again.";
+        err instanceof Error ? err.message : t('notes.moveNoteModal.error');
       setError(message);
       setIsSubmitting(false);
     }
@@ -58,24 +60,24 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
     <div className="w-full max-w-md p-1 max-h-[80vh] flex flex-col">
       <div className="space-y-2 mb-4">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-          Move to space
+          {t('notes.moveNoteModal.title')}
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Select a destination space for this thought. Any replies in the same thread move with it.
+          {t('notes.moveNoteModal.description')}
         </p>
       </div>
       {candidateChannels.length === 0 ? (
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Create another space first to move this thought.
+          {t('notes.moveNoteModal.noSpaces')}
         </p>
       ) : (
         <>
           <div className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Destination space
+              {t('notes.moveNoteModal.destinationSpace')}
             </span>
             <Input
-              placeholder="Search spaces"
+              placeholder={t('notes.moveNoteModal.searchPlaceholder')}
               value={search}
               onChange={event => setSearch(event.target.value)}
               disabled={isSubmitting}
@@ -85,7 +87,7 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
             <div className="space-y-1.5 py-1">
               {filteredChannels.length === 0 ? (
                 <p className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
-                  No spaces match your search.
+                  {t('notes.moveNoteModal.noMatches')}
                 </p>
               ) : (
                 filteredChannels.map(channel => {
@@ -123,7 +125,7 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
           </ScrollArea>
           {selectedChannel && (
             <div className="mt-3 rounded-md border border-slate-200/70 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800/40 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
-              <span className="font-semibold">Will move to: </span>
+              <span className="font-semibold">{t('notes.moveNoteModal.willMoveTo')} </span>
               {selectedChannel.emoji && <span className="mr-1">{selectedChannel.emoji}</span>}
               <span className="font-medium">{selectedChannel.name}</span>
               {selectedChannel.description && (
@@ -135,16 +137,16 @@ export function MoveNoteModal({ fromChannelId, onMove }: MoveNoteModalProps) {
           )}
           <div className="mt-6 flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={() => modal.close()} disabled={isSubmitting}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="button" onClick={handleConfirm} disabled={!selectedChannelId || isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Moving…
+                  {t('notes.moveNoteModal.moving')}
                 </>
               ) : (
-                "Confirm move"
+                t('notes.moveNoteModal.confirmMove')
               )}
             </Button>
           </div>

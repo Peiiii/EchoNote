@@ -3,6 +3,7 @@ import { Input } from "@/common/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/common/components/ui/popover";
 import { Plus, X, Tag as TagIcon } from "lucide-react";
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface TagEditorPopoverProps {
   tags: string[];
@@ -17,12 +18,14 @@ export function TagEditorPopover({
   onTagsChange,
   trigger,
   maxTags = 10,
-  placeholder = "Add a tag...",
+  placeholder,
 }: TagEditorPopoverProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [editingTag, setEditingTag] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const defaultPlaceholder = placeholder || t('notes.tagEditor.placeholder');
 
   // Focus input when popover opens
   useEffect(() => {
@@ -111,7 +114,7 @@ export function TagEditorPopover({
             className="h-8 px-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
           >
             <TagIcon className="h-4 w-4 mr-1" />
-            Tags
+            {t('notes.tagEditor.tags')}
             {tags.length > 0 && (
               <span className="ml-1 px-1.5 py-0.5 text-xs bg-slate-200 dark:bg-slate-700 rounded-full">
                 {tags.length}
@@ -124,7 +127,7 @@ export function TagEditorPopover({
         <div className="p-3 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2 mb-3">
             <TagIcon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-            <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">Edit Tags</h3>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100">{t('notes.tagEditor.editTags')}</h3>
           </div>
 
           {/* Input area */}
@@ -134,7 +137,7 @@ export function TagEditorPopover({
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyPress={editingTag ? handleKeyPressEdit : handleKeyPress}
-              placeholder={editingTag ? `Edit "${editingTag}"` : placeholder}
+              placeholder={editingTag ? t('notes.tagEditor.editPlaceholder', { tag: editingTag }) : defaultPlaceholder}
               className="flex-1"
             />
             {editingTag ? (
@@ -168,12 +171,12 @@ export function TagEditorPopover({
         <div className="p-3">
           {tags.length === 0 ? (
             <div className="text-center py-4 text-slate-500 dark:text-slate-400 text-sm">
-              No tags yet. Add some above.
+              {t('notes.tagEditor.noTags')}
             </div>
           ) : (
             <div className="space-y-2">
               <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                {tags.length} of {maxTags} tags
+                {t('notes.tagEditor.tagCount', { current: tags.length, max: maxTags })}
               </div>
               <div className="flex flex-wrap gap-1">
                 {tags.map(tag => (

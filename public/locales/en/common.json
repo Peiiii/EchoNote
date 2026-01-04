@@ -1,5 +1,11 @@
 {
   "agentTools": {
+    "comparisonLayout": {
+      "loadingOriginal": "Loading original content...",
+      "loadingUpdated": "Loading updated content...",
+      "original": "Original",
+      "updated": "Updated"
+    },
     "createNote": {
       "cancelled": "Creation Cancelled",
       "confirm": "Create Note",
@@ -82,6 +88,27 @@
     }
   },
   "aiAssistant": {
+    "contextControl": {
+      "activeToolSpace": "Active Tool Space",
+      "applyChanges": "Apply Changes",
+      "currentSpace": "Current space",
+      "loading": "Loading context data...",
+      "mode": {
+        "all": "All",
+        "allDescription": "All spaces access",
+        "auto": "Auto",
+        "autoDescription": "Current space only",
+        "custom": "Custom",
+        "customDescription": "Select specific spaces",
+        "none": "None",
+        "noneDescription": "No context access"
+      },
+      "none": "(none)",
+      "noSpacesAvailable": "No spaces available",
+      "noSpacesFound": "No spaces found",
+      "searchSpaces": "Search spaces...",
+      "title": "Context Settings"
+    },
     "conversationList": {
       "archiveConversation": "Archive conversation",
       "archived": "Archived",
@@ -108,6 +135,12 @@
       "startConversation": "Start Conversation",
       "title": "AI Note Agent",
       "tryAsking": "Try asking:"
+    },
+    "modelSelector": {
+      "chooseModel": "Choose AI Model",
+      "default": "Default",
+      "selected": "Selected",
+      "selectModel": "Select Model"
     }
   },
   "auth": {
@@ -131,6 +164,15 @@
       "resendLink": "Resend link",
       "sending": "Sending...",
       "sentLink": "We've sent a verification link{{email}}"
+    },
+    "guestDataNotice": {
+      "description": "Your data is only saved locally (no cloud sync, not visible on other devices). Sign in to enable cloud sync and publishing capabilities.",
+      "gotIt": "Got it",
+      "goToLogin": "Go to login",
+      "loginDescription": "Sign in to enable cloud sync, publish spaces, and access your data on multiple devices.",
+      "loginTitle": "Sign in to enable cloud features",
+      "subtitle": "You are currently using local data",
+      "title": "Guest Mode Notice"
     },
     "login": {
       "descOrLocal": "Sign in for cloud sync and publishing, or try local mode first.",
@@ -180,6 +222,8 @@
       "continueWithGoogle": "Continue with Google"
     },
     "userProfile": {
+      "avatarAlt": "User avatar",
+      "avatarFallback": "U",
       "manageAccount": "Click to manage account",
       "signInHint": "Sign in to sync your data",
       "signOut": "Sign Out",
@@ -373,6 +417,64 @@
       "label": "Reply:"
     }
   },
+  "notes": {
+    "messageTimeline": {
+      "collapse": "Collapse",
+      "collapseCurrent": "Collapse current",
+      "openAIAssistant": "Open AI Assistant",
+      "showComposer": "Show composer"
+    },
+    "moveNoteModal": {
+      "confirmMove": "Confirm move",
+      "description": "Select a destination space for this thought. Any replies in the same thread move with it.",
+      "destinationSpace": "Destination space",
+      "error": "Failed to move note. Please try again.",
+      "moving": "Moving…",
+      "noMatches": "No spaces match your search.",
+      "noSpaces": "Create another space first to move this thought.",
+      "searchPlaceholder": "Search spaces",
+      "title": "Move to space",
+      "willMoveTo": "Will move to:"
+    },
+    "spaceEmptyState": {
+      "description": "Start capturing your thoughts and ideas here. Your AI assistant will help you explore and develop them further.",
+      "tip1": "Type your first thought below",
+      "tip2": "AI will help expand your ideas",
+      "tip3": "Connect your ideas together",
+      "title": "Your space is ready!"
+    },
+    "tagEditor": {
+      "editPlaceholder": "Edit \"{{tag}}\"",
+      "editTags": "Edit Tags",
+      "noTags": "No tags yet. Add some above.",
+      "placeholder": "Add a tag...",
+      "tagCount": "{{current}} of {{max}} tags",
+      "tags": "Tags"
+    },
+    "tagList": {
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more"
+    }
+  },
+  "noteSearch": {
+    "emptyStates": {
+      "noResults": "No results found",
+      "refreshIndex": "Refresh index",
+      "refreshing": "Refreshing...",
+      "searchAll": "Search all spaces",
+      "searchCurrent": "Search current space"
+    },
+    "searchHeader": {
+      "all": "All",
+      "current": "Current",
+      "indexing": "Indexing…",
+      "placeholderAll": "Search all spaces…",
+      "placeholderCurrent": "Search current space…"
+    },
+    "searchResults": {
+      "noPreview": "(no preview)"
+    }
+  },
   "pwa": {
     "install": {
       "button": "Install App",
@@ -390,6 +492,23 @@
       "later": "Later",
       "title": "Update Available",
       "updating": "Updating..."
+    }
+  },
+  "spacePublish": {
+    "publicSpacePage": {
+      "failedToLoad": "Failed to load space",
+      "failedToSend": "Failed to send message",
+      "invalidToken": "Invalid share token",
+      "loadingSpace": "Loading space",
+      "messagePlaceholder": "Type your message... (Ctrl/Cmd+Enter to send)",
+      "pleaseWait": "Please wait a moment...",
+      "sendMessage": "Send message",
+      "spaceNotAvailable": "This space is not available or has been removed.",
+      "spaceNotFound": "Space not found",
+      "spaceNotFoundTitle": "Space Not Found"
+    },
+    "publicTimeline": {
+      "noMessages": "This space doesn't have any messages yet."
     }
   },
   "spaceSelector": {

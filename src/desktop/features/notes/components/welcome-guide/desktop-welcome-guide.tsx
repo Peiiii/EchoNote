@@ -10,14 +10,15 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, FileText, Lightbulb, Plus, Sparkles } from "lucide-react";
 
 export const DesktopWelcomeGuide = () => {
+  const { t } = useTranslation();
   const { addChannel } = useNotesDataStore();
 
   const handleCreateFirstChannel = async () => {
     try {
       await addChannel({
-        name: "My First Space",
+        name: t('desktop.welcomeGuide.firstSpaceName'),
         emoji: "🚀",
-        description: "Start your journey here",
+        description: t('desktop.welcomeGuide.firstSpaceDescription'),
       });
     } catch (error) {
       console.error("Failed to create first channel:", error);
@@ -32,10 +33,9 @@ export const DesktopWelcomeGuide = () => {
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
             <Sparkles className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Welcome to StillRoot</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('desktop.welcomeGuide.title')}</h1>
           <p className="text-lg text-muted-foreground max-w-lg mx-auto">
-            Your personal space for thoughts, ideas, and AI-powered conversations. Let's create your
-            first thought space to get started.
+            {t('desktop.welcomeGuide.description')}
           </p>
         </div>
 
@@ -46,12 +46,11 @@ export const DesktopWelcomeGuide = () => {
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <CardTitle className="text-base">Organize Thoughts</CardTitle>
+              <CardTitle className="text-base">{t('desktop.welcomeGuide.feature1.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-sm">
-                Create dedicated spaces for different topics and organize your thoughts
-                systematically.
+                {t('desktop.welcomeGuide.feature1.description')}
               </CardDescription>
             </CardContent>
           </Card>
@@ -61,12 +60,11 @@ export const DesktopWelcomeGuide = () => {
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <Bot className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
-              <CardTitle className="text-base">AI Assistant</CardTitle>
+              <CardTitle className="text-base">{t('desktop.welcomeGuide.feature2.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-sm">
-                Get help from AI to explore ideas, answer questions, and enhance your thinking
-                process.
+                {t('desktop.welcomeGuide.feature2.description')}
               </CardDescription>
             </CardContent>
           </Card>
@@ -76,11 +74,11 @@ export const DesktopWelcomeGuide = () => {
               <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <Lightbulb className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <CardTitle className="text-base">Spark Ideas</CardTitle>
+              <CardTitle className="text-base">{t('desktop.welcomeGuide.feature3.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-sm">
-                Capture inspiration, brainstorm solutions, and develop your creative potential.
+                {t('desktop.welcomeGuide.feature3.description')}
               </CardDescription>
             </CardContent>
           </Card>
@@ -94,10 +92,10 @@ export const DesktopWelcomeGuide = () => {
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Create Your First Space
+            {t('desktop.welcomeGuide.createFirstSpace')}
           </Button>
           <p className="text-sm text-muted-foreground">
-            You can always create more spaces later from the sidebar
+            {t('desktop.welcomeGuide.createMoreHint')}
           </p>
         </div>
       </div>

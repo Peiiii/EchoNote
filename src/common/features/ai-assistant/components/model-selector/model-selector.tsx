@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/common/components/ui/badge";
 import { PRESET_MODELS, getModelById, ModelConfig } from "../../config/model-config";
 import { ModelSelectorProps } from "../../types/model-config.types";
+import { useTranslation } from "react-i18next";
 
 const getModelBadgeVariant = (
   modelId: string
@@ -29,6 +30,7 @@ export function ModelSelector({
   onModelChange,
   className = "",
 }: ModelSelectorProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedModel = selectedModelId ? getModelById(selectedModelId) : PRESET_MODELS[0];
@@ -47,14 +49,14 @@ export function ModelSelector({
             size="sm"
             className="h-8 px-3 gap-2 bg-transparent hover:bg-accent/50 text-muted-foreground hover:text-foreground"
           >
-            <span className="text-sm font-medium">{selectedModel?.name || "Select Model"}</span>
+            <span className="text-sm font-medium">{selectedModel?.name || t('aiAssistant.modelSelector.selectModel')}</span>
             <ChevronDown className="w-3 h-3 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start" className="w-64 p-1" side="top">
           <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1.5">
-            Choose AI Model
+            {t('aiAssistant.modelSelector.chooseModel')}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
 
@@ -69,12 +71,12 @@ export function ModelSelector({
               <div className="flex items-center gap-1">
                 {model.isDefault && (
                   <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                    Default
+                    {t('aiAssistant.modelSelector.default')}
                   </Badge>
                 )}
                 {selectedModelId === model.id && (
                   <Badge variant={getModelBadgeVariant(model.id)} className="text-xs px-1.5 py-0.5">
-                    Selected
+                    {t('aiAssistant.modelSelector.selected')}
                   </Badge>
                 )}
               </div>

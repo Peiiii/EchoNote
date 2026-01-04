@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { ConversationContextMode, AIConversation } from "@/common/types/ai-conversation";
+import { useTranslation } from "react-i18next";
 
 // Context trigger component - encapsulates the trigger button logic
 interface ContextTriggerProps {
@@ -169,6 +170,7 @@ function ChannelSelector({
   toggleChannel,
   fallbackChannelId,
 }: ChannelSelectorProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-muted/35 border border-muted/50 rounded-lg shadow-sm transition-all">
       {/* Search bar */}
@@ -176,7 +178,7 @@ function ChannelSelector({
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <Input
-            placeholder="Search spaces..."
+            placeholder={t('aiAssistant.contextControl.searchSpaces')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="pl-9 h-7 text-sm border-0 bg-background/95 focus:bg-background focus:ring-1 focus:ring-primary/20"
@@ -192,7 +194,7 @@ function ChannelSelector({
               {searchQuery ? "🔍" : "📁"}
             </div>
             <div className="text-xs text-muted-foreground/70">
-              {searchQuery ? "No spaces found" : "No spaces available"}
+              {searchQuery ? t('aiAssistant.contextControl.noSpacesFound') : t('aiAssistant.contextControl.noSpacesAvailable')}
             </div>
           </div>
         ) : (
@@ -214,7 +216,7 @@ function ChannelSelector({
                     <span className="text-sm">{ch.emoji || "📝"}</span>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{ch.name}</div>
-                      {isFallback && <div className="text-xs text-primary/80">Current space</div>}
+                      {isFallback && <div className="text-xs text-primary/80">{t('aiAssistant.contextControl.currentSpace')}</div>}
                     </div>
                   </div>
                   {checked && <Check className="w-4 h-4 text-primary" />}
@@ -242,11 +244,12 @@ function ToolChannelSelector({
   onActiveToolChannelChange,
   getChannelName,
 }: ToolChannelSelectorProps) {
+  const { t } = useTranslation();
   return (
     <div className="p-2.5 rounded-lg bg-muted/35 border border-muted/50 shadow-sm">
       <div className="flex items-center gap-2 mb-2">
         <SlidersHorizontal className="w-4 h-4 text-muted-foreground/70" />
-        <span className="text-sm font-medium text-foreground/90">Active Tool Space</span>
+        <span className="text-sm font-medium text-foreground/90">{t('aiAssistant.contextControl.activeToolSpace')}</span>
       </div>
       <select
         value={
@@ -257,7 +260,7 @@ function ToolChannelSelector({
         onChange={e => onActiveToolChannelChange(e.target.value || null)}
         className="w-full h-7 px-2.5 rounded-lg border-0 bg-background/95 text-sm focus:bg-background focus:ring-1 focus:ring-primary/20 transition-all duration-200"
       >
-        {draftChannelIds.length === 0 && <option value="">(none)</option>}
+        {draftChannelIds.length === 0 && <option value="">{t('aiAssistant.contextControl.none')}</option>}
         {draftChannelIds.map(id => (
           <option key={id} value={id}>
             {getChannelName(id)}
@@ -287,6 +290,7 @@ export function ConversationContextControl({
   className,
   showModeNameInCompact = false,
 }: Props) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const conv = useConversationStore(s => s.conversations.find(c => c.id === conversationId));
   const { channels } = useNotesDataStore();
@@ -337,11 +341,11 @@ export function ConversationContextControl({
   // Get current mode name for display
   const getCurrentModeName = () => {
     const ctx = conv?.contexts;
-    if (!ctx || ctx.mode === ConversationContextMode.AUTO) return "Auto";
-    if (ctx.mode === ConversationContextMode.NONE) return "None";
-    if (ctx.mode === ConversationContextMode.ALL) return "All";
-    if (ctx.mode === ConversationContextMode.CHANNELS) return "Custom";
-    return "Auto";
+    if (!ctx || ctx.mode === ConversationContextMode.AUTO) return t('aiAssistant.contextControl.mode.auto');
+    if (ctx.mode === ConversationContextMode.NONE) return t('aiAssistant.contextControl.mode.none');
+    if (ctx.mode === ConversationContextMode.ALL) return t('aiAssistant.contextControl.mode.all');
+    if (ctx.mode === ConversationContextMode.CHANNELS) return t('aiAssistant.contextControl.mode.custom');
+    return t('aiAssistant.contextControl.mode.auto');
   };
 
   return (
@@ -373,13 +377,13 @@ export function ConversationContextControl({
         <RefinedPopover.Content width="w-80" align="center" side="bottom">
           <RefinedPopover.Header>
             <SlidersHorizontal className="w-4 h-4 text-primary/80" />
-            <div className="text-sm font-semibold text-foreground/90">Context Settings</div>
+            <div className="text-sm font-semibold text-foreground/90">{t('aiAssistant.contextControl.title')}</div>
             <RefinedPopover.Button
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 ml-auto"
               onClick={() => setIsOpen(false)}
-              title="Close"
+              title={t('common.close')}
             >
               <X className="h-3 w-3" />
             </RefinedPopover.Button>
@@ -390,7 +394,7 @@ export function ConversationContextControl({
               <div className="mb-3 p-2.5 rounded-lg bg-primary/6">
                 <div className="flex items-center gap-2 text-xs text-primary/90">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span>Loading context data...</span>
+                  <span>{t('aiAssistant.contextControl.loading')}</span>
                 </div>
               </div>
             )}
@@ -399,8 +403,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.AUTO}
                 currentMode={draftMode}
                 icon={<Sparkles className="w-4 h-4 text-muted-foreground" />}
-                title="Auto"
-                description="Current space only"
+                title={t('aiAssistant.contextControl.mode.auto')}
+                description={t('aiAssistant.contextControl.mode.autoDescription')}
                 onClick={() => {
                   setDraftMode(ConversationContextMode.AUTO);
                   setIsCustomExpanded(false);
@@ -411,8 +415,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.NONE}
                 currentMode={draftMode}
                 icon={<Ban className="w-4 h-4 text-muted-foreground" />}
-                title="None"
-                description="No context access"
+                title={t('aiAssistant.contextControl.mode.none')}
+                description={t('aiAssistant.contextControl.mode.noneDescription')}
                 onClick={() => {
                   setDraftMode(ConversationContextMode.NONE);
                   setIsCustomExpanded(false);
@@ -423,8 +427,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.ALL}
                 currentMode={draftMode}
                 icon={<Globe className="w-4 h-4 text-muted-foreground" />}
-                title="All"
-                description="All spaces access"
+                title={t('aiAssistant.contextControl.mode.all')}
+                description={t('aiAssistant.contextControl.mode.allDescription')}
                 onClick={() => {
                   setDraftMode(ConversationContextMode.ALL);
                   setIsCustomExpanded(false);
@@ -435,8 +439,8 @@ export function ConversationContextControl({
                 mode={ConversationContextMode.CHANNELS}
                 currentMode={draftMode}
                 icon={<Layers className="w-4 h-4 text-muted-foreground" />}
-                title="Custom"
-                description="Select specific spaces"
+                title={t('aiAssistant.contextControl.mode.custom')}
+                description={t('aiAssistant.contextControl.mode.customDescription')}
                 showChevron={true}
                 isExpanded={isCustomExpanded}
                 onClick={() => {
@@ -474,7 +478,7 @@ export function ConversationContextControl({
 
           <RefinedPopover.Actions>
             <RefinedPopover.Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </RefinedPopover.Button>
             <RefinedPopover.Button
               type="button"
@@ -484,7 +488,7 @@ export function ConversationContextControl({
                 setIsOpen(false);
               }}
             >
-              Apply Changes
+              {t('aiAssistant.contextControl.applyChanges')}
             </RefinedPopover.Button>
           </RefinedPopover.Actions>
         </RefinedPopover.Content>

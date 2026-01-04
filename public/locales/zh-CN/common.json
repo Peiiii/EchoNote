@@ -1,5 +1,11 @@
 {
   "agentTools": {
+    "comparisonLayout": {
+      "loadingOriginal": "正在加载原始内容...",
+      "loadingUpdated": "正在加载更新内容...",
+      "original": "原始",
+      "updated": "更新"
+    },
     "createNote": {
       "cancelled": "创建已取消",
       "confirm": "创建笔记",
@@ -82,6 +88,27 @@
     }
   },
   "aiAssistant": {
+    "contextControl": {
+      "activeToolSpace": "活动工具空间",
+      "applyChanges": "应用更改",
+      "currentSpace": "当前空间",
+      "loading": "正在加载上下文数据...",
+      "mode": {
+        "all": "全部",
+        "allDescription": "访问所有空间",
+        "auto": "自动",
+        "autoDescription": "仅当前空间",
+        "custom": "自定义",
+        "customDescription": "选择特定空间",
+        "none": "无",
+        "noneDescription": "无上下文访问"
+      },
+      "none": "（无）",
+      "noSpacesAvailable": "没有可用空间",
+      "noSpacesFound": "未找到空间",
+      "searchSpaces": "搜索空间...",
+      "title": "上下文设置"
+    },
     "conversationList": {
       "archiveConversation": "归档对话",
       "archived": "已归档",
@@ -108,6 +135,12 @@
       "startConversation": "开始对话",
       "title": "AI 笔记助手",
       "tryAsking": "试试问："
+    },
+    "modelSelector": {
+      "chooseModel": "选择 AI 模型",
+      "default": "默认",
+      "selected": "已选择",
+      "selectModel": "选择模型"
     }
   },
   "auth": {
@@ -131,6 +164,15 @@
       "resendLink": "重新发送链接",
       "sending": "发送中...",
       "sentLink": "我们已发送验证链接{{email}}"
+    },
+    "guestDataNotice": {
+      "description": "你的数据仅保存在本机（不会云同步，换设备不可见）。登录后可启用云同步与发布能力。",
+      "gotIt": "我知道了",
+      "goToLogin": "去登录",
+      "loginDescription": "登录后可云同步、发布空间，并在多设备访问你的数据。",
+      "loginTitle": "登录以启用云端能力",
+      "subtitle": "你当前在使用本地数据集",
+      "title": "访客模式提示"
     },
     "login": {
       "descOrLocal": "登录后可云同步、发布空间；也可以先用本地模式体验。",
@@ -180,6 +222,8 @@
       "continueWithGoogle": "使用 Google 继续"
     },
     "userProfile": {
+      "avatarAlt": "用户头像",
+      "avatarFallback": "U",
       "manageAccount": "点击管理账户",
       "signInHint": "登录以同步您的数据",
       "signOut": "退出登录",
@@ -373,6 +417,64 @@
       "label": "回复："
     }
   },
+  "notes": {
+    "messageTimeline": {
+      "collapse": "折叠",
+      "collapseCurrent": "折叠当前",
+      "openAIAssistant": "打开 AI 助手",
+      "showComposer": "显示编辑器"
+    },
+    "moveNoteModal": {
+      "confirmMove": "确认移动",
+      "description": "为此想法选择一个目标空间。同一线程中的任何回复都会一起移动。",
+      "destinationSpace": "目标空间",
+      "error": "移动笔记失败。请重试。",
+      "moving": "正在移动…",
+      "noMatches": "没有匹配的空间。",
+      "noSpaces": "请先创建另一个空间以移动此想法。",
+      "searchPlaceholder": "搜索空间",
+      "title": "移动到空间",
+      "willMoveTo": "将移动到："
+    },
+    "spaceEmptyState": {
+      "description": "开始在这里捕捉你的想法和灵感。你的 AI 助手将帮助你探索和进一步发展它们。",
+      "tip1": "在下方输入你的第一个想法",
+      "tip2": "AI 将帮助扩展你的想法",
+      "tip3": "将你的想法连接在一起",
+      "title": "你的空间已准备就绪！"
+    },
+    "tagEditor": {
+      "editPlaceholder": "编辑 \"{{tag}}\"",
+      "editTags": "编辑标签",
+      "noTags": "还没有标签。在上面添加一些。",
+      "placeholder": "添加标签...",
+      "tagCount": "{{current}} / {{max}} 个标签",
+      "tags": "标签"
+    },
+    "tagList": {
+      "more_one": "+{{count}} 个",
+      "more_other": "+{{count}} 个"
+    }
+  },
+  "noteSearch": {
+    "emptyStates": {
+      "noResults": "未找到结果",
+      "refreshIndex": "刷新索引",
+      "refreshing": "正在刷新...",
+      "searchAll": "搜索所有空间",
+      "searchCurrent": "搜索当前空间"
+    },
+    "searchHeader": {
+      "all": "全部",
+      "current": "当前",
+      "indexing": "正在索引…",
+      "placeholderAll": "搜索所有空间…",
+      "placeholderCurrent": "搜索当前空间…"
+    },
+    "searchResults": {
+      "noPreview": "（无预览）"
+    }
+  },
   "pwa": {
     "install": {
       "button": "安装应用",
@@ -390,6 +492,23 @@
       "later": "稍后",
       "title": "有可用更新",
       "updating": "更新中..."
+    }
+  },
+  "spacePublish": {
+    "publicSpacePage": {
+      "failedToLoad": "加载空间失败",
+      "failedToSend": "发送消息失败",
+      "invalidToken": "无效的分享令牌",
+      "loadingSpace": "正在加载空间",
+      "messagePlaceholder": "输入你的消息...（Ctrl/Cmd+Enter 发送）",
+      "pleaseWait": "请稍候...",
+      "sendMessage": "发送消息",
+      "spaceNotAvailable": "此空间不可用或已被删除。",
+      "spaceNotFound": "未找到空间",
+      "spaceNotFoundTitle": "未找到空间"
+    },
+    "publicTimeline": {
+      "noMessages": "此空间还没有任何消息。"
     }
   },
   "spaceSelector": {

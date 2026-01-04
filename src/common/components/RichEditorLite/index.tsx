@@ -75,8 +75,9 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
 )
 ToolbarButton.displayName = 'ToolbarButton'
 
-export function RichEditorLite({ value, onChange, editable = true, placeholder = 'Write here...', className = '', variant = 'default', maxHeight, minHeight, enterSends = false, onSubmitEnter, hideToolbar, suspended = false }: RichEditorLiteProps) {
+export function RichEditorLite({ value, onChange, editable = true, placeholder, className = '', variant = 'default', maxHeight, minHeight, enterSends = false, onSubmitEnter, hideToolbar, suspended = false }: RichEditorLiteProps) {
   const { t } = useTranslation()
+  const defaultPlaceholder = placeholder || t('editor.placeholder')
   // Create bubble menu element before editor initialization so the extension can mount.
   const bubbleEl = useMemo<HTMLElement>(() => {
     const el = document.createElement('div')
@@ -172,7 +173,7 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder =
         }
       }),
       Placeholder.configure({
-        placeholder,
+        placeholder: defaultPlaceholder,
         showOnlyWhenEditable: true,
         showOnlyCurrent: false,
       }),

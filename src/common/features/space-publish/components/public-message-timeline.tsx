@@ -1,6 +1,7 @@
 import { Message } from "@/core/stores/notes-data.store";
 import { useMemo } from "react";
 import { PublicMessageItem } from "./public-message-item";
+import { useTranslation } from "react-i18next";
 
 interface PublicMessageTimelineProps {
   groupedMessages: Record<string, Message[]>;
@@ -15,6 +16,7 @@ interface TimelineItem {
 export function PublicMessageTimeline({
   groupedMessages,
 }: PublicMessageTimelineProps) {
+  const { t } = useTranslation();
   const items = useMemo(() => {
     const list: TimelineItem[] = [];
     Object.entries(groupedMessages).forEach(([date, dayMessages]) => {
@@ -42,7 +44,7 @@ export function PublicMessageTimeline({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        <p className="text-muted-foreground font-medium">This space doesn't have any messages yet.</p>
+        <p className="text-muted-foreground font-medium">{t('spacePublish.publicTimeline.noMessages')}</p>
       </div>
     );
   }

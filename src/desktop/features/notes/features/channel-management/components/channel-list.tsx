@@ -13,12 +13,14 @@ import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
 }
 
 export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
   const channels = useNotesDataStore(state => state.channels);
   const channelsLoading = useNotesDataStore(state => state.channelsLoading);
@@ -58,7 +60,7 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
       >
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
-            Spaces
+            {t('channelManagement.channelList.title')}
           </h3>
         </div>
         <div className="flex items-center gap-1.5">
@@ -66,8 +68,8 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
             type="button"
             onClick={() => openQuickSearchModal({ defaultScope: "all" })}
             className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Search all notes"
-            title="Search all notes (Cmd/Ctrl+K)"
+            aria-label={t('channelManagement.channelList.searchAllNotes')}
+            title={t('channelManagement.channelList.searchAllNotesTooltip')}
           >
             <Search className="w-4 h-4" />
           </button>
@@ -77,8 +79,8 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
               <button
                 type="button"
                 className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label="New space"
-                title="New space"
+                aria-label={t('channelManagement.channelList.newSpace')}
+                title={t('channelManagement.channelList.newSpace')}
               >
                 <Plus className="w-4 h-4" />
               </button>

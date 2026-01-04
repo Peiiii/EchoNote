@@ -9,6 +9,7 @@ import {
 import { Textarea } from "@/common/components/ui/textarea";
 import { Button } from "@/common/components/ui/button";
 import { generateObject } from "@/common/services/ai/generate-object";
+import { useTranslation } from "react-i18next";
 
 // Define the expected return type
 interface TodoItem {
@@ -18,8 +19,9 @@ interface TodoItem {
 }
 
 export function AiObjectDemo() {
+  const { t } = useTranslation();
   const [prompt, setPrompt] = useState(
-    "You are a creative assistant in StillRoot. Generate a short todo item with title, completion status, and tags array (2-3 items)."
+    t('demo.aiObjectDemo.defaultPrompt')
   );
   const [result, setResult] = useState<TodoItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,28 +74,28 @@ export function AiObjectDemo() {
     <Card className="border border-slate-200 dark:border-slate-700">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
-          Object Generation Demo
+          {t('demo.aiObjectDemo.title')}
         </CardTitle>
         <CardDescription className="text-slate-600 dark:text-slate-400">
-          Generate and validate structured objects using JSON Schema constraints
+          {t('demo.aiObjectDemo.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm text-slate-600 dark:text-slate-300">Prompt</label>
+          <label className="text-sm text-slate-600 dark:text-slate-300">{t('demo.aiObjectDemo.promptLabel')}</label>
           <Textarea
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
-            placeholder="Enter object generation instructions..."
+            placeholder={t('demo.aiObjectDemo.promptPlaceholder')}
           />
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={handleRun} disabled={isLoading}>
-            {isLoading ? "Generating..." : "Generate Object"}
+            {isLoading ? t('demo.aiObjectDemo.generating') : t('demo.aiObjectDemo.generate')}
           </Button>
           {!import.meta.env.VITE_DASHSCOPE_API_KEY && (
             <span className="text-xs text-amber-600">
-              VITE_DASHSCOPE_API_KEY not detected, please configure in local .env file
+              {t('demo.aiObjectDemo.apiKeyWarning')}
             </span>
           )}
         </div>

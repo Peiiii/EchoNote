@@ -1,4 +1,5 @@
 import { Search as SearchIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface EmptyStatesProps {
   q: string;
@@ -8,6 +9,7 @@ interface EmptyStatesProps {
 }
 
 export function EmptyStates({ q, scope, isRefreshing, onRefresh }: EmptyStatesProps) {
+  const { t } = useTranslation();
   if (q.trim() === "") {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -15,7 +17,7 @@ export function EmptyStates({ q, scope, isRefreshing, onRefresh }: EmptyStatesPr
           <SearchIcon className="h-6 w-6 text-muted-foreground/50" />
         </div>
         <p className="text-sm text-muted-foreground/70">
-          Search {scope === "current" ? "current space" : "all spaces"}
+          {scope === "current" ? t('noteSearch.emptyStates.searchCurrent') : t('noteSearch.emptyStates.searchAll')}
         </p>
       </div>
     );
@@ -27,14 +29,14 @@ export function EmptyStates({ q, scope, isRefreshing, onRefresh }: EmptyStatesPr
         <SearchIcon className="h-6 w-6 text-muted-foreground/50" />
       </div>
       <p className="text-sm text-muted-foreground/70 mb-4">
-        No results found
+        {t('noteSearch.emptyStates.noResults')}
       </p>
       <button
         onClick={onRefresh}
         disabled={isRefreshing}
         className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
       >
-        {isRefreshing ? "Refreshing..." : "Refresh index"}
+        {isRefreshing ? t('noteSearch.emptyStates.refreshing') : t('noteSearch.emptyStates.refreshIndex')}
       </button>
     </div>
   );
