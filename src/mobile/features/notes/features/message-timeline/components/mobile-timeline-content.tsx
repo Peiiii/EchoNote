@@ -8,6 +8,7 @@ import { useGroupedMessages } from "@/common/features/notes/hooks/use-grouped-me
 import { useLazyLoading } from "@/common/features/notes/hooks/use-lazy-loading";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { Message } from "@/core/stores/notes-data.store";
+import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileWelcomeGuide } from "@/mobile/features/notes/components/welcome-guide/mobile-welcome-guide";
 import { MobileThoughtRecord } from "@/mobile/features/notes/features/message-timeline/components/thought-record/index";
@@ -24,6 +25,8 @@ interface MobileTimelineContentProps {
 export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelineContentProps) => {
   const presenter = useCommonPresenterContext();
   const { currentChannelId } = useNotesViewStore();
+  const channels = useNotesDataStore(s => s.channels);
+  const channelsLoading = useNotesDataStore(s => s.channelsLoading);
   const {
     messages = [],
     loading,
@@ -54,6 +57,11 @@ export const MobileTimelineContent = ({ onReply, className = "" }: MobileTimelin
   );
 
   if (!currentChannelId) {
+    // Avoid a transient welcome state while channels are still loading or awaiting auto-selection.
+    // Only show the welcome guide when we are confident the user truly has zero spaces.
+    if (channelsLoading || channels.length > 0) {
+      return <MessageTimelineSkeleton count={5} />;
+    }
     return <MobileWelcomeGuide />;
   }
 
