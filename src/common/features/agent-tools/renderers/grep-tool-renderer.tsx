@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { DisplayToolPanel, EmptyState, ErrorMessage } from "@/common/lib/agent-tools-ui";
 import { ToolInvocation } from "@agent-labs/agent-chat";
+import { useTranslation } from "react-i18next";
 
 export interface GrepToolArgs {
   pattern: string;
@@ -60,6 +61,7 @@ interface GrepToolRendererProps {
 }
 
 export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
+  const { t } = useTranslation();
   // Build a user-facing grep command string from args (context scope is not part of this command)
   const buildGrepCommand = (args: Partial<GrepToolArgs>): string => {
     const a = args || {};
@@ -101,22 +103,22 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
     const cmd = buildGrepCommand(args);
     return (
       <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 space-y-2">
-        <div className="text-xs text-gray-600 dark:text-gray-400">Command</div>
+        <div className="text-xs text-gray-600 dark:text-gray-400">{t("agentTools.grep.command")}</div>
         <pre className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1 rounded overflow-x-auto">
           {cmd}
         </pre>
         <div className="text-xs text-gray-700 dark:text-gray-300">
           <span className="inline-block mr-2">
-            scope: <code>{scope || "global"}</code>
+            {t("agentTools.grep.scope")}: <code>{scope || t("agentTools.grep.global")}</code>
           </span>
           {typeof effectiveIncludeCount === "number" && (
             <span className="inline-block">
-              channels: <code>{effectiveIncludeCount}</code>
+              {t("agentTools.grep.channels")}: <code>{effectiveIncludeCount}</code>
             </span>
           )}
         </div>
         <div className="text-[10px] text-gray-500 dark:text-gray-400">
-          Scope is enforced by conversation/UI context and is not part of the grep command.
+          {t("agentTools.grep.scopeNote")}
         </div>
       </div>
     );
@@ -126,16 +128,22 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
     <DisplayToolPanel<GrepToolArgs, GrepToolResult>
       invocation={invocation}
       icon={<Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
-      title="Grep Notes"
-      loadingText="Searching notes..."
+      title={t("agentTools.grep.title")}
+      loadingText={t("agentTools.grep.searching")}
       successStatusText={result => {
         const s = result?.summary;
-        if (!s) return "Search finished";
-        const suffix = s.timedOut ? " (timed out)" : "";
-        return `Matches ${s.totalMatches} in ${s.matchedNotes}/${s.scannedNotes} notes • ${s.tookMs}ms${suffix}`;
+        if (!s) return t("agentTools.grep.finished");
+        const suffix = s.timedOut ? ` (${t("agentTools.grep.timedOut")})` : "";
+        return t("agentTools.grep.successStatus", {
+          totalMatches: s.totalMatches,
+          matchedNotes: s.matchedNotes,
+          scannedNotes: s.scannedNotes,
+          tookMs: s.tookMs,
+          suffix
+        });
       }}
-      errorStatusText={() => "Search failed"}
-      readyStatusText="Ready to search"
+      errorStatusText={() => t("agentTools.grep.failed")}
+      readyStatusText={t("agentTools.grep.ready")}
       contentScrollable={true}
       headerCardClassName="border-blue-200 dark:border-blue-800"
       contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
@@ -151,7 +159,7 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
               {paramPanel}
               <ErrorMessage
                 error={error}
-                fallbackMessage="An error occurred while searching"
+                fallbackMessage={t("agentTools.grep.errorOccurred")}
                 variant="alert"
               />
             </div>
@@ -170,7 +178,7 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
           return (
             <div className="space-y-3">
               {paramPanel}
-              <div className="text-sm text-gray-600 dark:text-gray-400">Matched notes:</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{t("agentTools.grep.matchedNotes")}</div>
               <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                 <ul className="list-disc pl-6 text-sm">
                   {result.noteIds.map(id => (
@@ -188,7 +196,7 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
           return (
             <div className="space-y-3">
               {paramPanel}
-              <EmptyState icon={Search} message="No matches found" />
+              <EmptyState icon={Search} message={t("agentTools.grep.noMatches")} />
             </div>
           );
         }
@@ -202,7 +210,7 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
                 className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 space-y-2"
               >
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  note: <code>{m.noteId}</code> • channel: <code>{m.channelId}</code> •{" "}
+                  {t("agentTools.grep.note")}: <code>{m.noteId}</code> • {t("agentTools.grep.channel")}: <code>{m.channelId}</code> •{" "}
                   {m.timestamp}
                 </div>
                 <div className="font-mono text-sm">

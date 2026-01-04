@@ -12,12 +12,14 @@ import {
 import { LogOut } from "lucide-react";
 import { firebaseAuthService } from "@/common/services/firebase";
 import { LoginButton } from "@/common/features/auth/components/login-button";
+import { useTranslation } from "react-i18next";
 
 interface UserProfileProps {
   user: User | null; // Firebase User
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) {
@@ -30,7 +32,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
             </div>
           </TooltipTrigger>
           <TooltipContent side="right">
-            <p>Sign in to sync your data</p>
+            <p>{t("auth.userProfile.signInHint")}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -76,7 +78,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{user.displayName || "User"}</p>
+                    <p className="text-sm font-medium truncate">{user.displayName || t("auth.userProfile.user")}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                       {user.email}
                     </p>
@@ -92,7 +94,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign Out
+                    {t("auth.userProfile.signOut")}
                   </Button>
                 </div>
               </div>
@@ -101,9 +103,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
         </TooltipTrigger>
         <TooltipContent side="right">
           <div className="text-center">
-            <p className="font-medium">{user.displayName || "User"}</p>
+            <p className="font-medium">{user.displayName || t("auth.userProfile.user")}</p>
             <p className="text-xs text-slate-400">{user.email}</p>
-            <p className="text-xs text-slate-500">Click to manage account</p>
+            <p className="text-xs text-slate-500">{t("auth.userProfile.manageAccount")}</p>
           </div>
         </TooltipContent>
       </Tooltip>

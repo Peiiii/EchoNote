@@ -1,4 +1,86 @@
 {
+  "agentTools": {
+    "createNote": {
+      "cancelled": "Creation Cancelled",
+      "confirm": "Create Note",
+      "preparing": "Preparing parameters...",
+      "ready": "Ready to create",
+      "resultSuccess": "Note Created Successfully!",
+      "saved": "Your note has been saved to the channel.",
+      "success": "Note created successfully",
+      "title": "Create Note"
+    },
+    "deleteNote": {
+      "confirm": "Delete Note",
+      "deletedContent": "Deleted note content",
+      "loadingContent": "Loading note content...",
+      "preparing": "Preparing parameters...",
+      "ready": "Ready to delete",
+      "resultSuccess": "Note Deleted Successfully!",
+      "success": "Note deleted successfully",
+      "title": "Delete Note",
+      "warning": "Warning:",
+      "warningDescription": "This action will permanently delete the note. This cannot be undone."
+    },
+    "grep": {
+      "channel": "channel",
+      "channels": "channels",
+      "command": "Command",
+      "errorOccurred": "An error occurred while searching",
+      "failed": "Search failed",
+      "finished": "Search finished",
+      "global": "global",
+      "matchedNotes": "Matched notes:",
+      "noMatches": "No matches found",
+      "note": "note",
+      "ready": "Ready to search",
+      "scope": "scope",
+      "scopeNote": "Scope is enforced by conversation/UI context and is not part of the grep command.",
+      "searching": "Searching notes...",
+      "successStatus": "Matches {{totalMatches}} in {{matchedNotes}}/{{scannedNotes}} notes • {{tookMs}}ms{{suffix}}",
+      "timedOut": "timed out",
+      "title": "Grep Notes"
+    },
+    "listNotes": {
+      "errorOccurred": "An error occurred while loading notes",
+      "failed": "Failed to load notes",
+      "found_one": "Found 1 note",
+      "found_other": "Found {{count}} notes",
+      "loading": "Loading notes from channel...",
+      "noNotes": "No notes found in this channel",
+      "preparing": "Preparing to list notes...",
+      "showing": "Showing up to {{limit}} notes from the channel",
+      "title": "List Notes"
+    },
+    "noteList": {
+      "charactersTotal_one": "(1 character total)",
+      "charactersTotal_other": "({{count}} characters total)"
+    },
+    "readNote": {
+      "errorOccurred": "An error occurred while loading the note",
+      "failed": "Failed to load note",
+      "loading": "Reading note {{noteId}}...",
+      "notFound": "Note not found",
+      "preparing": "Preparing to read note...",
+      "success": "Note loaded successfully",
+      "title": "Read Note"
+    },
+    "updateNote": {
+      "cancelled": "Update Cancelled",
+      "confirm": "Update Note",
+      "loadingOriginal": "Loading original content...",
+      "loadingUpdated": "Loading updated content...",
+      "original": "Original",
+      "originalContent": "Original content",
+      "preparing": "Preparing parameters...",
+      "ready": "Ready to update",
+      "resultSuccess": "Note Updated Successfully!",
+      "success": "Note updated successfully",
+      "title": "Update Note",
+      "updated": "Updated",
+      "updatedContent": "Updated content"
+    }
+  },
   "auth": {
     "login": {
       "descOrLocal": "Sign in for cloud sync and publishing, or try local mode first.",
@@ -10,6 +92,12 @@
       },
       "title": "Sign in",
       "titleOrLocal": "Sign in or try locally"
+    },
+    "userProfile": {
+      "manageAccount": "Click to manage account",
+      "signInHint": "Sign in to sync your data",
+      "signOut": "Sign Out",
+      "user": "User"
     }
   },
   "backgroundSwitcher": {
@@ -37,12 +125,16 @@
     "studio": "Studio"
   },
   "common": {
+    "brand": "EN",
+    "clearSearch": "Clear search",
     "close": "Close",
     "closeViewer": "Close viewer",
+    "copied": "Copied!",
     "loading": "Loading...",
     "loadingWorkspace": "Please wait while we prepare your workspace...",
     "moreActions": "More actions",
     "pressEscToClose": "Press <0>ESC</0> to close",
+    "unknown": "unknown",
     "viewLarger": "View larger"
   },
   "header": {
@@ -69,6 +161,18 @@
     "en": "English",
     "label": "Language",
     "zhCN": "中文"
+  },
+  "markdown": {
+    "mermaid": {
+      "copySource": "Copy source",
+      "downloadMmd": "Download .mmd",
+      "downloadSvg": "Download SVG",
+      "label": "MERMAID",
+      "preview": "Diagram Preview",
+      "renderFailed": "Failed to render mermaid diagram",
+      "viewDiagram": "View diagram",
+      "viewSource": "View source"
+    }
   },
   "messageInput": {
     "bottom": {
@@ -115,6 +219,13 @@
       "title": "Update Available",
       "updating": "Updating..."
     }
+  },
+  "spaceSelector": {
+    "allSpaces": "All spaces",
+    "noSpacesAvailable": "No spaces available",
+    "noSpacesFound": "No spaces found",
+    "searchPlaceholder": "Search spaces...",
+    "tryDifferentSearch": "Try a different search term"
   },
   "thoughtRecord": {
     "actions": {

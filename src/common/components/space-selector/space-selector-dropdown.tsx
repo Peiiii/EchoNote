@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { cn } from "@/common/lib/utils";
 import { getChannelIcon } from "@/desktop/features/notes/features/channel-management/components/channel-icons";
+import { useTranslation } from "react-i18next";
 
 type DisplayItem = 
   | { type: "channel"; channel: Channel }
@@ -127,6 +128,7 @@ export const SpaceSelectorDropdown = ({
   maxHeight = 400,
   itemHeight = 40,
 }: SpaceSelectorDropdownProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -188,7 +190,7 @@ export const SpaceSelectorDropdown = ({
       });
       
       if (otherChannels.length > 0) {
-        result.push({ type: "separator", label: "All spaces" });
+        result.push({ type: "separator", label: t("spaceSelector.allSpaces") });
       }
     }
     
@@ -283,7 +285,7 @@ export const SpaceSelectorDropdown = ({
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
                 ref={searchInputRef}
-                placeholder="Search spaces..."
+                placeholder={t("spaceSelector.searchPlaceholder")}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onKeyDown={handleKeyDown}
@@ -293,7 +295,7 @@ export const SpaceSelectorDropdown = ({
                 <button
                   onClick={clearSearch}
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Clear search"
+                  aria-label={t("common.clearSearch")}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -311,11 +313,11 @@ export const SpaceSelectorDropdown = ({
                   {searchQuery ? "🔍" : "📁"}
                 </div>
                 <div className="text-sm text-muted-foreground font-medium mb-1">
-                  {searchQuery ? "No spaces found" : "No spaces available"}
+                  {searchQuery ? t("spaceSelector.noSpacesFound") : t("spaceSelector.noSpacesAvailable")}
                 </div>
                 {searchQuery && (
                   <div className="text-xs text-muted-foreground/70">
-                    Try a different search term
+                    {t("spaceSelector.tryDifferentSearch")}
                   </div>
                 )}
               </div>

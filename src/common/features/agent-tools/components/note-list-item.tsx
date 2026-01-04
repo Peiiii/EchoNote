@@ -1,6 +1,7 @@
 import { Badge } from "@/common/components/ui/badge";
 import { Clock, Hash } from "lucide-react";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface NoteListItemProps {
   noteId: string;
@@ -25,6 +26,7 @@ export function NoteListItem({
   charCountThreshold = 60,
   className,
 }: NoteListItemProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={cn(
@@ -49,7 +51,7 @@ export function NoteListItem({
       <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{content}</p>
       {showCharCount && contentLength > charCountThreshold && (
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          ({contentLength} characters total)
+          {t("agentTools.noteList.charactersTotal", { count: contentLength })}
         </p>
       )}
     </div>

@@ -1,4 +1,86 @@
 {
+  "agentTools": {
+    "createNote": {
+      "cancelled": "创建已取消",
+      "confirm": "创建笔记",
+      "preparing": "准备参数...",
+      "ready": "准备创建",
+      "resultSuccess": "笔记创建成功！",
+      "saved": "您的笔记已保存到频道。",
+      "success": "笔记创建成功",
+      "title": "创建笔记"
+    },
+    "deleteNote": {
+      "confirm": "删除笔记",
+      "deletedContent": "已删除的笔记内容",
+      "loadingContent": "加载笔记内容...",
+      "preparing": "准备参数...",
+      "ready": "准备删除",
+      "resultSuccess": "笔记删除成功！",
+      "success": "笔记删除成功",
+      "title": "删除笔记",
+      "warning": "警告：",
+      "warningDescription": "此操作将永久删除笔记。此操作无法撤销。"
+    },
+    "grep": {
+      "channel": "频道",
+      "channels": "频道",
+      "command": "命令",
+      "errorOccurred": "搜索时发生错误",
+      "failed": "搜索失败",
+      "finished": "搜索完成",
+      "global": "全局",
+      "matchedNotes": "匹配的笔记：",
+      "noMatches": "未找到匹配项",
+      "note": "笔记",
+      "ready": "准备搜索",
+      "scope": "范围",
+      "scopeNote": "范围由对话/UI 上下文强制执行，不属于 grep 命令的一部分。",
+      "searching": "搜索笔记...",
+      "successStatus": "在 {{matchedNotes}}/{{scannedNotes}} 条笔记中找到 {{totalMatches}} 个匹配项 • {{tookMs}} 毫秒{{suffix}}",
+      "timedOut": "超时",
+      "title": "搜索笔记"
+    },
+    "listNotes": {
+      "errorOccurred": "加载笔记时发生错误",
+      "failed": "加载笔记失败",
+      "found_one": "找到 1 条笔记",
+      "found_other": "找到 {{count}} 条笔记",
+      "loading": "从频道加载笔记...",
+      "noNotes": "此频道中未找到笔记",
+      "preparing": "准备列出笔记...",
+      "showing": "显示最多 {{limit}} 条笔记",
+      "title": "列出笔记"
+    },
+    "noteList": {
+      "charactersTotal_one": "（共 1 个字符）",
+      "charactersTotal_other": "（共 {{count}} 个字符）"
+    },
+    "readNote": {
+      "errorOccurred": "加载笔记时发生错误",
+      "failed": "加载笔记失败",
+      "loading": "正在读取笔记 {{noteId}}...",
+      "notFound": "未找到笔记",
+      "preparing": "准备读取笔记...",
+      "success": "笔记加载成功",
+      "title": "读取笔记"
+    },
+    "updateNote": {
+      "cancelled": "更新已取消",
+      "confirm": "更新笔记",
+      "loadingOriginal": "加载原始内容...",
+      "loadingUpdated": "加载更新内容...",
+      "original": "原始",
+      "originalContent": "原始内容",
+      "preparing": "准备参数...",
+      "ready": "准备更新",
+      "resultSuccess": "笔记更新成功！",
+      "success": "笔记更新成功",
+      "title": "更新笔记",
+      "updated": "已更新",
+      "updatedContent": "更新内容"
+    }
+  },
   "auth": {
     "login": {
       "descOrLocal": "登录后可云同步、发布空间；也可以先用本地模式体验。",
@@ -10,6 +92,12 @@
       },
       "title": "登录",
       "titleOrLocal": "登录或本地体验"
+    },
+    "userProfile": {
+      "manageAccount": "点击管理账户",
+      "signInHint": "登录以同步您的数据",
+      "signOut": "退出登录",
+      "user": "用户"
     }
   },
   "backgroundSwitcher": {
@@ -37,12 +125,16 @@
     "studio": "工作室"
   },
   "common": {
+    "brand": "EN",
+    "clearSearch": "清除搜索",
     "close": "关闭",
     "closeViewer": "关闭查看器",
+    "copied": "已复制！",
     "loading": "加载中...",
     "loadingWorkspace": "请稍候，我们正在准备您的工作区...",
     "moreActions": "更多操作",
     "pressEscToClose": "按 <0>ESC</0> 关闭",
+    "unknown": "未知",
     "viewLarger": "查看大图"
   },
   "header": {
@@ -69,6 +161,18 @@
     "en": "English",
     "label": "语言",
     "zhCN": "中文"
+  },
+  "markdown": {
+    "mermaid": {
+      "copySource": "复制源代码",
+      "downloadMmd": "下载 .mmd",
+      "downloadSvg": "下载 SVG",
+      "label": "MERMAID",
+      "preview": "图表预览",
+      "renderFailed": "渲染 mermaid 图表失败",
+      "viewDiagram": "查看图表",
+      "viewSource": "查看源代码"
+    }
   },
   "messageInput": {
     "bottom": {
@@ -115,6 +219,13 @@
       "title": "有可用更新",
       "updating": "更新中..."
     }
+  },
+  "spaceSelector": {
+    "allSpaces": "所有空间",
+    "noSpacesAvailable": "没有可用空间",
+    "noSpacesFound": "未找到空间",
+    "searchPlaceholder": "搜索空间...",
+    "tryDifferentSearch": "尝试其他搜索词"
   },
   "thoughtRecord": {
     "actions": {

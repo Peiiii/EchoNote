@@ -156,7 +156,7 @@ export const FullScreenLoading: React.FC<FullScreenLoadingProps> = ({
         {/* Logo/Brand */}
         <div className="flex items-center justify-center mb-8">
           <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-xl">EN</span>
+            <span className="text-white font-bold text-xl">{t("common.brand")}</span>
           </div>
         </div>
 

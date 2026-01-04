@@ -4,8 +4,10 @@ import { DisplayToolPanel } from "@/common/lib/agent-tools-ui";
 import { getParsedArgs } from "../utils/invocation-utils";
 import { NoteContent } from "@/common/features/agent-tools";
 import { ErrorMessage } from "@/common/lib/agent-tools-ui";
+import { useTranslation } from "react-i18next";
 
 export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
+  const { t } = useTranslation();
   const args = getParsedArgs<ReadNoteRenderArgs>(invocation);
   const noteId = args?.noteId;
 
@@ -13,18 +15,18 @@ export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
     <DisplayToolPanel<ReadNoteRenderArgs, ReadNoteRenderResult>
       invocation={invocation}
       icon={<FileText className="h-5 w-5 text-blue-600" />}
-      title="Read Note"
-      loadingText={`Reading note ${noteId?.substring(0, 8) || "unknown"}...`}
+      title={t("agentTools.readNote.title")}
+      loadingText={t("agentTools.readNote.loading", { noteId: noteId?.substring(0, 8) || t("common.unknown") })}
       successIcon={<FileText className="h-5 w-5 text-green-600" />}
       errorIcon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-      successStatusText={() => "Note loaded successfully"}
+      successStatusText={() => t("agentTools.readNote.success")}
       errorStatusText={error => {
         if (error && typeof error === "object" && "found" in error && !error.found) {
-          return "Note not found";
+          return t("agentTools.readNote.notFound");
         }
-        return "Failed to load note";
+        return t("agentTools.readNote.failed");
       }}
-      readyStatusText="Preparing to read note..."
+      readyStatusText={t("agentTools.readNote.preparing")}
       contentScrollable={true}
       headerCardClassName="border-blue-200 dark:border-blue-900"
       contentCardClassName="border-gray-200 dark:border-gray-800 mt-2"
@@ -34,13 +36,13 @@ export function ReadNoteToolRenderer({ invocation }: ReadNoteRenderProps) {
           return (
             <ErrorMessage
               error={error}
-              fallbackMessage="An error occurred while loading the note"
+              fallbackMessage={t("agentTools.readNote.errorOccurred")}
             />
           );
         }
 
         if (!result?.found) {
-          return <ErrorMessage error="Note not found" fallbackMessage="Note not found" />;
+          return <ErrorMessage error={t("agentTools.readNote.notFound")} fallbackMessage={t("agentTools.readNote.notFound")} />;
         }
 
         return (

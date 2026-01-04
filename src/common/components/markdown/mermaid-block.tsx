@@ -1,6 +1,7 @@
 import { Check, Copy, Download, Maximize2, Code2, Image as ImageIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MermaidViewer } from "@/common/components/ui/mermaid-viewer";
+import { useTranslation } from "react-i18next";
 
 interface MermaidBlockProps {
   code: string;
@@ -8,6 +9,7 @@ interface MermaidBlockProps {
 
 // Render Mermaid diagrams on demand to keep bundle size small.
 export function MermaidBlock({ code }: MermaidBlockProps) {
+  const { t } = useTranslation();
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -80,19 +82,19 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
     return (
       <div className="group/code relative my-4">
         <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">MERMAID</span>
+          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">{t("markdown.mermaid.label")}</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSource(s => !s)}
               className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-              title={showSource ? "View diagram" : "View source"}
+              title={showSource ? t("markdown.mermaid.viewDiagram") : t("markdown.mermaid.viewSource")}
             >
               {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
             </button>
             <button
               onClick={handleCopy}
               className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-              title={copied ? "Copied!" : "Copy source"}
+              title={copied ? t("common.copied") : t("markdown.mermaid.copySource")}
             >
               {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             </button>
@@ -104,7 +106,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
           </pre>
         ) : (
           <div className="bg-white dark:bg-gray-950 rounded-b p-3 overflow-x-auto border border-slate-200 dark:border-gray-700">
-            <code className="text-sm text-red-400">Failed to render mermaid diagram</code>
+            <code className="text-sm text-red-400">{t("markdown.mermaid.renderFailed")}</code>
           </div>
         )}
       </div>
@@ -114,12 +116,12 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
   return (
       <div className="group/code relative my-4" ref={containerRef}>
       <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-t px-2 py-1">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">MERMAID</span>
+        <span className="text-[11px] font-medium uppercase tracking-wide text-slate-600 dark:text-gray-300">{t("markdown.mermaid.label")}</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSource(s => !s)}
             className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-            title={showSource ? "View diagram" : "View source"}
+            title={showSource ? t("markdown.mermaid.viewDiagram") : t("markdown.mermaid.viewSource")}
           >
             {showSource ? <ImageIcon className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
           </button>
@@ -127,7 +129,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
             <button
               onClick={() => setOpen(true)}
               className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-              title="View larger"
+              title={t("common.viewLarger")}
             >
               <Maximize2 className="w-3 h-3" />
             </button>
@@ -150,14 +152,14 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
               }
             } : handleDownloadSvg}
             className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-            title={showSource ? "Download .mmd" : "Download SVG"}
+            title={showSource ? t("markdown.mermaid.downloadMmd") : t("markdown.mermaid.downloadSvg")}
           >
             <Download className="w-3 h-3" />
           </button>
           <button
             onClick={handleCopy}
             className="flex items-center justify-center w-6 h-6 text-xs text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 bg-transparent hover:bg-black/10 dark:hover:bg-gray-700/70 rounded transition-all duration-150 opacity-0 group-hover/code:opacity-100"
-            title={copied ? "Copied!" : "Copy source"}
+            title={copied ? t("common.copied") : t("markdown.mermaid.copySource")}
           >
             {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           </button>
@@ -180,7 +182,7 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
         isOpen={open}
         onClose={() => setOpen(false)}
         content={svg || ""}
-        title="Diagram Preview"
+        title={t("markdown.mermaid.preview")}
         onDownload={handleDownloadSvg}
         showDownload={!!svg}
       />
