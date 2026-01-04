@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface StudioEmptyStateProps {
   title?: string;
@@ -9,10 +10,13 @@ interface StudioEmptyStateProps {
 }
 
 export const StudioEmptyState = memo(function StudioEmptyState({
-  title = "Your Ideas, Elevated",
-  description = "Pick a module to generate insights from your notes. Simple, focused, world‑class.",
+  title,
+  description,
   children,
 }: StudioEmptyStateProps) {
+  const { t } = useTranslation();
+  const displayTitle = title ?? t("studio.emptyState.title");
+  const displayDescription = description ?? t("studio.emptyState.description");
   return (
     <div className="text-center py-12 px-4">
       <motion.div
@@ -47,7 +51,7 @@ export const StudioEmptyState = memo(function StudioEmptyState({
         }}
         className="text-sm font-semibold mb-2 text-foreground/90"
       >
-        {title}
+        {displayTitle}
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 4 }}
@@ -59,7 +63,7 @@ export const StudioEmptyState = memo(function StudioEmptyState({
         }}
         className="text-sm text-muted-foreground/80 leading-relaxed max-w-sm mx-auto mb-4"
       >
-        {description}
+        {displayDescription}
       </motion.div>
       {children}
     </div>
