@@ -3,6 +3,7 @@ import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { Bot, FileText, Lightbulb, Plus, Sparkles } from "lucide-react";
 
 export const MobileWelcomeGuide = () => {
+  const { t } = useTranslation();
   const { addChannel } = useNotesDataStore();
 
   const handleCreateFirstChannel = async () => {
@@ -25,10 +26,9 @@ export const MobileWelcomeGuide = () => {
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Welcome to StillRoot</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("mobile.welcome.title")}</h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Your personal space for thoughts, ideas, and AI-powered conversations. Create your first
-            thought space to get started.
+            {t("mobile.welcome.description")}
           </p>
         </div>
 

@@ -139,6 +139,9 @@
       "title": "AI 笔记助手",
       "tryAsking": "试试问："
     },
+    "mobile": {
+      "showConversations": "显示对话"
+    },
     "modelSelector": {
       "chooseModel": "选择 AI 模型",
       "default": "默认",
@@ -574,11 +577,11 @@
     },
     "hero": {
       "badge": "AI-Powered Note-Taking",
-      "demoMessage": "感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。",
-      "description": "捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
       "demoBadgeInsight": "Insight +3",
       "demoBadgeMindmap": "Mindmap Generated",
+      "demoMessage": "感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。",
       "demoResponse": "理解你的困扰。RSC 的核心在于改变『组件所有权』。我为你生成了思维导图，并关联了你上周关于 SSR 的笔记。",
+      "description": "捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
       "featureAIInsight": "AI Insight",
       "featureAutoSync": "Auto Sync",
       "featureZeroFriction": "Zero Friction",
@@ -634,8 +637,20 @@
     }
   },
   "mobile": {
+    "header": {
+      "channels": "频道",
+      "chat": "聊天",
+      "newSpace": "新建空间",
+      "search": "搜索"
+    },
     "settings": {
+      "account": "账户",
+      "appearance": "外观",
       "title": "设置"
+    },
+    "welcome": {
+      "description": "您的个人空间，用于记录想法、灵感和 AI 对话。创建您的第一个想法空间开始使用。",
+      "title": "欢迎使用 StillRoot"
     }
   },
   "notes": {
@@ -660,8 +675,11 @@
     "messageTimeline": {
       "collapse": "折叠",
       "collapseCurrent": "折叠当前",
+      "editMessage": "编辑消息",
+      "editThoughtPlaceholder": "编辑您的想法...",
       "openAIAssistant": "打开 AI 助手",
-      "showComposer": "显示编辑器"
+      "showComposer": "显示编辑器",
+      "tagEnhanced": "标签增强"
     },
     "moveNoteModal": {
       "confirmMove": "确认移动",
@@ -804,6 +822,14 @@
     "noSpacesFound": "未找到空间",
     "searchPlaceholder": "搜索空间...",
     "tryDifferentSearch": "尝试其他搜索词"
+  },
+  "studio": {
+    "contextSelector": {
+      "title": "上下文"
+    },
+    "recentItem": {
+      "failed": "失败"
+    }
   },
   "thoughtRecord": {
     "actions": {

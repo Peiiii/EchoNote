@@ -5,6 +5,7 @@ import { Save, X, Expand } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useEditor } from "@/common/hooks/use-editor";
 import { RichEditorLite } from "@/common/components/RichEditorLite";
+import { useTranslation } from "react-i18next";
 
 interface MobileInlineEditorProps {
   onSave: () => void;
@@ -23,6 +24,7 @@ export function MobileInlineEditor({
   editorMode,
   onEditorModeChange: _onEditorModeChange,
 }: MobileInlineEditorProps) {
+  const { t } = useTranslation();
   const editContent = useEditStateStore(s => s.editContent);
   const originalContent = useEditStateStore(s => s.originalContent);
   const updateContent = useEditStateStore(s => s.updateContent);
@@ -61,7 +63,7 @@ export function MobileInlineEditor({
             ref={textareaRef}
             value={editContent}
             onChange={handleContentChange}
-            placeholder="Edit your thought..."
+            placeholder={t("notes.messageTimeline.editThoughtPlaceholder")}
             className="min-h-[120px] resize-none text-sm leading-relaxed border-2 border-blue-200 dark:border-blue-700 focus:border-blue-400 dark:focus:border-blue-500"
             autoFocus
             style={{ caretColor: "#3b82f6" }}
@@ -71,7 +73,7 @@ export function MobileInlineEditor({
             value={editContent}
             onChange={(md) => updateContent(md)}
             editable={!isSaving}
-            placeholder="Edit your thought..."
+            placeholder={t("notes.messageTimeline.editThoughtPlaceholder")}
             className="min-h-[140px]"
           />
         )}

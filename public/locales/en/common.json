@@ -139,6 +139,9 @@
       "title": "AI Note Agent",
       "tryAsking": "Try asking:"
     },
+    "mobile": {
+      "showConversations": "Show conversations"
+    },
     "modelSelector": {
       "chooseModel": "Choose AI Model",
       "default": "Default",
@@ -511,7 +514,7 @@
     },
     "demo": {
       "title": "Real-time Dialogue with Your Growth",
-      "titleHighlight": ""
+      "titleHighlight": "Real-time Dialogue"
     },
     "features": {
       "description": "We hide complex features behind a simple interface, helping you build your own second brain.",
@@ -574,11 +577,11 @@
     },
     "hero": {
       "badge": "AI-Powered Note-Taking",
-      "demoMessage": "I feel like when learning React Server Components, the information is too fragmented to form a system.",
-      "description": "Capture every fleeting inspiration. EchoNote helps you transform fragmented information into clear actions and cognition through AI's deep organization and growth planning.",
       "demoBadgeInsight": "Insight +3",
       "demoBadgeMindmap": "Mindmap Generated",
+      "demoMessage": "I feel like when learning React Server Components, the information is too fragmented to form a system.",
       "demoResponse": "I understand your concern. The core of RSC is changing 'component ownership'. I've generated a mind map for you and linked it to your notes about SSR from last week.",
+      "description": "Capture every fleeting inspiration. EchoNote helps you transform fragmented information into clear actions and cognition through AI's deep organization and growth planning.",
       "featureAIInsight": "AI Insight",
       "featureAutoSync": "Auto Sync",
       "featureZeroFriction": "Zero Friction",
@@ -634,8 +637,20 @@
     }
   },
   "mobile": {
+    "header": {
+      "channels": "Channels",
+      "chat": "Chat",
+      "newSpace": "New space",
+      "search": "Search"
+    },
     "settings": {
+      "account": "Account",
+      "appearance": "Appearance",
       "title": "Settings"
+    },
+    "welcome": {
+      "description": "Your personal space for thoughts, ideas, and AI-powered conversations. Create your first thought space to get started.",
+      "title": "Welcome to StillRoot"
     }
   },
   "notes": {
@@ -660,8 +675,11 @@
     "messageTimeline": {
       "collapse": "Collapse",
       "collapseCurrent": "Collapse current",
+      "editMessage": "Edit Message",
+      "editThoughtPlaceholder": "Edit your thought...",
       "openAIAssistant": "Open AI Assistant",
-      "showComposer": "Show composer"
+      "showComposer": "Show composer",
+      "tagEnhanced": "Tag‑enhanced"
     },
     "moveNoteModal": {
       "confirmMove": "Confirm move",
@@ -804,6 +822,14 @@
     "noSpacesFound": "No spaces found",
     "searchPlaceholder": "Search spaces...",
     "tryDifferentSearch": "Try a different search term"
+  },
+  "studio": {
+    "contextSelector": {
+      "title": "Context"
+    },
+    "recentItem": {
+      "failed": "Failed"
+    }
   },
   "thoughtRecord": {
     "actions": {

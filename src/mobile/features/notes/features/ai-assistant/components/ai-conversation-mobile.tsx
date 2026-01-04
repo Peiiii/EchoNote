@@ -7,6 +7,7 @@ import { useConversationStore } from "@/common/features/ai-assistant/stores/conv
 import { AIConversation } from "@/common/types/ai-conversation";
 import { ArrowLeft, History, Plus } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
+import { useTranslation } from "react-i18next";
 
 export type MobileConversationRef = {
   showList: () => void;
@@ -103,7 +104,7 @@ export const AIConversationMobile = forwardRef<MobileConversationRef, Props>(
                 variant="ghost"
                 size="icon"
                 onClick={() => showList()}
-                aria-label="Show conversations"
+                aria-label={t("aiAssistant.mobile.showConversations")}
                 className="h-8 w-8 flex-shrink-0"
               >
                 <History className="w-4 h-4" />

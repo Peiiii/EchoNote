@@ -65,8 +65,7 @@ export const DemoSection = () => {
             viewport={{ once: true }}
             className="text-5xl md:text-7xl lp-heading font-black tracking-tighter text-white"
           >
-            {t("landing.demo.title")}
-            <span className="lp-gradient-text">{t("landing.demo.titleHighlight")}</span>
+            {t("landing.demo.title")}<span className="lp-gradient-text">{t("landing.demo.titleHighlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

@@ -4,6 +4,7 @@ import { Textarea } from "@/common/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { useEditStateStore } from "@/core/stores/edit-state.store";
 import { useEditor } from "@/common/hooks/use-editor";
+import { useTranslation } from "react-i18next";
 
 interface MobileExpandedEditorProps {
   originalContent: string;
@@ -56,7 +57,7 @@ export const MobileExpandedEditor = ({
           <Button variant="ghost" size="icon" onClick={onCollapse} className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h3 className="font-semibold text-foreground">Edit Message</h3>
+          <h3 className="font-semibold text-foreground">{t("notes.messageTimeline.editMessage")}</h3>
         </div>
         <div className="flex items-center gap-2">
           <Button

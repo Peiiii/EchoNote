@@ -7,6 +7,7 @@ import { useUIStateStore } from "@/core/stores/ui-state.store";
 import { MobileChannelDropdownSelector } from "@/mobile/features/notes/features/channel-management/components/mobile-channel-dropdown-selector";
 import { Bot, PanelLeft, Search, Settings, Plus } from "lucide-react";
 import { CreateChannelPopover } from "@/common/features/channel-management/components/create-channel-popover";
+import { useTranslation } from "react-i18next";
 
 interface MobileHeaderProps {
   currentChannelName?: string;
@@ -19,6 +20,7 @@ export const MobileHeader = ({
   currentChannel,
   channels: _channels,
 }: MobileHeaderProps) => {
+  const { t } = useTranslation();
   const { openChannelList, openAIAssistant, openSettings } = useUIStateStore();
   const { setCurrentChannel } = useNotesViewStore();
   const { channels: allChannels } = useNotesDataStore();
@@ -40,8 +42,8 @@ export const MobileHeader = ({
             size="icon"
             onClick={openChannelList}
             className="h-9 w-9 dark:text-primary"
-            title="Channels"
-            aria-label="Channels"
+            title={t("mobile.header.channels")}
+            aria-label={t("mobile.header.channels")}
           >
             <PanelLeft className="size-5" />
           </Button>
@@ -53,8 +55,8 @@ export const MobileHeader = ({
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 dark:text-primary"
-                title="New space"
-                aria-label="New space"
+                title={t("mobile.header.newSpace")}
+                aria-label={t("mobile.header.newSpace")}
               >
                 <Plus className="size-5" />
               </Button>
@@ -73,7 +75,7 @@ export const MobileHeader = ({
             />
           ) : (
             <h1 className="text-lg font-semibold text-foreground/90 truncate px-2 max-w-full">
-              {currentChannelName || "Chat"}
+              {currentChannelName || t("mobile.header.chat")}
             </h1>
           )}
         </div>
@@ -85,7 +87,7 @@ export const MobileHeader = ({
             size="icon"
             onClick={() => openQuickSearchModal()}
             className="h-9 w-9 dark:text-primary"
-            title="Search"
+            title={t("mobile.header.search")}
           >
             <Search className="size-5" />
           </Button>

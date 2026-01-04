@@ -12,6 +12,7 @@ import { getStudioModule } from "../modules/registry";
 import { Pin, MoreVertical, Trash2, ExternalLink, AlertCircle } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface StudioRecentItemProps {
   item: StudioContentItem;
@@ -111,7 +112,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                   {item.status === "error" && (
                     <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400">
                       <AlertCircle className="w-3 h-3" />
-                      <span>Failed</span>
+                      <span>{t("studio.recentItem.failed")}</span>
                     </div>
                   )}
                   {item.status === "generating" && (

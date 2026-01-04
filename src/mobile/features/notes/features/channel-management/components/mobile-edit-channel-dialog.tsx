@@ -8,6 +8,7 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { ChannelEditField, logService } from "@/core/services/log.service";
 import { Channel } from "@/core/stores/notes-data.store";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface MobileEditChannelDialogProps {
   channel: Channel;
@@ -89,7 +90,7 @@ export function MobileEditChannelDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Space</DialogTitle>
+          <DialogTitle>{t("channelManagement.editChannel.title")}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">

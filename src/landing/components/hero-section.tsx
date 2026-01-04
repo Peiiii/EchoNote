@@ -93,14 +93,14 @@ export const HeroSection = () => {
                     </div>
                     <div className="space-y-3 max-w-[85%]">
                       <div className="bg-white/5 px-6 py-4 rounded-3xl rounded-tl-sm text-sm text-slate-300 border border-white/5">
-                        理解你的困扰。RSC 的核心在于改变『组件所有权』。我为你生成了思维导图，并关联了你上周关于 SSR 的笔记。
+                        {t("landing.hero.demoResponse")}
                       </div>
                       <div className="flex gap-2">
                         <div className="px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] text-blue-400 font-bold uppercase tracking-wider">
-                          Mindmap Generated
+                          {t("landing.hero.demoBadgeMindmap")}
                         </div>
                         <div className="px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] text-purple-400 font-bold uppercase tracking-wider">
-                          Insight +3
+                          {t("landing.hero.demoBadgeInsight")}
                         </div>
                       </div>
                     </div>

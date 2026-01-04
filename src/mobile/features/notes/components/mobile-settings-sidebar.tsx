@@ -43,7 +43,7 @@ export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) =
       <div className="flex-1 p-4 space-y-4">
         {/* Account Section */}
         <div className="space-y-3">
-          <div className="text-sm font-medium text-foreground">Account</div>
+          <div className="text-sm font-medium text-foreground">{t("mobile.settings.account")}</div>
           <div className="bg-muted/50 rounded-lg p-3">
             <AuthStatus />
           </div>
@@ -51,7 +51,7 @@ export const MobileSettingsSidebar = ({ onClose }: MobileSettingsSidebarProps) =
 
         {/* Appearance Section */}
         <div className="space-y-3">
-          <div className="text-sm font-medium text-foreground">Appearance</div>
+          <div className="text-sm font-medium text-foreground">{t("mobile.settings.appearance")}</div>
           <div className="bg-muted/50 rounded-lg p-3">
             <ThemeToggle />
           </div>

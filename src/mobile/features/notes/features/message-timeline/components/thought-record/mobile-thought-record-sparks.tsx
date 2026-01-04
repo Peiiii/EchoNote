@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { getFeaturesConfig } from "@/core/config/features.config";
 import { Button } from "@/common/components/ui/button";
 import { useSparks } from "@/common/features/notes/hooks/use-sparks";
+import { useTranslation } from "react-i18next";
 
 interface MobileThoughtRecordSparksProps {
   message: Message;
@@ -64,7 +65,7 @@ export function MobileThoughtRecordSparks({
           </button>
           {hasTagContext && (
             <span className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
-              Tag‑enhanced
+              {t("notes.messageTimeline.tagEnhanced")}
             </span>
           )}
         </div>

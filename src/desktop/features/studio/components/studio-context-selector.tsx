@@ -5,8 +5,10 @@ import { ChevronDown, Check, Search } from "lucide-react";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useStudioStore } from "@/core/stores/studio.store";
 import { cn } from "@/common/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export const StudioContextSelector = memo(function StudioContextSelector() {
+  const { t } = useTranslation();
   const { channels } = useNotesDataStore();
   const { currentContext, setCurrentContext } = useStudioStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -78,7 +80,7 @@ export const StudioContextSelector = memo(function StudioContextSelector() {
       </RefinedPopover.Trigger>
       <RefinedPopover.Content className="w-80">
         <RefinedPopover.Header>
-          <div className="text-sm font-semibold text-foreground/90">Context</div>
+          <div className="text-sm font-semibold text-foreground/90">{t("studio.contextSelector.title")}</div>
         </RefinedPopover.Header>
         <RefinedPopover.Body>
           <div className="space-y-2">
