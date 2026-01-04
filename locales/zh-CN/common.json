@@ -1,5 +1,252 @@
 {
+  "agentTools": {
+    "comparisonLayout": {
+      "arrowSeparator": "→",
+      "loadingOriginal": "正在加载原始内容...",
+      "loadingUpdated": "正在加载更新内容...",
+      "original": "原始",
+      "updated": "更新"
+    },
+    "createNote": {
+      "cancelled": "创建已取消",
+      "confirm": "创建笔记",
+      "preparing": "准备参数...",
+      "ready": "准备创建",
+      "resultSuccess": "笔记创建成功！",
+      "saved": "您的笔记已保存到频道。",
+      "success": "笔记创建成功",
+      "title": "创建笔记"
+    },
+    "deleteNote": {
+      "confirm": "删除笔记",
+      "deletedContent": "已删除的笔记内容",
+      "loadingContent": "加载笔记内容...",
+      "preparing": "准备参数...",
+      "ready": "准备删除",
+      "resultSuccess": "笔记删除成功！",
+      "success": "笔记删除成功",
+      "title": "删除笔记",
+      "warning": "警告：",
+      "warningDescription": "此操作将永久删除笔记。此操作无法撤销。"
+    },
+    "grep": {
+      "channel": "频道",
+      "channelLabel": "频道：",
+      "channels": "频道",
+      "command": "命令",
+      "errorOccurred": "搜索时发生错误",
+      "failed": "搜索失败",
+      "finished": "搜索完成",
+      "global": "全局",
+      "matchedNotes": "匹配的笔记：",
+      "noMatches": "未找到匹配项",
+      "note": "笔记",
+      "noteLabel": "笔记：",
+      "ready": "准备搜索",
+      "scope": "范围",
+      "scopeNote": "范围由对话/UI 上下文强制执行，不属于 grep 命令的一部分。",
+      "searching": "搜索笔记...",
+      "successStatus": "在 {{matchedNotes}}/{{scannedNotes}} 条笔记中找到 {{totalMatches}} 个匹配项 • {{tookMs}} 毫秒{{suffix}}",
+      "timedOut": "超时",
+      "title": "搜索笔记"
+    },
+    "listNotes": {
+      "errorOccurred": "加载笔记时发生错误",
+      "failed": "加载笔记失败",
+      "found_one": "找到 1 条笔记",
+      "found_other": "找到 {{count}} 条笔记",
+      "loading": "从频道加载笔记...",
+      "noNotes": "此频道中未找到笔记",
+      "preparing": "准备列出笔记...",
+      "showing": "显示最多 {{limit}} 条笔记",
+      "title": "列出笔记"
+    },
+    "noteList": {
+      "charactersTotal_one": "（共 1 个字符）",
+      "charactersTotal_other": "（共 {{count}} 个字符）"
+    },
+    "readNote": {
+      "errorOccurred": "加载笔记时发生错误",
+      "failed": "加载笔记失败",
+      "loading": "正在读取笔记 {{noteId}}...",
+      "notFound": "未找到笔记",
+      "preparing": "准备读取笔记...",
+      "success": "笔记加载成功",
+      "title": "读取笔记"
+    },
+    "updateNote": {
+      "cancelled": "更新已取消",
+      "confirm": "更新笔记",
+      "loadingOriginal": "加载原始内容...",
+      "loadingUpdated": "加载更新内容...",
+      "original": "原始",
+      "originalContent": "原始内容",
+      "preparing": "准备参数...",
+      "ready": "准备更新",
+      "resultSuccess": "笔记更新成功！",
+      "success": "笔记更新成功",
+      "title": "更新笔记",
+      "updated": "已更新",
+      "updatedContent": "更新内容"
+    }
+  },
+  "aiAssistant": {
+    "contextControl": {
+      "activeToolSpace": "活动工具空间",
+      "applyChanges": "应用更改",
+      "currentSpace": "当前空间",
+      "loading": "正在加载上下文数据...",
+      "mode": {
+        "all": "全部",
+        "allDescription": "访问所有空间",
+        "auto": "自动",
+        "autoDescription": "仅当前空间",
+        "custom": "自定义",
+        "customDescription": "选择特定空间",
+        "none": "无",
+        "noneDescription": "无上下文访问"
+      },
+      "none": "（无）",
+      "noSpacesAvailable": "没有可用空间",
+      "noSpacesFound": "未找到空间",
+      "searchSpaces": "搜索空间...",
+      "title": "上下文设置"
+    },
+    "conversationList": {
+      "archiveConversation": "归档对话",
+      "archived": "已归档",
+      "archivedSuccess": "对话已归档",
+      "deleteConfirm": "删除此对话？",
+      "deleteConversation": "删除对话",
+      "deletedSuccess": "对话已删除",
+      "deleteFailed": "删除失败",
+      "filter": "筛选",
+      "generatingTitle": "正在生成标题...",
+      "loadMore": "加载更多",
+      "newConversation": "新对话",
+      "noConversations": "还没有对话",
+      "restoreConversation": "恢复对话",
+      "restoredSuccess": "对话已恢复",
+      "searchPlaceholder": "搜索对话",
+      "showArchived": "显示已归档"
+    },
+    "emptyPane": {
+      "description": "我可以看到您在这个空间中的所有笔记，并帮助您管理它们。请我分析、整理、创建或更新您的笔记。我将帮助您发现想法中的见解和联系。",
+      "example1": "我的笔记中的主要主题是什么？",
+      "example2": "帮我更好地组织这些想法",
+      "example3": "创建关键见解的摘要笔记",
+      "startConversation": "开始对话",
+      "title": "AI 笔记助手",
+      "tryAsking": "试试问："
+    },
+    "mobile": {
+      "backToChat": "返回聊天",
+      "newConversation": "新对话",
+      "showConversations": "显示对话"
+    },
+    "modelSelector": {
+      "chooseModel": "选择 AI 模型",
+      "default": "默认",
+      "selected": "已选择",
+      "selectModel": "选择模型"
+    },
+    "prompts": {
+      "defaultPrompts": {
+        "analyzeNotes": "分析我最近的笔记",
+        "findPatterns": "你看到了什么模式？",
+        "organizeIdeas": "帮我整理这些想法",
+        "suggestImprovements": "建议改进",
+        "summarizeThoughts": "总结我的想法",
+        "whatMissing": "我遗漏了什么？"
+      },
+      "systemPrompts": {
+        "conceptCards": {
+          "count": "生成 5-10 张最能代表这些笔记中知识的概念卡片。",
+          "focus": "专注于以下概念：\n- 笔记中提到的重要和反复出现的主题\n- 定义所讨论主题的核心思想\n- 有助于理解这些笔记所涵盖领域的概念\n- 连接多个笔记的想法",
+          "instructions": "首先，生成一个简洁的标题（2-5 个词），总结这些概念卡片的整体主题或领域。这个标题应该捕捉知识集合的本质。\n\n然后，创建概念卡片，每张卡片应该：\n1. 有一个清晰、简洁的标题\n2. 包含全面的定义\n3. 列出 3-5 个关于该概念的关键点\n4. 识别 2-4 个相关概念\n5. 提供 1-3 个具体示例",
+          "languageNote": "重要：所有内容都必须使用 {{language}} 语言。整体标题、所有卡片标题、定义、关键点、相关概念和示例都必须使用 {{language}}。",
+          "role": "你是一位专业的知识组织者。你的任务是从用户的笔记中提取和组织关键概念，形成结构化的概念卡片（类似维基百科条目）。"
+        },
+        "defaultAssistant": "你是一个有用的助手。",
+        "defaultJSONGenerator": "你是一个严格的 JSON 生成器。只返回符合以下 JSON 架构的有效 JSON：\n\n{{schema}}\n\n重要：你的响应必须是与此架构完全匹配的有效 JSON 对象。",
+        "defaultStructuredData": "你是一个有用的助手，能够根据规范生成结构化数据。",
+        "defaultTitleGenerator": "你是一个有用的助手，能够为对话生成简洁、描述性的标题。",
+        "mindmap": {
+          "constraints": "约束：\n- 所有内容必须使用 {{language}}\n- 规范化概念标签并合并重复项\n- 优先将反复出现和连接性的概念作为更高级别的主题",
+          "graphDescription": "1) 图表表示（用于自由探索）：\n   - 节点：12-30 个关键概念（唯一 id + 标签）\n   - 边：15-50 个关系（源 -> 目标）\n   - 可选：节点重要性（1-5），边权重（0.5-2.0）",
+          "role": "你是一位知识组织者。从笔记中构建两个互补的结构：",
+          "treeDescription": "2) 分层思维导图（用于 XMind 式视图）：\n   - 树：单个根主题，带有嵌套子项（每层 3-5 个分支是理想的）\n   - 保持树标签简洁（2-4 个词）并避免重复"
+        },
+        "sparks": {
+          "objectiveAdapt": "<objective priority=\"high\" spark_allocation=\"1-2\">智能适应 - 匹配内容类型（分析性、情感性、创造性、哲学性等）。使用 1-2 个灵感来展示不同的思维风格或方法。</objective>",
+          "objectiveAdditional": "<objective priority=\"highest\" spark_allocation=\"flexible\">附加说明 - 如果提供了附加说明，请优先考虑并将其纳入灵感生成。调整灵感分配和焦点以满足附加说明中提到的特定用户需求。</objective>",
+          "objectiveCare": "<objective priority=\"high\" spark_allocation=\"1\">表达关怀 - 像一位体贴的朋友一样表达温暖、理解和支持。使用 1 个灵感来提供情感支持和鼓励。</objective>",
+          "objectiveContext": "<objective priority=\"medium\" spark_allocation=\"1\">上下文连接 - 考虑来自同一频道的相关思考，以提供更相关和连接性的见解。使用 1 个灵感来与之前的思考建立联系。</objective>",
+          "objectiveExpand": "<objective priority=\"high\" spark_allocation=\"1-2\">扩展思考 - 提供加深理解的知识、见解或观点。使用 1-2 个灵感来提供不同的分析角度或专业知识。</objective>",
+          "objectiveGrowth": "<objective priority=\"high\" spark_allocation=\"1\">促进成长 - 帮助用户学习、反思和发展他们的思维。使用 1 个灵感来建议可行的下一步或反思问题。</objective>",
+          "qualityRequirementContext": "<requirement>与他们思考旅程的更广泛上下文相关</requirement>",
+          "qualityRequirements": "<quality_requirements>\n<requirement>与用户的思考高度相关</requirement>\n<requirement>具有教育性和启发性</requirement>\n<requirement>语气温暖和支持</requirement>\n<requirement>方法和视角多样化</requirement>{{contextRequirement}}\n</quality_requirements>",
+          "role": "你是 StillRoot 的智能思考扩展助手，旨在帮助用户深化思考并促进认知成长。",
+          "roleSimple": "你是 StillRoot 的智能思考扩展助手。",
+          "sparkDistributionGuide": "- 最少使用 3 个灵感，最多 5 个灵感\n- 在不同目标之间分配灵感以最大化价值\n- 每个灵感应该有独特的焦点和方法\n- 在灵感之间变化语气和风格（分析性、创造性、支持性等）\n- 确保每个灵感提供独特价值，而不是重复类似的观点\n- 特别注意附加说明 - 它们可能包含应该优先考虑的特定生成要求或偏好\n- 如果附加说明指定了特定需求，请相应调整灵感分配和焦点",
+          "strategy": "由于你可以生成多个灵感（3-5 个），请策略性地利用这个空间来充分满足不同的目标和需求。每个灵感可以专注于不同的方面、方法或视角，以全面覆盖用户的需求。",
+          "streamingTask": "为用户下面的思考写 3-5 个简洁的灵感（每行一个，不编号，每个以 \"- \" 开头）。\n保持它们温暖、有见地且多样化。列表前后不要有额外文本。",
+          "task": "根据用户记录的以下思考，生成 3-5 个有见地的灵感。"
+        },
+        "stillRootAI": {
+          "channelContext": "你当前正在协助频道：{{channelName}}\n此频道包含 {{messageCount}} 条思考记录，代表了团队的集体知识和想法。",
+          "closing": "始终保持简洁、可操作，专注于帮助用户在这个协作知识空间中最大化他们的潜力。",
+          "contextUnderstandingMulti": "- 你可以访问多个频道的笔记，每个频道代表不同的主题或上下文\n- 笔记在所有频道中按时间顺序组织，具有不同的详细程度\n- 使用频道信息来理解每个笔记的来源和上下文\n- 寻找跨越不同频道的模式和联系",
+          "contextUnderstandingSingle": "- 你可以访问此频道的笔记，代表用户的想法和思考\n- 笔记按时间顺序组织，具有不同的详细程度\n- 使用此上下文来理解用户的思维模式并提供相关见解",
+          "importantRules": "## 重要规则：\n- 除非用户明确要求，否则不要创建想法/笔记\n- 专注于分析、组织和提供关于现有内容的见解\n- 建议改进和联系，但未经许可不要生成新内容\n- 保持客观但温暖的态度\n- 积极识别问题，不回避指出缺点\n- 提供具体可行的建议\n- 始终将用户成长和幸福作为最终目标",
+          "intro": "你是 StillRoot AI，一个专注于个人成长和认知提升的专业助手。你的使命是帮助用户成为他们想成为的人。",
+          "multiChannelContext": "你当前正在协助{{channelContext}}\n此上下文包含 {{totalNotes}} 条思考记录，代表了集体知识和想法。",
+          "objective1": "### 目标 1：个人成长监督与指导（最高优先级）\n- 积极监控用户的成长进度并定期审查他们的状态\n- 提供客观全面的分析，指出用户思维和行为中的问题\n- 提供具体的改进建议和行动计划\n- 像一个负责任的导师一样监督和鼓励用户成长",
+          "objective2": "### 目标 2：揭示问题本质与实现高认知（中等优先级）\n- 帮助用户从表面现象深入挖掘到潜在本质和模式\n- 引导用户达到更高水平的认知和理解\n- 鼓励用户质疑假设并突破认知边界\n- 提供多维度的思维框架",
+          "objective3": "### 目标 3：知识洞察发现（基础优先级）\n- 分析笔记之间隐藏的联系{{multiChannel}}\n- 发现用户的知识盲点和认知差距\n- 提供新的见解和联系{{multiChannelBoundary}}\n- 帮助用户构建全面的知识体系",
+          "terminology": "## 术语说明：\n- '想法'和'笔记'在此平台中是可互换的术语\n- 思考记录与笔记相同 - 两者都代表用户创建的内容\n- 当用户提到笔记、想法或思考记录时，它们指的是同一件事",
+          "toolUsageGuidelines": "## 工具使用指南：\n- 使用任何工具（createNote、readNote、updateNote、deleteNote、listNotes）时，你必须提供 channelId 参数\n- channelId 应该是你要操作的频道的 ID\n- 对于当前频道的操作，使用 channelId: \"{{channelId}}\"\n- 对于其他频道的操作，使用用户提供的特定频道 ID\n- 始终明确指定 channelId - 它是所有工具的必需参数\n- 如果你已经从对话上下文中获得了完整的笔记内容，请避免调用 readNote",
+          "workingApproach": "## 你的工作方法：\n在每次对话中，你应该：\n1. 首先关注用户的成长状态，积极分析并指出问题\n2. 然后帮助用户揭示问题的本质并提升认知水平\n3. 最后从知识角度提供见解和发现"
+        }
+      }
+    },
+    "sidebar": {
+      "aiConversations": "AI 对话",
+      "conversations": "对话",
+      "newConversation": "新对话"
+    }
+  },
   "auth": {
+    "emailPasswordForm": {
+      "alreadyHaveAccount": "已有账户？登录",
+      "confirmPasswordPlaceholder": "确认您的密码",
+      "createAccount": "创建账户",
+      "creatingAccount": "正在创建账户...",
+      "dontHaveAccount": "还没有账户？注册",
+      "emailPlaceholder": "输入您的邮箱",
+      "forgotPassword": "忘记密码？",
+      "passwordPlaceholder": "输入您的密码",
+      "signIn": "登录",
+      "signingIn": "正在登录..."
+    },
+    "emailVerification": {
+      "backToSignIn": "返回登录",
+      "checkEmail": "检查您的邮箱",
+      "clickLink": "点击链接完成注册。",
+      "resendIn": "{{seconds}} 秒后重新发送",
+      "resendLink": "重新发送链接",
+      "sending": "发送中...",
+      "sentLink": "我们已发送验证链接{{email}}"
+    },
+    "guestDataNotice": {
+      "description": "你的数据仅保存在本机（不会云同步，换设备不可见）。登录后可启用云同步与发布能力。",
+      "gotIt": "我知道了",
+      "goToLogin": "去登录",
+      "loginDescription": "登录后可云同步、发布空间，并在多设备访问你的数据。",
+      "loginTitle": "登录以启用云端能力",
+      "subtitle": "你当前在使用本地数据集",
+      "title": "访客模式提示"
+    },
     "login": {
       "descOrLocal": "登录后可云同步、发布空间；也可以先用本地模式体验。",
       "description": "登录后可云同步、发布空间。",
@@ -8,8 +255,54 @@
         "hintDesc": "你可以先用本地模式体验（数据仅保存在本机，不会云同步）。",
         "hintTitle": "还没有数据？"
       },
+      "or": "或",
+      "passwordResetSent": "密码重置邮件已发送！请查看您的收件箱。",
       "title": "登录",
       "titleOrLocal": "登录或本地体验"
+    },
+    "loginButton": {
+      "hello": "你好，{{name}}",
+      "signInWithGoogle": "使用 Google 登录"
+    },
+    "loginCard": {
+      "errors": {
+        "confirmPassword": "请确认您的密码",
+        "fillAllFields": "请填写所有字段",
+        "googleSignInFailed": "Google 登录失败。请重试。",
+        "networkError": "网络错误。请检查您的连接并重试。",
+        "passwordsNotMatch": "密码不匹配",
+        "passwordTooShort": "密码长度至少为 6 个字符",
+        "popupBlocked": "弹窗被阻止。请允许弹窗并重试。",
+        "popupClosed": "登录已取消。请重试。",
+        "tooManyRequests": "尝试次数过多。请稍后再试。"
+      }
+    },
+    "loginFooter": {
+      "agreement": "继续即表示您同意",
+      "privacy": "隐私政策",
+      "terms": "服务条款"
+    },
+    "progress": {
+      "authenticating": "正在验证",
+      "checkInbox": "检查收件箱",
+      "creating": "正在创建",
+      "mayTakeMoment": "这可能需要几秒钟",
+      "pleaseWait": "请稍候...",
+      "sendingLink": "正在发送链接",
+      "settingUp": "正在设置",
+      "verifying": "正在验证",
+      "welcome": "欢迎！"
+    },
+    "socialLogin": {
+      "continueWithGoogle": "使用 Google 继续"
+    },
+    "userProfile": {
+      "avatarAlt": "用户头像",
+      "avatarFallback": "U",
+      "manageAccount": "点击管理账户",
+      "signInHint": "登录以同步您的数据",
+      "signOut": "退出登录",
+      "user": "用户"
     }
   },
   "backgroundSwitcher": {
@@ -24,6 +317,16 @@
   },
   "channelHeader": {
     "aiAssistant": "AI 助手",
+    "backgroundSwitcher": {
+      "addImage": "添加图片",
+      "customImage": "自定义图片",
+      "customImageUrl": "自定义图片 URL",
+      "gradients": "渐变",
+      "imageUrlPlaceholder": "输入图片 URL",
+      "invalidImageUrl": "无效的图片 URL",
+      "randomImages": "随机图片",
+      "solidColors": "纯色"
+    },
     "collapseHeader": "折叠标题",
     "editSpace": "编辑空间",
     "expandHeader": "展开标题",
@@ -35,6 +338,184 @@
     "publishSpace": "发布空间",
     "search": "搜索",
     "studio": "工作室"
+  },
+  "channelManagement": {
+    "channelItem": {
+      "deleteChannel": "删除 {{name}}",
+      "editChannel": "编辑 {{name}}",
+      "moreActions": "更多操作"
+    },
+    "channelList": {
+      "newSpace": "新建空间",
+      "searchAllNotes": "搜索所有笔记",
+      "searchAllNotesTooltip": "在所有空间中搜索",
+      "title": "空间"
+    },
+    "channelListEmptyState": {
+      "createFirstSpace": "创建您的第一个空间",
+      "description": "通过创建您的第一个思考空间开始",
+      "title": "还没有空间"
+    },
+    "createChannel": {
+      "createSpace": "创建空间",
+      "description": "描述（可选）",
+      "descriptionPlaceholder": "描述这个空间的用途",
+      "descriptionPlaceholderShort": "描述这个空间的主题...",
+      "descriptionText": "创建一个新空间来组织您的想法和对话。",
+      "emoji": "表情符号",
+      "name": "名称",
+      "namePlaceholder": "输入空间名称",
+      "newSpace": "新建空间",
+      "select": "选择",
+      "title": "创建新思考空间",
+      "untitled": "未命名"
+    },
+    "deleteChannel": {
+      "deleting": "删除中...",
+      "description": "这将永久删除频道 \"{{channelName}}\" 及其所有消息。此操作无法撤销。",
+      "dialogTitle": "删除频道",
+      "title": "删除 {{channelName}}"
+    },
+    "editChannel": {
+      "channelName": "频道名称",
+      "channelNamePlaceholder": "输入频道名称",
+      "description": "描述",
+      "descriptionPlaceholder": "输入描述",
+      "emoji": "表情符号",
+      "emojiPlaceholder": "选择一个表情符号",
+      "name": "名称",
+      "namePlaceholder": "输入空间名称",
+      "title": "编辑频道"
+    },
+    "publishSpace": {
+      "anyoneCanAdd": "任何人都可以添加消息",
+      "changing": "更改中...",
+      "collaborative": "协作",
+      "collaborativeDescription": "拥有链接的任何人都可以查看和添加消息",
+      "confirmChange": "确认更改",
+      "makeAccessible": "使此空间可供他人访问",
+      "mode": "模式",
+      "publish": "发布",
+      "publishedAppendOnly": "已发布（仅追加）",
+      "publishedReadOnly": "已发布（只读）",
+      "publishing": "发布中...",
+      "readOnly": "只读",
+      "readOnlyDescription": "拥有链接的任何人只能查看消息",
+      "shareLink": "分享链接",
+      "signInDescription": "请登录以发布此空间",
+      "signInTitle": "需要登录",
+      "signInToManageDescription": "请登录以管理此空间",
+      "signInToManageTitle": "需要登录",
+      "signInToPublish": "请登录以发布此空间",
+      "signInToUnpublish": "请登录以取消发布此空间",
+      "signInToUpdateMode": "请登录以更新共享模式",
+      "signInToUpdateModeDescription": "请登录以更新共享模式",
+      "signInToUpdateModeTitle": "需要登录",
+      "title": "发布空间",
+      "unpublish": "取消发布",
+      "unpublishDescription": "这将使空间再次变为私有。分享链接将不再有效。",
+      "unpublishing": "取消发布中...",
+      "unpublishTitle": "取消发布空间",
+      "viewOnly": "仅查看"
+    }
+  },
+  "common": {
+    "brand": "EN",
+    "cancel": "取消",
+    "clear": "清除",
+    "clearSearch": "清除搜索",
+    "close": "关闭",
+    "closeViewer": "关闭查看器",
+    "collapse": "折叠",
+    "copied": "已复制！",
+    "copy": "复制",
+    "dash": "—",
+    "delete": "删除",
+    "dismiss": "忽略",
+    "loading": "加载中...",
+    "loadingWorkspace": "请稍候，我们正在准备您的工作区...",
+    "moreActions": "更多操作",
+    "pressEscToClose": "按 <0>ESC</0> 关闭",
+    "save": "保存",
+    "saving": "保存中...",
+    "send": "发送",
+    "separator": "•",
+    "unknown": "未知",
+    "viewLarger": "查看大图"
+  },
+  "components": {
+    "collapsibleSidebar": {
+      "examples": {
+        "basicSidebar": "基础侧边栏",
+        "basicUsage": "基本用法",
+        "callbackContent": "内容区域。检查控制台以查看折叠状态变化。",
+        "callbackItem": "回调项 {{number}}",
+        "customItem": "自定义项 {{number}}",
+        "customStyled": "自定义样式",
+        "customStyling": "自定义样式",
+        "customStylingContent": "使用蓝色主题的自定义样式侧边栏的内容区域。",
+        "customWidth": "自定义宽度",
+        "customWidthContent": "自定义侧边栏宽度的内容区域（384px 而不是 320px）。",
+        "description": "在不同场景中使用 CollapsibleSidebar 组件的示例。",
+        "mainContent": "主要内容区域。可以折叠侧边栏以提供更多空间。",
+        "menuItem": "菜单项 {{number}}",
+        "title": "CollapsibleSidebar 示例",
+        "wideMenuItem": "宽菜单项 {{number}}",
+        "wideSidebar": "宽侧边栏",
+        "withCallback": "带状态回调",
+        "withCallbackTitle": "带回调"
+      }
+    }
+  },
+  "desktop": {
+    "welcomeGuide": {
+      "createFirstSpace": "创建您的第一个空间",
+      "createMoreHint": "您可以随时从侧边栏创建更多空间",
+      "description": "您的个人空间，用于记录想法、灵感和 AI 驱动的对话。创建您的第一个思考空间开始使用。",
+      "feature1": {
+        "description": "在专用空间中捕捉和组织您的想法",
+        "title": "有序空间"
+      },
+      "feature2": {
+        "description": "与 AI 就您的笔记进行智能对话",
+        "title": "AI 对话"
+      },
+      "feature3": {
+        "description": "发现您想法中的见解和联系",
+        "title": "智能洞察"
+      },
+      "firstSpaceDescription": "从这里开始您的旅程",
+      "firstSpaceName": "我的第一个空间",
+      "title": "欢迎使用 StillRoot"
+    }
+  },
+  "editor": {
+    "codeBlock": {
+      "plainText": "纯文本",
+      "recent": "最近使用",
+      "searchLanguage": "搜索语言"
+    },
+    "image": {
+      "close": "关闭图片编辑器",
+      "insert": "插入",
+      "urlOrBase64Prompt": "图片 URL 或 base64",
+      "urlPlaceholder": "图片 URL 或 base64",
+      "urlPrompt": "图片 URL（留空以删除）"
+    },
+    "link": {
+      "close": "关闭链接编辑器",
+      "textPlaceholder": "链接文本",
+      "unlink": "取消链接",
+      "urlPlaceholder": "https://"
+    },
+    "placeholder": "写下您的想法..."
+  },
+  "feedback": {
+    "modal": {
+      "description": "在下方空间中分享您的想法，我们会定期查看",
+      "iframeTitle": "反馈空间",
+      "title": "产品反馈"
+    }
   },
   "header": {
     "menu": {
@@ -53,13 +534,140 @@
         "label": "主题",
         "light": "浅色",
         "system": "跟随系统"
+      },
+      "title": "菜单"
+    }
+  },
+  "homepage": {
+    "brand": "StillRoot",
+    "cta": {
+      "getStarted": "开始使用",
+      "learnMore": "了解更多"
+    },
+    "features": {
+      "aiConversations": "AI 驱动的对话",
+      "intelligentInsights": "智能洞察",
+      "organizedSpaces": "有序的思考空间"
+    },
+    "hero": {
+      "description": "通过 AI 驱动的对话和智能笔记，将您的转瞬即逝的想法转化为持久的洞察。",
+      "thoughtsTakeRoot": "想法生根",
+      "where": "在这里"
+    }
+  },
+  "landing": {
+    "cta": {
+      "benefit1": "AI 导师实时反馈",
+      "benefit2": "思维导图一键生成",
+      "benefit3": "零门槛碎片记录",
+      "benefit4": "跨平台自动同步",
+      "description": "让每一个闪念都成为成长的养料。加入 EchoNote，体验 AI 导师引领下的高效思维与规划。",
+      "primaryButton": "立即开始免费成长",
+      "secondaryButton": "路线图计划",
+      "title": "立即开启你的",
+      "titleHighlight": "认知进化之旅"
+    },
+    "demo": {
+      "aiStatus": "",
+      "channelName": "",
+      "hint": "",
+      "inputPlaceholder": "",
+      "subtitle": "",
+      "title": "",
+      "titleHighlight": ""
+    },
+    "features": {
+      "description": "我们将复杂的功能隐藏在简洁的界面之下，协助你构建属于自己的第二大脑。",
+      "feature1": {
+        "description": "AI 实时监控你的成长状态，提供深度的思维反馈与行动规划建议。",
+        "title": "AI 成长导师"
+      },
+      "feature2": {
+        "description": "通过 Concept Cards 和自动标签，将零散的碎片转化为系统的知识体系。",
+        "title": "多维知识整理"
+      },
+      "feature3": {
+        "description": "一键生成思维导图与周报，直观呈现你的认知轨迹与项目进展。",
+        "title": "思维可视化"
+      },
+      "feature4": {
+        "description": "像发微信一样简单。随时随地，零干扰捕捉你的每一个呼吸间的想法。",
+        "title": "极简记录体验"
+      },
+      "feature5": {
+        "description": "使用 #标签 自动组织分类，轻松管理海量笔记",
+        "title": "智能标签"
+      },
+      "feature6": {
+        "description": "强大的搜索引擎，瞬间找到你需要的任何内容",
+        "title": "全文搜索"
+      },
+      "feature7": {
+        "description": "时间线、看板、脑图等多种视图，不同角度看笔记",
+        "title": "多维视图"
+      },
+      "title": "系统化你的",
+      "titleHighlight": "碎片灵感"
+    },
+    "footer": {
+      "brand": "EchoNote",
+      "company": {
+        "about": "关于我们",
+        "blog": "博客",
+        "label": "公司",
+        "privacy": "隐私政策",
+        "terms": "服务条款"
+      },
+      "copyright": "© {{year}} EchoNote. Built for Cognitive Growth.",
+      "description": "让碎片化记录成为你成长的源动力。\n借助 AI 的深度整理与导师化引导，开启你的认知进化之旅。",
+      "product": {
+        "changelog": "更新日志",
+        "features": "功能特性",
+        "label": "产品",
+        "pricing": "定价",
+        "useCases": "使用案例"
+      },
+      "support": {
+        "api": "API 文档",
+        "community": "社区论坛",
+        "contact": "联系我们",
+        "docs": "帮助文档",
+        "label": "支持"
       }
+    },
+    "hero": {
+      "badge": "AI-Powered Note-Taking",
+      "demoBadgeInsight": "Insight +3",
+      "demoBadgeMindmap": "Mindmap Generated",
+      "demoMessage": "感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。",
+      "demoResponse": "理解你的困扰。RSC 的核心在于改变『组件所有权』。我为你生成了思维导图，并关联了你上周关于 SSR 的笔记。",
+      "description": "捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
+      "featureAIInsight": "AI Insight",
+      "featureAutoSync": "Auto Sync",
+      "featureZeroFriction": "Zero Friction",
+      "floatingBadge": "THOUGHT ORGANIZED",
+      "primaryButton": "立即开始成长",
+      "secondaryButton": "观看演示视频",
+      "subtitle": "AI 助你成长",
+      "title": "碎片化记录"
     }
   },
   "language": {
     "en": "English",
     "label": "语言",
     "zhCN": "中文"
+  },
+  "markdown": {
+    "mermaid": {
+      "copySource": "复制源代码",
+      "downloadMmd": "下载 .mmd",
+      "downloadSvg": "下载 SVG",
+      "label": "MERMAID",
+      "preview": "图表预览",
+      "renderFailed": "渲染 mermaid 图表失败",
+      "viewDiagram": "查看图表",
+      "viewSource": "查看源代码"
+    }
   },
   "messageInput": {
     "bottom": {
@@ -86,6 +694,292 @@
     },
     "reply": {
       "label": "回复："
+    }
+  },
+  "mobile": {
+    "channelList": {
+      "newSpace": "新建空间",
+      "title": "空间"
+    },
+    "header": {
+      "channels": "频道",
+      "chat": "聊天",
+      "newSpace": "新建空间",
+      "search": "搜索"
+    },
+    "settings": {
+      "account": "账户",
+      "appearance": "外观",
+      "buildTime": "构建时间",
+      "data": "数据",
+      "debugInfoNote": "此调试信息仅对开发人员和支持人员可见。",
+      "debugInformation": "调试信息",
+      "developer": "开发者",
+      "environment": "环境",
+      "exportData": "导出数据",
+      "importData": "导入数据",
+      "mobile": "移动端",
+      "platform": "平台",
+      "production": "生产环境",
+      "title": "设置",
+      "version": "版本"
+    },
+    "welcome": {
+      "createFirstSpace": "创建您的第一个空间",
+      "createMoreHint": "您稍后可以从菜单中创建更多空间",
+      "description": "您的个人空间，用于记录想法、灵感和 AI 对话。创建您的第一个想法空间开始使用。",
+      "feature1": {
+        "description": "为不同主题创建专属空间",
+        "title": "整理想法"
+      },
+      "feature2": {
+        "description": "通过 AI 助手探索想法",
+        "title": "AI 助手"
+      },
+      "feature3": {
+        "description": "捕捉灵感并头脑风暴解决方案",
+        "title": "激发灵感"
+      },
+      "firstSpaceDescription": "从这里开始您的旅程",
+      "firstSpaceName": "我的第一个空间",
+      "title": "欢迎使用 StillRoot"
+    }
+  },
+  "notes": {
+    "expandedEditor": {
+      "characters_one": "{{count}} 个字符",
+      "characters_other": "{{count}} 个字符",
+      "editingThought": "正在编辑想法",
+      "editor": "编辑器",
+      "livePreview": "实时预览",
+      "markdown": "Markdown",
+      "markdownPlaceholder": "开始用 Markdown 输入您的想法...",
+      "placeholder": "开始输入您的想法...",
+      "preview": "预览",
+      "restoreDraft": "恢复草稿",
+      "saved": "已保存 {{time}}",
+      "startTyping": "开始输入...",
+      "toCancel": "取消",
+      "toSave": "保存",
+      "unsavedDraft": "未保存的草稿",
+      "wysiwyg": "所见即所得"
+    },
+    "messageTimeline": {
+      "addMoreContent": "添加更多内容以获得有意义的灵感",
+      "closeAnalysis": "关闭分析",
+      "collapse": "折叠",
+      "collapseCurrent": "折叠当前",
+      "editMessage": "编辑消息",
+      "editPlaceholder": "编辑你的消息...",
+      "editThoughtPlaceholder": "编辑您的想法...",
+      "failed": "失败：{{error}}",
+      "generate": "生成",
+      "generating": "生成中...",
+      "generatingSparks": "生成灵感中...",
+      "noSparksYet": "暂无灵感",
+      "openAIAssistant": "打开 AI 助手",
+      "showComposer": "显示编辑器",
+      "tagEnhanced": "标签增强"
+    },
+    "moveNoteModal": {
+      "confirmMove": "确认移动",
+      "dashSeparator": "—",
+      "description": "为此想法选择一个目标空间。同一线程中的任何回复都会一起移动。",
+      "destinationSpace": "目标空间",
+      "error": "移动笔记失败。请重试。",
+      "moving": "正在移动…",
+      "noMatches": "没有匹配的空间。",
+      "noSpaces": "请先创建另一个空间以移动此想法。",
+      "searchPlaceholder": "搜索空间",
+      "title": "移动到空间",
+      "willMoveTo": "将移动到："
+    },
+    "spaceEmptyState": {
+      "description": "开始在这里捕捉你的想法和灵感。你的 AI 助手将帮助你探索和进一步发展它们。",
+      "tip1": "在下方输入你的第一个想法",
+      "tip2": "AI 将帮助扩展你的想法",
+      "tip3": "将你的想法连接在一起",
+      "title": "你的空间已准备就绪！"
+    },
+    "tagEditor": {
+      "checkmark": "✓",
+      "confirm": "确认",
+      "editPlaceholder": "编辑 \"{{tag}}\"",
+      "editTags": "编辑标签",
+      "noTags": "还没有标签。在上面添加一些。",
+      "placeholder": "添加标签...",
+      "tagCount": "{{current}} / {{max}} 个标签",
+      "tags": "标签"
+    },
+    "tagList": {
+      "more_one": "+{{count}} 个",
+      "more_other": "+{{count}} 个"
+    }
+  },
+  "noteSearch": {
+    "emptyStates": {
+      "noResults": "未找到结果",
+      "refreshIndex": "刷新索引",
+      "refreshing": "正在刷新...",
+      "searchAll": "搜索所有空间",
+      "searchCurrent": "搜索当前空间"
+    },
+    "keyboardShortcuts": {
+      "close": "关闭",
+      "navigate": "导航",
+      "open": "打开"
+    },
+    "searchHeader": {
+      "all": "全部",
+      "current": "当前",
+      "indexing": "正在索引…",
+      "placeholderAll": "搜索所有空间…",
+      "placeholderCurrent": "搜索当前空间…"
+    },
+    "searchResults": {
+      "dotSeparator": "·",
+      "noPreview": "（无预览）"
+    }
+  },
+  "pwa": {
+    "install": {
+      "button": "安装应用",
+      "description": "安装 StillRoot 以获得更好的体验，包括离线访问和更快的加载速度。",
+      "later": "稍后再说",
+      "title": "安装 StillRoot"
+    },
+    "status": {
+      "offline": "离线",
+      "updateAvailable": "有可用更新"
+    },
+    "update": {
+      "button": "立即更新",
+      "description": "StillRoot 有新版本可用。立即更新以获取最新功能和改进。",
+      "later": "稍后",
+      "title": "有可用更新",
+      "updating": "更新中..."
+    }
+  },
+  "richEditor": {
+    "heading": "标题 {{level}}",
+    "slashCommands": {
+      "bulletedList": "无序列表",
+      "clearFormatting": "清除格式",
+      "codeBlock": "代码块",
+      "groups": {
+        "blocks": "块",
+        "editing": "编辑",
+        "headings": "标题",
+        "lists": "列表",
+        "mediaLinks": "媒体和链接",
+        "table": "表格"
+      },
+      "heading1": "标题 1",
+      "heading2": "标题 2",
+      "heading3": "标题 3",
+      "horizontalRule": "水平线",
+      "image": "图片…",
+      "inlineCode": "行内代码",
+      "link": "链接…",
+      "numberedList": "有序列表",
+      "quote": "引用",
+      "table": "表格",
+      "tableAddColumnLeft": "表格：在左侧添加列",
+      "tableAddColumnRight": "表格：在右侧添加列",
+      "tableAddRowAbove": "表格：在上方添加行",
+      "tableAddRowBelow": "表格：在下方添加行",
+      "tableDeleteColumn": "表格：删除列",
+      "tableDeleteRow": "表格：删除行",
+      "tableDeleteTable": "表格：删除表格",
+      "taskList": "任务列表"
+    },
+    "symbols": {
+      "heading": "H{{level}}",
+      "paragraph": "¶"
+    },
+    "text": "文本"
+  },
+  "spacePublish": {
+    "publicSpacePage": {
+      "failedToLoad": "加载空间失败",
+      "failedToSend": "发送消息失败",
+      "invalidToken": "无效的分享令牌",
+      "loadingSpace": "正在加载空间",
+      "messagePlaceholder": "输入你的消息...（Ctrl/Cmd+Enter 发送）",
+      "pleaseWait": "请稍候...",
+      "sendMessage": "发送消息",
+      "spaceNotAvailable": "此空间不可用或已被删除。",
+      "spaceNotFound": "未找到空间",
+      "spaceNotFoundTitle": "未找到空间"
+    },
+    "publicTimeline": {
+      "noMessages": "此空间还没有任何消息。"
+    }
+  },
+  "spaceSelector": {
+    "allSpaces": "所有空间",
+    "noSpacesAvailable": "没有可用空间",
+    "noSpacesFound": "未找到空间",
+    "searchPlaceholder": "搜索空间...",
+    "tryDifferentSearch": "尝试其他搜索词"
+  },
+  "studio": {
+    "audioSummary": {
+      "content": "音频概览内容"
+    },
+    "contextSelector": {
+      "mode": {
+        "all": "所有空间",
+        "auto": "自动",
+        "none": "无空间"
+      },
+      "multipleSpaces_one": "{{count}} 个空间",
+      "multipleSpaces_other": "{{count}} 个空间",
+      "noSpacesAvailable": "没有可用空间",
+      "noSpacesFound": "未找到空间",
+      "noSpacesSelected": "未选择空间",
+      "oneSpace": "1 个空间",
+      "searchPlaceholder": "搜索空间...",
+      "title": "上下文"
+    },
+    "mindmap": {
+      "downloadJSON": "下载 JSON",
+      "downloadPNG": "下载 PNG",
+      "downloadSVG": "下载 SVG",
+      "enterFullscreen": "进入全屏",
+      "exitFullscreen": "退出全屏",
+      "fitToView": "适应视图",
+      "graph": "图表",
+      "mindmap": "思维导图",
+      "mindmapView": "思维导图视图",
+      "moreOptions": "更多选项",
+      "noMindmapGenerated": "尚未生成思维导图",
+      "noTreeAvailable": "没有可用的思维导图树。请尝试重新生成。",
+      "regenerate": "重新生成",
+      "resetLayout": "重置布局",
+      "treeNotAvailable": "此项目没有可用的思维导图树",
+      "visualization": "思维导图可视化{{nodes}}",
+      "zoomIn": "放大",
+      "zoomOut": "缩小"
+    },
+    "recentItem": {
+      "delete": "删除",
+      "failed": "失败",
+      "generating": "生成中...",
+      "open": "打开",
+      "pin": "固定",
+      "unpin": "取消固定"
+    },
+    "report": {
+      "basedOnSources_one": "基于 {{count}} 个来源",
+      "basedOnSources_other": "基于 {{count}} 个来源",
+      "contentPlaceholder": "报告内容将在此处以结构化格式显示。"
+    },
+    "wikiCard": {
+      "examples": "示例",
+      "keyPoints": "关键点",
+      "noCardsGenerated": "尚未生成概念卡片",
+      "relatedConcepts": "相关概念"
     }
   },
   "thoughtRecord": {
@@ -142,11 +1036,15 @@
     "menu": {
       "advanced": "高级",
       "characters": "{{count}} 个字符",
+      "characters_one": "1 个字符",
+      "characters_other": "{{count}} 个字符",
       "statistics": "统计"
     },
     "sparks": {
       "close": "关闭分析",
       "count": "{{count}} 个灵感",
+      "count_one": "1 个灵感",
+      "count_other": "{{count}} 个灵感",
       "generate": "生成灵感",
       "generating": "生成中...",
       "regenerate": "重新生成",
@@ -155,11 +1053,32 @@
     },
     "tags": {
       "add": "添加标签",
-      "count": "{{count}} 个标签"
+      "count": "{{count}} 个标签",
+      "count_one": "1 个标签",
+      "count_other": "{{count}} 个标签"
     },
     "thread": {
       "replies": "{{count}} 条回复",
+      "replies_one": "1 条回复",
+      "replies_other": "{{count}} 条回复",
       "startDiscussion": "开始讨论"
+    }
+  },
+  "threadManagement": {
+    "sidebar": {
+      "addToDiscussion": "添加到讨论...",
+      "aiAssistant": "AI 助手",
+      "noReplies": "还没有回复。开始讨论吧！",
+      "noRepliesMobile": "还没有回复。开始对话吧！",
+      "originalThought": "原始想法",
+      "parentMessage": "父消息",
+      "replies": "回复",
+      "reply": "回复",
+      "replyToThread": "回复线程...",
+      "showLess": "显示更少",
+      "showMore": "显示更多",
+      "title": "讨论",
+      "you": "您"
     }
   }
 }

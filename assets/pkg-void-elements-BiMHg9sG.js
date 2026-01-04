@@ -1,0 +1,1 @@
+import{g as t}from"./pkg-at-braintree-sanitize-url-DFOppRqi.js";var e,r;function u(){return r||(r=1,e={area:!0,base:!0,br:!0,col:!0,embed:!0,hr:!0,img:!0,input:!0,link:!0,meta:!0,param:!0,source:!0,track:!0,wbr:!0}),e}var o=u();const i=t(o);export{i as e};
