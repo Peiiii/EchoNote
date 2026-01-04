@@ -1,5 +1,8 @@
 import { Card, CardContent } from "@/common/components/ui/card";
-import { Sparkles } from "lucide-react";
+import { FloatingActionButton } from "@/common/components/ui/floating-action-button";
+import { useInputCollapse } from "@/common/features/notes/hooks/use-input-collapse";
+import { Pencil, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SpaceEmptyStateProps {
@@ -8,8 +11,25 @@ interface SpaceEmptyStateProps {
 
 export const SpaceEmptyState = ({ className = "" }: SpaceEmptyStateProps) => {
   const { t } = useTranslation();
+  const { inputCollapsed, handleExpandInput } = useInputCollapse();
+  const [showComposerFab, setShowComposerFab] = useState(false);
+
+  useEffect(() => {
+    // Match the composer panel transition (~220ms) with a small buffer
+    const DELAY_MS = 260;
+    let timer: number | null = null;
+    if (inputCollapsed) {
+      timer = window.setTimeout(() => setShowComposerFab(true), DELAY_MS);
+    } else {
+      setShowComposerFab(false);
+    }
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [inputCollapsed]);
+
   return (
-    <div className={`flex-1 flex items-center justify-center p-8 ${className}`}>
+    <div className={`relative flex-1 flex items-center justify-center p-8 ${className}`}>
       <Card className="max-w-md w-full border-2 border-dashed border-muted-foreground/20 bg-gradient-to-br from-background to-muted/20 shadow-lg">
         <CardContent className="p-8 text-center space-y-6">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
@@ -41,6 +61,24 @@ export const SpaceEmptyState = ({ className = "" }: SpaceEmptyStateProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Bottom-right floating area: reveal after collapse settles (no sliding) */}
+      <div
+        className="absolute right-4 z-20 pointer-events-none"
+        style={{
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+        }}
+      >
+        <div className={`transition-opacity duration-150 ${showComposerFab ? "opacity-100" : "opacity-0"}`}>
+          {showComposerFab && (
+            <div className="pointer-events-auto">
+              <FloatingActionButton onClick={handleExpandInput} ariaLabel="Show composer">
+                <Pencil className="h-4 w-4" />
+              </FloatingActionButton>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

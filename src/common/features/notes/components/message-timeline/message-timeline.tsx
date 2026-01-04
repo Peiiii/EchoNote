@@ -13,7 +13,7 @@ import type {
 } from "@/common/services/scroll.manager";
 import { Message } from "@/core/stores/notes-data.store";
 import { SideViewEnum, useUIStateStore } from "@/core/stores/ui-state.store";
-import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { useInputCollapse } from "@/common/features/notes/hooks/use-input-collapse";
 import { Bot, ChevronUp, Pencil } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";

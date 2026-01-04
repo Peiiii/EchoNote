@@ -472,8 +472,8 @@ export const ChannelHeader = ({
                   variant="ghost"
                   size="sm"
                   className="group h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
-                  title="More actions"
-                  aria-label="More actions"
+                  title={t("channelHeader.moreActions")}
+                  aria-label={t("channelHeader.moreActions")}
                   onClick={e => e.stopPropagation()}
                 >
                   <MoreVertical className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />

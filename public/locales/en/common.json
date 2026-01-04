@@ -253,7 +253,13 @@
   "channelHeader": {
     "aiAssistant": "AI Assistant",
     "backgroundSwitcher": {
+      "addImage": "Add Image",
+      "customImage": "Custom Image",
+      "customImageUrl": "Custom Image URL",
       "gradients": "Gradients",
+      "imageUrlPlaceholder": "Enter image URL",
+      "invalidImageUrl": "Invalid image URL",
+      "randomImages": "Random Images",
       "solidColors": "Solid Colors"
     },
     "collapseHeader": "Collapse header",
@@ -352,15 +358,18 @@
     "clearSearch": "Clear search",
     "close": "Close",
     "closeViewer": "Close viewer",
+    "collapse": "Collapse",
     "copied": "Copied!",
     "copy": "Copy",
     "delete": "Delete",
+    "dismiss": "Dismiss",
     "loading": "Loading...",
     "loadingWorkspace": "Please wait while we prepare your workspace...",
     "moreActions": "More actions",
     "pressEscToClose": "Press <0>ESC</0> to close",
     "save": "Save",
     "saving": "Saving...",
+    "send": "Send",
     "unknown": "unknown",
     "viewLarger": "View larger"
   },
@@ -538,6 +547,24 @@
     }
   },
   "notes": {
+    "expandedEditor": {
+      "characters_one": "{{count}} character",
+      "characters_other": "{{count}} characters",
+      "editingThought": "Editing thought",
+      "editor": "Editor",
+      "livePreview": "Live preview",
+      "markdown": "Markdown",
+      "markdownPlaceholder": "Start typing your thought in Markdown...",
+      "placeholder": "Start typing your thought...",
+      "preview": "Preview",
+      "restoreDraft": "Restore draft",
+      "saved": "Saved {{time}}",
+      "startTyping": "Start typing...",
+      "toCancel": "to cancel",
+      "toSave": "to save",
+      "unsavedDraft": "Unsaved draft",
+      "wysiwyg": "WYSIWYG"
+    },
     "messageTimeline": {
       "collapse": "Collapse",
       "collapseCurrent": "Collapse current",
@@ -766,6 +793,23 @@
       "replies_one": "1 reply",
       "replies_other": "{{count}} replies",
       "startDiscussion": "Start discussion"
+    }
+  },
+  "threadManagement": {
+    "sidebar": {
+      "addToDiscussion": "Add to discussion...",
+      "aiAssistant": "AI Assistant",
+      "noReplies": "No replies yet. Start the discussion!",
+      "noRepliesMobile": "No replies yet. Start the conversation!",
+      "originalThought": "Original Thought",
+      "parentMessage": "Parent Message",
+      "replies": "Replies",
+      "reply": "Reply",
+      "replyToThread": "Reply to thread...",
+      "showLess": "Show less",
+      "showMore": "Show more",
+      "title": "Discussion",
+      "you": "You"
     }
   }
 }

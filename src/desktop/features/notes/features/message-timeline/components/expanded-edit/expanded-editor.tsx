@@ -8,6 +8,7 @@ import { useEditor } from "@/common/hooks/use-editor";
 import { isModifierKeyPressed, SHORTCUTS } from "@/common/lib/keyboard-shortcuts";
 import { RichEditorLite } from "@/common/components/RichEditorLite";
 import { formatRelativeTime } from "@/common/lib/time-utils";
+import { useTranslation } from "react-i18next";
 
 interface ExpandedEditorProps {
   content: string;
@@ -24,6 +25,7 @@ export function ExpandedEditor({
   onCollapse,
   isSaving,
 }: ExpandedEditorProps) {
+  const { t } = useTranslation();
   const [localContent, setLocalContent] = useState(content);
   const [isLocalSaving, setIsLocalSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -187,7 +189,7 @@ export function ExpandedEditor({
                 value={localContent}
                 onChange={e => handleContentChange(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Write your thought in Markdown..."
+                placeholder={t("notes.expandedEditor.markdownPlaceholder")}
                 className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
                 disabled={isSaving}
                 style={{
@@ -213,8 +215,8 @@ export function ExpandedEditor({
           <div className="w-1/2 min-h-0 flex flex-col overflow-hidden">
             <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/20">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">Preview</h3>
-                <div className="text-xs text-slate-500 dark:text-slate-500">Live Preview</div>
+                <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">{t("notes.expandedEditor.preview")}</h3>
+                <div className="text-xs text-slate-500 dark:text-slate-500">{t("notes.expandedEditor.livePreview")}</div>
               </div>
             </div>
 
@@ -224,7 +226,7 @@ export function ExpandedEditor({
                   <MarkdownContent content={localContent} />
                 ) : (
                   <div className="text-slate-400 dark:text-slate-500 italic text-center py-8">
-                    Start typing to see preview...
+                    {t("notes.expandedEditor.startTyping")}
                   </div>
                 )}
               </div>
@@ -241,11 +243,11 @@ export function ExpandedEditor({
             <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700">
               Cmd+S
             </kbd>
-            <span className="ml-2">to save,</span>
+            <span className="ml-2">{t("notes.expandedEditor.toSave")}</span>
             <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs border border-slate-200 dark:border-slate-700 ml-2">
               {SHORTCUTS.CANCEL}
             </kbd>
-            <span className="ml-2">to cancel</span>
+            <span className="ml-2">{t("notes.expandedEditor.toCancel")}</span>
           </div>
 
           {/* Right side - Action buttons */}
@@ -258,7 +260,7 @@ export function ExpandedEditor({
               className="h-8 px-3 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               <X className="w-3.5 h-3.5 mr-1.5" />
-              Cancel
+              {t("common.cancel")}
             </Button>
 
             <Button
@@ -270,12 +272,12 @@ export function ExpandedEditor({
               {isLocalSaving ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Saving...
+                  {t("common.saving")}
                 </>
               ) : (
                 <>
                   <Check className="w-3.5 h-3.5 mr-1.5" />
-                  Save
+                  {t("common.save")}
                 </>
               )}
             </Button>

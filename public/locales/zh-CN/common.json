@@ -253,7 +253,13 @@
   "channelHeader": {
     "aiAssistant": "AI 助手",
     "backgroundSwitcher": {
+      "addImage": "添加图片",
+      "customImage": "自定义图片",
+      "customImageUrl": "自定义图片 URL",
       "gradients": "渐变",
+      "imageUrlPlaceholder": "输入图片 URL",
+      "invalidImageUrl": "无效的图片 URL",
+      "randomImages": "随机图片",
       "solidColors": "纯色"
     },
     "collapseHeader": "折叠标题",
@@ -352,15 +358,18 @@
     "clearSearch": "清除搜索",
     "close": "关闭",
     "closeViewer": "关闭查看器",
+    "collapse": "折叠",
     "copied": "已复制！",
     "copy": "复制",
     "delete": "删除",
+    "dismiss": "忽略",
     "loading": "加载中...",
     "loadingWorkspace": "请稍候，我们正在准备您的工作区...",
     "moreActions": "更多操作",
     "pressEscToClose": "按 <0>ESC</0> 关闭",
     "save": "保存",
     "saving": "保存中...",
+    "send": "发送",
     "unknown": "未知",
     "viewLarger": "查看大图"
   },
@@ -538,6 +547,24 @@
     }
   },
   "notes": {
+    "expandedEditor": {
+      "characters_one": "{{count}} 个字符",
+      "characters_other": "{{count}} 个字符",
+      "editingThought": "正在编辑想法",
+      "editor": "编辑器",
+      "livePreview": "实时预览",
+      "markdown": "Markdown",
+      "markdownPlaceholder": "开始用 Markdown 输入您的想法...",
+      "placeholder": "开始输入您的想法...",
+      "preview": "预览",
+      "restoreDraft": "恢复草稿",
+      "saved": "已保存 {{time}}",
+      "startTyping": "开始输入...",
+      "toCancel": "取消",
+      "toSave": "保存",
+      "unsavedDraft": "未保存的草稿",
+      "wysiwyg": "所见即所得"
+    },
     "messageTimeline": {
       "collapse": "折叠",
       "collapseCurrent": "折叠当前",
@@ -766,6 +793,23 @@
       "replies_one": "1 条回复",
       "replies_other": "{{count}} 条回复",
       "startDiscussion": "开始讨论"
+    }
+  },
+  "threadManagement": {
+    "sidebar": {
+      "addToDiscussion": "添加到讨论...",
+      "aiAssistant": "AI 助手",
+      "noReplies": "还没有回复。开始讨论吧！",
+      "noRepliesMobile": "还没有回复。开始对话吧！",
+      "originalThought": "原始想法",
+      "parentMessage": "父消息",
+      "replies": "回复",
+      "reply": "回复",
+      "replyToThread": "回复线程...",
+      "showLess": "显示更少",
+      "showMore": "显示更多",
+      "title": "讨论",
+      "you": "您"
     }
   }
 }

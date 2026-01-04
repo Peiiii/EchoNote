@@ -210,8 +210,11 @@ export function GrepToolRenderer({ invocation }: GrepToolRendererProps) {
                 className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 space-y-2"
               >
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("agentTools.grep.noteLabel")} <code>{m.noteId}</code> <span aria-hidden="true">•</span> {t("agentTools.grep.channelLabel")} <code>{m.channelId}</code> <span aria-hidden="true">•</span>{" "}
-                  {m.timestamp}
+                  {t("agentTools.grep.noteLabel")} <code>{m.noteId}</code>
+                  {" "}
+                  <span aria-hidden="true">•</span> {t("agentTools.grep.channelLabel")} <code>{m.channelId}</code>
+                  {" "}
+                  <span aria-hidden="true">•</span> {m.timestamp}
                 </div>
                 <div className="font-mono text-sm">
                   {m.contexts.map((c, idx) => (

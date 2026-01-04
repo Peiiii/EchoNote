@@ -4,7 +4,7 @@ import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { MobileHeader } from "@/mobile/components/mobile-header";
 
 import { MobileMessageInput } from "@/mobile/features/notes/features/message-timeline/components/mobile-message-input";
-import { useInputCollapse } from "@/desktop/features/notes/features/message-timeline/hooks/use-input-collapse";
+import { useInputCollapse } from "@/common/features/notes/hooks/use-input-collapse";
 import { MobileTimelineContent } from "@/mobile/features/notes/features/message-timeline/components/mobile-timeline-content";
 import { useMobileTimelineState } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-timeline-state";
 import { useMobileViewportHeight } from "@/mobile/features/notes/features/message-timeline/hooks/use-mobile-viewport-height";

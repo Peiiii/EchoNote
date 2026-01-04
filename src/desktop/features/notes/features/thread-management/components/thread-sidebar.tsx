@@ -2,6 +2,7 @@ import { useChannelMessages } from "@/common/features/notes/hooks/use-channel-me
 import { Bot, ChevronDown, ChevronUp, MessageCircle, Send, User, X } from "lucide-react";
 import { useState } from "react";
 import { isModifierKeyPressed } from "@/common/lib/keyboard-shortcuts";
+import { useTranslation } from "react-i18next";
 
 interface ThreadSidebarProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export const ThreadSidebar = ({
   onSendMessage,
   currentThreadId,
 }: ThreadSidebarProps) => {
+  const { t } = useTranslation();
   const { messages } = useChannelMessages({});
   const parentMessage = currentThreadId
     ? messages?.find(m => m.id === currentThreadId) || null
@@ -56,7 +58,7 @@ export const ThreadSidebar = ({
       <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="font-semibold text-slate-800 dark:text-slate-200">Discussion</h3>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200">{t("threadManagement.sidebar.title")}</h3>
           {threadMessages.length > 0 && (
             <span className="px-2 py-1 text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full">
               {threadMessages.length}
@@ -82,7 +84,7 @@ export const ThreadSidebar = ({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
-                  Original Thought
+                  {t("threadManagement.sidebar.originalThought")}
                 </div>
 
                 {/* 内容区域 - 展开状态直接平铺，收起状态截断 */}
@@ -101,12 +103,12 @@ export const ThreadSidebar = ({
                     {isOriginalExpanded ? (
                       <>
                         <ChevronUp className="w-3 h-3" />
-                        Show less
+                        {t("threadManagement.sidebar.showLess")}
                       </>
                     ) : (
                       <>
                         <ChevronDown className="w-3 h-3" />
-                        Show more
+                        {t("threadManagement.sidebar.showMore")}
                       </>
                     )}
                   </button>
@@ -122,7 +124,7 @@ export const ThreadSidebar = ({
             <div className="text-center py-8">
               <MessageCircle className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
               <p className="text-slate-500 dark:text-slate-400 text-sm">
-                No replies yet. Start the discussion!
+                {t("threadManagement.sidebar.noReplies")}
               </p>
             </div>
           ) : (
@@ -141,7 +143,7 @@ export const ThreadSidebar = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">
-                    {message.sender === "user" ? "You" : "AI Assistant"}
+                    {message.sender === "user" ? t("threadManagement.sidebar.you") : t("threadManagement.sidebar.aiAssistant")}
                   </div>
                   <div className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                     {message.content}
@@ -161,7 +163,7 @@ export const ThreadSidebar = ({
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Add to discussion..."
+              placeholder={t("threadManagement.sidebar.addToDiscussion")}
               className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder:text-slate-500 resize-none focus:outline-none  focus:border-transparent"
               rows={2}
             />
