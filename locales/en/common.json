@@ -32,6 +32,30 @@
       "feedback": "Feedback"
     }
   },
+  "channelHeader": {
+    "expandSidebar": "Expand sidebar",
+    "newSpace": "New space",
+    "editSpace": "Edit space",
+    "moreActions": "More actions",
+    "manageSharing": "Manage sharing",
+    "publishSpace": "Publish space",
+    "collapseHeader": "Collapse header",
+    "expandHeader": "Expand header",
+    "search": "Search",
+    "studio": "Studio",
+    "aiAssistant": "AI Assistant",
+    "messages": "messages"
+  },
+  "backgroundSwitcher": {
+    "changeBackground": "Change background",
+    "background": "Background",
+    "close": "Close",
+    "colors": "Colors",
+    "images": "Images",
+    "description": "Choose a background to personalize your channel",
+    "resetToOriginal": "Reset to original background",
+    "reset": "Reset"
+  },
   "language": {
     "en": "English",
     "label": "Language",
