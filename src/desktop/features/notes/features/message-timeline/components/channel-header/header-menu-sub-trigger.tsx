@@ -18,6 +18,7 @@ export function HeaderMenuSubTrigger({
   
   if (isValidElement(Icon)) {
     iconElement = Icon;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } else if (Icon && (typeof Icon === "function" || (Icon as any)?.$$typeof)) {
     const IconComponent = Icon as LucideIcon;
     iconElement = <IconComponent className="h-4 w-4" />;

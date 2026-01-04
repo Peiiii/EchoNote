@@ -3,7 +3,6 @@ import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
@@ -39,6 +38,7 @@ import { EditChannelPopover } from "../../../channel-management/components/edit-
 import { Edit2 } from "lucide-react";
 import { PublishSpaceDialog } from "../../../channel-management/components/publish-space-dialog";
 import { HeaderMenu } from "./header-menu";
+import { HeaderMenuItem } from "./header-menu-item";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -359,18 +359,16 @@ export const ChannelHeader = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
-              <DropdownMenuItem
-                className="cursor-pointer rounded-md"
+              <HeaderMenuItem
+                icon={channel.shareToken ? Share2 : Globe}
                 onSelect={() => setIsPublishDialogOpen(true)}
               >
-                {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
-                <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
-              </DropdownMenuItem>
+                {channel.shareToken ? "Manage sharing" : "Publish space"}
+              </HeaderMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
-                <ChevronUp className="h-4 w-4" />
-                <span>Collapse header</span>
-              </DropdownMenuItem>
+              <HeaderMenuItem icon={ChevronUp} onSelect={handleToggle}>
+                Collapse header
+              </HeaderMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -480,18 +478,16 @@ export const ChannelHeader = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
-                <DropdownMenuItem
-                  className="cursor-pointer rounded-md"
+                <HeaderMenuItem
+                  icon={channel.shareToken ? Share2 : Globe}
                   onSelect={() => setIsPublishDialogOpen(true)}
                 >
-                  {channel.shareToken ? <Share2 className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
-                  <span>{channel.shareToken ? "Manage sharing" : "Publish space"}</span>
-                </DropdownMenuItem>
+                  {channel.shareToken ? "Manage sharing" : "Publish space"}
+                </HeaderMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer rounded-md" onSelect={handleToggle}>
-                  <ChevronDown className="h-4 w-4" />
-                  <span>Expand header</span>
-                </DropdownMenuItem>
+                <HeaderMenuItem icon={ChevronDown} onSelect={handleToggle}>
+                  Expand header
+                </HeaderMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
