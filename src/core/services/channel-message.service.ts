@@ -7,10 +7,12 @@ import {
   combineLatest,
   distinctUntilChanged,
   filter,
+  firstValueFrom,
   map,
   of,
   ReplaySubject,
   switchMap,
+  timeout,
 } from "rxjs";
 import { v4 } from "uuid";
 
@@ -91,6 +93,67 @@ export class ChannelMessageService {
     return combineLatest(
       channelIds.map(cId => createSlice(this.dataContainer, `messageByChannel.${cId}.loading`).$)
     ).pipe(map(loadings => loadings.some(loading => loading)));
+  };
+
+  waitForChannelIdle = async (channelId: string, options?: { timeoutMs?: number }) => {
+    const slice = createSlice(this.dataContainer, `messageByChannel.${channelId}`);
+    await firstValueFrom(
+      slice.$.pipe(
+        filter((s): s is ChannelState => !!s),
+        filter(s => !s.loading && !s.loadingMore),
+        timeout({ first: options?.timeoutMs ?? 15_000 })
+      )
+    );
+  };
+
+  /**
+   * Ensure a channel has messages loaded in `dataContainer` (and optionally paginate for more),
+   * so downstream features (e.g. Studio mindmap/wiki-card generation) can safely read notes.
+   */
+  ensureMessagesLoaded = async (
+    channelId: string,
+    options?: {
+      initialLimit?: number;
+      pageSize?: number;
+      maxMessages?: number;
+      timeoutMs?: number;
+    }
+  ) => {
+    const { userId } = useNotesDataStore.getState();
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+    if (!channelId) {
+      throw new Error("Channel id is required");
+    }
+
+    const initialLimit = Math.max(1, options?.initialLimit ?? 50);
+    const pageSize = Math.max(1, options?.pageSize ?? 50);
+    const maxMessages = Math.max(1, options?.maxMessages ?? 200);
+    const timeoutMs = options?.timeoutMs ?? 15_000;
+
+    const existing = this.dataContainer.get().messageByChannel[channelId];
+    if (!existing) {
+      await this.loadInitialMessages({ channelId, messagesLimit: Math.min(initialLimit, maxMessages) });
+    } else if (existing.loading || existing.loadingMore) {
+      await this.waitForChannelIdle(channelId, { timeoutMs });
+    }
+
+    let state = this.dataContainer.get().messageByChannel[channelId];
+    if (!state) return;
+
+    while (state.hasMore && state.messages.length < maxMessages) {
+      const remaining = maxMessages - state.messages.length;
+      if (remaining <= 0) break;
+
+      await this.loadMoreHistory({
+        channelId,
+        messagesLimit: Math.min(pageSize, remaining),
+      });
+
+      state = this.dataContainer.get().messageByChannel[channelId];
+      if (!state) break;
+    }
   };
 
   getChannelStateControl = (channelId: string) => {

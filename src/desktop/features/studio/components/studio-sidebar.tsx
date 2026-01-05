@@ -101,7 +101,15 @@ export const StudioSidebar = memo(function StudioSidebar() {
         console.warn(`Module ${moduleId} generation not yet implemented`);
       }
     },
-    [setCurrentModule, setActiveItem, currentContext, currentChannelId, channels, generateConceptCards]
+    [
+      setCurrentModule,
+      setActiveItem,
+      currentContext,
+      currentChannelId,
+      channels,
+      generateConceptCards,
+      generateMindmap,
+    ]
   );
 
   const handleCloseDetail = useCallback(() => {

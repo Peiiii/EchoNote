@@ -1,8 +1,8 @@
 import { generateObject } from "@/common/services/ai/generate-object";
 import { MindmapData, MindmapTreeNode } from "../types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
-import { channelMessageService } from "@/core/services/channel-message.service";
 import { i18n } from "@/common/i18n";
+import { getUserNotesFromChannels } from "../../shared/services/channel-user-notes.service";
 
 const mindmapSchema = {
   type: "object",
@@ -76,32 +76,18 @@ export async function generateMindmap(channelIds: string[]): Promise<MindmapData
     throw new Error("At least one channel is required");
   }
 
-  const allNotes: Array<{ channelId: string; content: string; timestamp: Date | number }> = [];
+  const channelNames = channelIds
+    .map((id) => channels.find((c) => c.id === id)?.name || id)
+    .join(", ");
 
-  for (const channelId of channelIds) {
-    const channelState = channelMessageService.dataContainer.get().messageByChannel[channelId];
-    if (channelState?.messages) {
-      const userMessages = channelState.messages.filter((msg) => msg.sender === "user");
-      for (const msg of userMessages) {
-        allNotes.push({
-          channelId,
-          content: msg.content || "",
-          timestamp: msg.timestamp || new Date(0),
-        });
-      }
-    }
-  }
+  const allNotes = await getUserNotesFromChannels(channelIds, { maxMessagesPerChannel: 200 });
 
   if (allNotes.length === 0) {
-    throw new Error("No notes found in selected channels");
+    throw new Error(`No notes found in selected channels: ${channelNames}`);
   }
 
   const combinedText = allNotes.map((note) => note.content).join("\n\n");
   const detectedLanguage = detectLanguage(combinedText);
-
-  const channelNames = channelIds
-    .map((id) => channels.find((c) => c.id === id)?.name || id)
-    .join(", ");
 
   const notesText = allNotes
     .sort((a, b) => {
