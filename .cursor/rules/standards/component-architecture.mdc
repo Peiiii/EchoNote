@@ -83,6 +83,90 @@ export const LeftSidebar = ({ children }: Props) => {
 - **位置**：`@/common/components/ui/`
 - **示例**：Button, Input, Modal, Card
 
+#### ⚠️ **UI 组件禁止依赖业务逻辑**
+
+UI 组件必须保持纯粹，**不应该感知任何业务逻辑**，包括但不限于：
+- ❌ **国际化（i18n）**：不应该使用 `useTranslation`，不应该接收 `titleKey`、`labelKey` 等
+- ❌ **状态管理**：不应该直接使用 store、context
+- ❌ **业务服务**：不应该调用业务服务或 API
+- ❌ **业务类型**：不应该依赖业务特定的类型定义
+
+#### ✅ **正确做法：接收已处理的数据**
+
+```tsx
+// ✅ UI 组件：接收已翻译的文本
+interface IconButtonProps {
+  icon: LucideIcon;
+  onClick: () => void;
+  title: string;           // 接收已翻译的文本
+  ariaLabel?: string;      // 接收已翻译的文本
+}
+
+export function IconButton({ icon: Icon, onClick, title, ariaLabel }: IconButtonProps) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      title={title}              // 直接使用传入的文本
+      aria-label={ariaLabel ?? title}
+    >
+      <Icon className="h-4 w-4" />
+    </Button>
+  );
+}
+```
+
+#### ❌ **错误做法：在 UI 组件中处理业务逻辑**
+
+```tsx
+// ❌ 错误：UI 组件感知 i18n
+import { useTranslation } from "react-i18next";
+
+interface IconButtonProps {
+  icon: LucideIcon;
+  onClick: () => void;
+  titleKey: string;        // ❌ 接收 i18n key
+  ariaLabelKey?: string;    // ❌ 接收 i18n key
+}
+
+export function IconButton({ icon: Icon, onClick, titleKey, ariaLabelKey }: IconButtonProps) {
+  const { t } = useTranslation();  // ❌ UI 组件不应该使用 i18n
+  const title = t(titleKey);      // ❌ UI 组件不应该处理翻译
+  
+  return <Button title={title}>...</Button>;
+}
+```
+
+#### ✅ **正确做法：在容器组件中处理业务逻辑**
+
+```tsx
+// ✅ 容器组件：处理 i18n，然后传给 UI 组件
+export const ChannelHeader = () => {
+  const { t } = useTranslation();  // ✅ 容器组件可以使用 i18n
+  
+  return (
+    <div>
+      <IconButton
+        icon={Bot}
+        onClick={() => presenter.openAIAssistant()}
+        title={t("channelHeader.aiAssistant")}  // ✅ 在外部翻译后传入
+      />
+    </div>
+  );
+};
+```
+
+#### 📋 **UI 组件设计检查清单**
+
+在创建或修改 UI 组件时，检查：
+- [ ] 组件是否在 `@/common/components/ui/` 目录下？
+- [ ] 组件是否只接收原始数据（字符串、数字、布尔值）？
+- [ ] 组件是否没有使用任何业务相关的 hooks（`useTranslation`、`useStore` 等）？
+- [ ] 组件是否没有导入任何业务服务或 store？
+- [ ] 组件是否可以在任何项目中使用（不依赖业务上下文）？
+- [ ] 组件是否只负责展示和基本的交互（点击、悬停等）？
+
 ```tsx
 // ✅ UI 组件示例
 export const Button = ({ 
