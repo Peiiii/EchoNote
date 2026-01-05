@@ -40,7 +40,7 @@ import { Edit2 } from "lucide-react";
 import { PublishSpaceDialog } from "../../../channel-management/components/publish-space-dialog";
 import { HeaderMenu } from "./header-menu";
 import { HeaderMenuItem } from "./header-menu-item";
-import { HeaderIconButton } from "./header-icon-button";
+import { IconButton } from "@/common/components/ui/icon-button";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -431,26 +431,26 @@ export const ChannelHeader = ({
         <>
           {collapsedContent}
           <div className="flex items-center space-x-2">
-            <HeaderIconButton
+            <IconButton
               icon={Bot}
               onClick={() => presenter.openAIAssistant()}
-              titleKey="channelHeader.aiAssistant"
+              title={t("channelHeader.aiAssistant")}
             />
-            <HeaderIconButton
+            <IconButton
               icon={Sparkles}
               onClick={() => presenter.openStudio()}
-              titleKey="channelHeader.studio"
+              title={t("channelHeader.studio")}
             />
-            <HeaderIconButton
+            <IconButton
               icon={Search}
               onClick={() => openQuickSearchModal()}
-              titleKey="channelHeader.search"
+              title={t("channelHeader.search")}
             />
             {getFeaturesConfig().channel.settings.enabled && (
-              <HeaderIconButton
+              <IconButton
                 icon={Settings}
                 onClick={() => presenter.openSettings()}
-                titleKey="channelHeader.settings"
+                title={t("channelHeader.settings")}
               />
             )}
             <DropdownMenu>

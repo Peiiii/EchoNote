@@ -13,7 +13,7 @@ import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
 import { useTranslation } from "react-i18next";
-import { HeaderIconButton } from "@/desktop/features/notes/features/message-timeline/components/channel-header/header-icon-button";
+import { IconButton } from "@/common/components/ui/icon-button";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
@@ -64,19 +64,19 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
           </h3>
         </div>
         <div className="flex items-center gap-1.5">
-          <HeaderIconButton
+          <IconButton
             icon={Search}
             onClick={() => openQuickSearchModal({ defaultScope: "all" })}
-            titleKey="channelManagement.channelList.searchAllNotesTooltip"
-            ariaLabelKey="channelManagement.channelList.searchAllNotes"
+            title={t("channelManagement.channelList.searchAllNotesTooltip")}
+            ariaLabel={t("channelManagement.channelList.searchAllNotes")}
           />
           <CreateChannelPopover
             instantCreate
             trigger={
-              <HeaderIconButton
+              <IconButton
                 icon={Plus}
                 onClick={() => {}}
-                titleKey="channelManagement.channelList.newSpace"
+                title={t("channelManagement.channelList.newSpace")}
               />
             }
           />
