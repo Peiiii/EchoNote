@@ -51,7 +51,9 @@ export const useLanguageStore = create<LanguageState>()(
         if (isUpdatingFromI18n) return;
         set({ language });
         if (typeof window !== "undefined" && i18n.isInitialized) {
-          i18n.changeLanguage(language);
+          i18n.changeLanguage(language).then(() => {
+            window.location.reload();
+          });
         }
       },
     }),
