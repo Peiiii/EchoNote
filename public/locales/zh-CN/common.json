@@ -475,24 +475,10 @@
   },
   "desktop": {
     "welcomeGuide": {
-      "createFirstSpace": "创建您的第一个空间",
-      "createMoreHint": "您可以随时从侧边栏创建更多空间",
-      "description": "您的个人空间，用于记录想法、灵感和 AI 驱动的对话。创建您的第一个思考空间开始使用。",
-      "feature1": {
-        "description": "在专用空间中捕捉和组织您的想法",
-        "title": "有序空间"
-      },
-      "feature2": {
-        "description": "与 AI 就您的笔记进行智能对话",
-        "title": "AI 对话"
-      },
-      "feature3": {
-        "description": "发现您想法中的见解和联系",
-        "title": "智能洞察"
-      },
-      "firstSpaceDescription": "从这里开始您的旅程",
-      "firstSpaceName": "我的第一个空间",
-      "title": "欢迎使用 StillRoot"
+      "createFirstSpace": "创建你的第一个空间",
+      "emptyStateHint": "开始记录你的第一个想法",
+      "firstSpaceDescription": "从这里开始",
+      "firstSpaceName": "我的第一个空间"
     }
   },
   "editor": {

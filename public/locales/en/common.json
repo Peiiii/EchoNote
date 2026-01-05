@@ -476,23 +476,9 @@
   "desktop": {
     "welcomeGuide": {
       "createFirstSpace": "Create Your First Space",
-      "createMoreHint": "You can create more spaces anytime from the sidebar",
-      "description": "Your personal space for thoughts, ideas, and AI-powered conversations. Create your first thought space to get started.",
-      "feature1": {
-        "description": "Capture and organize your thoughts in dedicated spaces",
-        "title": "Organized Spaces"
-      },
-      "feature2": {
-        "description": "Have intelligent conversations with AI about your notes",
-        "title": "AI Conversations"
-      },
-      "feature3": {
-        "description": "Discover insights and connections in your thoughts",
-        "title": "Smart Insights"
-      },
+      "emptyStateHint": "Start recording your first thought",
       "firstSpaceDescription": "Start your journey here",
-      "firstSpaceName": "My First Space",
-      "title": "Welcome to StillRoot"
+      "firstSpaceName": "My First Space"
     }
   },
   "editor": {
