@@ -1084,5 +1084,9 @@
       "title": "Discussion",
       "you": "You"
     }
+  },
+  "readMore": {
+    "collapse": "Collapse",
+    "readMore": "Read more"
   }
 }

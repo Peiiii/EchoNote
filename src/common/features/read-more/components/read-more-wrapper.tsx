@@ -3,6 +3,7 @@ import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-c
 import { cn } from "@/common/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { READ_MORE_DATA_ATTRS, READ_MORE_SELECTORS } from "../core/dom-constants";
 import { selectShowFloatingCollapse, useReadMoreStore } from "../store/read-more.store";
 
@@ -24,10 +25,13 @@ export function ReadMoreBaseWrapper({
   clampMargin = 0,
   className,
   gradientClassName,
-  readMoreLabel = "Read more",
-  collapseLabel = "Collapse",
+  readMoreLabel,
+  collapseLabel,
 }: ReadMoreBaseWrapperProps) {
+  const { t } = useTranslation();
   const presenter = useCommonPresenterContext();
+  const displayReadMoreLabel = readMoreLabel ?? t("readMore.readMore");
+  const displayCollapseLabel = collapseLabel ?? t("readMore.collapse");
   const setStatus = useReadMoreStore(useCallback(state => state.setStatus, []));
   const pendingCollapseId = useReadMoreStore(state => state.pendingCollapseId);
   const acknowledgeCollapse = useReadMoreStore(useCallback(state => state.acknowledgeCollapse, []));
@@ -130,7 +134,7 @@ export function ReadMoreBaseWrapper({
             onClick={handleToggle}
             className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-xs px-2 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm text-muted-foreground shadow-sm border border-slate-200/30 dark:border-slate-700/30 flex items-center gap-1 active:scale-[0.98] transition-all duration-150 hover:bg-white/90 dark:hover:bg-slate-900/70 hover:shadow-md"
           >
-            <span>{readMoreLabel}</span>
+            <span>{displayReadMoreLabel}</span>
             <ChevronDown className="w-3 h-3" />
           </button>
         </>
@@ -147,7 +151,7 @@ export function ReadMoreBaseWrapper({
           )}
         >
           <ChevronUp className="w-3 h-3" />
-          <span>{collapseLabel}</span>
+          <span>{displayCollapseLabel}</span>
         </button>
       )}
     </div>

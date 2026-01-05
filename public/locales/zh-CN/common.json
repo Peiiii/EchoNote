@@ -1084,5 +1084,9 @@
       "title": "讨论",
       "you": "您"
     }
+  },
+  "readMore": {
+    "collapse": "折叠",
+    "readMore": "展开更多"
   }
 }
