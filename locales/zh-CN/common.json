@@ -178,6 +178,11 @@
           "role": "你是一位知识组织者。从笔记中构建两个互补的结构：",
           "treeDescription": "2) 分层思维导图（用于 XMind 式视图）：\n   - 树：单个根主题，带有嵌套子项（每层 3-5 个分支是理想的）\n   - 保持树标签简洁（2-4 个词）并避免重复"
         },
+        "report": {
+          "constraints": "约束：\n- 所有内容必须使用 {{language}}\n- 结论必须以笔记为依据；证据不足时要明确说明\n- 具体且可执行，避免空泛建议\n- 不要编造笔记中不存在的事实或事件",
+          "instructions": "生成一份高信噪比、结构化的综合报告，帮助用户理解这些笔记揭示了什么：关键主题、具体洞见、矛盾/张力，以及可执行的下一步计划。同时给出最能澄清意图、解除卡点的反思问题。",
+          "role": "你是 StillRoot AI，一位擅长个人成长分析与知识整合的专家。你的任务是基于用户笔记产出一份高质量报告。"
+        },
         "sparks": {
           "objectiveAdapt": "<objective priority=\"high\" spark_allocation=\"1-2\">智能适应 - 匹配内容类型（分析性、情感性、创造性、哲学性等）。使用 1-2 个灵感来展示不同的思维风格或方法。</objective>",
           "objectiveAdditional": "<objective priority=\"highest\" spark_allocation=\"flexible\">附加说明 - 如果提供了附加说明，请优先考虑并将其纳入灵感生成。调整灵感分配和焦点以满足附加说明中提到的特定用户需求。</objective>",
@@ -447,6 +452,7 @@
     "saving": "保存中...",
     "send": "发送",
     "separator": "•",
+    "unknownError": "未知错误",
     "unknown": "未知",
     "viewLarger": "查看大图"
   },
@@ -970,7 +976,9 @@
     "report": {
       "basedOnSources_one": "基于 {{count}} 个来源",
       "basedOnSources_other": "基于 {{count}} 个来源",
-      "contentPlaceholder": "报告内容将在此处以结构化格式显示。"
+      "contentPlaceholder": "报告内容将在此处以结构化格式显示。",
+      "downloadJSON": "下载 JSON",
+      "downloadMarkdown": "下载 Markdown"
     },
     "wikiCard": {
       "examples": "示例",

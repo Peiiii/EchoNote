@@ -178,6 +178,11 @@
           "role": "You are a knowledge organizer. Build two complementary structures from notes:",
           "treeDescription": "2) A hierarchical mindmap (for XMind-like view):\n   - tree: a single root topic with nested children (3–5 branches per level is ideal)\n   - keep tree labels concise (2–4 words) and avoid duplicates"
         },
+        "report": {
+          "constraints": "Constraints:\n- Everything must be in {{language}}\n- Ground claims in the notes; if evidence is weak, say so explicitly\n- Be specific and actionable; avoid generic advice\n- Do not invent facts or events not present in the notes",
+          "instructions": "Create a comprehensive, structured report that helps the user understand what their notes reveal: key themes, concrete insights, tensions, and an actionable next-step plan. Include reflective questions that would most efficiently clarify intent and unblock progress.",
+          "role": "You are StillRoot AI, an expert personal growth analyst and knowledge synthesizer. Your job is to produce a high-signal report from the user's notes."
+        },
         "sparks": {
           "objectiveAdapt": "<objective priority=\"high\" spark_allocation=\"1-2\">Adapt intelligently - Match the content type (analytical, emotional, creative, philosophical, etc.). Use 1-2 sparks to demonstrate different thinking styles or approaches.</objective>",
           "objectiveAdditional": "<objective priority=\"highest\" spark_allocation=\"flexible\">Additional Instructions - If additional instructions are provided, prioritize and incorporate them into spark generation. Adjust spark allocation and focus to meet specific user requirements mentioned in additional instructions.</objective>",
@@ -447,6 +452,7 @@
     "saving": "Saving...",
     "send": "Send",
     "separator": "•",
+    "unknownError": "Unknown error",
     "unknown": "unknown",
     "viewLarger": "View larger"
   },
@@ -970,7 +976,9 @@
     "report": {
       "basedOnSources_one": "Based on {{count}} source",
       "basedOnSources_other": "Based on {{count}} sources",
-      "contentPlaceholder": "Report content will be displayed here in a structured format."
+      "contentPlaceholder": "Report content will be displayed here in a structured format.",
+      "downloadJSON": "Download JSON",
+      "downloadMarkdown": "Download Markdown"
     },
     "wikiCard": {
       "examples": "Examples",
