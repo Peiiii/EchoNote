@@ -927,6 +927,10 @@
     "audioSummary": {
       "content": "Audio Overview Content"
     },
+    "emptyState": {
+      "description": "Pick a module to generate insights from your notes. Simple, focused, world‑class.",
+      "title": "Your Ideas, Elevated"
+    },
     "contextSelector": {
       "mode": {
         "all": "All spaces",
@@ -1080,5 +1084,9 @@
       "title": "Discussion",
       "you": "You"
     }
+  },
+  "readMore": {
+    "collapse": "Collapse",
+    "readMore": "Read more"
   }
 }

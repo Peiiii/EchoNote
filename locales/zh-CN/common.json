@@ -927,6 +927,10 @@
     "audioSummary": {
       "content": "音频概览内容"
     },
+    "emptyState": {
+      "description": "选择一个模块，从你的笔记中生成洞察。简单、专注、世界级。",
+      "title": "你的想法，得到提升"
+    },
     "contextSelector": {
       "mode": {
         "all": "所有空间",
@@ -1080,5 +1084,9 @@
       "title": "讨论",
       "you": "您"
     }
+  },
+  "readMore": {
+    "collapse": "折叠",
+    "readMore": "展开更多"
   }
 }
