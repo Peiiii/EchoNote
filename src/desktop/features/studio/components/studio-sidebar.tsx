@@ -15,6 +15,7 @@ import { WikiCardDetail } from "../modules/wiki-card/components/wiki-card-detail
 import { ReportDetail } from "../modules/report/components/report-detail";
 import { useConceptCards } from "../modules/wiki-card/hooks/use-concept-cards";
 import { useMindmap } from "../modules/mindmap/hooks/use-mindmap";
+import { useReport } from "../modules/report/hooks/use-report";
 import { StudioRecentItem } from "./studio-recent-item";
 import { StudioEmptyState } from "./studio-empty-state";
 import { AnimatePresence, motion } from "framer-motion";
@@ -61,10 +62,11 @@ export const StudioSidebar = memo(function StudioSidebar() {
   const modules = getEnabledModules();
   const { generate: generateConceptCards } = useConceptCards();
   const { generate: generateMindmap } = useMindmap();
+  const { generate: generateReport } = useReport();
 
   const handleModuleClick = useCallback(
     async (moduleId: string) => {
-      if (moduleId === "wiki-card" || moduleId === "mindmap") {
+      if (moduleId === "wiki-card" || moduleId === "mindmap" || moduleId === "report") {
         let channelIds: string[] = [];
 
         if (currentContext?.mode === "all") {
@@ -78,22 +80,25 @@ export const StudioSidebar = memo(function StudioSidebar() {
         }
 
         if (channelIds.length === 0) {
-          console.warn("No channels available for concept cards generation");
+          console.warn("No channels available for studio generation");
           return;
         }
 
         try {
           setCurrentModule(moduleId as typeof currentModule);
-          const itemId =
-            moduleId === "wiki-card"
-              ? await generateConceptCards(channelIds)
-              : await generateMindmap(channelIds);
+          const itemId = await (moduleId === "wiki-card"
+            ? generateConceptCards(channelIds)
+            : moduleId === "mindmap"
+              ? generateMindmap(channelIds)
+              : generateReport(channelIds));
           setActiveItem(itemId);
         } catch (error) {
           console.error(
             moduleId === "wiki-card"
               ? "Failed to generate concept cards:"
-              : "Failed to generate mindmap:",
+              : moduleId === "mindmap"
+                ? "Failed to generate mindmap:"
+                : "Failed to generate report:",
             error
           );
         }
@@ -109,6 +114,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
       channels,
       generateConceptCards,
       generateMindmap,
+      generateReport,
     ]
   );
 

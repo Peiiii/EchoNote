@@ -3,6 +3,11 @@ import { ConceptCardsData, ConceptCard } from "../types";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { i18n } from "@/common/i18n";
 import { getUserNotesFromChannels } from "../../shared/services/channel-user-notes.service";
+import {
+  detectLanguageFromText,
+  formatNotesForPrompt,
+  getChannelNames,
+} from "../../shared/services/notes-prompt.service";
 
 const conceptCardSchema = {
   type: "object",
@@ -39,21 +44,6 @@ const conceptCardSchema = {
   required: ["title", "cards"],
 };
 
-function detectLanguage(text: string): string {
-  const chineseRegex = /[\u4e00-\u9fff]/;
-  const japaneseRegex = /[\u3040-\u309f\u30a0-\u30ff]/;
-  const koreanRegex = /[\uac00-\ud7af]/;
-  const arabicRegex = /[\u0600-\u06ff]/;
-  const cyrillicRegex = /[\u0400-\u04ff]/;
-
-  if (chineseRegex.test(text)) return "Chinese";
-  if (japaneseRegex.test(text)) return "Japanese";
-  if (koreanRegex.test(text)) return "Korean";
-  if (arabicRegex.test(text)) return "Arabic";
-  if (cyrillicRegex.test(text)) return "Russian";
-  return "English";
-}
-
 export async function generateConceptCards(
   channelIds: string[]
 ): Promise<ConceptCardsData> {
@@ -63,9 +53,7 @@ export async function generateConceptCards(
     throw new Error("At least one channel is required");
   }
 
-  const channelNames = channelIds
-    .map((id) => channels.find((c) => c.id === id)?.name || id)
-    .join(", ");
+  const channelNames = getChannelNames(channelIds, channels);
 
   const allNotes = await getUserNotesFromChannels(channelIds, { maxMessagesPerChannel: 200 });
 
@@ -74,19 +62,8 @@ export async function generateConceptCards(
   }
 
   const combinedText = allNotes.map((note) => note.content).join("\n\n");
-  const detectedLanguage = detectLanguage(combinedText);
-
-  const notesText = allNotes
-    .sort((a, b) => {
-      const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : a.timestamp;
-      const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : b.timestamp;
-      return timeB - timeA;
-    })
-    .map((note, idx) => {
-      const channelName = channels.find((c) => c.id === note.channelId)?.name || note.channelId;
-      return `Note ${idx + 1} (from ${channelName}):\n${note.content}`;
-    })
-    .join("\n\n---\n\n");
+  const detectedLanguage = detectLanguageFromText(combinedText);
+  const notesText = formatNotesForPrompt(allNotes, channels);
 
   const t = i18n.t.bind(i18n);
   const systemPrompt = `${t("aiAssistant.prompts.systemPrompts.conceptCards.role")}
