@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@ag-ui/client": "^0.0.36",
-    "@agent-labs/agent-chat": "^1.20.32",
+    "@agent-labs/agent-chat": "^1.21.2",
     "@cardos/extension": "0.2.0-beta.3",
     "@dimstack/git-auth": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -65,6 +65,8 @@
     "emoji-picker-react": "^4.13.3",
     "firebase": "^12.1.0",
     "framer-motion": "^12.23.24",
+    "i18next": "^25.7.3",
+    "i18next-http-backend": "^3.0.2",
     "katex": "^0.16.23",
     "lodash-es": "^4.17.21",
     "lowlight": "2.8.0",
@@ -74,6 +76,7 @@
     "openai": "^5.12.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-i18next": "^16.5.1",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.4",
     "react-router-dom": "^7.7.1",
@@ -95,10 +98,7 @@
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
     "uuid": "^11.1.0",
-    "zustand": "^5.0.7",
-    "i18next": "^25.7.3",
-    "i18next-http-backend": "^3.0.2",
-    "react-i18next": "^16.5.1"
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

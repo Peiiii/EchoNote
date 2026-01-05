@@ -5,10 +5,9 @@ import {
   useConversationStore,
 } from "@/common/features/ai-assistant/stores/conversation.store";
 import {
-  AgentChatCore,
   UIMessage,
-  useAgentSessionManager,
-  useAgentSessionManagerState,
+  AgentChat,
+  useAgentChatController,
   useParseTools,
 } from "@agent-labs/agent-chat";
 import { useMemoizedFn } from "ahooks";
@@ -86,53 +85,57 @@ function AgentChatCoreWrapper({
   }, []);
   const { toolDefs, toolExecutors, toolRenderers } = useParseTools(tools);
 
-  const getContextsWithFirstSessionInfo = useMemo(() => {
+  const getContexts = useMemo(() => {
     return () => {
       const baseContexts = aiAgentFactory.getSessionContexts(conversationId, channelId);
 
-      if (isFirstConversation) {
-        return [
-          {
-            description: "Product Information & First Session Guide",
-            value: JSON.stringify({
-              welcomeMessage: "This is the user's first AI conversation. Please DEMONSTRATE your agent capabilities by actively using tools to show what you can do.",
-              productInfo: {
-                name: "StillRoot",
-                purpose: "A personal growth companion platform that helps users become who they want to be",
-                coreFeatures: [
-                  "Personal Growth Guidance: Monitor progress, identify problems in thinking and behavior, provide specific improvement suggestions",
-                  "Deep Understanding: Help users dig deeper from surface phenomena to underlying essence and patterns",
-                  "Insight Discovery: Analyze connections between notes, discover knowledge blind spots, provide new insights",
-                  "Note Management: Create, read, update, and organize notes across channels with AI assistance"
-                ],
-                valueProposition: "StillRoot helps users track thoughts, discover patterns, and grow personally through AI-powered analysis of their notes and ideas.",
-                mission: "Help users become who they want to be through cognitive enhancement and personal growth supervision"
-              },
-              engagementStrategy: "Be enthusiastic, show value by USING TOOLS, demonstrate capabilities, and encourage exploration. Make them feel excited about using StillRoot regularly.",
-              demonstrationRequirements: [
-                "You MUST actively use at least 2-3 tools to demonstrate your capabilities",
-                "Use listNotes to show you can access their notes and provide insights",
-                "Use grepNotes to search their notes and find patterns or interesting content",
-                "Analyze their notes to provide meaningful insights",
-                "Show excitement about their data and suggest ways to explore it",
-                "CRITICAL: Call tools ONE AT A TIME. Wait for each tool to complete before calling the next one. Do not send multiple tool calls in parallel.",
-                "For example, first call listNotes, wait for results, then call grepNotes, wait for results, then analyze"
+      if (!isFirstConversation) return baseContexts;
+
+      return [
+        {
+          description: "Product Information & First Session Guide",
+          value: JSON.stringify({
+            welcomeMessage:
+              "This is the user's first AI conversation. Please DEMONSTRATE your agent capabilities by actively using tools to show what you can do.",
+            productInfo: {
+              name: "StillRoot",
+              purpose:
+                "A personal growth companion platform that helps users become who they want to be",
+              coreFeatures: [
+                "Personal Growth Guidance: Monitor progress, identify problems in thinking and behavior, provide specific improvement suggestions",
+                "Deep Understanding: Help users dig deeper from surface phenomena to underlying essence and patterns",
+                "Insight Discovery: Analyze connections between notes, discover knowledge blind spots, provide new insights",
+                "Note Management: Create, read, update, and organize notes across channels with AI assistance",
               ],
-              suggestedApproach: [
-                "Greet them warmly as their personal growth companion",
-                "Briefly introduce StillRoot's mission and your role",
-                "IMMEDIATELY start using tools (listNotes, grepNotes, etc.) to demonstrate your capabilities",
-                "Show actual insights from their notes, even if they're just starting out",
-                "Highlight the value of having AI-powered analysis of their thoughts",
-                "Invite them to try asking questions or exploring specific topics",
-                "Be encouraging and show enthusiasm about helping them grow"
-              ]
-            }),
-          },
-          ...baseContexts,
-        ];
-      }
-      return baseContexts;
+              valueProposition:
+                "StillRoot helps users track thoughts, discover patterns, and grow personally through AI-powered analysis of their notes and ideas.",
+              mission:
+                "Help users become who they want to be through cognitive enhancement and personal growth supervision",
+            },
+            engagementStrategy:
+              "Be enthusiastic, show value by USING TOOLS, demonstrate capabilities, and encourage exploration. Make them feel excited about using StillRoot regularly.",
+            demonstrationRequirements: [
+              "You MUST actively use at least 2-3 tools to demonstrate your capabilities",
+              "Use listNotes to show you can access their notes and provide insights",
+              "Use grepNotes to search their notes and find patterns or interesting content",
+              "Analyze their notes to provide meaningful insights",
+              "Show excitement about their data and suggest ways to explore it",
+              "CRITICAL: Call tools ONE AT A TIME. Wait for each tool to complete before calling the next one. Do not send multiple tool calls in parallel.",
+              "For example, first call listNotes, wait for results, then call grepNotes, wait for results, then analyze",
+            ],
+            suggestedApproach: [
+              "Greet them warmly as their personal growth companion",
+              "Briefly introduce StillRoot's mission and your role",
+              "IMMEDIATELY start using tools (listNotes, grepNotes, etc.) to demonstrate your capabilities",
+              "Show actual insights from their notes, even if they're just starting out",
+              "Highlight the value of having AI-powered analysis of their thoughts",
+              "Invite them to try asking questions or exploring specific topics",
+              "Be encouraging and show enthusiasm about helping them grow",
+            ],
+          }),
+        },
+        ...baseContexts,
+      ];
     };
   }, [conversationId, channelId, isFirstConversation]);
 
@@ -153,10 +156,10 @@ function AgentChatCoreWrapper({
     return messages;
   }, [isFirstConversation, conversationId, messages, t]);
 
-  const agentSessionManager = useAgentSessionManager({
+  const agentChatController = useAgentChatController({
     agent,
     getToolDefs: () => toolDefs,
-    getContexts: getContextsWithFirstSessionInfo,
+    getContexts,
     initialMessages: initialMessagesWithWelcome,
     getToolExecutor: (name: string) => toolExecutors[name],
   });
@@ -167,25 +170,25 @@ function AgentChatCoreWrapper({
     if (isFirstConversation) {
       if (!welcomeMessageSentRef.current) {
         welcomeMessageSentRef.current = true;
-        agentSessionManager.runAgent();
+        agentChatController.runAgent();
       }
     }
-  }, [isFirstConversation, conversationId, agentSessionManager]);
+  }, [isFirstConversation, conversationId, agentChatController]);
 
   const memoizedCreateMessage = useMemoizedFn(createMessage);
   const memoizedUpdateMessage = useMemoizedFn(updateMessage);
 
   useEffect(() => {
-    const sub = agentSessionManager.addMessagesEvent$.subscribe(({ messages }) => {
-      messages.forEach(async m => {
-        memoizedCreateMessage(m);
+    const sub = agentChatController.addMessagesEvent$.subscribe(({ messages: nextMessages }) => {
+      nextMessages.forEach(async m => {
+        await memoizedCreateMessage(m);
       });
     });
     return () => sub.unsubscribe();
-  }, [agentSessionManager.addMessagesEvent$, memoizedCreateMessage]);
+  }, [agentChatController.addMessagesEvent$, memoizedCreateMessage]);
 
   useEffect(() => {
-    const sub = agentSessionManager.updateMessageEvent$
+    const sub = agentChatController.updateMessageEvent$
       .pipe(
         map(({ message }) => message),
         groupBy(message => message.id),
@@ -197,18 +200,18 @@ function AgentChatCoreWrapper({
         )
       )
       .subscribe(message => {
-        memoizedUpdateMessage(message);
+        memoizedUpdateMessage(message).catch(() => {});
       });
 
     return () => sub.unsubscribe();
-  }, [agentSessionManager.updateMessageEvent$, memoizedUpdateMessage]);
+  }, [agentChatController.updateMessageEvent$, memoizedUpdateMessage]);
 
   useEffect(() => {
-    const sub = agentSessionManager.messages$.pipe(debounceTime(100)).subscribe(arr => {
-      useConversationStore.getState().onMessagesSnapshot(conversationId, arr);
+    const sub = agentChatController.messages$.pipe(debounceTime(100)).subscribe(nextMessages => {
+      useConversationStore.getState().onMessagesSnapshot(conversationId, nextMessages);
     });
     return () => sub.unsubscribe();
-  }, [agentSessionManager, conversationId]);
+  }, [agentChatController, conversationId]);
 
   const inputExtensions = useMemo(
     () => [
@@ -255,13 +258,11 @@ function AgentChatCoreWrapper({
     ];
   }, [t]);
 
-  const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);
-
   return (
     <div className="h-full flex flex-col agent-chat-fullwidth">
       <div className="flex-1 min-h-0">
-        <AgentChatCore
-          agentSessionManager={agentSessionManager}
+        <AgentChat
+          agentChatController={agentChatController}
           toolRenderers={toolRenderers}
           className="h-full w-full"
           messageItemProps={{
@@ -270,18 +271,23 @@ function AgentChatCoreWrapper({
           promptsProps={{
             items: channelPrompts,
             onItemClick: ({ prompt }) => {
-              agentSessionManager.handleAddMessages([
-                {
-                  id: crypto.randomUUID(),
-                  role: "user",
-                  parts: [
+              agentChatController
+                .handleAddMessages(
+                  [
                     {
-                      type: "text",
-                      text: prompt,
+                      id: crypto.randomUUID(),
+                      role: "user",
+                      parts: [
+                        {
+                          type: "text",
+                          text: prompt,
+                        },
+                      ],
                     },
                   ],
-                },
-              ]);
+                  { triggerAgent: true }
+                )
+                .catch(() => {});
             },
           }}
           inputExtensions={inputExtensions}
