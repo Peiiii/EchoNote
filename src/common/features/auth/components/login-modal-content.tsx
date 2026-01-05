@@ -8,7 +8,6 @@ import { Button } from "@/common/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { ArrowLeft } from "lucide-react";
-import { LanguageToggle } from "@/common/components/language-toggle";
 
 type LoginStep = "select" | "email";
 
@@ -103,9 +102,7 @@ export function LoginModalContent({ allowGuest }: { allowGuest?: boolean }) {
         {t("auth.login.backToOptions")}
       </Button>
       <EmailLoginForm />
-      <div className="pt-2">
-        <LanguageToggle />
-      </div>
     </div>
   );
 }
+

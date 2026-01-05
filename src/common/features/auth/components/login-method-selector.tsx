@@ -1,7 +1,6 @@
 import { Button } from "@/common/components/ui/button";
 import { useGoogleAuthSupport } from "@/common/hooks/use-google-auth-support";
 import { useTranslation } from "react-i18next";
-import { LanguageToggle } from "@/common/components/language-toggle";
 import { Mail, Monitor } from "lucide-react";
 
 interface LoginMethodSelectorProps {
@@ -95,11 +94,6 @@ export const LoginMethodSelector = ({
                     </div>
                 </Button>
             )}
-
-            {/* Language Toggle */}
-            <div className="pt-2">
-                <LanguageToggle />
-            </div>
         </div>
     );
 };
