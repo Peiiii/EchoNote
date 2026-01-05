@@ -40,6 +40,7 @@ import { Edit2 } from "lucide-react";
 import { PublishSpaceDialog } from "../../../channel-management/components/publish-space-dialog";
 import { HeaderMenu } from "./header-menu";
 import { HeaderMenuItem } from "./header-menu-item";
+import { HeaderIconButton } from "./header-icon-button";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -430,41 +431,27 @@ export const ChannelHeader = ({
         <>
           {collapsedContent}
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
-              onClick={() => openQuickSearchModal()}
-              title={t("channelHeader.search")}
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+            <HeaderIconButton
+              icon={Bot}
               onClick={() => presenter.openAIAssistant()}
-            > 
-              <Bot className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+              titleKey="channelHeader.aiAssistant"
+            />
+            <HeaderIconButton
+              icon={Sparkles}
               onClick={() => presenter.openStudio()}
-              title={t("channelHeader.studio")}
-            >
-              <Sparkles className="h-4 w-4" />
-            </Button>
+              titleKey="channelHeader.studio"
+            />
+            <HeaderIconButton
+              icon={Search}
+              onClick={() => openQuickSearchModal()}
+              titleKey="channelHeader.search"
+            />
             {getFeaturesConfig().channel.settings.enabled && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200 hover:scale-105"
+              <HeaderIconButton
+                icon={Settings}
                 onClick={() => presenter.openSettings()}
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
+                titleKey="channelHeader.settings"
+              />
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

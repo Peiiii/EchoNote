@@ -5,15 +5,15 @@ import { sortChannelsByActivity } from "@/common/lib/channel-sorting";
 import { logService } from "@/core/services/log.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChannelItem } from "./channel-item";
 import { ChannelListEmptyState } from "./channel-list-empty-state";
 import { ChannelListSkeleton } from "./channel-list-skeleton";
 import { useCommonPresenterContext } from "@/common/hooks/use-common-presenter-context";
 import { openQuickSearchModal } from "@/common/features/note-search/components/quick-search-modal";
-import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { HeaderIconButton } from "@/desktop/features/notes/features/message-timeline/components/channel-header/header-icon-button";
 
 interface ChannelListProps {
   showFadeEffect?: boolean;
@@ -64,26 +64,20 @@ export function ChannelList({ showFadeEffect = false }: ChannelListProps) {
           </h3>
         </div>
         <div className="flex items-center gap-1.5">
-          <button
-            type="button"
+          <HeaderIconButton
+            icon={Search}
             onClick={() => openQuickSearchModal({ defaultScope: "all" })}
-            className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label={t('channelManagement.channelList.searchAllNotes')}
-            title={t('channelManagement.channelList.searchAllNotesTooltip')}
-          >
-            <Search className="w-4 h-4" />
-          </button>
+            titleKey="channelManagement.channelList.searchAllNotesTooltip"
+            ariaLabelKey="channelManagement.channelList.searchAllNotes"
+          />
           <CreateChannelPopover
             instantCreate
             trigger={
-              <button
-                type="button"
-                className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label={t('channelManagement.channelList.newSpace')}
-                title={t('channelManagement.channelList.newSpace')}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              <HeaderIconButton
+                icon={Plus}
+                onClick={() => {}}
+                titleKey="channelManagement.channelList.newSpace"
+              />
             }
           />
           <CollapsibleSidebar.ToggleButton />
