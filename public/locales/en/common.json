@@ -159,6 +159,7 @@
         "summarizeThoughts": "Summarize my thoughts",
         "whatMissing": "What am I missing?"
       },
+      "firstConversationWelcome": "Hi! I'm new here. Could you please introduce yourself and explain what you can do to help me?",
       "systemPrompts": {
         "conceptCards": {
           "count": "Generate 5-10 concept cards that best represent the knowledge in these notes.",

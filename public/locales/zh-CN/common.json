@@ -159,6 +159,7 @@
         "summarizeThoughts": "总结我的想法",
         "whatMissing": "我遗漏了什么？"
       },
+      "firstConversationWelcome": "你好！我是新来的。你能介绍一下自己，并解释一下你能如何帮助我吗？",
       "systemPrompts": {
         "conceptCards": {
           "count": "生成 5-10 张最能代表这些笔记中知识的概念卡片。",

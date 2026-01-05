@@ -15,7 +15,7 @@ import { useMemoizedFn } from "ahooks";
 import { isEqual } from "lodash-es";
 import { useEffect, useMemo, useRef } from "react";
 import { debounceTime, distinctUntilChanged, groupBy, map, mergeMap } from "rxjs";
-import { i18n } from "@/common/i18n";
+import { useTranslation } from "react-i18next";
 import { createModelSelectorExtension } from "../extensions/model-selector-extension";
 import { createContextSelectorExtension } from "../extensions/context-selector-extension";
 import { aiAgentFactory } from "../services/ai-agent-factory";
@@ -79,6 +79,7 @@ function AgentChatCoreWrapper({
   isFirstConversation,
 }: AgentChatCoreWrapperProps) {
   const { isMobile } = useBreakpoint();
+  const { t } = useTranslation();
   const agent = useMemo(() => aiAgentFactory.getAgent(), []);
   const tools = useMemo(() => {
     return aiAgentFactory.getChannelTools();
@@ -143,14 +144,14 @@ function AgentChatCoreWrapper({
         parts: [
           {
             type: "text",
-            text: "Hi! I'm new here. Could you please introduce yourself and explain what you can do to help me?",
+            text: t("aiAssistant.prompts.firstConversationWelcome"),
           },
         ],
       };
       return [welcomePrompt];
     }
     return messages;
-  }, [isFirstConversation, conversationId, messages]);
+  }, [isFirstConversation, conversationId, messages, t]);
 
   const agentSessionManager = useAgentSessionManager({
     agent,
@@ -225,6 +226,35 @@ function AgentChatCoreWrapper({
     [conversationId, channelId, isMobile]
   );
 
+  const channelPrompts = useMemo(() => {
+    return [
+      {
+        id: "prompt-1",
+        prompt: t("aiAssistant.prompts.defaultPrompts.analyzeNotes"),
+      },
+      {
+        id: "prompt-2",
+        prompt: t("aiAssistant.prompts.defaultPrompts.summarizeThoughts"),
+      },
+      {
+        id: "prompt-3",
+        prompt: t("aiAssistant.prompts.defaultPrompts.findPatterns"),
+      },
+      {
+        id: "prompt-4",
+        prompt: t("aiAssistant.prompts.defaultPrompts.organizeIdeas"),
+      },
+      {
+        id: "prompt-5",
+        prompt: t("aiAssistant.prompts.defaultPrompts.whatMissing"),
+      },
+      {
+        id: "prompt-6",
+        prompt: t("aiAssistant.prompts.defaultPrompts.suggestImprovements"),
+      },
+    ];
+  }, [t]);
+
   const { messages: _messages } = useAgentSessionManagerState(agentSessionManager);
 
   return (
@@ -238,7 +268,7 @@ function AgentChatCoreWrapper({
             showAvatar: false,
           }}
           promptsProps={{
-            items: getChannelPrompts(channelId),
+            items: channelPrompts,
             onItemClick: ({ prompt }) => {
               agentSessionManager.handleAddMessages([
                 {
@@ -259,33 +289,4 @@ function AgentChatCoreWrapper({
       </div>
     </div>
   );
-}
-
-function getChannelPrompts(_channelId: string) {
-  return [
-    {
-      id: "prompt-1",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.analyzeNotes"),
-    },
-    {
-      id: "prompt-2",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.summarizeThoughts"),
-    },
-    {
-      id: "prompt-3",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.findPatterns"),
-    },
-    {
-      id: "prompt-4",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.organizeIdeas"),
-    },
-    {
-      id: "prompt-5",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.whatMissing"),
-    },
-    {
-      id: "prompt-6",
-      prompt: i18n.t("aiAssistant.prompts.defaultPrompts.suggestImprovements"),
-    },
-  ];
 }
