@@ -248,6 +248,8 @@
       "title": "访客模式提示"
     },
     "login": {
+      "backToOptions": "返回",
+      "continueWithEmail": "使用邮箱继续",
       "descOrLocal": "登录后可云同步、发布空间；也可以先用本地模式体验。",
       "description": "登录后可云同步、发布空间。",
       "local": {
@@ -255,8 +257,11 @@
         "hintDesc": "你可以先用本地模式体验（数据仅保存在本机，不会云同步）。",
         "hintTitle": "还没有数据？"
       },
+      "localMode": "本地体验",
+      "localModeHint": "无需登录",
       "or": "或",
       "passwordResetSent": "密码重置邮件已发送！请查看您的收件箱。",
+      "selectMethod": "选择登录方式",
       "title": "登录",
       "titleOrLocal": "登录或本地体验"
     },

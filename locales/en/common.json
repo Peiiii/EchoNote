@@ -248,6 +248,8 @@
       "title": "Guest Mode Notice"
     },
     "login": {
+      "backToOptions": "Back",
+      "continueWithEmail": "Continue with email",
       "descOrLocal": "Sign in for cloud sync and publishing, or try local mode first.",
       "description": "Sign in to enable cloud features like publishing and sync.",
       "local": {
@@ -255,8 +257,11 @@
         "hintDesc": "You can try local mode (data stays on this device; no cloud sync).",
         "hintTitle": "No data yet?"
       },
+      "localMode": "Try local mode",
+      "localModeHint": "No sign-in required",
       "or": "or",
       "passwordResetSent": "Password reset email sent! Check your inbox.",
+      "selectMethod": "Choose how to continue",
       "title": "Sign in",
       "titleOrLocal": "Sign in or try locally"
     },
