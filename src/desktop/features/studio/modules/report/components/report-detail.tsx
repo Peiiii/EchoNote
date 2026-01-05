@@ -1,7 +1,7 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { Download, ArrowLeft, Copy } from "lucide-react";
+import { ArrowLeft, Braces, Check, Copy, Download, FileDown } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { useTranslation } from "react-i18next";
 import { ReportData } from "../types";
@@ -9,10 +9,9 @@ import { MarkdownContent } from "@/common/components/markdown/markdown-content";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { HeaderMenuItem } from "@/desktop/features/notes/features/message-timeline/components/channel-header/header-menu-item";
 
 interface ReportDetailProps {
   item: StudioContentItem;
@@ -35,6 +34,13 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
   const { t } = useTranslation();
   const data = item.data as ReportData | undefined;
   const markdown = data?.reportMarkdown || "";
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const id = window.setTimeout(() => setCopied(false), 900);
+    return () => window.clearTimeout(id);
+  }, [copied]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -52,37 +58,43 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
           variant="ghost"
           size="icon"
           className="h-7 w-7"
-          title={t("common.copy")}
+          title={copied ? t("common.copied") : t("common.copy")}
           disabled={!data || !markdown}
           onClick={async () => {
             if (!data) return;
             await navigator.clipboard.writeText(data.reportMarkdown || "");
-            toast(t("common.copied"));
+            setCopied(true);
           }}
         >
-          <Copy className="w-4 h-4" />
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={!data}>
-              <Download className="w-4 h-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="group h-7 w-7"
+              title={t("studio.report.download")}
+              aria-label={t("studio.report.download")}
+              disabled={!data}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => {
+          <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+            <HeaderMenuItem
+              icon={FileDown}
+              onSelect={() => {
                 if (!data) return;
-                downloadText(
-                  `${data.title || "report"}.md`,
-                  data.reportMarkdown || "",
-                  "text/markdown"
-                );
+                downloadText(`${data.title || "report"}.md`, data.reportMarkdown || "", "text/markdown");
               }}
             >
               {t("studio.report.downloadMarkdown")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
+            </HeaderMenuItem>
+            <HeaderMenuItem
+              icon={Braces}
+              onSelect={() => {
                 if (!data) return;
                 downloadText(
                   `${data.title || "report"}.json`,
@@ -92,7 +104,7 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
               }}
             >
               {t("studio.report.downloadJSON")}
-            </DropdownMenuItem>
+            </HeaderMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

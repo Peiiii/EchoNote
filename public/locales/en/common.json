@@ -977,9 +977,9 @@
       "basedOnSources_one": "Based on {{count}} source",
       "basedOnSources_other": "Based on {{count}} sources",
       "contentPlaceholder": "Report content will be displayed here in a structured format.",
+      "download": "Download",
       "downloadJSON": "Download JSON",
-      "downloadMarkdown": "Download Markdown",
-      "copyMarkdown": "Copy as Markdown"
+      "downloadMarkdown": "Download Markdown"
     },
     "wikiCard": {
       "examples": "Examples",

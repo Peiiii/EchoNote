@@ -12,8 +12,8 @@ importers:
         specifier: ^0.0.36
         version: 0.0.36
       '@agent-labs/agent-chat':
-        specifier: ^1.21.4
-        version: 1.21.4(@emotion/is-prop-valid@1.2.2)(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
+        specifier: ^1.21.5
+        version: 1.21.5(@emotion/is-prop-valid@1.2.2)(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))
       '@cardos/extension':
         specifier: 0.2.0-beta.3
         version: 0.2.0-beta.3(rxjs@7.8.2)
@@ -341,8 +341,8 @@ packages:
   '@ag-ui/proto@0.0.36':
     resolution: {integrity: sha512-yaWLwJQmBaCtFstSoZEALztVckCYv+RD8guU91kL5AvywRXvZPP5mjiN+bEwvtw8VU3idXoee1ZbJGpSlSAQ8A==}
 
-  '@agent-labs/agent-chat@1.21.4':
-    resolution: {integrity: sha512-fvEIKPLl97y/zxWfOkGEEkhEegPY0To0rD0Hln0DNb54/kwSo/bOhYjD/p7KGpn0aO80aW8jy05QctfITXwDDg==}
+  '@agent-labs/agent-chat@1.21.5':
+    resolution: {integrity: sha512-H+gL1t0XBEZoOgeAM/EVEx356Yt5kkkOM8sOUatS2sFeMraNmN0s3WScZJCfdrxiecJMVzIZNgz1gEizSUjL6Q==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -5926,7 +5926,7 @@ snapshots:
       '@bufbuild/protobuf': 2.7.0
       '@protobuf-ts/protoc': 2.11.1
 
-  '@agent-labs/agent-chat@1.21.4(@emotion/is-prop-valid@1.2.2)(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))':
+  '@agent-labs/agent-chat@1.21.5(@emotion/is-prop-valid@1.2.2)(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))':
     dependencies:
       '@radix-ui/react-avatar': 1.1.10(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@radix-ui/react-slot': 1.2.3(@types/react@19.1.12)(react@19.1.1)

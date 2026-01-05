@@ -5,7 +5,7 @@ import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
 import { getStudioModule } from "../modules/registry";
@@ -13,6 +13,7 @@ import { Pin, MoreVertical, Trash2, ExternalLink, AlertCircle } from "lucide-rea
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { HeaderMenuItem } from "@/desktop/features/notes/features/message-timeline/components/channel-header/header-menu-item";
 
 interface StudioRecentItemProps {
   item: StudioContentItem;
@@ -149,6 +150,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                   size="icon"
                   variant="ghost"
                   className="h-7 w-7"
+                  title={t("common.moreActions")}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical className="w-3.5 h-3.5 text-muted-foreground/60" />
@@ -156,29 +158,21 @@ export const StudioRecentItem = memo(function StudioRecentItem({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-48 p-1.5"
+                sideOffset={8}
+                className="min-w-[220px] p-1"
                 onClick={(e) => e.stopPropagation()}
               >
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpen(item);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
+                <HeaderMenuItem icon={ExternalLink} onSelect={() => onOpen(item)}>
                   {t("studio.recentItem.open")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(item);
-                  }}
-                  className="text-destructive cursor-pointer focus:text-destructive"
+                </HeaderMenuItem>
+                <DropdownMenuSeparator />
+                <HeaderMenuItem
+                  icon={Trash2}
+                  onSelect={() => onDelete(item)}
+                  className="text-destructive focus:text-destructive"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
                   {t("studio.recentItem.delete")}
-                </DropdownMenuItem>
+                </HeaderMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
