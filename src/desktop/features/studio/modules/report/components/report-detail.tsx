@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Button } from "@/common/components/ui/button";
 import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { Download, ArrowLeft } from "lucide-react";
+import { Download, ArrowLeft, Copy } from "lucide-react";
 import { StudioContentItem } from "@/core/stores/studio.store";
 import { useTranslation } from "react-i18next";
 import { ReportData } from "../types";
@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface ReportDetailProps {
   item: StudioContentItem;
@@ -47,6 +48,20 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div className="text-sm font-medium flex-1 truncate">{item.title}</div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title={t("common.copy")}
+          disabled={!data || !markdown}
+          onClick={async () => {
+            if (!data) return;
+            await navigator.clipboard.writeText(data.reportMarkdown || "");
+            toast(t("common.copied"));
+          }}
+        >
+          <Copy className="w-4 h-4" />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-7 w-7" disabled={!data}>

@@ -31,6 +31,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
   const module = getStudioModule(item.moduleId);
   const Icon = module?.icon;
   const [isHovered, setIsHovered] = useState(false);
+  const isGenerating = item.status === "generating";
 
   const displayTitle = useMemo(() => {
     if (item.moduleId === "wiki-card" && item.status === "completed") {
@@ -41,8 +42,6 @@ export const StudioRecentItem = memo(function StudioRecentItem({
     return item.title;
   }, [item.title, item.moduleId, item.status, item.data]);
 
-  const isGenerating = item.status === "generating";
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
@@ -52,10 +51,11 @@ export const StudioRecentItem = memo(function StudioRecentItem({
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "group relative mx-3 mb-2 last:mb-0 transition-all duration-200",
-        isGenerating ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+        "cursor-pointer",
+        isGenerating && "opacity-80"
       )}
       onClick={() => {
-        if (!isGenerating) onOpen(item);
+        onOpen(item);
       }}
     >
       <div
@@ -63,8 +63,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
           "relative rounded-lg border transition-all duration-200 overflow-hidden",
           "backdrop-blur-sm bg-card/50",
           "border-border/40 hover:border-border/60",
-          !isGenerating &&
-            "hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-0.5",
+          "hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-0.5",
           isGenerating && "bg-muted/20"
         )}
       >
@@ -72,7 +71,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
           {Icon && (
             <div className={cn(
               "flex-shrink-0 flex items-center justify-center transition-all duration-200",
-              !isGenerating && "group-hover:scale-105"
+              "group-hover:scale-105"
             )}>
               <Icon
                 className={cn(
@@ -121,75 +120,71 @@ export const StudioRecentItem = memo(function StudioRecentItem({
             </div>
           </div>
 
-          {!isGenerating && (
-            <div
-              className={cn(
-                "flex items-center gap-0.5 transition-opacity duration-200 flex-shrink-0",
-                isHovered ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              )}
-              onClick={(e) => e.stopPropagation()}
+          <div
+            className={cn(
+              "flex items-center gap-0.5 transition-opacity duration-200 flex-shrink-0",
+              isHovered ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7"
+              title={item.pinned ? t("studio.recentItem.unpin") : t("studio.recentItem.pin")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTogglePin(item);
+              }}
             >
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                title={item.pinned ? t("studio.recentItem.unpin") : t("studio.recentItem.pin")}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onTogglePin(item);
-                }}
-              >
-                {item.pinned ? (
-                  <Pin className="w-3.5 h-3.5 text-primary fill-primary" />
-                ) : (
-                  <Pin className="w-3.5 h-3.5 text-muted-foreground/60" />
-                )}
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-7 w-7"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical className="w-3.5 h-3.5 text-muted-foreground/60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-48 p-1.5"
+              {item.pinned ? (
+                <Pin className="w-3.5 h-3.5 text-primary fill-primary" />
+              ) : (
+                <Pin className="w-3.5 h-3.5 text-muted-foreground/60" />
+              )}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpen(item);
-                    }} 
-                    className="cursor-pointer"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    {t("studio.recentItem.open")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item);
-                    }}
-                    className="text-destructive cursor-pointer focus:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    {t("studio.recentItem.delete")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
+                  <MoreVertical className="w-3.5 h-3.5 text-muted-foreground/60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-48 p-1.5"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen(item);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  {t("studio.recentItem.open")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(item);
+                  }}
+                  className="text-destructive cursor-pointer focus:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {t("studio.recentItem.delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         
-        {!isGenerating && (
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-        )}
+        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
       </div>
     </motion.div>
   );

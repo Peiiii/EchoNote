@@ -978,7 +978,8 @@
       "basedOnSources_other": "基于 {{count}} 个来源",
       "contentPlaceholder": "报告内容将在此处以结构化格式显示。",
       "downloadJSON": "下载 JSON",
-      "downloadMarkdown": "下载 Markdown"
+      "downloadMarkdown": "下载 Markdown",
+      "copyMarkdown": "复制 Markdown"
     },
     "wikiCard": {
       "examples": "示例",

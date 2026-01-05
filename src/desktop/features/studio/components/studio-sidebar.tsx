@@ -180,8 +180,15 @@ export const StudioSidebar = memo(function StudioSidebar() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="text-sm font-medium flex-1">{item.title}</div>
-            <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 pointer-events-none">
-              <X className="w-4 h-4" />
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                deleteContentItem(item.id);
+                handleCloseDetail();
+              }}
+            >
+              {t("studio.recentItem.delete")}
             </Button>
           </div>
           <div className="flex-1 flex items-center justify-center">
