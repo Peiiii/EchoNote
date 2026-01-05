@@ -41,12 +41,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
     return item.title;
   }, [item.title, item.moduleId, item.status, item.data]);
 
-  const disabledReason = useMemo(() => {
-    if (item.status === "generating") return "Still generating";
-    if (item.status === "error") return item.errorMessage || "Generation failed";
-    return null;
-  }, [item.status, item.errorMessage]);
-
+  const isGenerating = item.status === "generating";
 
   return (
     <motion.div
@@ -57,12 +52,10 @@ export const StudioRecentItem = memo(function StudioRecentItem({
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "group relative mx-3 mb-2 last:mb-0 transition-all duration-200",
-        disabledReason
-          ? "opacity-60 cursor-not-allowed"
-          : "cursor-pointer"
+        isGenerating ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
       )}
       onClick={() => {
-        if (!disabledReason) onOpen(item);
+        if (!isGenerating) onOpen(item);
       }}
     >
       <div
@@ -70,15 +63,16 @@ export const StudioRecentItem = memo(function StudioRecentItem({
           "relative rounded-lg border transition-all duration-200 overflow-hidden",
           "backdrop-blur-sm bg-card/50",
           "border-border/40 hover:border-border/60",
-          !disabledReason && "hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-0.5",
-          disabledReason && "bg-muted/20"
+          !isGenerating &&
+            "hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-0.5",
+          isGenerating && "bg-muted/20"
         )}
       >
         <div className="relative flex items-center gap-3 p-3">
           {Icon && (
             <div className={cn(
               "flex-shrink-0 flex items-center justify-center transition-all duration-200",
-              !disabledReason && "group-hover:scale-105"
+              !isGenerating && "group-hover:scale-105"
             )}>
               <Icon
                 className={cn(
@@ -99,7 +93,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                 <div
                   className={cn(
                     "text-sm font-medium truncate transition-colors",
-                    disabledReason 
+                    isGenerating 
                       ? "text-muted-foreground/60" 
                       : "text-foreground group-hover:text-foreground/90"
                   )}
@@ -127,7 +121,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
             </div>
           </div>
 
-          {!disabledReason && (
+          {!isGenerating && (
             <div
               className={cn(
                 "flex items-center gap-0.5 transition-opacity duration-200 flex-shrink-0",
@@ -193,7 +187,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
           )}
         </div>
         
-        {!disabledReason && (
+        {!isGenerating && (
           <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
         )}
       </div>

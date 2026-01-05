@@ -19,6 +19,7 @@ import { useReport } from "../modules/report/hooks/use-report";
 import { StudioRecentItem } from "./studio-recent-item";
 import { StudioEmptyState } from "./studio-empty-state";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const renderDetail = (
   moduleId: StudioModuleId,
@@ -45,6 +46,7 @@ const renderDetail = (
 };
 
 export const StudioSidebar = memo(function StudioSidebar() {
+  const { t } = useTranslation();
   const close = useUIStateStore((s) => s.closeStudio);
   const {
     currentModule,
@@ -129,6 +131,42 @@ export const StudioSidebar = memo(function StudioSidebar() {
     const item = items.find((i) => i.id === activeItemId);
     if (!item) return null;
 
+    if (item.status === "error") {
+      return (
+        <div className="h-full flex flex-col">
+          <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/40 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleCloseDetail}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="text-sm font-medium flex-1 truncate">{item.title}</div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                deleteContentItem(item.id);
+                handleCloseDetail();
+              }}
+            >
+              {t("studio.recentItem.delete")}
+            </Button>
+          </div>
+          <div className="flex-1 min-h-0 flex items-center justify-center px-6">
+            <div className="max-w-md w-full rounded-xl border border-border/50 bg-card/60 p-5">
+              <div className="text-sm font-semibold">{t("studio.recentItem.failed")}</div>
+              <div className="mt-2 text-sm text-muted-foreground break-words">
+                {item.errorMessage || t("common.unknownError")}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (item.status === "generating") {
       return (
         <div className="h-full flex flex-col">
@@ -156,7 +194,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
       );
     }
     return renderDetail(currentModule, activeItemId, handleCloseDetail, contentItems);
-  }, [activeItemId, contentItems, currentModule, handleCloseDetail]);
+  }, [activeItemId, contentItems, currentModule, deleteContentItem, handleCloseDetail, t]);
 
   const recentItems = useMemo(() => {
     const all = Object.values(contentItems).flat();

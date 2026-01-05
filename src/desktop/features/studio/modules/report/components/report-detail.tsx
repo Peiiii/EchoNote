@@ -36,7 +36,7 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
   const markdown = data?.reportMarkdown || "";
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/40 flex-shrink-0">
         <Button
           variant="ghost"
@@ -81,7 +81,7 @@ export const ReportDetail = memo(function ReportDetail({ item, onClose }: Report
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="p-4">
           <div className="text-sm text-muted-foreground mb-4">
             {t("studio.report.basedOnSources", { count: item.contextChannelIds.length })}
