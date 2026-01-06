@@ -1,9 +1,12 @@
 import OpenAI from "openai";
 
-const apiKey = (import.meta.env.VITE_DASHSCOPE_API_KEY as string | undefined) || "";
-const baseURL =
-  import.meta.env.VITE_DASHSCOPE_API_BASE ||
-  "https://dashscope-intl.aliyuncs.com/compatible-mode/v1";
+const proxyBase = (import.meta.env.VITE_AI_PROXY_BASE as string | undefined) || "";
+const apiKey = proxyBase
+  ? "proxy"
+  : (import.meta.env.VITE_DASHSCOPE_API_KEY as string | undefined) || "";
+const baseURL = proxyBase
+  ? `${proxyBase.replace(/\/+$/, "")}/openai/v1`
+  : import.meta.env.VITE_DASHSCOPE_API_BASE || "https://dashscope-intl.aliyuncs.com/compatible-mode/v1";
 export const defaultModelId: string =
   (import.meta.env.VITE_DASHSCOPE_MODEL as string | undefined) || "qwen3-max";
 

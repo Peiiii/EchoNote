@@ -170,11 +170,16 @@
         },
         "defaultAssistant": "You are a helpful assistant.",
         "defaultJSONGenerator": "You are a strict JSON generator. Return ONLY valid JSON that conforms to the following JSON schema:\n\n{{schema}}\n\nIMPORTANT: Your response must be a valid JSON object that matches this schema exactly.",
-        "defaultStructuredData": "You are a helpful assistant that generates structured data according to specifications.",
-        "defaultTitleGenerator": "You are a helpful assistant that generates concise, descriptive titles for conversations.",
-        "mindmap": {
-          "constraints": "Constraints:\n- Everything must be in {{language}}\n- Normalize concept labels and merge duplicates\n- Prefer recurring and connective concepts as higher-level topics",
-          "graphDescription": "1) A graph representation (for free-form exploration):\n   - nodes: 12–30 key concepts (unique id + label)\n   - edges: 15–50 relations (source -> target)\n   - optional: node importance (1–5), edge weight (0.5–2.0)",
+      "defaultStructuredData": "You are a helpful assistant that generates structured data according to specifications.",
+      "defaultTitleGenerator": "You are a helpful assistant that generates concise, descriptive titles for conversations.",
+      "audioPodcast": {
+        "constraints": "Constraints:\n- Everything must be in {{language}}\n- Two speakers: a host and a guest\n- Sound like a natural podcast: curiosity, light humor, short back-and-forth\n- Ground everything in the notes; don't invent facts\n- Prefer concrete examples and actionable takeaways\n- Keep each turn 1-3 sentences, avoid long monologues",
+        "instructions": "Generate a NotebookLM-style podcast episode: a host interviews a guest about the user's notes. The conversation should be engaging, structured, and insightful. Include an intro, 2-4 segments with transitions, and a concise outro. Provide a clean markdown transcript.",
+        "role": "You are a podcast producer and scriptwriter."
+      },
+      "mindmap": {
+        "constraints": "Constraints:\n- Everything must be in {{language}}\n- Normalize concept labels and merge duplicates\n- Prefer recurring and connective concepts as higher-level topics",
+        "graphDescription": "1) A graph representation (for free-form exploration):\n   - nodes: 12–30 key concepts (unique id + label)\n   - edges: 15–50 relations (source -> target)\n   - optional: node importance (1–5), edge weight (0.5–2.0)",
           "role": "You are a knowledge organizer. Build two complementary structures from notes:",
           "treeDescription": "2) A hierarchical mindmap (for XMind-like view):\n   - tree: a single root topic with nested children (3–5 branches per level is ideal)\n   - keep tree labels concise (2–4 words) and avoid duplicates"
         },
@@ -924,7 +929,10 @@
   },
   "studio": {
     "audioSummary": {
-      "content": "Audio Overview Content"
+      "content": "Audio Overview Content",
+      "generatedPodcast": "Podcast generated",
+      "noAudioAvailable": "Audio is not available (TTS provider not supported). Transcript is still available.",
+      "transcript": "Transcript"
     },
     "emptyState": {
       "description": "Pick a module to generate insights from your notes. Simple, focused, world‑class.",

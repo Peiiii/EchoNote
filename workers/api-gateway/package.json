@@ -1,0 +1,21 @@
+{
+  "name": "@stillroot/api-gateway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "hono": "^4.6.15"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260103.0",
+    "eslint": "^9.30.1",
+    "typescript": "~5.8.3",
+    "wrangler": "^3.114.0"
+  }
+}
+

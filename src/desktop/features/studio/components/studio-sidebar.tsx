@@ -16,10 +16,12 @@ import { ReportDetail } from "../modules/report/components/report-detail";
 import { useConceptCards } from "../modules/wiki-card/hooks/use-concept-cards";
 import { useMindmap } from "../modules/mindmap/hooks/use-mindmap";
 import { useReport } from "../modules/report/hooks/use-report";
+import { useAudioSummary } from "../modules/audio-summary/hooks/use-audio-summary";
 import { StudioRecentItem } from "./studio-recent-item";
 import { StudioEmptyState } from "./studio-empty-state";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { deleteStudioItem } from "../services/studio-item.service";
 
 const renderDetail = (
   moduleId: StudioModuleId,
@@ -55,7 +57,6 @@ export const StudioSidebar = memo(function StudioSidebar() {
     setActiveItem,
     contentItems,
     currentContext,
-    deleteContentItem,
     togglePin,
   } = useStudioStore();
   const { currentChannelId } = useNotesViewStore();
@@ -65,10 +66,16 @@ export const StudioSidebar = memo(function StudioSidebar() {
   const { generate: generateConceptCards } = useConceptCards();
   const { generate: generateMindmap } = useMindmap();
   const { generate: generateReport } = useReport();
+  const { generate: generateAudioSummary } = useAudioSummary();
 
   const handleModuleClick = useCallback(
     async (moduleId: string) => {
-      if (moduleId === "wiki-card" || moduleId === "mindmap" || moduleId === "report") {
+      if (
+        moduleId === "wiki-card" ||
+        moduleId === "mindmap" ||
+        moduleId === "report" ||
+        moduleId === "audio-summary"
+      ) {
         let channelIds: string[] = [];
 
         if (currentContext?.mode === "all") {
@@ -92,7 +99,9 @@ export const StudioSidebar = memo(function StudioSidebar() {
             ? generateConceptCards(channelIds)
             : moduleId === "mindmap"
               ? generateMindmap(channelIds)
-              : generateReport(channelIds));
+              : moduleId === "report"
+                ? generateReport(channelIds)
+                : generateAudioSummary(channelIds));
           setActiveItem(itemId);
         } catch (error) {
           console.error(
@@ -100,7 +109,9 @@ export const StudioSidebar = memo(function StudioSidebar() {
               ? "Failed to generate concept cards:"
               : moduleId === "mindmap"
                 ? "Failed to generate mindmap:"
-                : "Failed to generate report:",
+                : moduleId === "report"
+                  ? "Failed to generate report:"
+                  : "Failed to generate audio summary:",
             error
           );
         }
@@ -117,6 +128,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
       generateConceptCards,
       generateMindmap,
       generateReport,
+      generateAudioSummary,
     ]
   );
 
@@ -148,7 +160,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
               variant="destructive"
               size="sm"
               onClick={() => {
-                deleteContentItem(item.id);
+                void deleteStudioItem(item.id);
                 handleCloseDetail();
               }}
             >
@@ -184,7 +196,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
               variant="destructive"
               size="sm"
               onClick={() => {
-                deleteContentItem(item.id);
+                void deleteStudioItem(item.id);
                 handleCloseDetail();
               }}
             >
@@ -201,7 +213,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
       );
     }
     return renderDetail(currentModule, activeItemId, handleCloseDetail, contentItems);
-  }, [activeItemId, contentItems, currentModule, deleteContentItem, handleCloseDetail, t]);
+  }, [activeItemId, contentItems, currentModule, handleCloseDetail, t]);
 
   const recentItems = useMemo(() => {
     const all = Object.values(contentItems).flat();
@@ -287,7 +299,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
                             setCurrentModule(it.moduleId);
                             setActiveItem(it.id);
                           }}
-                          onDelete={(it) => deleteContentItem(it.id)}
+                          onDelete={(it) => void deleteStudioItem(it.id)}
                           onTogglePin={(it) => togglePin(it.id)}
                         />
                       ))}

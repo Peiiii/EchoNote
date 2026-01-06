@@ -11,16 +11,22 @@ export interface ModelConfig {
 }
 
 const CLOUDFLARE_WORKER_AI_PROXY_API_URL = "https://stillroot-ai-proxy.agentverse.cc";
+const AI_PROXY_BASE = (import.meta.env.VITE_AI_PROXY_BASE as string | undefined) || "";
+const AI_PROXY_OPENAI_BASE_URL = AI_PROXY_BASE
+  ? `${AI_PROXY_BASE.replace(/\/+$/, "")}/openai/v1`
+  : "";
 
 export const PRESET_MODELS: ModelConfig[] = [
   {
     id: "qwen-plus",
     name: "Qwen Plus",
     description: "Alibaba Cloud Qwen model via DashScope",
-    apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY || "",
+    apiKey: AI_PROXY_OPENAI_BASE_URL ? "proxy" : import.meta.env.VITE_DASHSCOPE_API_KEY || "",
     model: "qwen-plus-latest",
     apiUrl:
-      import.meta.env.VITE_DASHSCOPE_API_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      AI_PROXY_OPENAI_BASE_URL ||
+      import.meta.env.VITE_DASHSCOPE_API_BASE ||
+      "https://dashscope.aliyuncs.com/compatible-mode/v1",
     temperature: 0.7,
     maxTokens: 4000,
   },
@@ -28,10 +34,12 @@ export const PRESET_MODELS: ModelConfig[] = [
     id: "qwen3-max",
     name: "Qwen3 Max",
     description: "Alibaba Cloud Qwen3 Max model via DashScope",
-    apiKey: import.meta.env.VITE_DASHSCOPE_API_KEY || "",
+    apiKey: AI_PROXY_OPENAI_BASE_URL ? "proxy" : import.meta.env.VITE_DASHSCOPE_API_KEY || "",
     model: "qwen3-max",
     apiUrl:
-      import.meta.env.VITE_DASHSCOPE_API_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      AI_PROXY_OPENAI_BASE_URL ||
+      import.meta.env.VITE_DASHSCOPE_API_BASE ||
+      "https://dashscope.aliyuncs.com/compatible-mode/v1",
     temperature: 0.7,
     maxTokens: 4000,
     isDefault: true,
