@@ -90,6 +90,11 @@ function jsonError(message: string, status = 400): Response {
   });
 }
 
+app.use("*", async (c, next) => {
+  await next();
+  c.res = withCorsHeaders(c.req.raw, c.res, c.env);
+});
+
 app.options("*", (c) => {
   const origin = c.req.header("Origin") || "";
   const allowed = parseAllowedOrigins(c.env.ALLOWED_ORIGINS);
@@ -114,7 +119,7 @@ app.get("/health", (c) => c.json({ ok: true }));
 
 app.post("/tts", async (c) => {
   if (!c.env.DASHSCOPE_API_KEY) {
-    return withCorsHeaders(c.req.raw, jsonError("Missing DASHSCOPE_API_KEY", 500), c.env);
+    return jsonError("Missing DASHSCOPE_API_KEY", 500);
   }
 
   const base = (c.env.DASHSCOPE_AIGC_API_BASE || "https://dashscope.aliyuncs.com/api/v1").replace(
@@ -127,7 +132,7 @@ app.post("/tts", async (c) => {
   try {
     body = await c.req.json();
   } catch {
-    return withCorsHeaders(c.req.raw, jsonError("Invalid JSON body"), c.env);
+    return jsonError("Invalid JSON body");
   }
 
   const upstreamResp = await fetch(url, {
@@ -143,8 +148,7 @@ app.post("/tts", async (c) => {
   try {
     upstreamJson = await upstreamResp.json();
   } catch {
-    const res = jsonError("DashScope response is not JSON", 502);
-    return withCorsHeaders(c.req.raw, res, c.env);
+    return jsonError("DashScope response is not JSON", 502);
   }
 
   const record =
@@ -154,11 +158,10 @@ app.post("/tts", async (c) => {
   const upstreamCode = typeof record?.code === "string" ? record.code : "";
 
   if (!upstreamResp.ok || upstreamCode) {
-    const res = new Response(JSON.stringify(upstreamJson ?? {}), {
+    return new Response(JSON.stringify(upstreamJson ?? {}), {
       status: upstreamResp.status,
       headers: { "Content-Type": "application/json" },
     });
-    return withCorsHeaders(c.req.raw, res, c.env);
   }
 
   const output =
@@ -175,22 +178,20 @@ app.post("/tts", async (c) => {
 
   if (audioData) {
     const bytes = Uint8Array.from(atob(audioData), (ch) => ch.charCodeAt(0));
-    const res = new Response(bytes, {
+    return new Response(bytes, {
       status: 200,
       headers: {
         "Content-Type": "audio/wav",
         "Cache-Control": "no-store",
       },
     });
-    return withCorsHeaders(c.req.raw, res, c.env);
   }
 
   if (!audioUrl) {
-    const res = new Response(JSON.stringify(upstreamJson), {
+    return new Response(JSON.stringify(upstreamJson), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
-    return withCorsHeaders(c.req.raw, res, c.env);
   }
 
   const normalizedUrl = audioUrl.startsWith("http://")
@@ -199,8 +200,7 @@ app.post("/tts", async (c) => {
 
   const audioResp = await fetch(normalizedUrl);
   if (!audioResp.ok) {
-    const res = jsonError(`Failed to fetch audio: HTTP ${audioResp.status}`, 502);
-    return withCorsHeaders(c.req.raw, res, c.env);
+    return jsonError(`Failed to fetch audio: HTTP ${audioResp.status}`, 502);
   }
 
   const headers = new Headers(audioResp.headers);
@@ -209,16 +209,15 @@ app.post("/tts", async (c) => {
   headers.delete("Access-Control-Expose-Headers");
   headers.delete("Access-Control-Allow-Credentials");
 
-  const res = new Response(audioResp.body, {
+  return new Response(audioResp.body, {
     status: 200,
     headers,
   });
-  return withCorsHeaders(c.req.raw, res, c.env);
 });
 
 app.all("/openai/v1/*", async (c) => {
   if (!c.env.DASHSCOPE_API_KEY) {
-    return withCorsHeaders(c.req.raw, jsonError("Missing DASHSCOPE_API_KEY", 500), c.env);
+    return jsonError("Missing DASHSCOPE_API_KEY", 500);
   }
 
   const base = (c.env.DASHSCOPE_COMPAT_BASE || "https://dashscope.aliyuncs.com/compatible-mode/v1").replace(
@@ -245,12 +244,11 @@ app.all("/openai/v1/*", async (c) => {
     redirect: "manual",
   });
 
-  const res = new Response(upstreamResp.body, {
+  return new Response(upstreamResp.body, {
     status: upstreamResp.status,
     statusText: upstreamResp.statusText,
     headers: upstreamResp.headers,
   });
-  return withCorsHeaders(c.req.raw, res, c.env);
 });
 
 export default app;

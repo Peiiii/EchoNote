@@ -16,6 +16,16 @@ export function detectLanguageFromText(text: string): string {
   return "English";
 }
 
+export function languageTypeFromAppLanguage(appLanguage: string | undefined | null): string {
+  const normalized = (appLanguage || "").toLowerCase();
+  if (normalized.startsWith("zh")) return "Chinese";
+  if (normalized.startsWith("ja")) return "Japanese";
+  if (normalized.startsWith("ko")) return "Korean";
+  if (normalized.startsWith("ru")) return "Russian";
+  if (normalized.startsWith("ar")) return "Arabic";
+  return "English";
+}
+
 export function getChannelNames(channelIds: string[], channels: Channel[]): string {
   return channelIds.map((id) => channels.find((c) => c.id === id)?.name || id).join(", ");
 }
@@ -34,4 +44,3 @@ export function formatNotesForPrompt(notes: ChannelUserNote[], channels: Channel
     })
     .join("\n\n---\n\n");
 }
-

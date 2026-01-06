@@ -6,6 +6,7 @@ import {
   detectLanguageFromText,
   formatNotesForPrompt,
   getChannelNames,
+  languageTypeFromAppLanguage,
 } from "../../shared/services/notes-prompt.service";
 import { AudioPodcastData, PodcastSpeaker, PodcastTurn } from "../types";
 import { concatAudioBuffers, decodeAudioArrayBuffer, encodeWav } from "./audio-utils";
@@ -120,6 +121,8 @@ export async function generateAudioPodcast(options: {
 
   const combinedText = notes.map((n) => n.content).join("\n\n");
   const detectedLanguage = detectLanguageFromText(combinedText);
+  const uiLanguageType = languageTypeFromAppLanguage(i18n.resolvedLanguage ?? i18n.language);
+  const targetLanguage = uiLanguageType || detectedLanguage;
   const notesText = formatNotesForPrompt(notes, channels);
 
   const t = i18n.t.bind(i18n);
@@ -127,10 +130,19 @@ export async function generateAudioPodcast(options: {
 
 ${t("aiAssistant.prompts.systemPrompts.audioPodcast.instructions")}
 
-${t("aiAssistant.prompts.systemPrompts.audioPodcast.constraints", { language: detectedLanguage })}
+${t("aiAssistant.prompts.systemPrompts.audioPodcast.constraints", { language: targetLanguage })}
 `;
 
-  const userPrompt = `Create a two-person podcast conversation based on the following notes.
+  const userPrompt =
+    targetLanguage === "Chinese"
+      ? `请基于以下笔记生成一个两个人对谈的播客脚本。
+
+空间：${channelNames}
+
+笔记：
+${notesText}
+`
+      : `Create a two-person podcast conversation based on the following notes.
 
 Spaces: ${channelNames}
 
@@ -169,7 +181,7 @@ ${notesText}
         text: turn.text,
         voice,
         model: ttsModel,
-        languageType: detectedLanguage,
+        languageType: targetLanguage,
       });
       const decodedParts: AudioBuffer[] = [];
       for (const ab of parts) {
