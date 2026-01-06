@@ -172,6 +172,11 @@
         "defaultJSONGenerator": "你是一个严格的 JSON 生成器。只返回符合以下 JSON 架构的有效 JSON：\n\n{{schema}}\n\n重要：你的响应必须是与此架构完全匹配的有效 JSON 对象。",
         "defaultStructuredData": "你是一个有用的助手，能够根据规范生成结构化数据。",
         "defaultTitleGenerator": "你是一个有用的助手，能够为对话生成简洁、描述性的标题。",
+        "audioPodcast": {
+          "constraints": "约束：\n- 所有内容必须使用 {{language}}\n- 两位说话者：主持人与嘉宾\n- 真实播客风格：有好奇心、轻松幽默、短频快的来回对话\n- 一切必须以笔记为依据，不要编造事实\n- 多用具体例子与可执行结论\n- 每轮发言 1-3 句，避免长篇独白",
+          "instructions": "生成一个 NotebookLM 风格的播客：主持人采访嘉宾，围绕用户笔记进行讨论。对话要有结构、有洞见、好听。包含开场、2-4 个段落（带转场）、以及简洁的收尾，并输出一份干净的 Markdown 逐字稿。",
+          "role": "你是一位播客制作人和脚本写作者。"
+        },
         "mindmap": {
           "constraints": "约束：\n- 所有内容必须使用 {{language}}\n- 规范化概念标签并合并重复项\n- 优先将反复出现和连接性的概念作为更高级别的主题",
           "graphDescription": "1) 图表表示（用于自由探索）：\n   - 节点：12-30 个关键概念（唯一 id + 标签）\n   - 边：15-50 个关系（源 -> 目标）\n   - 可选：节点重要性（1-5），边权重（0.5-2.0）",
@@ -924,7 +929,10 @@
   },
   "studio": {
     "audioSummary": {
-      "content": "音频概览内容"
+      "content": "音频概览内容",
+      "generatedPodcast": "播客已生成",
+      "noAudioAvailable": "当前无法生成音频（TTS 服务不支持）。仍可查看逐字稿。",
+      "transcript": "逐字稿"
     },
     "emptyState": {
       "description": "选择一个模块，从你的笔记中生成洞察。简单、专注、世界级。",
@@ -986,6 +994,29 @@
       "keyPoints": "关键点",
       "noCardsGenerated": "尚未生成概念卡片",
       "relatedConcepts": "相关概念"
+    },
+    "voiceCall": {
+      "clear": "清空",
+      "emptyHint": "点击开始后直接说话；不会留下任何记录。",
+      "end": "结束",
+      "mute": "静音",
+      "role": {
+        "assistant": "助手",
+        "user": "你"
+      },
+      "start": "开始",
+      "status": {
+        "connecting": "连接中…",
+        "error": "出错",
+        "idle": "未开始",
+        "listening": "聆听中…",
+        "speaking": "播报中…",
+        "thinking": "思考中…"
+      },
+      "statusLabel": "状态：{{status}}",
+      "subtitle": "不保存历史 · 音色：{{voice}}",
+      "title": "语音通话",
+      "unmute": "取消静音"
     }
   },
   "thoughtRecord": {
