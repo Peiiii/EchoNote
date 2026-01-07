@@ -3,11 +3,18 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
 [durable_objects]
-bindings = [{ name = "TEMP_AUDIO", class_name = "TempAudio" }]
+bindings = [
+  { name = "TEMP_AUDIO", class_name = "TempAudio" },
+  { name = "VOICE_CALL", class_name = "VoiceCallSession" }
+]
 
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["TempAudio"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["VoiceCallSession"]
 
 [vars]
 # Comma-separated list, e.g. "http://localhost:* ,https://stillroot.app,https://*.stillroot.app"

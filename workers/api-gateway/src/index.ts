@@ -7,6 +7,7 @@ type Env = {
   DASHSCOPE_COMPAT_BASE?: string;
   DASHSCOPE_ASR_MODEL?: string;
   TEMP_AUDIO: DurableObjectNamespace;
+  VOICE_CALL: DurableObjectNamespace;
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -67,6 +68,10 @@ function isOriginAllowed(origin: string, allowed: string[]): boolean {
 }
 
 function withCorsHeaders(req: Request, res: Response, env: Env): Response {
+  // Don't wrap websocket upgrade responses (it would drop the webSocket handle).
+  const maybeWebSocket = (res as unknown as { webSocket?: unknown }).webSocket;
+  if (maybeWebSocket) return res;
+
   const origin = req.headers.get("Origin") || "";
   const allowed = parseAllowedOrigins(env.ALLOWED_ORIGINS);
   const headers = new Headers(res.headers);
@@ -395,6 +400,262 @@ export class TempAudio {
   }
 }
 
+type VoiceCallInitMessage = {
+  type: "init";
+  language?: string;
+  maxSentenceSilenceMs?: number;
+};
+
+type VoiceCallServerMessage =
+  | { type: "ready" }
+  | { type: "asr"; text: string }
+  | { type: "error"; error: string };
+
+function safeJsonParse(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function makeTaskId(): string {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 32);
+}
+
+function clampInt(value: unknown, min: number, max: number, fallback: number): number {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.floor(n)));
+}
+
+export class VoiceCallSession {
+  private client: WebSocket | null = null;
+  private upstream: WebSocket | null = null;
+  private upstreamReady = false;
+  private pendingAudio: ArrayBuffer[] = [];
+  private init: VoiceCallInitMessage | null = null;
+  private taskId = "";
+
+  constructor(
+    private readonly state: DurableObjectState,
+    private readonly env: Env
+  ) {}
+
+  private send(msg: VoiceCallServerMessage) {
+    const ws = this.client;
+    if (!ws) return;
+    try {
+      ws.send(JSON.stringify(msg));
+    } catch {
+      // ignore
+    }
+  }
+
+  private async connectUpstream() {
+    if (this.upstream) return;
+    if (!this.env.DASHSCOPE_API_KEY) {
+      this.send({ type: "error", error: "Missing DASHSCOPE_API_KEY" });
+      return;
+    }
+
+    const url = "https://dashscope.aliyuncs.com/api-ws/v1/inference";
+    const resp = await fetch(url, {
+      headers: {
+        Upgrade: "websocket",
+        Authorization: `bearer ${this.env.DASHSCOPE_API_KEY}`,
+        "X-DashScope-DataInspection": "enable",
+      },
+    });
+
+    const ws = (resp as unknown as { webSocket?: WebSocket }).webSocket;
+    if (!ws) {
+      this.send({ type: "error", error: `Upstream websocket not available: HTTP ${resp.status}` });
+      return;
+    }
+
+    ws.accept();
+    this.upstream = ws;
+    this.taskId = makeTaskId();
+
+    const language = (this.init?.language || "").trim();
+    const maxSentenceSilenceMs = clampInt(this.init?.maxSentenceSilenceMs, 200, 3000, 650);
+
+    ws.send(
+      JSON.stringify({
+        header: {
+          action: "run-task",
+          task_id: this.taskId,
+          streaming: "duplex",
+        },
+        payload: {
+          task_group: "audio",
+          task: "asr",
+          function: "recognition",
+          model: "paraformer-realtime-v2",
+          parameters: {
+            sample_rate: 16000,
+            format: "pcm",
+            max_sentence_silence: maxSentenceSilenceMs,
+            ...(language ? { language_hints: [language] } : {}),
+          },
+          input: {},
+        },
+      })
+    );
+
+    ws.addEventListener("message", (ev) => {
+      const data = ev.data;
+      if (typeof data !== "string") return;
+      const parsed = safeJsonParse(data);
+      if (!isRecord(parsed)) return;
+      const header = isRecord(parsed.header) ? parsed.header : null;
+      const event = typeof header?.event === "string" ? header.event : "";
+
+      if (event === "task-started") {
+        this.upstreamReady = true;
+        this.send({ type: "ready" });
+
+        const pending = this.pendingAudio.slice();
+        this.pendingAudio = [];
+        for (const buf of pending) {
+          try {
+            ws.send(buf);
+          } catch {
+            // ignore
+          }
+        }
+        return;
+      }
+
+      if (event === "result-generated") {
+        const payload = isRecord(parsed.payload) ? parsed.payload : null;
+        const output = payload && isRecord(payload.output) ? payload.output : null;
+        const sentence = output && isRecord(output.sentence) ? output.sentence : null;
+        const text = typeof sentence?.text === "string" ? sentence.text.trim() : "";
+        if (text) this.send({ type: "asr", text });
+        return;
+      }
+
+      if (event === "task-failed") {
+        const errorMessage =
+          typeof header?.error_message === "string" && header.error_message.trim()
+            ? header.error_message.trim()
+            : "Upstream task failed";
+        this.send({ type: "error", error: errorMessage });
+        return;
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      if (this.upstream === ws) {
+        this.upstream = null;
+        this.upstreamReady = false;
+      }
+    });
+  }
+
+  private closeUpstream() {
+    const ws = this.upstream;
+    if (!ws) return;
+    this.upstream = null;
+    this.upstreamReady = false;
+
+    try {
+      if (this.taskId) {
+        ws.send(
+          JSON.stringify({
+            header: { action: "finish-task", task_id: this.taskId, streaming: "duplex" },
+            payload: { input: {} },
+          })
+        );
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      ws.close();
+    } catch {
+      // ignore
+    }
+  }
+
+  async fetch(req: Request): Promise<Response> {
+    const upgrade = req.headers.get("Upgrade") || "";
+    if (upgrade.toLowerCase() !== "websocket") {
+      return new Response("Expected websocket", { status: 426 });
+    }
+
+    const pair = new WebSocketPair();
+    const [client, server] = Object.values(pair) as [WebSocket, WebSocket];
+    server.accept();
+
+    this.client = server;
+    this.upstreamReady = false;
+    this.pendingAudio = [];
+    this.init = null;
+    this.taskId = "";
+
+    const onClose = () => {
+      if (this.client === server) this.client = null;
+      this.closeUpstream();
+    };
+    server.addEventListener("close", onClose);
+    server.addEventListener("error", onClose);
+
+    server.addEventListener("message", (ev) => {
+      const data = ev.data;
+      if (typeof data === "string") {
+        const msg = safeJsonParse(data);
+        if (!isRecord(msg)) return;
+        const type = typeof msg.type === "string" ? msg.type : "";
+        if (type === "init") {
+          this.init = msg as VoiceCallInitMessage;
+          void this.connectUpstream();
+        }
+        if (type === "close") {
+          try {
+            server.close();
+          } catch {
+            // ignore
+          }
+        }
+        return;
+      }
+
+      const ab: ArrayBuffer =
+        data instanceof ArrayBuffer
+          ? data
+          : ArrayBuffer.isView(data)
+            ? data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+            : new ArrayBuffer(0);
+      if (ab.byteLength === 0) return;
+
+      const upstream = this.upstream;
+      if (!upstream || !this.upstreamReady) {
+        this.pendingAudio.push(ab);
+        if (this.pendingAudio.length > 60) {
+          this.pendingAudio.splice(0, this.pendingAudio.length - 60);
+        }
+        return;
+      }
+
+      try {
+        upstream.send(ab);
+      } catch {
+        // ignore
+      }
+    });
+
+    return new Response(null, { status: 101, webSocket: client });
+  }
+}
+
 app.use("*", async (c, next) => {
   await next();
   c.res = withCorsHeaders(c.req.raw, c.res, c.env);
@@ -421,6 +682,16 @@ app.options("*", (c) => {
 });
 
 app.get("/health", (c) => c.json({ ok: true }));
+
+app.get("/voice-call/ws", (c) => {
+  const upgrade = c.req.header("Upgrade") || "";
+  if (upgrade.toLowerCase() !== "websocket") {
+    return jsonError("Expected websocket upgrade", 426);
+  }
+  const sessionId = c.req.query("sessionId") || "default";
+  const stub = c.env.VOICE_CALL.get(c.env.VOICE_CALL.idFromName(sessionId));
+  return stub.fetch(c.req.raw);
+});
 
 app.get("/tmp-audio/:id", async (c) => {
   const id = c.req.param("id");

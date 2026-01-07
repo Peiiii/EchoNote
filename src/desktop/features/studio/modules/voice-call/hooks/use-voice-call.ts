@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { openai, defaultModelId } from "@/common/services/ai/client";
 import { i18n } from "@/common/i18n";
 import { getUserNotesFromChannels } from "../../shared/services/channel-user-notes.service";
-import { formatNotesForPrompt, getChannelNames, languageTypeFromAppLanguage } from "../../shared/services/notes-prompt.service";
+import {
+  formatNotesForPrompt,
+  getChannelNames,
+  languageTypeFromAppLanguage,
+} from "../../shared/services/notes-prompt.service";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { resolveAssistantVoice } from "../../shared/services/tts-voice.service";
 import { qwenTtsToArrayBuffers } from "@/common/services/ai/qwen-tts";
-import { dashscopeTranscribe } from "@/common/services/ai/dashscope-asr";
-import { concatAudioBuffers, decodeAudioArrayBuffer, encodeWav } from "@/common/utils/audio/audio-utils";
 
 export type VoiceCallMessage = {
   id: string;
@@ -31,17 +33,61 @@ function computeRmsFromTimeDomain(data: Uint8Array): number {
   return Math.sqrt(sum / data.length);
 }
 
-function getSupportedRecorderMimeType(): string {
-  const candidates = [
-    "audio/webm;codecs=opus",
-    "audio/webm",
-    "audio/mp4",
-    "audio/ogg;codecs=opus",
-  ];
-  for (const t of candidates) {
-    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)) return t;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function safeJsonParse(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
   }
-  return "";
+}
+
+function languageHintFromLanguageType(languageType?: string): string | undefined {
+  if (!languageType) return undefined;
+  if (languageType === "Chinese") return "zh";
+  if (languageType === "English") return "en";
+  return undefined;
+}
+
+function makeVoiceCallWsUrl(proxyBase: string, sessionId: string): string {
+  const base = proxyBase.replace(/\/+$/, "");
+  const wsBase = base.startsWith("https://")
+    ? `wss://${base.slice("https://".length)}`
+    : base.startsWith("http://")
+      ? `ws://${base.slice("http://".length)}`
+      : base;
+  return `${wsBase}/voice-call/ws?sessionId=${encodeURIComponent(sessionId)}`;
+}
+
+function splitSpeakableChunks(buffer: string): { chunks: string[]; rest: string } {
+  const chunks: string[] = [];
+  let rest = buffer;
+  const maxKeep = 1200;
+
+  // Prefer sentence boundaries; keep the remainder for the next delta.
+  const boundary = /([。！？.!?]+[\s\n]|[\n\r]{2,})/;
+  while (rest.length > 0) {
+    const m = rest.match(boundary);
+    if (!m || m.index == null) break;
+    const endIdx = m.index + m[0].length;
+    const head = rest.slice(0, endIdx).trim();
+    if (head) chunks.push(head);
+    rest = rest.slice(endIdx);
+    if (chunks.length >= 4) break;
+  }
+
+  // Avoid unbounded buffering when model streams without punctuation.
+  if (chunks.length === 0 && rest.length > maxKeep) {
+    const cut = rest.lastIndexOf(" ", maxKeep);
+    const endIdx = cut > 200 ? cut : maxKeep;
+    chunks.push(rest.slice(0, endIdx).trim());
+    rest = rest.slice(endIdx);
+  }
+
+  return { chunks, rest: rest.trimStart() };
 }
 
 export function useVoiceCall(options: { channelIds: string[] }) {
@@ -52,6 +98,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<VoiceCallMessage[]>([]);
   const [isMuted, setIsMuted] = useState(false);
+  const [liveUserText, setLiveUserText] = useState("");
   const messagesRef = useRef<VoiceCallMessage[]>([]);
 
   const sessionId = useMemo(() => createId("voice_call"), []);
@@ -77,38 +124,174 @@ export function useVoiceCall(options: { channelIds: string[] }) {
   }, []);
 
   const isRunningRef = useRef(false);
-  const abortRef = useRef<AbortController | null>(null);
+  const llmAbortRef = useRef<AbortController | null>(null);
   const audioElRef = useRef<HTMLAudioElement | null>(null);
+  const isAudioPlayingRef = useRef(false);
+  const playbackQueueRef = useRef<string[]>([]);
+  const ttsTextQueueRef = useRef<string[]>([]);
+  const ttsRunningRef = useRef(false);
+  const assistantTextBufferRef = useRef("");
+  const ttsGenerationRef = useRef(0);
 
   const mediaStreamRef = useRef<MediaStream | null>(null);
-  const recorderMimeTypeRef = useRef<string>("");
-  const segmentRecorderRef = useRef<MediaRecorder | null>(null);
-  const segmentChunksRef = useRef<BlobPart[]>([]);
-  const analyserCtxRef = useRef<AudioContext | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserNodeRef = useRef<AnalyserNode | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const captureEnabledRef = useRef(true);
   const isSpeakingRef = useRef(false);
   const lastVoiceMsRef = useRef(0);
-  const lastSegmentStartMsRef = useRef(0);
   const lastProcessingMsRef = useRef(0);
   const contextPromptRef = useRef<string>("");
+  const wsRef = useRef<WebSocket | null>(null);
+  const wsReadyRef = useRef(false);
+  const acceptAsrUntilMsRef = useRef(0);
+  const liveUserTextRef = useRef("");
+  const commitTimerRef = useRef<number | null>(null);
 
   const stopPlayback = useCallback(() => {
     const el = audioElRef.current;
     if (!el) return;
     try {
+      isAudioPlayingRef.current = false;
+      el.onended = null;
+      el.onerror = null;
       el.pause();
       el.src = "";
     } catch {
       // ignore
     }
+    for (const url of playbackQueueRef.current) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
+    }
+    playbackQueueRef.current = [];
   }, []);
+
+  const setCaptureEnabled = useCallback((enabled: boolean) => {
+    captureEnabledRef.current = enabled;
+    const node = workletNodeRef.current;
+    if (!node) return;
+    try {
+      node.port.postMessage({ type: "enable", enabled });
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const cancelAssistant = useCallback(() => {
+    ttsGenerationRef.current += 1;
+    llmAbortRef.current?.abort();
+    llmAbortRef.current = null;
+    ttsTextQueueRef.current = [];
+    assistantTextBufferRef.current = "";
+    stopPlayback();
+  }, [stopPlayback]);
+
+  const enqueuePlayback = useCallback(async () => {
+    const el = audioElRef.current || new Audio();
+    audioElRef.current = el;
+
+    if (isAudioPlayingRef.current) return;
+    isAudioPlayingRef.current = true;
+
+    const playNext = async (): Promise<void> => {
+      if (!isRunningRef.current) return;
+      const nextUrl = playbackQueueRef.current.shift();
+      if (!nextUrl) {
+        isAudioPlayingRef.current = false;
+        setCaptureEnabled(true);
+        setStatus("listening");
+        return;
+      }
+      el.onended = () => {
+        try {
+          URL.revokeObjectURL(nextUrl);
+        } catch {
+          // ignore
+        }
+        void playNext();
+      };
+      el.onerror = () => {
+        try {
+          URL.revokeObjectURL(nextUrl);
+        } catch {
+          // ignore
+        }
+        void playNext();
+      };
+      el.src = nextUrl;
+      try {
+        await el.play();
+      } catch {
+        void playNext();
+      }
+    };
+
+    await playNext();
+  }, [setCaptureEnabled]);
+
+  const enqueueAudioWav = useCallback(
+    (ab: ArrayBuffer) => {
+      const url = URL.createObjectURL(new Blob([ab], { type: "audio/wav" }));
+      playbackQueueRef.current.push(url);
+      void enqueuePlayback();
+    },
+    [enqueuePlayback]
+  );
+
+  const runTtsQueue = useCallback(async () => {
+    if (ttsRunningRef.current) return;
+    ttsRunningRef.current = true;
+    const generation = ttsGenerationRef.current;
+    try {
+      while (ttsTextQueueRef.current.length > 0 && isRunningRef.current) {
+        if (generation !== ttsGenerationRef.current) return;
+        const text = ttsTextQueueRef.current.shift() || "";
+        if (!text.trim()) continue;
+        const parts = await qwenTtsToArrayBuffers({
+          text,
+          voice: assistantVoice,
+          model:
+            (import.meta.env.VITE_DASHSCOPE_TTS_MODEL as string | undefined) ||
+            (import.meta.env.VITE_TTS_MODEL as string | undefined) ||
+          "qwen3-tts-flash",
+          languageType: targetLanguage,
+        });
+        if (!isRunningRef.current) return;
+        if (generation !== ttsGenerationRef.current) return;
+        if (parts.length === 0) continue;
+        setCaptureEnabled(false);
+        for (const ab of parts) {
+          if (generation !== ttsGenerationRef.current) return;
+          enqueueAudioWav(ab);
+        }
+      }
+    } finally {
+      ttsRunningRef.current = false;
+    }
+  }, [assistantVoice, enqueueAudioWav, setCaptureEnabled, targetLanguage]);
+
+  const speakStreamingDelta = useCallback(
+    (delta: string) => {
+      if (!delta) return;
+      assistantTextBufferRef.current += delta;
+      const { chunks, rest } = splitSpeakableChunks(assistantTextBufferRef.current);
+      assistantTextBufferRef.current = rest;
+      if (chunks.length === 0) return;
+      for (const c of chunks) ttsTextQueueRef.current.push(c);
+      void runTtsQueue();
+    },
+    [runTtsQueue]
+  );
 
   const hardStop = useCallback(() => {
     isRunningRef.current = false;
-    abortRef.current?.abort();
-    abortRef.current = null;
+    llmAbortRef.current?.abort();
+    llmAbortRef.current = null;
 
     stopPlayback();
 
@@ -116,51 +299,67 @@ export function useVoiceCall(options: { channelIds: string[] }) {
     rafRef.current = null;
 
     try {
-      segmentRecorderRef.current?.stop();
+      wsRef.current?.close();
     } catch {
       // ignore
     }
-    segmentRecorderRef.current = null;
-    segmentChunksRef.current = [];
-    captureEnabledRef.current = true;
+    wsRef.current = null;
+    wsReadyRef.current = false;
+
+    setCaptureEnabled(true);
+    setLiveUserText("");
+    liveUserTextRef.current = "";
+    acceptAsrUntilMsRef.current = 0;
+    if (commitTimerRef.current != null) {
+      window.clearTimeout(commitTimerRef.current);
+      commitTimerRef.current = null;
+    }
+
+    const workletNode = workletNodeRef.current;
+    workletNodeRef.current = null;
+    try {
+      workletNode?.disconnect();
+    } catch {
+      // ignore
+    }
 
     analyserNodeRef.current = null;
-    if (analyserCtxRef.current) {
+    if (audioCtxRef.current) {
       try {
-        void analyserCtxRef.current.close();
+        void audioCtxRef.current.close();
       } catch {
         // ignore
       }
     }
-    analyserCtxRef.current = null;
+    audioCtxRef.current = null;
 
     if (mediaStreamRef.current) {
       for (const track of mediaStreamRef.current.getTracks()) track.stop();
     }
     mediaStreamRef.current = null;
-  }, [stopPlayback]);
+  }, [setCaptureEnabled, stopPlayback]);
 
-  const finalizeSegment = useCallback(async (blob: Blob) => {
-    const now = Date.now();
-    if (now - lastProcessingMsRef.current < 250) return;
-    lastProcessingMsRef.current = now;
+  const upsertMessage = useCallback((msg: VoiceCallMessage) => {
+    setMessages((prev) => {
+      const idx = prev.findIndex((m) => m.id === msg.id);
+      if (idx < 0) return [...prev, msg];
+      const next = prev.slice();
+      next[idx] = msg;
+      return next;
+    });
+  }, []);
 
-    if (blob.size < 8000) return;
+  const runAssistantTurn = useCallback(
+    async (userText: string) => {
+      const now = Date.now();
+      if (now - lastProcessingMsRef.current < 250) return;
+      lastProcessingMsRef.current = now;
 
-    setStatus("thinking");
-    setError(null);
-
-    const controller = new AbortController();
-    abortRef.current?.abort();
-    abortRef.current = controller;
-
-    try {
-      const userText = await dashscopeTranscribe({ blob, signal: controller.signal });
       const normalized = userText.trim();
-      if (!normalized) {
-        setStatus("listening");
-        return;
-      }
+      if (!normalized) return;
+
+      cancelAssistant();
+      setError(null);
 
       const userMsg: VoiceCallMessage = {
         id: createId("m_user"),
@@ -168,7 +367,21 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         text: normalized,
         createdAt: Date.now(),
       };
-      setMessages((prev) => [...prev, userMsg]);
+      upsertMessage(userMsg);
+
+      const assistantId = createId("m_assistant");
+      upsertMessage({
+        id: assistantId,
+        role: "assistant",
+        text: "",
+        createdAt: Date.now(),
+      });
+
+      setStatus("thinking");
+
+      const controller = new AbortController();
+      llmAbortRef.current?.abort();
+      llmAbortRef.current = controller;
 
       const system = [
         `You are a realtime voice assistant in EchoNote Studio.`,
@@ -185,126 +398,58 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         { role: "user" as const, content: normalized },
       ];
 
-      const completion = await openai.chat.completions.create(
-        {
-          model: defaultModelId,
-          messages: chatMessages,
-          temperature: 0.4,
-        },
-        { signal: controller.signal }
-      );
-      const assistantText = String(completion.choices?.[0]?.message?.content || "").trim();
-      if (!assistantText) {
-        setStatus("listening");
-        return;
+      try {
+        const stream = await openai.chat.completions.create(
+          {
+            model: defaultModelId,
+            messages: chatMessages,
+            stream: true,
+            temperature: 0.4,
+          },
+          { signal: controller.signal }
+        );
+
+        setStatus("speaking");
+        let full = "";
+        for await (const part of stream) {
+          if (controller.signal.aborted) throw new DOMException("Aborted", "AbortError");
+          const delta = part.choices?.[0]?.delta?.content || "";
+          if (!delta) continue;
+          full += delta;
+          upsertMessage({
+            id: assistantId,
+            role: "assistant",
+            text: full,
+            createdAt: Date.now(),
+          });
+          speakStreamingDelta(delta);
+        }
+
+        // Flush any remaining TTS buffer.
+        const tail = assistantTextBufferRef.current.trim();
+        assistantTextBufferRef.current = "";
+        if (tail) {
+          ttsTextQueueRef.current.push(tail);
+          void runTtsQueue();
+        }
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") {
+          setStatus("listening");
+          return;
+        }
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
+        setStatus("error");
       }
-
-      const assistantMsg: VoiceCallMessage = {
-        id: createId("m_assistant"),
-        role: "assistant",
-        text: assistantText,
-        createdAt: Date.now(),
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-
-      setStatus("speaking");
-      stopPlayback();
-
-      const audioParts = await qwenTtsToArrayBuffers({
-        text: assistantText,
-        voice: assistantVoice,
-        model:
-          (import.meta.env.VITE_DASHSCOPE_TTS_MODEL as string | undefined) ||
-          (import.meta.env.VITE_TTS_MODEL as string | undefined) ||
-          "qwen3-tts-flash",
-        languageType: targetLanguage,
-      });
-
-      if (audioParts.length === 0) {
-        setStatus("listening");
-        return;
-      }
-
-      captureEnabledRef.current = false;
-      const ctx = new AudioContext();
-      const decoded: AudioBuffer[] = [];
-      for (const ab of audioParts) decoded.push(await decodeAudioArrayBuffer(ctx, ab));
-      const merged = concatAudioBuffers(ctx, decoded, { silenceSecondsBetween: 0 });
-      const wav = encodeWav(merged);
-
-      const url = URL.createObjectURL(wav);
-      const el = audioElRef.current || new Audio();
-      audioElRef.current = el;
-      el.src = url;
-      el.onended = () => {
-        URL.revokeObjectURL(url);
-        captureEnabledRef.current = true;
-        setStatus("listening");
-      };
-      await el.play();
-      void ctx.close();
-    } catch (e) {
-      captureEnabledRef.current = true;
-      const msg = e instanceof Error ? e.message : String(e);
-      setError(msg);
-      setStatus("error");
-    }
-  }, [assistantVoice, stopPlayback, targetLanguage]);
-
-  const startSegmentRecorder = useCallback(() => {
-    if (!isRunningRef.current) return;
-    if (isMuted) return;
-    if (!captureEnabledRef.current) return;
-    if (segmentRecorderRef.current) return;
-
-    const stream = mediaStreamRef.current;
-    if (!stream) return;
-
-    segmentChunksRef.current = [];
-
-    const mimeType = recorderMimeTypeRef.current;
-    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-    segmentRecorderRef.current = recorder;
-
-    recorder.ondataavailable = (ev: BlobEvent) => {
-      if (!isRunningRef.current) return;
-      if (isMuted) return;
-      if (!captureEnabledRef.current) return;
-      if (ev.data && ev.data.size > 0) {
-        segmentChunksRef.current.push(ev.data);
-      }
-    };
-
-    recorder.onstop = () => {
-      segmentRecorderRef.current = null;
-      const parts = segmentChunksRef.current.slice();
-      segmentChunksRef.current = [];
-      if (!isRunningRef.current) return;
-      if (parts.length === 0) return;
-      const outType = recorder.mimeType || recorderMimeTypeRef.current || "audio/webm";
-      const out = new Blob(parts, { type: outType });
-      void finalizeSegment(out);
-    };
-
-    try {
-      recorder.start(250);
-    } catch (e) {
-      segmentRecorderRef.current = null;
-      const msg = e instanceof Error ? e.message : String(e);
-      setError(msg);
-      setStatus("error");
-    }
-  }, [finalizeSegment, isMuted]);
-
-  const stopSegmentRecorder = useCallback(() => {
-    const recorder = segmentRecorderRef.current;
-    if (!recorder) return;
-    try {
-      recorder.stop();
-    } catch {
-      // ignore
-    }
-  }, []);
+    },
+    [
+      cancelAssistant,
+      runTtsQueue,
+      speakStreamingDelta,
+      targetLanguage,
+      upsertMessage,
+    ]
+  );
 
   const start = useCallback(async () => {
     if (isRunningRef.current) return;
@@ -323,6 +468,11 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         }
       }
 
+      const proxyBase = (import.meta.env.VITE_AI_PROXY_BASE as string | undefined) || "";
+      if (!proxyBase) throw new Error("AI proxy base missing: VITE_AI_PROXY_BASE");
+
+      const wsUrl = makeVoiceCallWsUrl(proxyBase, sessionId);
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -332,19 +482,110 @@ export function useVoiceCall(options: { channelIds: string[] }) {
       });
       mediaStreamRef.current = stream;
 
-      recorderMimeTypeRef.current = getSupportedRecorderMimeType();
+      let ctx: AudioContext;
+      try {
+        ctx = new AudioContext({ sampleRate: 16000 });
+      } catch {
+        ctx = new AudioContext();
+      }
+      audioCtxRef.current = ctx;
 
-      const ctx = new AudioContext();
-      analyserCtxRef.current = ctx;
+      // Set up VAD analyser
       const src = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
       src.connect(analyser);
       analyserNodeRef.current = analyser;
 
+      // Load PCM worklet (16kHz context is preferred; otherwise browser will resample for us)
+      await ctx.audioWorklet.addModule(
+        new URL("../audio/pcm16k-worklet.ts", import.meta.url)
+      );
+      const worklet = new AudioWorkletNode(ctx, "pcm16k");
+      workletNodeRef.current = worklet;
+      src.connect(worklet);
+
+      // Create WS connection to Worker ASR bridge.
+      const ws = new WebSocket(wsUrl);
+      ws.binaryType = "arraybuffer";
+      wsRef.current = ws;
+      wsReadyRef.current = false;
+
+      const languageHint = languageHintFromLanguageType(targetLanguage);
+
+      ws.onopen = () => {
+        try {
+          ws.send(
+            JSON.stringify({
+              type: "init",
+              language: languageHint,
+              maxSentenceSilenceMs: 650,
+            })
+          );
+        } catch {
+          // ignore
+        }
+      };
+
+      ws.onmessage = (ev) => {
+        const data = ev.data;
+        if (typeof data !== "string") return;
+        const parsed = safeJsonParse(data);
+        if (!isRecord(parsed)) return;
+        const type = typeof parsed.type === "string" ? parsed.type : "";
+        if (type === "ready") {
+          wsReadyRef.current = true;
+          setCaptureEnabled(true);
+          setStatus("listening");
+          return;
+        }
+        if (type === "asr") {
+          const text = typeof parsed.text === "string" ? parsed.text.trim() : "";
+          if (!text) return;
+          const now = Date.now();
+          if (now > acceptAsrUntilMsRef.current) return;
+
+          const prev = liveUserTextRef.current;
+          const next = text.startsWith(prev) ? text : prev.startsWith(text) ? prev : text;
+          liveUserTextRef.current = next;
+          setLiveUserText(next);
+          return;
+        }
+        if (type === "error") {
+          const msg = typeof parsed.error === "string" ? parsed.error : "Voice call error";
+          setError(msg);
+          setStatus("error");
+          return;
+        }
+      };
+
+      ws.onerror = () => {
+        setError("Voice call websocket error");
+        setStatus("error");
+      };
+      ws.onclose = () => {
+        wsReadyRef.current = false;
+      };
+
+      // Send PCM frames only when capture is enabled + not muted + ws is ready.
+      worklet.port.onmessage = (ev: MessageEvent) => {
+        if (!isRunningRef.current) return;
+        if (isMuted) return;
+        if (!captureEnabledRef.current) return;
+        if (!wsReadyRef.current) return;
+        const ws0 = wsRef.current;
+        if (!ws0 || ws0.readyState !== WebSocket.OPEN) return;
+        const ab = ev.data as ArrayBuffer;
+        if (!(ab instanceof ArrayBuffer) || ab.byteLength === 0) return;
+        try {
+          ws0.send(ab);
+        } catch {
+          // ignore
+        }
+      };
+
       const buffer = new Uint8Array(analyser.fftSize);
       lastVoiceMsRef.current = Date.now();
-      lastSegmentStartMsRef.current = Date.now();
       isSpeakingRef.current = false;
 
       const tick = async () => {
@@ -355,32 +596,40 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         const now = Date.now();
         const speechThreshold = 0.035;
         const silenceMsToCommit = 750;
-        const maxSegmentMs = 15_000;
 
         if (rms > speechThreshold) {
           if (!isSpeakingRef.current) {
             isSpeakingRef.current = true;
+            acceptAsrUntilMsRef.current = now + 30_000;
+            liveUserTextRef.current = "";
+            setLiveUserText("");
+            cancelAssistant();
             stopPlayback(); // barge-in
-            captureEnabledRef.current = true;
-            abortRef.current?.abort();
-            abortRef.current = null;
-            lastSegmentStartMsRef.current = now;
-            startSegmentRecorder();
+            setCaptureEnabled(true);
+            if (commitTimerRef.current != null) {
+              window.clearTimeout(commitTimerRef.current);
+              commitTimerRef.current = null;
+            }
           }
           lastVoiceMsRef.current = now;
           if (status !== "listening") setStatus("listening");
         } else if (isSpeakingRef.current) {
           const silenceMs = now - lastVoiceMsRef.current;
-          const segMs = now - lastSegmentStartMsRef.current;
-          if (silenceMs > silenceMsToCommit || segMs > maxSegmentMs) {
+          if (silenceMs > silenceMsToCommit) {
             isSpeakingRef.current = false;
-            stopSegmentRecorder();
+            acceptAsrUntilMsRef.current = now + 1200;
+            const snapshot = liveUserTextRef.current;
+            commitTimerRef.current = window.setTimeout(() => {
+              commitTimerRef.current = null;
+              acceptAsrUntilMsRef.current = 0;
+              const finalText = liveUserTextRef.current.trim() || snapshot.trim();
+              liveUserTextRef.current = "";
+              setLiveUserText("");
+              void runAssistantTurn(finalText);
+            }, 350);
           }
         } else {
-          // Avoid unbounded buffering when the user isn't speaking.
-          if (now - lastVoiceMsRef.current > 2000 && segmentChunksRef.current.length > 0) {
-            segmentChunksRef.current = [];
-          }
+          // keep idle
         }
 
         rafRef.current = requestAnimationFrame(() => {
@@ -388,7 +637,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         });
       };
 
-      setStatus("listening");
+      setStatus("connecting");
       void tick();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -396,7 +645,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
       setStatus("error");
       hardStop();
     }
-  }, [channelIds, channels, hardStop, startSegmentRecorder, status, stopPlayback, stopSegmentRecorder]);
+  }, [cancelAssistant, channelIds, channels, hardStop, isMuted, runAssistantTurn, sessionId, setCaptureEnabled, status, stopPlayback, targetLanguage]);
 
   const stop = useCallback(() => {
     hardStop();
@@ -409,6 +658,8 @@ export function useVoiceCall(options: { channelIds: string[] }) {
 
   const clear = useCallback(() => {
     setMessages([]);
+    setLiveUserText("");
+    liveUserTextRef.current = "";
   }, []);
 
   useEffect(() => {
@@ -422,6 +673,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
     status,
     error,
     messages,
+    liveUserText,
     isMuted,
     targetLanguage,
     assistantVoice,

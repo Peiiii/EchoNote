@@ -9,14 +9,13 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
   const { onClose } = props;
   const { t } = useTranslation();
   const channelIds = useStudioStore((s) => s.ephemeralContextChannelIds);
-  const { status, error, messages, isMuted, assistantVoice, start, stop, toggleMute, clear } =
+  const { status, error, messages, liveUserText, isMuted, assistantVoice, start, stop, toggleMute, clear } =
     useVoiceCall({ channelIds });
 
   const canStart = status === "idle" || status === "error";
   const isInCall = status !== "idle";
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const [isSticky, setIsSticky] = useState(true);
   const isStickyRef = useRef(true);
 
@@ -49,10 +48,8 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
   }, [updateSticky]);
 
   useEffect(() => {
-    if (isStickyRef.current) {
-      scrollToBottom("auto");
-    }
-  }, [messages.length, scrollToBottom]);
+    if (isStickyRef.current) scrollToBottom("auto");
+  }, [messages, liveUserText, scrollToBottom]);
 
   const statusLabel = useMemo(() => {
     switch (status) {
@@ -170,7 +167,14 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
               <div className="whitespace-pre-wrap break-words">{m.text}</div>
             </div>
           ))}
-          <div ref={bottomRef} />
+          {liveUserText ? (
+            <div className="rounded-xl border border-border/50 p-3 text-sm leading-relaxed bg-muted/30">
+              <div className="text-xs text-muted-foreground mb-1">
+                {t("studio.voiceCall.role.user")}
+              </div>
+              <div className="whitespace-pre-wrap break-words">{liveUserText}</div>
+            </div>
+          ) : null}
         </div>
 
         {!isSticky && messages.length > 0 ? (
