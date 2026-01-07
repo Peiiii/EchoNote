@@ -1,7 +1,6 @@
-import { memo, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/common/components/ui/button";
-import { ScrollArea } from "@/common/components/ui/scroll-area";
-import { ArrowLeft, Mic, MicOff, PhoneOff, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, Mic, MicOff, PhoneOff, Trash2 } from "lucide-react";
 import { useStudioStore } from "@/core/stores/studio.store";
 import { useVoiceCall } from "../hooks/use-voice-call";
 import { useTranslation } from "react-i18next";
@@ -15,6 +14,45 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
 
   const canStart = status === "idle" || status === "error";
   const isInCall = status !== "idle";
+
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [isSticky, setIsSticky] = useState(true);
+  const isStickyRef = useRef(true);
+
+  const computeIsSticky = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return true;
+    const threshold = 48;
+    return el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
+  }, []);
+
+  const updateSticky = useCallback(() => {
+    const next = computeIsSticky();
+    isStickyRef.current = next;
+    setIsSticky(next);
+  }, [computeIsSticky]);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "auto") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior });
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => updateSticky();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    updateSticky();
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [updateSticky]);
+
+  useEffect(() => {
+    if (isStickyRef.current) {
+      scrollToBottom("auto");
+    }
+  }, [messages.length, scrollToBottom]);
 
   const statusLabel = useMemo(() => {
     switch (status) {
@@ -108,8 +146,8 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
         </div>
       ) : null}
 
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-3 space-y-3">
+      <div className="flex-1 min-h-0 relative">
+        <div ref={scrollRef} className="h-full overflow-y-auto px-4 py-3 space-y-3">
           {messages.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               {t("studio.voiceCall.emptyHint")}
@@ -132,8 +170,27 @@ export const VoiceCallDetail = memo(function VoiceCallDetail(props: { onClose: (
               <div className="whitespace-pre-wrap break-words">{m.text}</div>
             </div>
           ))}
+          <div ref={bottomRef} />
         </div>
-      </ScrollArea>
+
+        {!isSticky && messages.length > 0 ? (
+          <div className="absolute inset-x-0 bottom-0 pointer-events-none">
+            <div className="h-12 bg-gradient-to-t from-background/90 to-transparent" />
+            <div className="px-4 pb-3 flex justify-end">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="shadow-md pointer-events-auto"
+              onClick={() => scrollToBottom("smooth")}
+            >
+              <ArrowDown className="w-4 h-4 mr-2" />
+              {t("studio.voiceCall.scrollToLatest")}
+            </Button>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 });

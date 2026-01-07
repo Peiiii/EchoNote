@@ -1000,6 +1000,7 @@
       "emptyHint": "点击开始后直接说话；不会留下任何记录。",
       "end": "结束",
       "mute": "静音",
+      "scrollToLatest": "回到最新",
       "role": {
         "assistant": "助手",
         "user": "你"
