@@ -65,7 +65,11 @@ function makeVoiceCallWsUrl(proxyBase: string, sessionId: string): string {
 function splitSpeakableChunks(buffer: string): { chunks: string[]; rest: string } {
   const chunks: string[] = [];
   let rest = buffer;
-  const maxKeep = 1200;
+  // Keep the assistant speaking continuously while streaming:
+  // - Prefer strong sentence boundaries.
+  // - If the model streams long sentences without "。！？.!?", cut by length and soft pauses like "，,；;、".
+  const maxKeep = 260;
+  const minCut = 80;
 
   // Prefer sentence boundaries; keep the remainder for the next delta.
   const boundary = /([。！？.!?]+[\s\n]|[\n\r]{2,})/;
@@ -79,11 +83,20 @@ function splitSpeakableChunks(buffer: string): { chunks: string[]; rest: string 
     if (chunks.length >= 4) break;
   }
 
-  // Avoid unbounded buffering when model streams without punctuation.
-  if (chunks.length === 0 && rest.length > maxKeep) {
-    const cut = rest.lastIndexOf(" ", maxKeep);
-    const endIdx = cut > 200 ? cut : maxKeep;
-    chunks.push(rest.slice(0, endIdx).trim());
+  // Avoid long silent gaps when the model keeps streaming without strong punctuation.
+  while (rest.length > maxKeep && chunks.length < 4) {
+    const window = rest.slice(0, maxKeep);
+    const candidates = ["\n\n", "\n", "。", "！", "？", ".", "!", "?", "；", ";", "，", ",", "、", " "];
+    let endIdx = -1;
+    for (const token of candidates) {
+      const idx = window.lastIndexOf(token);
+      if (idx < 0) continue;
+      endIdx = Math.max(endIdx, idx + token.length);
+    }
+
+    if (endIdx < minCut) endIdx = maxKeep;
+    const head = rest.slice(0, endIdx).trim();
+    if (head) chunks.push(head);
     rest = rest.slice(endIdx);
   }
 
@@ -103,7 +116,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
 
   const sessionId = useMemo(() => createId("voice_call"), []);
   const assistantVoice = useMemo(
-    () => resolveAssistantVoice({ seed: sessionId, preferGender: "any" }),
+    () => resolveAssistantVoice({ seed: sessionId, preferGender: "female", style: "cute" }),
     [sessionId]
   );
   const [targetLanguage, setTargetLanguage] = useState(() =>
@@ -252,15 +265,22 @@ export function useVoiceCall(options: { channelIds: string[] }) {
         if (generation !== ttsGenerationRef.current) return;
         const text = ttsTextQueueRef.current.shift() || "";
         if (!text.trim()) continue;
-        const parts = await qwenTtsToArrayBuffers({
-          text,
-          voice: assistantVoice,
-          model:
-            (import.meta.env.VITE_DASHSCOPE_TTS_MODEL as string | undefined) ||
-            (import.meta.env.VITE_TTS_MODEL as string | undefined) ||
-          "qwen3-tts-flash",
-          languageType: targetLanguage,
-        });
+        let parts: ArrayBuffer[];
+        try {
+          parts = await qwenTtsToArrayBuffers({
+            text,
+            voice: assistantVoice,
+            model:
+              (import.meta.env.VITE_DASHSCOPE_TTS_MODEL as string | undefined) ||
+              (import.meta.env.VITE_TTS_MODEL as string | undefined) ||
+              "qwen3-tts-flash",
+            languageType: targetLanguage,
+          });
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setError(msg ? `TTS failed: ${msg}` : "TTS failed");
+          continue;
+        }
         if (!isRunningRef.current) return;
         if (generation !== ttsGenerationRef.current) return;
         if (parts.length === 0) continue;

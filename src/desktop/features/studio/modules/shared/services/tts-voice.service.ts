@@ -7,6 +7,8 @@ const MANDARIN_FEMALE_VOICES = [
   "Vivian",
 ] as const;
 
+const MANDARIN_CUTE_FEMALE_VOICES = ["Cherry", "Bella", "Mia"] as const;
+
 const MANDARIN_MALE_VOICES = ["Neil", "Ethan", "Kai", "Moon", "Andre"] as const;
 
 function hashToUint32(input: string): number {
@@ -57,11 +59,14 @@ export function resolveAssistantVoice(options: {
   seed: string;
   override?: string;
   preferGender?: "female" | "male" | "any";
+  style?: "cute" | "default";
 }): string {
   if (options.override) return options.override;
   const rnd = mulberry32(hashToUint32(options.seed));
   const gender = options.preferGender || "any";
-  if (gender === "female") return pickOne(MANDARIN_FEMALE_VOICES, rnd);
+  const style = options.style || "default";
+  const femalePool = style === "cute" ? MANDARIN_CUTE_FEMALE_VOICES : MANDARIN_FEMALE_VOICES;
+  if (gender === "female") return pickOne(femalePool, rnd);
   if (gender === "male") return pickOne(MANDARIN_MALE_VOICES, rnd);
-  return rnd() < 0.5 ? pickOne(MANDARIN_FEMALE_VOICES, rnd) : pickOne(MANDARIN_MALE_VOICES, rnd);
+  return rnd() < 0.5 ? pickOne(femalePool, rnd) : pickOne(MANDARIN_MALE_VOICES, rnd);
 }
