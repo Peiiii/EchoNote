@@ -10,6 +10,44 @@ export type GenerateObjectOptions = {
   jsonOnly?: boolean;
 };
 
+function stripMarkdownCodeFence(text: string): string {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return match ? match[1].trim() : trimmed;
+}
+
+function extractJsonObjectSubstring(text: string): string {
+  const stripped = stripMarkdownCodeFence(text);
+  const start = stripped.indexOf("{");
+  const end = stripped.lastIndexOf("}");
+  if (start >= 0 && end > start) return stripped.slice(start, end + 1).trim();
+  return stripped.trim();
+}
+
+function removeTrailingCommas(text: string): string {
+  // Common model mistake: trailing commas before } or ]
+  return text.replace(/,\s*([}\]])/g, "$1");
+}
+
+function parseModelJson<T>(raw: string): T {
+  const candidates = [
+    raw,
+    stripMarkdownCodeFence(raw),
+    extractJsonObjectSubstring(raw),
+    removeTrailingCommas(extractJsonObjectSubstring(raw)),
+  ];
+
+  let lastError: unknown = null;
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate) as T;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(`Failed to parse JSON: ${String(lastError)}`);
+}
+
 export async function generateObject<T = unknown>({
   schema,
   prompt,
@@ -35,6 +73,41 @@ export async function generateObject<T = unknown>({
     return content as T;
   }
 
+  const schemaDescription = JSON.stringify(schema, null, 2);
+  const baseSystem =
+    system || i18n.t("aiAssistant.prompts.systemPrompts.defaultStructuredData");
+  const jsonSystem = i18n.t("aiAssistant.prompts.systemPrompts.defaultJSONGenerator", { schema: schemaDescription });
+  const jsonOnlySystem = `${baseSystem}\n\n${jsonSystem}`;
+  const userSuffix = `\n\nRequired output format: A single JSON object that matches the schema above. No markdown, no comments, no additional text.`;
+
+  // Prefer JSON mode (more reliable than tool arguments on some compat providers)
+  try {
+    const create = async (useJsonMode: boolean) =>
+      openai.chat.completions.create({
+        model: defaultModelId,
+        messages: [
+          { role: "system", content: jsonOnlySystem },
+          { role: "user", content: `${prompt}${userSuffix}` },
+        ],
+        ...(useJsonMode ? { response_format: { type: "json_object" as const } } : {}),
+        temperature: typeof temperature === "number" ? temperature : 0.3,
+      });
+
+    let completion: Awaited<ReturnType<typeof openai.chat.completions.create>>;
+    try {
+      completion = await create(true);
+    } catch (_err) {
+      completion = await create(false);
+    }
+
+    const content = completion.choices?.[0]?.message?.content;
+    if (!content) throw new Error("No content generated");
+    return parseModelJson<T>(content);
+  } catch (error) {
+    // Fall through to tool calling + iterative repair fallback.
+    console.warn("[generateObject] JSON mode failed, trying tool calling:", error);
+  }
+
   // Create tool definition for function calling
   const tool = {
     type: "function" as const,
@@ -45,15 +118,11 @@ export async function generateObject<T = unknown>({
     },
   };
 
-  const systemPrefix =
-    system ||
-    i18n.t("aiAssistant.prompts.systemPrompts.defaultStructuredData");
-
   try {
     const completion = await openai.chat.completions.create({
       model: defaultModelId,
       messages: [
-        { role: "system", content: systemPrefix },
+        { role: "system", content: baseSystem },
         { role: "user", content: prompt },
       ],
       tools: [tool],
@@ -77,19 +146,12 @@ export async function generateObject<T = unknown>({
     }
 
     // Parse the arguments and return
-    const parsed = JSON.parse(argumentsContent);
-    return parsed as T;
+    return parseModelJson<T>(argumentsContent);
   } catch (error) {
     console.error("Failed to generate structured data using tools:", error);
 
     // Fallback to manual JSON generation
     console.warn("Falling back to manual JSON generation...");
-
-    const schemaDescription = JSON.stringify(schema, null, 2);
-
-    const systemPrefix = i18n.t("aiAssistant.prompts.systemPrompts.defaultJSONGenerator", { schema: schemaDescription });
-
-    const userSuffix = `\n\nRequired output format: A single JSON object that matches the schema above. No markdown, no comments, no additional text.`;
 
     const request = async (fixNote?: string, attemptNumber: number = 1) => {
       const attemptInfo =
@@ -97,28 +159,35 @@ export async function generateObject<T = unknown>({
           ? `\n\nThis is attempt ${attemptNumber}. Please ensure the output strictly follows the schema.`
           : "";
 
-      const completion = await openai.chat.completions.create({
-        model: defaultModelId,
-        messages: [
-          {
-            role: "system",
-            content: `${systemPrefix}${fixNote ? `\n${fixNote}` : ""}${attemptInfo}`,
-          },
-          { role: "user", content: `${prompt}${userSuffix}` },
-        ],
-        temperature: typeof temperature === "number" ? temperature : 0.3,
-      });
+      const create = async (useJsonMode: boolean) =>
+        openai.chat.completions.create({
+          model: defaultModelId,
+          messages: [
+            {
+              role: "system",
+              content: `${jsonOnlySystem}${fixNote ? `\n${fixNote}` : ""}${attemptInfo}`,
+            },
+            { role: "user", content: `${prompt}${userSuffix}` },
+          ],
+          ...(useJsonMode ? { response_format: { type: "json_object" as const } } : {}),
+          temperature: typeof temperature === "number" ? temperature : 0.3,
+        });
+
+      let completion: Awaited<ReturnType<typeof openai.chat.completions.create>>;
+      try {
+        completion = await create(true);
+      } catch (_err) {
+        completion = await create(false);
+      }
       const content = completion.choices?.[0]?.message?.content;
       return typeof content === "string" ? content : "";
     };
 
     // First attempt
     let text = await request();
-    let parsed: T;
 
     try {
-      parsed = JSON.parse(text) as T;
-      return parsed;
+      return parseModelJson<T>(text);
     } catch (fallbackError) {
       console.warn("First fallback attempt failed, retrying...", fallbackError);
 
@@ -139,8 +208,7 @@ Output ONLY the valid JSON object.`;
       text = await request(fixMsg, 2);
 
       try {
-        parsed = JSON.parse(text) as T;
-        return parsed;
+        return parseModelJson<T>(text);
       } catch (secondError) {
         console.error("All attempts failed:", secondError);
         console.error("Generated text:", text);

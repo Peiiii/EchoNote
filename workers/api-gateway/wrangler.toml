@@ -2,6 +2,13 @@ name = "stillroot-api-gateway"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
+[durable_objects]
+bindings = [{ name = "TEMP_AUDIO", class_name = "TempAudio" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["TempAudio"]
+
 [vars]
 # Comma-separated list, e.g. "http://localhost:* ,https://stillroot.app,https://*.stillroot.app"
 ALLOWED_ORIGINS = "http://localhost:5173,https://stillroot.app,https://memol.dimstack.com"
@@ -9,3 +16,6 @@ ALLOWED_ORIGINS = "http://localhost:5173,https://stillroot.app,https://memol.dim
 # DashScope bases (Beijing). Keep the key as a secret: `wrangler secret put DASHSCOPE_API_KEY`
 DASHSCOPE_AIGC_API_BASE = "https://dashscope.aliyuncs.com/api/v1"
 DASHSCOPE_COMPAT_BASE = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+# ASR (speech-to-text). Used by the Studio voice call feature via `/openai/v1/audio/transcriptions`.
+DASHSCOPE_ASR_MODEL = "paraformer-v2"

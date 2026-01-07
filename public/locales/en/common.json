@@ -994,6 +994,29 @@
       "keyPoints": "Key Points",
       "noCardsGenerated": "No concept cards generated yet",
       "relatedConcepts": "Related Concepts"
+    },
+    "voiceCall": {
+      "clear": "Clear",
+      "emptyHint": "Tap Start and speak. Nothing will be saved.",
+      "end": "End",
+      "mute": "Mute",
+      "role": {
+        "assistant": "Assistant",
+        "user": "You"
+      },
+      "start": "Start",
+      "status": {
+        "connecting": "Connecting…",
+        "error": "Error",
+        "idle": "Idle",
+        "listening": "Listening…",
+        "speaking": "Speaking…",
+        "thinking": "Thinking…"
+      },
+      "statusLabel": "Status: {{status}}",
+      "subtitle": "No history is saved · Voice: {{voice}}",
+      "title": "Voice Call",
+      "unmute": "Unmute"
     }
   },
   "thoughtRecord": {

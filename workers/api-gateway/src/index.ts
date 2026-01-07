@@ -5,6 +5,8 @@ type Env = {
   ALLOWED_ORIGINS?: string;
   DASHSCOPE_AIGC_API_BASE?: string;
   DASHSCOPE_COMPAT_BASE?: string;
+  DASHSCOPE_ASR_MODEL?: string;
+  TEMP_AUDIO: DurableObjectNamespace;
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -90,6 +92,309 @@ function jsonError(message: string, status = 400): Response {
   });
 }
 
+function guessAudioFormat(file: File): string | undefined {
+  const type = (file.type || "").toLowerCase();
+  if (type.includes("wav")) return "wav";
+  if (type.includes("mpeg") || type.includes("mp3")) return "mp3";
+  if (type.includes("mp4") || type.includes("m4a")) return "m4a";
+  if (type.includes("ogg")) return "ogg";
+  if (type.includes("webm")) return "webm";
+
+  const name = (file.name || "").toLowerCase();
+  const ext = name.includes(".") ? name.split(".").pop() : "";
+  if (ext) return ext;
+  return undefined;
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+function extractAsrText(payload: unknown): string {
+  const root =
+    typeof payload === "object" && payload !== null ? (payload as Record<string, unknown>) : null;
+  const output =
+    typeof root?.output === "object" && root.output !== null
+      ? (root.output as Record<string, unknown>)
+      : null;
+
+  const direct =
+    (typeof output?.text === "string" && output.text.trim()) ||
+    (typeof output?.result === "string" && output.result.trim()) ||
+    (typeof output?.transcription === "string" && output.transcription.trim());
+  if (direct) return direct;
+
+  const results = output?.results;
+  if (Array.isArray(results)) {
+    const parts: string[] = [];
+    for (const r of results) {
+      if (typeof r === "string") {
+        if (r.trim()) parts.push(r.trim());
+        continue;
+      }
+      if (typeof r === "object" && r !== null) {
+        const obj = r as Record<string, unknown>;
+        const t =
+          (typeof obj.text === "string" && obj.text.trim()) ||
+          (typeof obj.transcription === "string" && obj.transcription.trim()) ||
+          "";
+        if (t) parts.push(t);
+      }
+    }
+    if (parts.length) return parts.join(" ");
+  }
+
+  const sentences = output?.sentences;
+  if (Array.isArray(sentences)) {
+    const parts: string[] = [];
+    for (const s of sentences) {
+      if (typeof s === "string") {
+        if (s.trim()) parts.push(s.trim());
+        continue;
+      }
+      if (typeof s === "object" && s !== null) {
+        const r = s as Record<string, unknown>;
+        const t = typeof r.text === "string" ? r.text.trim() : "";
+        if (t) parts.push(t);
+      }
+    }
+    if (parts.length) return parts.join(" ");
+  }
+
+  return "";
+}
+
+function extractTranscriptionUrl(payload: unknown): string {
+  const root =
+    typeof payload === "object" && payload !== null ? (payload as Record<string, unknown>) : null;
+  const output =
+    typeof root?.output === "object" && root.output !== null
+      ? (root.output as Record<string, unknown>)
+      : null;
+
+  const results = output?.results;
+  if (!Array.isArray(results)) return "";
+
+  for (const r of results) {
+    if (typeof r !== "object" || r === null) continue;
+    const obj = r as Record<string, unknown>;
+    const u = typeof obj.transcription_url === "string" ? obj.transcription_url.trim() : "";
+    if (u) return u;
+  }
+  return "";
+}
+
+function extractTextFromTranscriptionFile(payload: unknown): string {
+  const root =
+    typeof payload === "object" && payload !== null ? (payload as Record<string, unknown>) : null;
+  const transcripts = root?.transcripts;
+  if (Array.isArray(transcripts)) {
+    const parts: string[] = [];
+    for (const t of transcripts) {
+      if (typeof t !== "object" || t === null) continue;
+      const obj = t as Record<string, unknown>;
+      const text = typeof obj.text === "string" ? obj.text.trim() : "";
+      if (text) parts.push(text);
+    }
+    if (parts.length) return parts.join("\n");
+  }
+  const direct = typeof root?.text === "string" ? root.text.trim() : "";
+  return direct;
+}
+
+async function startAsrTask(options: {
+  env: Env;
+  requestOrigin: string;
+  file: File;
+}): Promise<{ taskId: string; taskUrl: string }> {
+  const { env, requestOrigin, file } = options;
+  const base = (env.DASHSCOPE_AIGC_API_BASE || "https://dashscope.aliyuncs.com/api/v1").replace(/\/+$/, "");
+  const url = `${base}/services/audio/asr/transcription`;
+  const model = (env.DASHSCOPE_ASR_MODEL || "paraformer-v2").trim() || "paraformer-v2";
+
+  const format = guessAudioFormat(file);
+  const parameters: Record<string, unknown> = {};
+  if (format) parameters.format = format;
+
+  const audioId = crypto.randomUUID();
+  const token = crypto.randomUUID();
+  const stub = env.TEMP_AUDIO.get(env.TEMP_AUDIO.idFromName(audioId));
+  const putResp = await stub.fetch("https://temp-audio/put", {
+    method: "POST",
+    headers: {
+      "x-token": token,
+      "content-type": file.type || "application/octet-stream",
+    },
+    body: await file.arrayBuffer(),
+  });
+  if (!putResp.ok) {
+    throw new Error("Failed to store audio");
+  }
+
+  const fileUrl = new URL(`${requestOrigin}/tmp-audio/${audioId}`);
+  fileUrl.searchParams.set("token", token);
+
+  const upstreamResp = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.DASHSCOPE_API_KEY}`,
+      "Content-Type": "application/json",
+      "X-DashScope-Async": "enable",
+    },
+    body: JSON.stringify({
+      model,
+      input: { file_urls: [fileUrl.toString()] },
+      ...(Object.keys(parameters).length ? { parameters } : {}),
+    }),
+  });
+
+  let upstreamJson: unknown = null;
+  try {
+    upstreamJson = await upstreamResp.json();
+  } catch {
+    throw new Error("DashScope response is not JSON");
+  }
+
+  const record =
+    typeof upstreamJson === "object" && upstreamJson !== null
+      ? (upstreamJson as Record<string, unknown>)
+      : null;
+  const upstreamCode = typeof record?.code === "string" ? record.code : "";
+  if (!upstreamResp.ok || upstreamCode) {
+    throw new Error(
+      typeof record?.message === "string" && record.message.trim()
+        ? record.message.trim()
+        : `DashScope ASR HTTP ${upstreamResp.status}`
+    );
+  }
+
+  const output =
+    typeof record?.output === "object" && record.output !== null
+      ? (record.output as Record<string, unknown>)
+      : null;
+  const taskId = typeof output?.task_id === "string" ? output.task_id.trim() : "";
+  if (!taskId) throw new Error("Missing task_id from DashScope");
+
+  return { taskId, taskUrl: `${base}/tasks/${encodeURIComponent(taskId)}` };
+}
+
+async function fetchAsrTaskStatus(options: {
+  env: Env;
+  taskId: string;
+}): Promise<
+  | { status: "running"; task: unknown }
+  | { status: "failed"; task: unknown }
+  | { status: "succeeded"; task: unknown; text: string }
+> {
+  const base = (options.env.DASHSCOPE_AIGC_API_BASE || "https://dashscope.aliyuncs.com/api/v1").replace(/\/+$/, "");
+  const taskUrl = `${base}/tasks/${encodeURIComponent(options.taskId)}`;
+
+  const taskResp = await fetch(taskUrl, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${options.env.DASHSCOPE_API_KEY}` },
+  });
+  if (!taskResp.ok) {
+    return { status: "running", task: null };
+  }
+
+  let taskJson: unknown = null;
+  try {
+    taskJson = await taskResp.json();
+  } catch {
+    return { status: "running", task: null };
+  }
+
+  const taskRecord =
+    typeof taskJson === "object" && taskJson !== null ? (taskJson as Record<string, unknown>) : null;
+  const taskStatus = typeof taskRecord?.output === "object" && taskRecord.output !== null
+    ? (taskRecord.output as Record<string, unknown>)
+    : null;
+  const statusRaw =
+    typeof taskStatus?.task_status === "string" ? taskStatus.task_status.toUpperCase() : "";
+
+  if (statusRaw === "FAILED" || statusRaw === "CANCELLED") {
+    return { status: "failed", task: taskJson };
+  }
+  if (statusRaw !== "SUCCEEDED") {
+    return { status: "running", task: taskJson };
+  }
+
+  const directText = extractAsrText(taskJson);
+  if (directText) return { status: "succeeded", task: taskJson, text: directText };
+
+  const transcriptionUrl = extractTranscriptionUrl(taskJson);
+  if (!transcriptionUrl) return { status: "succeeded", task: taskJson, text: "" };
+
+  const normalizedUrl = transcriptionUrl.startsWith("http://")
+    ? `https://${transcriptionUrl.slice("http://".length)}`
+    : transcriptionUrl;
+  const trResp = await fetch(normalizedUrl);
+  if (!trResp.ok) return { status: "succeeded", task: taskJson, text: "" };
+  try {
+    const trJson: unknown = await trResp.json();
+    const trText = extractTextFromTranscriptionFile(trJson);
+    return { status: "succeeded", task: taskJson, text: trText || "" };
+  } catch {
+    return { status: "succeeded", task: taskJson, text: "" };
+  }
+}
+
+type TempAudioMeta = {
+  token: string;
+  contentType: string;
+  createdAt: number;
+};
+
+export class TempAudio {
+  constructor(
+    private readonly state: DurableObjectState,
+    private readonly env: Env
+  ) {}
+
+  async alarm(): Promise<void> {
+    await this.state.storage.deleteAll();
+  }
+
+  async fetch(req: Request): Promise<Response> {
+    const url = new URL(req.url);
+
+    if (req.method === "POST" && url.pathname === "/put") {
+      const token = req.headers.get("x-token") || "";
+      if (!token) return jsonError("Missing token", 400);
+      const contentType = req.headers.get("content-type") || "application/octet-stream";
+      const ab = await req.arrayBuffer();
+      if (ab.byteLength === 0) return jsonError("Empty audio", 400);
+      if (ab.byteLength > 10 * 1024 * 1024) return jsonError("Audio too large", 413);
+
+      const meta: TempAudioMeta = { token, contentType, createdAt: Date.now() };
+      await this.state.storage.put("meta", meta);
+      await this.state.storage.put("audio", ab);
+      await this.state.storage.setAlarm(Date.now() + 2 * 60 * 1000);
+      return new Response(null, { status: 204 });
+    }
+
+    if (req.method === "GET" && url.pathname === "/get") {
+      const token = url.searchParams.get("token") || "";
+      const meta = (await this.state.storage.get<TempAudioMeta>("meta")) || null;
+      if (!meta || !meta.token) return jsonError("Not found", 404);
+      if (!token || token !== meta.token) return jsonError("Unauthorized", 401);
+      const audio = await this.state.storage.get<ArrayBuffer>("audio");
+      if (!audio) return jsonError("Not found", 404);
+
+      // Keep it available briefly for retries; alarm will clean up.
+      return new Response(audio, {
+        status: 200,
+        headers: {
+          "Content-Type": meta.contentType || "application/octet-stream",
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    return new Response(null, { status: 404 });
+  }
+}
+
 app.use("*", async (c, next) => {
   await next();
   c.res = withCorsHeaders(c.req.raw, c.res, c.env);
@@ -116,6 +421,71 @@ app.options("*", (c) => {
 });
 
 app.get("/health", (c) => c.json({ ok: true }));
+
+app.get("/tmp-audio/:id", async (c) => {
+  const id = c.req.param("id");
+  const token = c.req.query("token") || "";
+  if (!id) return jsonError("Missing id", 400);
+  if (!token) return jsonError("Missing token", 400);
+
+  const stub = c.env.TEMP_AUDIO.get(c.env.TEMP_AUDIO.idFromName(id));
+  const url = new URL("https://temp-audio/get");
+  url.searchParams.set("token", token);
+  return await stub.fetch(url.toString(), { method: "GET" });
+});
+
+app.post("/asr", async (c) => {
+  if (!c.env.DASHSCOPE_API_KEY) {
+    return jsonError("Missing DASHSCOPE_API_KEY", 500);
+  }
+
+  const contentType = c.req.header("content-type") || "";
+  if (!contentType.toLowerCase().includes("multipart/form-data")) {
+    return jsonError("Expected multipart/form-data", 415);
+  }
+
+  let form: FormData;
+  try {
+    form = await c.req.formData();
+  } catch {
+    return jsonError("Invalid multipart body");
+  }
+
+  const file = form.get("file");
+  if (!(file instanceof File)) {
+    return jsonError("Missing file field", 400);
+  }
+
+  try {
+    const origin = new URL(c.req.url).origin;
+    const { taskId } = await startAsrTask({ env: c.env, requestOrigin: origin, file });
+    return c.json({ taskId });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return jsonError(message || "Failed to start ASR", 502);
+  }
+});
+
+app.get("/asr/:taskId", async (c) => {
+  if (!c.env.DASHSCOPE_API_KEY) {
+    return jsonError("Missing DASHSCOPE_API_KEY", 500);
+  }
+  const taskId = c.req.param("taskId") || "";
+  if (!taskId) return jsonError("Missing taskId", 400);
+
+  const debug = c.req.query("debug") === "1";
+  const result = await fetchAsrTaskStatus({ env: c.env, taskId });
+  if (result.status === "failed") {
+    return new Response(JSON.stringify(result.task ?? {}), {
+      status: 502,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  if (result.status === "succeeded") {
+    return c.json({ status: "succeeded", text: result.text, ...(debug ? { task: result.task } : {}) });
+  }
+  return c.json({ status: "running", ...(debug ? { task: result.task } : {}) });
+});
 
 app.post("/tts", async (c) => {
   if (!c.env.DASHSCOPE_API_KEY) {
@@ -212,6 +582,59 @@ app.post("/tts", async (c) => {
   return new Response(audioResp.body, {
     status: 200,
     headers,
+  });
+});
+
+// DashScope compatible-mode currently does not implement `/audio/transcriptions`.
+// Provide an OpenAI-shaped endpoint backed by DashScope ASR so frontend can keep using the OpenAI SDK.
+app.post("/openai/v1/audio/transcriptions", async (c) => {
+  if (!c.env.DASHSCOPE_API_KEY) {
+    return jsonError("Missing DASHSCOPE_API_KEY", 500);
+  }
+
+  const contentType = c.req.header("content-type") || "";
+  if (!contentType.toLowerCase().includes("multipart/form-data")) {
+    return jsonError("Expected multipart/form-data", 415);
+  }
+
+  let form: FormData;
+  try {
+    form = await c.req.formData();
+  } catch {
+    return jsonError("Invalid multipart body");
+  }
+
+  const file = form.get("file");
+  if (!(file instanceof File)) {
+    return jsonError("Missing file field", 400);
+  }
+  const origin = new URL(c.req.url).origin;
+  let taskId: string;
+  try {
+    taskId = (await startAsrTask({ env: c.env, requestOrigin: origin, file })).taskId;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return jsonError(message || "Failed to start ASR", 502);
+  }
+
+  // Best-effort sync: poll briefly, otherwise return 202 so callers can switch to `/asr/:taskId`.
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    await sleep(500);
+    const status = await fetchAsrTaskStatus({ env: c.env, taskId });
+    if (status.status === "failed") {
+      return new Response(JSON.stringify(status.task ?? {}), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (status.status === "succeeded" && status.text) {
+      return c.json({ text: status.text });
+    }
+  }
+
+  return new Response(JSON.stringify({ taskId, status: "running" }), {
+    status: 202,
+    headers: { "Content-Type": "application/json" },
   });
 });
 

@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type StudioModuleId = "audio-summary" | "mindmap" | "wiki-card" | "report";
+export type StudioEphemeralModuleId = "voice-call";
+export type StudioAnyModuleId = StudioModuleId | StudioEphemeralModuleId;
 
 export interface StudioContext {
   channelIds: string[];
@@ -24,13 +26,15 @@ export interface StudioContentItem {
 
 export interface StudioState {
   currentContext: StudioContext | null;
-  currentModule: StudioModuleId | null;
+  currentModule: StudioAnyModuleId | null;
   contentItems: Record<StudioModuleId, StudioContentItem[]>;
   activeItemId: string | null;
   isGenerating: boolean;
+  ephemeralContextChannelIds: string[];
 
   setCurrentContext: (context: StudioContext) => void;
-  setCurrentModule: (moduleId: StudioModuleId | null) => void;
+  setCurrentModule: (moduleId: StudioAnyModuleId | null) => void;
+  setEphemeralContextChannelIds: (channelIds: string[]) => void;
   addContentItem: (item: StudioContentItem) => void;
   updateContentItem: (itemId: string, updates: Partial<StudioContentItem>) => void;
   deleteContentItem: (itemId: string) => void;
@@ -52,9 +56,11 @@ export const useStudioStore = create<StudioState>()(
       },
       activeItemId: null,
       isGenerating: false,
+      ephemeralContextChannelIds: [],
 
       setCurrentContext: (context) => set({ currentContext: context }),
       setCurrentModule: (moduleId) => set({ currentModule: moduleId }),
+      setEphemeralContextChannelIds: (channelIds) => set({ ephemeralContextChannelIds: channelIds }),
       addContentItem: (item) =>
         set((state) => ({
           contentItems: {

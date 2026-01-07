@@ -1,8 +1,19 @@
-import { AudioLines, Network, BookOpen, FileText } from "lucide-react";
+import { AudioLines, Network, BookOpen, FileText, PhoneCall } from "lucide-react";
 import { StudioModuleConfig } from "../types";
-import { StudioModuleId } from "@/core/stores/studio.store";
+import { StudioAnyModuleId } from "@/core/stores/studio.store";
 
 export const studioModules: StudioModuleConfig[] = [
+  {
+    id: "voice-call",
+    title: "Call",
+    description: "Realtime voice call with AI (no history)",
+    icon: PhoneCall,
+    colorClass:
+      "bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-950/30 dark:to-cyan-950/30 border-sky-100/60 dark:border-sky-900/40",
+    iconColorClass: "text-sky-600 dark:text-sky-400",
+    order: 0,
+    enabled: true,
+  },
   {
     id: "audio-summary",
     title: "Audio",
@@ -45,11 +56,10 @@ export const studioModules: StudioModuleConfig[] = [
   },
 ];
 
-export const getStudioModule = (id: StudioModuleId): StudioModuleConfig | undefined => {
+export const getStudioModule = (id: StudioAnyModuleId): StudioModuleConfig | undefined => {
   return studioModules.find((m) => m.id === id);
 };
 
 export const getEnabledModules = (): StudioModuleConfig[] => {
   return studioModules.filter((m) => m.enabled).sort((a, b) => a.order - b.order);
 };
-

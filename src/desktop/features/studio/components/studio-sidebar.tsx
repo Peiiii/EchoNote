@@ -4,7 +4,7 @@ import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { X, ArrowLeft } from "lucide-react";
 import { getEnabledModules } from "../modules/registry";
 import { useUIStateStore } from "@/core/stores/ui-state.store";
-import { useStudioStore, StudioModuleId } from "@/core/stores/studio.store";
+import { useStudioStore, StudioAnyModuleId } from "@/core/stores/studio.store";
 import { useNotesViewStore } from "@/core/stores/notes-view.store";
 import { useNotesDataStore } from "@/core/stores/notes-data.store";
 import { StudioModuleCard } from "./studio-module-card";
@@ -13,6 +13,7 @@ import { AudioSummaryDetail } from "../modules/audio-summary/components/audio-su
 import { MindmapDetail } from "../modules/mindmap/components/mindmap-detail";
 import { WikiCardDetail } from "../modules/wiki-card/components/wiki-card-detail";
 import { ReportDetail } from "../modules/report/components/report-detail";
+import { VoiceCallDetail } from "../modules/voice-call/components/voice-call-detail";
 import { useConceptCards } from "../modules/wiki-card/hooks/use-concept-cards";
 import { useMindmap } from "../modules/mindmap/hooks/use-mindmap";
 import { useReport } from "../modules/report/hooks/use-report";
@@ -24,11 +25,15 @@ import { useTranslation } from "react-i18next";
 import { deleteStudioItem } from "../services/studio-item.service";
 
 const renderDetail = (
-  moduleId: StudioModuleId,
+  moduleId: StudioAnyModuleId,
   itemId: string | null,
   onClose: () => void,
   contentItems: ReturnType<typeof useStudioStore.getState>["contentItems"]
 ) => {
+  if (moduleId === "voice-call") {
+    return <VoiceCallDetail onClose={onClose} />;
+  }
+
   const items = contentItems[moduleId];
   const item = items.find((i) => i.id === itemId);
   if (!item) return null;
@@ -58,6 +63,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
     contentItems,
     currentContext,
     togglePin,
+    setEphemeralContextChannelIds,
   } = useStudioStore();
   const { currentChannelId } = useNotesViewStore();
   const { channels } = useNotesDataStore();
@@ -70,6 +76,24 @@ export const StudioSidebar = memo(function StudioSidebar() {
 
   const handleModuleClick = useCallback(
     async (moduleId: string) => {
+      if (moduleId === "voice-call") {
+        let channelIds: string[] = [];
+        if (currentContext?.mode === "all") {
+          channelIds = channels.map((ch) => ch.id);
+        } else if (currentContext?.mode === "custom" && currentContext.channelIds.length > 0) {
+          channelIds = currentContext.channelIds;
+        } else if (currentContext?.mode === "auto" && currentChannelId) {
+          channelIds = [currentChannelId];
+        } else if (currentChannelId) {
+          channelIds = [currentChannelId];
+        }
+
+        setEphemeralContextChannelIds(channelIds);
+        setCurrentModule("voice-call");
+        setActiveItem(null);
+        return;
+      }
+
       if (
         moduleId === "wiki-card" ||
         moduleId === "mindmap" ||
@@ -122,6 +146,7 @@ export const StudioSidebar = memo(function StudioSidebar() {
     [
       setCurrentModule,
       setActiveItem,
+      setEphemeralContextChannelIds,
       currentContext,
       currentChannelId,
       channels,
@@ -138,7 +163,11 @@ export const StudioSidebar = memo(function StudioSidebar() {
   }, [setCurrentModule, setActiveItem]);
 
   const detailView = useMemo(() => {
-    if (!currentModule || !activeItemId) return null;
+    if (!currentModule) return null;
+    if (currentModule === "voice-call") {
+      return <VoiceCallDetail onClose={handleCloseDetail} />;
+    }
+    if (!activeItemId) return null;
     const items = contentItems[currentModule];
     const item = items.find((i) => i.id === activeItemId);
     if (!item) return null;

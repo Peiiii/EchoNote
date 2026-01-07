@@ -1,8 +1,8 @@
-import { StudioModuleId } from "@/core/stores/studio.store";
+import { StudioAnyModuleId } from "@/core/stores/studio.store";
 import { LucideIcon } from "lucide-react";
 
 export interface StudioModuleConfig {
-  id: StudioModuleId;
+  id: StudioAnyModuleId;
   title: string;
   description?: string;
   icon: LucideIcon;
@@ -11,4 +11,3 @@ export interface StudioModuleConfig {
   order: number;
   enabled: boolean;
 }
-

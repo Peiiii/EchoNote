@@ -8,8 +8,9 @@ import {
   getChannelNames,
   languageTypeFromAppLanguage,
 } from "../../shared/services/notes-prompt.service";
+import { resolvePodcastVoices } from "../../shared/services/tts-voice.service";
 import { AudioPodcastData, PodcastSpeaker, PodcastTurn } from "../types";
-import { concatAudioBuffers, decodeAudioArrayBuffer, encodeWav } from "./audio-utils";
+import { concatAudioBuffers, decodeAudioArrayBuffer, encodeWav } from "@/common/utils/audio/audio-utils";
 import { studioAudioCache } from "./studio-audio-cache.service";
 import { qwenTtsToArrayBuffers } from "@/common/services/ai/qwen-tts";
 
@@ -43,64 +44,6 @@ function normalizeTurns(turns: PodcastTurn[]): PodcastTurn[] {
     out.push({ speaker, text });
   }
   return out;
-}
-
-const MANDARIN_FEMALE_VOICES = [
-  "Serena",
-  "Maia",
-  "Cherry",
-  "Bella",
-  "Mia",
-  "Vivian",
-] as const;
-
-const MANDARIN_MALE_VOICES = ["Neil", "Ethan", "Kai", "Moon", "Andre"] as const;
-
-function hashToUint32(input: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-function mulberry32(seed: number): () => number {
-  let t = seed >>> 0;
-  return () => {
-    t += 0x6d2b79f5;
-    let x = t;
-    x = Math.imul(x ^ (x >>> 15), x | 1);
-    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
-    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function pickOne<T>(arr: readonly T[], rnd: () => number): T {
-  return arr[Math.floor(rnd() * arr.length)]!;
-}
-
-function resolvePodcastVoices(options: { itemId: string }): { host: string; guest: string } {
-  const hostOverride =
-    (import.meta.env.VITE_DASHSCOPE_TTS_VOICE_HOST as string | undefined) ||
-    (import.meta.env.VITE_TTS_VOICE_HOST as string | undefined);
-  const guestOverride =
-    (import.meta.env.VITE_DASHSCOPE_TTS_VOICE_GUEST as string | undefined) ||
-    (import.meta.env.VITE_TTS_VOICE_GUEST as string | undefined);
-
-  if (hostOverride && guestOverride) {
-    return { host: hostOverride, guest: guestOverride };
-  }
-
-  const rnd = mulberry32(hashToUint32(options.itemId));
-  const host = hostOverride || pickOne(MANDARIN_FEMALE_VOICES, rnd);
-
-  let guest = guestOverride || pickOne(MANDARIN_MALE_VOICES, rnd);
-  if (guest === host) {
-    guest = MANDARIN_MALE_VOICES.find((v) => v !== host) || guest;
-  }
-
-  return { host, guest };
 }
 
 export async function generateAudioPodcast(options: {
@@ -169,7 +112,13 @@ ${notesText}
     (import.meta.env.VITE_DASHSCOPE_TTS_MODEL as string | undefined) ||
     (import.meta.env.VITE_TTS_MODEL as string | undefined) ||
     "qwen3-tts-flash";
-  const voices = resolvePodcastVoices({ itemId });
+  const hostOverride =
+    (import.meta.env.VITE_DASHSCOPE_TTS_VOICE_HOST as string | undefined) ||
+    (import.meta.env.VITE_TTS_VOICE_HOST as string | undefined);
+  const guestOverride =
+    (import.meta.env.VITE_DASHSCOPE_TTS_VOICE_GUEST as string | undefined) ||
+    (import.meta.env.VITE_TTS_VOICE_GUEST as string | undefined);
+  const voices = resolvePodcastVoices({ seed: itemId, hostOverride, guestOverride });
 
   let wavBlob: Blob | null = null;
   try {
