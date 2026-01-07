@@ -1000,6 +1000,7 @@
       "emptyHint": "Tap Start and speak. Nothing will be saved.",
       "end": "End",
       "mute": "Mute",
+      "scrollToLatest": "Latest",
       "role": {
         "assistant": "Assistant",
         "user": "You"
