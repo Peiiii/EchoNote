@@ -493,6 +493,22 @@
       "firstSpaceName": "My First Space"
     }
   },
+  "onboarding": {
+    "notesTour": {
+      "later": "Later",
+      "gotIt": "Got it",
+      "createSpace": {
+        "title": "Create your first space",
+        "description": "Click the button to create a space. You can organize everything later—just get started.",
+        "action": "Create space"
+      },
+      "write": {
+        "title": "Write your first note",
+        "description": "Type a few words here. After you write, AI can help you refine, summarize, or brainstorm.",
+        "action": "Start writing"
+      }
+    }
+  },
   "editor": {
     "codeBlock": {
       "plainText": "Plain text",
