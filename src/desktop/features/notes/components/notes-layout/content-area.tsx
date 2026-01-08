@@ -42,14 +42,14 @@ export const ContentArea = ({ children, rightSidebar, farRightSidebar, className
               setRightSidebarSize(size);
             }}
           >
-            <div className="h-full border-l border-border/40 bg-muted overflow-hidden flex">
+            <div className="h-full bg-muted overflow-hidden flex">
               {/* Nearest sidebar */}
               {rightSidebar && (
                 <div className="h-full flex-1 min-w-0">{rightSidebar}</div>
               )}
               {/* Far right sidebar */}
               {farRightSidebar && (
-                <div className={`h-full ${rightSidebar ? 'w-[450px] min-w-[450px] border-l border-border/40' : 'flex-1 min-w-0'}`}>{farRightSidebar}</div>
+                <div className={`h-full ${rightSidebar ? 'w-[450px] min-w-[450px]' : 'flex-1 min-w-0'}`}>{farRightSidebar}</div>
               )}
             </div>
           </ResizablePanel>

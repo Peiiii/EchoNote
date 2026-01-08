@@ -30,10 +30,10 @@ export const TimelineLayout = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className={`relative w-full h-full ${className}`} data-component="timeline-layout">
+    <div className={`relative w-full h-full app-gradient-bg ${className}`} data-component="timeline-layout">
       <div ref={containerRef} className={`relative flex-1 flex flex-col h-full ${outerPaddingClass}`}>
         <div className={`flex-1 min-h-0 ${contentWidthClass}`}>
-          <div className="relative flex flex-col h-full overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+          <div className="relative flex flex-col h-full overflow-hidden rounded-2xl bg-card" style={{ boxShadow: '0 0 24px rgba(0, 0, 0, 0.08)' }}>
             {/* Channel Cover Header */}
             {channel && <AutoHideChannelHeader channel={channel} layoutRef={containerRef} />}
 
