@@ -361,7 +361,7 @@ export const ChannelHeader = ({
                 <MoreVertical className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+            <DropdownMenuContent align="end" sideOffset={8} className="min-w-[180px] p-1">
               <HeaderMenuItem
                 icon={channel.shareToken ? Share2 : Globe}
                 onSelect={() => setIsPublishDialogOpen(true)}
@@ -466,7 +466,7 @@ export const ChannelHeader = ({
                   <MoreVertical className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px] p-1">
+              <DropdownMenuContent align="end" sideOffset={8} className="min-w-[180px] p-1">
                 <HeaderMenuItem
                   icon={channel.shareToken ? Share2 : Globe}
                   onSelect={() => setIsPublishDialogOpen(true)}
