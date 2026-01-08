@@ -81,18 +81,19 @@ export function ActionButtons({
           messageId: message.id,
           content: message.content,
           restoreDraft: true,
+          channelId: message.channelId,
         });
       };
 
       const discardDraft = () => {
         presenter.noteEditManager.discardDraft(message.id);
         modal.close();
-        presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
+        presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content, channelId: message.channelId });
       };
 
       const openWithoutRestore = () => {
         modal.close();
-        presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
+        presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content, channelId: message.channelId });
       };
 
       modal.show({
@@ -126,7 +127,7 @@ export function ActionButtons({
       return;
     }
 
-    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
+    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content, channelId: message.channelId });
   };
 
   const actionButtons = [

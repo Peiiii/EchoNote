@@ -51,7 +51,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "group relative mx-3 mb-2 last:mb-0 transition-all duration-200",
+        "group relative mx-3 mb-2 last:mb-0 transition-all duration-200 overflow-hidden",
         "cursor-pointer",
         isGenerating && "opacity-80"
       )}
@@ -68,7 +68,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
           isGenerating && "bg-muted/20"
         )}
       >
-        <div className="relative flex items-center gap-3 p-3">
+        <div className="relative flex items-center gap-3 p-3 min-w-0">
           {Icon && (
             <div className={cn(
               "flex-shrink-0 flex items-center justify-center transition-all duration-200",
@@ -80,21 +80,21 @@ export const StudioRecentItem = memo(function StudioRecentItem({
                   item.status === "generating"
                     ? "text-muted-foreground/40 animate-[breath_2.5s_ease-in-out_infinite]"
                     : item.status === "error"
-                    ? "text-destructive"
-                    : module?.iconColorClass || "text-muted-foreground/70"
+                      ? "text-destructive"
+                      : module?.iconColorClass || "text-muted-foreground/70"
                 )}
               />
             </div>
           )}
-          
+
           <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-2 min-w-0">
               <div className="flex-1 min-w-0 flex flex-col gap-1">
                 <div
                   className={cn(
                     "text-sm font-medium truncate transition-colors",
-                    isGenerating 
-                      ? "text-muted-foreground/60" 
+                    isGenerating
+                      ? "text-muted-foreground/60"
                       : "text-foreground group-hover:text-foreground/90"
                   )}
                 >
@@ -177,7 +177,7 @@ export const StudioRecentItem = memo(function StudioRecentItem({
             </DropdownMenu>
           </div>
         </div>
-        
+
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
       </div>
     </motion.div>

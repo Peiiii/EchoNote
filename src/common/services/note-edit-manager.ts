@@ -7,15 +7,17 @@ export class NoteEditManager {
     messageId,
     content,
     restoreDraft = false,
+    channelId,
   }: {
     messageId: string;
     content: string;
     restoreDraft?: boolean;
+    channelId?: string;
   }) => {
     const baseHash = computeNoteHash(content);
     return useEditStateStore
       .getState()
-      .startEditing(messageId, content, { baseHash, restoreDraft });
+      .startEditing(messageId, content, { baseHash, restoreDraft, channelId });
   };
   save = async (shouldCloseAfterSave = true) => {
     return await useEditStateStore.getState().save(shouldCloseAfterSave);

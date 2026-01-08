@@ -14,6 +14,7 @@ export interface EditDraftEntry {
 export interface EditState {
   // Editing state
   editingMessageId: string | null;
+  editingChannelId: string | null;
   editContent: string;
   originalContent: string;
   isDirty: boolean;
@@ -33,7 +34,7 @@ export interface EditState {
   startEditing: (
     messageId: string,
     content: string,
-    options?: { baseHash?: string; restoreDraft?: boolean }
+    options?: { baseHash?: string; restoreDraft?: boolean; channelId?: string }
   ) => void;
   updateContent: (content: string) => void;
   switchToExpandedMode: () => void;
@@ -52,6 +53,7 @@ export const useEditStateStore = create<EditState>()(
     (set, get) => ({
       // Initial state
       editingMessageId: null,
+      editingChannelId: null,
       editContent: "",
       originalContent: "",
       isDirty: false,
@@ -68,6 +70,8 @@ export const useEditStateStore = create<EditState>()(
         const baseHash = options?.baseHash ?? computeNoteHash(content);
         const draftEntry = get().drafts[messageId];
         const hasMatchingDraft = !!draftEntry && draftEntry.baseHash === baseHash;
+        const { currentChannelId } = useNotesViewStore.getState();
+        const editingChannelId = options?.channelId ?? currentChannelId ?? null;
 
         if (draftEntry && !hasMatchingDraft) {
           set(state => {
@@ -83,6 +87,7 @@ export const useEditStateStore = create<EditState>()(
         const currentEditorMode = get().editorMode;
         set({
           editingMessageId: messageId,
+          editingChannelId,
           editContent: restoredContent,
           originalContent: content,
           isDirty: restoredContent !== content,
@@ -161,7 +166,7 @@ export const useEditStateStore = create<EditState>()(
 
       // Switch to expanded editing mode
       switchToExpandedMode: () => {
-        set({ editMode: "expanded" });
+        set({ editMode: "expanded", editorMode: "wysiwyg" });
       },
 
       // Switch back to inline editing mode
@@ -176,7 +181,7 @@ export const useEditStateStore = create<EditState>()(
 
       // Save the edited message
       save: async (shouldCloseAfterSave = true) => {
-        const { editingMessageId, editContent } = get();
+        const { editingMessageId, editContent, editingChannelId } = get();
         if (!editingMessageId || !editContent.trim()) return;
 
         set({ isSaving: true });
@@ -187,14 +192,15 @@ export const useEditStateStore = create<EditState>()(
             throw new Error("User not authenticated");
           }
 
-          const { currentChannelId } = useNotesViewStore.getState();
-          if (!currentChannelId) {
+          const fallbackChannelId = useNotesViewStore.getState().currentChannelId;
+          const channelId = editingChannelId ?? fallbackChannelId;
+          if (!channelId) {
             throw new Error("No current channel selected");
           }
 
           await channelMessageService.updateMessage({
             messageId: editingMessageId,
-            channelId: currentChannelId,
+            channelId,
             updates: { content: editContent.trim() },
             userId,
           });
@@ -214,9 +220,8 @@ export const useEditStateStore = create<EditState>()(
         } catch (error) {
           console.error("Failed to save message:", error);
         } finally {
-          if (shouldCloseAfterSave) {
-            set({ isSaving: false });
-          }
+          // Always stop the saving indicator even if the request fails.
+          set(state => (state.isSaving ? { isSaving: false } : {}));
         }
       },
 
@@ -229,6 +234,7 @@ export const useEditStateStore = create<EditState>()(
       reset: () => {
         set({
           editingMessageId: null,
+          editingChannelId: null,
           editContent: "",
           originalContent: "",
           isDirty: false,

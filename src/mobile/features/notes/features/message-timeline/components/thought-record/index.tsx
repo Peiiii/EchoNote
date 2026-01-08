@@ -48,7 +48,7 @@ export const MobileThoughtRecord = ({
 
   // Action handlers
   const handleEdit = () => {
-    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content });
+    presenter.noteEditManager.startEditing({ messageId: message.id, content: message.content, channelId: message.channelId });
   };
 
   const handleDelete = async () => {
