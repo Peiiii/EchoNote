@@ -27,7 +27,9 @@ export function MessageInput() {
   const containerClass = "sticky bottom-0 z-10 shrink-0";
   const panelBase =
     "overflow-hidden transition-[max-height,opacity,transform,padding] duration-220 ease-out will-change-[max-height,opacity,transform] origin-bottom";
-  const panelOpen = "max-h-[180px] opacity-100 translate-y-0";
+  // Keep this comfortably above the worst-case content height (reply bar + header actions + editor maxHeight + bottom actions),
+  // otherwise the bottom actions row can get clipped when the editor starts scrolling.
+  const panelOpen = "max-h-[320px] opacity-100 translate-y-0";
   const panelClosed = "max-h-0 opacity-0 translate-y-1 py-0";
   const panelDecorOpen = "border-t border-border/60";
   const panelRef = useRef<HTMLDivElement>(null);
