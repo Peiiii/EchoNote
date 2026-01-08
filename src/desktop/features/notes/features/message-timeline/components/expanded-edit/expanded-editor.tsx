@@ -190,7 +190,7 @@ export function ExpandedEditor({
                 onChange={e => handleContentChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={t("notes.expandedEditor.markdownPlaceholder")}
-                className="w-full h-full resize-none bg-transparent border-0 rounded-none text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
+                className="w-full h-full resize-none bg-transparent border-0 rounded-none px-4 py-3 text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-mono"
                 disabled={isSaving}
                 style={{
                   caretColor: "#3b82f6",

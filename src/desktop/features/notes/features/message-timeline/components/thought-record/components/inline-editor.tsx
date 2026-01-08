@@ -128,7 +128,7 @@ export function InlineEditor({
             onChange={e => handleContentChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t("thoughtRecord.editor.placeholder")}
-            className="w-full min-h-[200px] max-h-[400px] resize-none bg-transparent border-0 rounded-none py-3 text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
+            className="w-full min-h-[200px] max-h-[400px] resize-none bg-transparent border-0 rounded-none px-4 py-3 text-base leading-relaxed placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-0 focus:outline-none focus:border-0 shadow-none text-slate-800 dark:text-slate-200 font-normal"
             disabled={isSaving}
             style={{ caretColor: "#3b82f6" }}
           />
