@@ -848,7 +848,8 @@ export function RichEditorLite({ value, onChange, editable = true, placeholder, 
         <div
           className={[
             "relative h-full",
-            hideToolbar ? "" : "mt-0.5",
+            // Use padding (not margin) so the content doesn't overflow and trigger a tiny scrollbar.
+            hideToolbar ? "" : "pt-0.5",
             variant === 'frameless' ? "px-3 pb-0" : "px-3 pb-3",
           ].join(' ')}
         >
