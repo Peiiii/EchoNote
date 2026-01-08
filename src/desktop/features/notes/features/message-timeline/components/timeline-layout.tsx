@@ -194,30 +194,40 @@ const AutoHideChannelHeader = ({ channel, layoutRef }: AutoHideChannelHeaderProp
     };
   }, [presenter]);
 
-  useEffect(() => {
-    if (!hiddenByScroll) {
-      setHoveringTopEdge(false);
-      return;
-    }
+	  useEffect(() => {
+	    if (!hiddenByScroll) {
+	      setHoveringTopEdge(false);
+	      return;
+	    }
 
-    const handlePointerMove = (event: MouseEvent) => {
-      const container = layoutRef.current;
-      if (!container) return;
+	    const handlePointerMove = (event: MouseEvent) => {
+	      const container = layoutRef.current;
+	      if (!container) return;
 
-      const rect = container.getBoundingClientRect();
-      const withinX = event.clientX >= rect.left && event.clientX <= rect.right;
-      const withinY = event.clientY >= rect.top && event.clientY <= rect.bottom;
+	      const rect = container.getBoundingClientRect();
+	      const withinX = event.clientX >= rect.left && event.clientX <= rect.right;
+	      const withinY = event.clientY >= rect.top && event.clientY <= rect.bottom;
 
-      if (!withinX || !withinY) {
-        setHoveringTopEdge(prev => (prev ? false : prev));
-        return;
-      }
+	      if (!withinX || !withinY) {
+	        setHoveringTopEdge(prev => (prev ? false : prev));
+	        return;
+	      }
 
-      const distanceFromTop = event.clientY - rect.top;
-      const shouldHover = distanceFromTop <= HOVER_REVEAL_DISTANCE_PX;
+	      const distanceFromTop = event.clientY - rect.top;
+	      const headerRect = wrapperRef.current?.getBoundingClientRect();
+	      const withinHeader =
+	        !!headerRect &&
+	        event.clientX >= headerRect.left &&
+	        event.clientX <= headerRect.right &&
+	        event.clientY >= headerRect.top &&
+	        event.clientY <= headerRect.bottom;
 
-      setHoveringTopEdge(prev => (prev === shouldHover ? prev : shouldHover));
-    };
+	      // Keep header visible while the pointer is inside header itself; otherwise it will collapse
+	      // immediately when moving down even though the cursor never left the header area.
+	      const shouldHover = withinHeader || distanceFromTop <= HOVER_REVEAL_DISTANCE_PX;
+
+	      setHoveringTopEdge(prev => (prev === shouldHover ? prev : shouldHover));
+	    };
 
     window.addEventListener("mousemove", handlePointerMove);
 
