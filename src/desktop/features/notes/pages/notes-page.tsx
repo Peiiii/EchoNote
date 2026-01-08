@@ -9,6 +9,7 @@ import { ThreadSidebar } from "@/desktop/features/notes/features/thread-manageme
 import { StudioSidebar } from "@/desktop/features/studio/components/studio-sidebar";
 import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useJumpToNote } from "../hooks/use-jump-to-note";
+import { NotesOnboardingHost } from "@/desktop/features/notes/features/onboarding/notes-onboarding-host";
 
 export function NotesPage() {
   const presenter = useDesktopPresenterContext();
@@ -46,10 +47,13 @@ export function NotesPage() {
   };
 
   return (
-    <NotesLayout
-      sidebar={<ChannelList />}
-      content={<MessageTimelineFeature />}
-      rightSidebar={renderSidebar()}
-    />
+    <>
+      <NotesLayout
+        sidebar={<ChannelList />}
+        content={<MessageTimelineFeature />}
+        rightSidebar={renderSidebar()}
+      />
+      <NotesOnboardingHost />
+    </>
   );
 }

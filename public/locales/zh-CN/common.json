@@ -493,6 +493,22 @@
       "firstSpaceName": "我的第一个空间"
     }
   },
+  "onboarding": {
+    "notesTour": {
+      "later": "稍后",
+      "gotIt": "知道了",
+      "createSpace": {
+        "title": "创建你的第一个空间",
+        "description": "点击按钮创建一个空间。先开始记录，之后再整理也不迟。",
+        "action": "创建空间"
+      },
+      "write": {
+        "title": "写下第一句话",
+        "description": "在这里输入几句话。写完后可以让 AI 帮你润色、总结或发散想法。",
+        "action": "开始输入"
+      }
+    }
+  },
   "editor": {
     "codeBlock": {
       "plainText": "纯文本",

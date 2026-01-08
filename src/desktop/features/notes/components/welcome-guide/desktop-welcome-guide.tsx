@@ -41,6 +41,7 @@ export const DesktopWelcomeGuide = () => {
 
           {/* Single CTA */}
           <Button
+            data-tour="create-first-space"
             onClick={handleCreateFirstChannel}
             size="lg"
             className="px-6"

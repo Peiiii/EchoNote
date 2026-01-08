@@ -19,7 +19,11 @@ export function InputArea({
   
   return (
     <div className="w-full">
-      <div className="relative min-h-[80px]" onMouseDown={handleExpandInput}>
+      <div
+        className="relative min-h-[80px]"
+        data-tour="timeline-composer"
+        onMouseDown={handleExpandInput}
+      >
         <RichEditorLite
           value={message}
           onChange={onMessageChange}
