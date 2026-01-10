@@ -1139,5 +1139,66 @@
   "readMore": {
     "collapse": "折叠",
     "readMore": "展开更多"
+  },
+  "settings": {
+    "title": "设置",
+    "tabs": {
+      "general": "通用",
+      "apiAccess": "API 访问"
+    },
+    "sections": {
+      "account": "账号",
+      "appearance": "外观"
+    }
+  },
+  "apiAccess": {
+    "menu": "API 访问",
+    "title": "API 访问",
+    "description": "创建并管理个人访问令牌（PAT），用于外部工具调用。",
+    "created": "令牌已创建",
+    "revoked": "令牌已撤销",
+    "scopes": {
+      "read": "读取笔记",
+      "write": "写入笔记"
+    },
+    "expiry": {
+      "days30": "30 天",
+      "days90": "90 天",
+      "never": "不过期"
+    },
+    "create": {
+      "title": "创建令牌",
+      "namePlaceholder": "令牌名称（例如 Cursor、Claude、CI）",
+      "cta": "创建令牌"
+    },
+    "createdToken": {
+      "title": "新令牌（仅显示一次）",
+      "note": "请立即复制并妥善保存。关闭后无法再次查看明文令牌。",
+      "copyToken": "复制令牌",
+      "copyForAgent": "复制给 Agent"
+    },
+    "tokens": {
+      "title": "有效令牌",
+      "refresh": "刷新",
+      "empty": "暂无令牌。",
+      "revoke": "撤销",
+      "expiresAt": "到期时间",
+      "noExpiry": "不过期"
+    },
+    "errors": {
+      "signInRequired": "请先登录。",
+      "emailNotVerified": "请先完成邮箱验证。",
+      "nameRequired": "名称不能为空。",
+      "scopeRequired": "请至少选择一个权限。",
+      "copyFailed": "复制失败。"
+    },
+    "signIn": {
+      "title": "需要登录",
+      "description": "登录后才能创建和管理 API 令牌。"
+    },
+    "verifyEmail": {
+      "title": "需要邮箱验证",
+      "description": "创建 API 令牌前请先完成邮箱验证。"
+    }
   }
 }

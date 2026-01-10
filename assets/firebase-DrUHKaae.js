@@ -1,4 +1,4 @@
-import"./pkg-at-firebase-analytics-CSlJI-t7.js";import{r}from"./pkg-at-firebase-app-BIK-kTny.js";import"./pkg-at-firebase-auth-omahK6ZZ.js";import"./pkg-at-firebase-logger-CNz1B4Yj.js";import"./pkg-at-firebase-firestore-DyYiRSku.js";var i="firebase",o="12.2.1";/**
+import"./pkg-at-firebase-analytics-sEzefGcm.js";import{r}from"./pkg-at-firebase-app-B774rL7t.js";import"./pkg-at-firebase-auth-jPkSjmcN.js";import"./pkg-at-firebase-logger-CNz1B4Yj.js";import"./pkg-at-firebase-firestore-6M7xsJkd.js";var i="firebase",o="12.2.1";/**
  * @license
  * Copyright 2020 Google LLC
  *

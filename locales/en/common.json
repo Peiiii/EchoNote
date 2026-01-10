@@ -1139,5 +1139,66 @@
   "readMore": {
     "collapse": "Collapse",
     "readMore": "Read more"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "apiAccess": "API Access"
+    },
+    "sections": {
+      "account": "Account",
+      "appearance": "Appearance"
+    }
+  },
+  "apiAccess": {
+    "menu": "API Access",
+    "title": "API Access",
+    "description": "Create and manage Personal Access Tokens (PAT) for external tools.",
+    "created": "Token created",
+    "revoked": "Token revoked",
+    "scopes": {
+      "read": "Read notes",
+      "write": "Write notes"
+    },
+    "expiry": {
+      "days30": "30 days",
+      "days90": "90 days",
+      "never": "No expiry"
+    },
+    "create": {
+      "title": "Create token",
+      "namePlaceholder": "Token name (e.g. Cursor, Claude, CI)",
+      "cta": "Create token"
+    },
+    "createdToken": {
+      "title": "New token (shown once)",
+      "note": "Copy and store it now. Once dismissed, you cannot view the plaintext token again.",
+      "copyToken": "Copy token",
+      "copyForAgent": "Copy for agent"
+    },
+    "tokens": {
+      "title": "Active tokens",
+      "refresh": "Refresh",
+      "empty": "No tokens yet.",
+      "revoke": "Revoke",
+      "expiresAt": "Expires",
+      "noExpiry": "No expiry"
+    },
+    "errors": {
+      "signInRequired": "Please sign in first.",
+      "emailNotVerified": "Please verify your email first.",
+      "nameRequired": "Name is required.",
+      "scopeRequired": "Select at least one scope.",
+      "copyFailed": "Copy failed."
+    },
+    "signIn": {
+      "title": "Sign in required",
+      "description": "Sign in to create and manage API tokens."
+    },
+    "verifyEmail": {
+      "title": "Email verification required",
+      "description": "Verify your email before creating API tokens."
+    }
   }
 }
