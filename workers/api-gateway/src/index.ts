@@ -8,6 +8,7 @@ type Env = {
   DASHSCOPE_ASR_MODEL?: string;
   TEMP_AUDIO: DurableObjectNamespace;
   VOICE_CALL: DurableObjectNamespace;
+  EXTENSION_AUTH: DurableObjectNamespace;
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -653,6 +654,19 @@ export class VoiceCallSession {
     });
 
     return new Response(null, { status: 101, webSocket: client });
+  }
+}
+
+// Backward-compat: previously deployed versions depended on this Durable Object class.
+// Keep it exported to allow deploying new versions safely.
+export class ExtensionAuth {
+  constructor(
+    private readonly _state: DurableObjectState,
+    private readonly _env: Env
+  ) {}
+
+  async fetch(): Promise<Response> {
+    return new Response(null, { status: 404 });
   }
 }
 

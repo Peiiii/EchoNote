@@ -10,7 +10,8 @@ inspector_port = 9231
 [durable_objects]
 bindings = [
   { name = "TEMP_AUDIO", class_name = "TempAudio" },
-  { name = "VOICE_CALL", class_name = "VoiceCallSession" }
+  { name = "VOICE_CALL", class_name = "VoiceCallSession" },
+  { name = "EXTENSION_AUTH", class_name = "ExtensionAuth" }
 ]
 
 [[migrations]]
@@ -20,6 +21,9 @@ new_sqlite_classes = ["TempAudio"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["VoiceCallSession"]
+
+[[migrations]]
+tag = "v3"
 
 [vars]
 # Comma-separated list, e.g. "http://localhost:* ,https://stillroot.app,https://*.stillroot.app"

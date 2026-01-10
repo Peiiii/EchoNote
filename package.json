@@ -22,7 +22,8 @@
     "format:check": "prettier --check .",
     "preview": "vite preview",
     "deploy": "pnpm build && ossutil cp -r -u dist oss://memol -c ./.ossutilconfig2.local",
-    "deploy:pages": "pnpm run build && gh-pages -d dist -b deploy"
+    "deploy:pages": "pnpm run build && gh-pages -d dist -b deploy",
+    "deploy:workers": "pnpm -C workers/app-api run deploy && pnpm -C workers/api-gateway run deploy"
   },
   "dependencies": {
     "@ag-ui/client": "^0.0.36",
