@@ -1,0 +1,8 @@
+## Local dev vars for workers/api-gateway (DO NOT COMMIT .dev.vars)
+##
+## Copy this file to `workers/api-gateway/.dev.vars` and fill the values.
+## Wrangler will load `.dev.vars` automatically for `wrangler dev`.
+##
+## If you use DashScope/OpenAI-compatible proxy in local dev:
+DASHSCOPE_API_KEY="replace-with-your-dashscope-key"
+

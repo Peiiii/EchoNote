@@ -1,0 +1,14 @@
+## Local dev vars for workers/app-api (DO NOT COMMIT .dev.vars)
+##
+## Copy this file to `workers/app-api/.dev.vars` and fill the values.
+## Wrangler will load `.dev.vars` automatically for `wrangler dev`.
+##
+## Required for app-api to access Firestore using a server identity:
+FIREBASE_PROJECT_ID="echo-note-9fe01"
+GOOGLE_SERVICE_ACCOUNT_EMAIL="firebase-adminsdk-xxxxx@echo-note-9fe01.iam.gserviceaccount.com"
+# Note: keep the JSON "private_key" value, but with `\n` escaped (Wrangler accepts both raw newlines or `\n` escaped).
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+##
+## Required for PAT hashing (application secret):
+TOKEN_PEPPER="replace-with-a-long-random-secret"
+

@@ -141,6 +141,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    strictPort: false,
+  },
   build: {
     cssCodeSplit: true,
     chunkSizeWarningLimit: 1200, // keep an eye on bundle size while avoiding noisy warnings

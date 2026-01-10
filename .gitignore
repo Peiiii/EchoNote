@@ -13,6 +13,8 @@ dist-ssr
 dev-dist
 *.local
 tmp
+.wrangler
+**/.wrangler
 
 # Editor directories and files
 .vscode/*
@@ -31,3 +33,7 @@ tmp
 .env.development
 .env.production
 .env.test
+
+# Cloudflare Wrangler (local secrets/vars)
+.dev.vars
+**/.dev.vars

@@ -7,7 +7,13 @@ import { globalIgnores } from "eslint/config";
 import localRules from "./eslint-rules/index.js";
 
 export default tseslint.config([
-  globalIgnores(["dist", "dev-dist", "src/common/components/RichEditor/**"]),
+  globalIgnores([
+    "dist",
+    "dev-dist",
+    ".wrangler",
+    "**/.wrangler",
+    "src/common/components/RichEditor/**",
+  ]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -35,6 +41,13 @@ export default tseslint.config([
         },
       ],
       "local/no-hardcoded-ui-text": "off",
+    },
+  },
+  // Cloudflare Workers (WebWorker runtime)
+  {
+    files: ["workers/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: globals.worker,
     },
   },
   // i18n adoption guardrail (incremental): detect hardcoded UI copy in JSX for high-signal surfaces first.

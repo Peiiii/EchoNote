@@ -6,6 +6,8 @@ import { ViewStateManager } from "./services/view-state-manager.service";
 import { NoteManager } from "@/common/services/note-manager.service";
 import { NoteEditManager } from "@/common/services/note-edit-manager";
 import { ScrollManager } from "@/common/services/scroll.manager";
+import { useSettingsViewStore, type SettingsTab } from "@/core/stores/settings-view.store";
+import { ApiAccessManager } from "@/common/services/api-access-manager.service";
 
 export class CommonPresenter {
   readonly rxEventBus = new RxEventBusService();
@@ -15,6 +17,7 @@ export class CommonPresenter {
   readonly noteManager = new NoteManager();
   readonly noteEditManager = new NoteEditManager();
   readonly scrollManager = new ScrollManager();
+  readonly apiAccessManager = new ApiAccessManager();
   
   openAIAssistant = () => {
     useUIStateStore.getState().openAIAssistant();
@@ -32,7 +35,10 @@ export class CommonPresenter {
     useUIStateStore.getState().closeAIAssistant();
   };
 
-  openSettings = () => {
+  openSettings = (options?: { tab?: SettingsTab }) => {
+    if (options?.tab) {
+      useSettingsViewStore.getState().setActiveTab(options.tab);
+    }
     useUIStateStore.getState().openSettings();
   };
   closeSettings = () => {

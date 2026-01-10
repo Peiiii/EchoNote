@@ -2,6 +2,11 @@ name = "stillroot-api-gateway"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
+[dev]
+ip = "127.0.0.1"
+port = 8788
+inspector_port = 9231
+
 [durable_objects]
 bindings = [
   { name = "TEMP_AUDIO", class_name = "TempAudio" },

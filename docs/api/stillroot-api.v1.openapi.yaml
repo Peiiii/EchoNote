@@ -1,0 +1,453 @@
+openapi: 3.1.0
+info:
+  title: StillRoot API
+  version: 1.0.0
+  description: >
+    Standard HTTP API for StillRoot/EchoNote. Publicly usable, optimized for agent workflows.
+servers:
+  - url: https://api.stillroot.app
+tags:
+  - name: Meta
+  - name: Channels
+  - name: Messages
+  - name: Tokens
+
+paths:
+  /openapi.json:
+    get:
+      tags: [Meta]
+      operationId: getOpenApi
+      security: []
+      responses:
+        "200":
+          description: OpenAPI document
+          content:
+            application/json:
+              schema: { type: object }
+
+  /v1/channels:
+    get:
+      tags: [Channels]
+      operationId: listChannels
+      security:
+        - PatAuth: [notes:read]
+      responses:
+        "200": { $ref: "#/components/responses/ChannelsList" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "403": { $ref: "#/components/responses/Error403" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+    post:
+      tags: [Channels]
+      operationId: createChannel
+      security:
+        - PatAuth: [notes:write]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateChannelRequest" }
+      responses:
+        "201": { $ref: "#/components/responses/ChannelCreated" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "403": { $ref: "#/components/responses/Error403" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /v1/messages:
+    get:
+      tags: [Messages]
+      operationId: listMessages
+      security:
+        - PatAuth: [notes:read]
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          schema: { type: string, minLength: 1 }
+          description: Required. Scope all message reads to a single channel.
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+        - name: cursor
+          in: query
+          required: false
+          schema: { type: string, minLength: 1 }
+          description: Opaque cursor returned by previous call.
+        - name: includeSenders
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "user,ai"
+          description: "Comma-separated senders; supported values: user,ai."
+      responses:
+        "200": { $ref: "#/components/responses/MessagesPage" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "403": { $ref: "#/components/responses/Error403" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+    post:
+      tags: [Messages]
+      operationId: createMessage
+      security:
+        - PatAuth: [notes:write]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateMessageRequest" }
+      responses:
+        "201": { $ref: "#/components/responses/MessageCreated" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "403": { $ref: "#/components/responses/Error403" }
+        "409": { $ref: "#/components/responses/Error409" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /v1/pats:
+    get:
+      tags: [Tokens]
+      operationId: listPats
+      security:
+        - FirebaseIdTokenAuth: []
+      responses:
+        "200": { $ref: "#/components/responses/PatsList" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+    post:
+      tags: [Tokens]
+      operationId: createPat
+      security:
+        - FirebaseIdTokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePatRequest" }
+      responses:
+        "201": { $ref: "#/components/responses/PatCreated" }
+        "400": { $ref: "#/components/responses/Error400" }
+        "401": { $ref: "#/components/responses/Error401" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+  /v1/pats/{patId}:
+    delete:
+      tags: [Tokens]
+      operationId: revokePat
+      security:
+        - FirebaseIdTokenAuth: []
+      parameters:
+        - name: patId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "204":
+          description: Revoked
+          headers:
+            X-Request-Id:
+              schema: { type: string }
+            Cache-Control:
+              schema: { type: string }
+              example: no-store
+        "401": { $ref: "#/components/responses/Error401" }
+        "404": { $ref: "#/components/responses/Error404" }
+        "429": { $ref: "#/components/responses/Error429" }
+        "500": { $ref: "#/components/responses/Error500" }
+
+components:
+  securitySchemes:
+    PatAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: PAT
+      description: "Personal Access Token: Authorization: Bearer sr_pat_..."
+    FirebaseIdTokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: FirebaseIDToken
+      description: "Firebase Auth ID Token (web-only; used only for PAT management)."
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema: { type: string, minLength: 8, maxLength: 200 }
+      description: "Recommended UUID. Same key+payload returns same result; key reused with different payload => 409."
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [unauthorized, forbidden, invalid_request, rate_limited, not_found, conflict, internal]
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+
+    Channel:
+      type: object
+      required: [id, name, description, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        emoji: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    Message:
+      type: object
+      required: [id, channelId, content, sender, timestamp]
+      properties:
+        id: { type: string }
+        channelId: { type: string }
+        content: { type: string }
+        sender:
+          type: string
+          enum: [user, ai]
+        timestamp: { type: string, format: date-time }
+        tags:
+          type: array
+          items: { type: string }
+
+    ChannelsListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Channel" }
+
+    CreateChannelRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, default: "", maxLength: 2000 }
+        emoji: { type: string, maxLength: 16 }
+
+    ChannelCreatedResponse:
+      type: object
+      required: [channel]
+      properties:
+        channel: { $ref: "#/components/schemas/Channel" }
+
+    MessagesPageResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Message" }
+        nextCursor:
+          anyOf:
+            - { type: string }
+            - { type: "null" }
+
+    CreateMessageRequest:
+      type: object
+      required: [channelId, content]
+      properties:
+        channelId: { type: string, minLength: 1 }
+        content: { type: string, minLength: 1, maxLength: 20000 }
+        sender:
+          type: string
+          enum: [user, ai]
+          default: user
+        tags:
+          type: array
+          items: { type: string, maxLength: 64 }
+          maxItems: 64
+
+    MessageCreatedResponse:
+      type: object
+      required: [message]
+      properties:
+        message: { $ref: "#/components/schemas/Message" }
+
+    PatMeta:
+      type: object
+      required: [id, name, prefix, scopes, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        prefix:
+          type: string
+          description: "Non-secret prefix/fingerprint, e.g. sr_pat_abcd... (not the full token)."
+        scopes:
+          type: array
+          items:
+            type: string
+            enum: [notes:read, notes:write]
+        createdAt: { type: string, format: date-time }
+        expiresAt:
+          anyOf:
+            - { type: string, format: date-time }
+            - { type: "null" }
+        lastUsedAt:
+          anyOf:
+            - { type: string, format: date-time }
+            - { type: "null" }
+
+    CreatePatRequest:
+      type: object
+      required: [name, scopes]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        scopes:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: string
+            enum: [notes:read, notes:write]
+        expiresAt:
+          anyOf:
+            - { type: string, format: date-time }
+            - { type: "null" }
+
+    PatCreatedResponse:
+      type: object
+      required: [pat, token]
+      properties:
+        pat: { $ref: "#/components/schemas/PatMeta" }
+        token:
+          type: string
+          description: "Secret. Returned only once on creation."
+
+    PatsListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/PatMeta" }
+
+  responses:
+    ChannelsList:
+      description: Channels list
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ChannelsListResponse" }
+
+    ChannelCreated:
+      description: Channel created
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ChannelCreatedResponse" }
+
+    MessagesPage:
+      description: Messages page (cursor pagination)
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/MessagesPageResponse" }
+
+    MessageCreated:
+      description: Message created
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/MessageCreatedResponse" }
+
+    PatCreated:
+      description: PAT created (token returned once)
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PatCreatedResponse" }
+
+    PatsList:
+      description: PAT list (no secret token)
+      headers:
+        X-Request-Id: { schema: { type: string } }
+        Cache-Control: { schema: { type: string }, example: no-store }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PatsListResponse" }
+
+    Error400:
+      description: Invalid request
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error401:
+      description: Unauthorized
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error403:
+      description: Forbidden (scope insufficient)
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error404:
+      description: Not found
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error409:
+      description: Conflict (e.g., idempotency key reused with different payload)
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error429:
+      description: Rate limited
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+    Error500:
+      description: Internal error
+      headers: { X-Request-Id: { schema: { type: string } } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }

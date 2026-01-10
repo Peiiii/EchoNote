@@ -10,6 +10,7 @@ import { StudioSidebar } from "@/desktop/features/studio/components/studio-sideb
 import { useDesktopPresenterContext } from "@/desktop/hooks/use-desktop-presenter-context";
 import { useJumpToNote } from "../hooks/use-jump-to-note";
 import { NotesOnboardingHost } from "@/desktop/features/notes/features/onboarding/notes-onboarding-host";
+import { DesktopSettingsSidebar } from "@/desktop/features/notes/components/desktop-settings-sidebar";
 
 export function NotesPage() {
   const presenter = useDesktopPresenterContext();
@@ -41,6 +42,8 @@ export function NotesPage() {
         );
       case SideViewEnum.STUDIO:
         return <StudioSidebar />;
+      case SideViewEnum.SETTINGS:
+        return <DesktopSettingsSidebar onClose={() => presenter.closeSettings()} />;
       default:
         return null;
     }

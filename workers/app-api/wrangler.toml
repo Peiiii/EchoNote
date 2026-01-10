@@ -1,0 +1,18 @@
+name = "stillroot-app-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[dev]
+ip = "127.0.0.1"
+port = 8787
+inspector_port = 9230
+
+[[rules]]
+type = "Text"
+globs = ["**/*.yaml", "**/*.yml"]
+
+[vars]
+# Comma-separated list, e.g. "http://localhost:* ,https://stillroot.app,https://*.stillroot.app"
+ALLOWED_ORIGINS = "http://localhost:*,http://127.0.0.1:*,https://stillroot.app,https://*.stillroot.app"
+FIREBASE_PROJECT_ID = "echo-note-9fe01"
+GOOGLE_SERVICE_ACCOUNT_EMAIL = "firebase-adminsdk-fbsvc@echo-note-9fe01.iam.gserviceaccount.com"

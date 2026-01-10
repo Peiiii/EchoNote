@@ -53,11 +53,11 @@ pnpm install
 cp .env.example .env
 # Edit .env with your configuration
 
-# Start development server
+# Start development (web + local workers)
 pnpm dev
 ```
 
-Visit `http://localhost:5173` to see the application.
+Visit the printed local URL to see the application.
 
 ### Environment Variables
 
@@ -143,6 +143,11 @@ EchoNote/
 ├── memory-bank/             # Project knowledge base
 └── public/                  # Static assets
 ```
+
+## 🔌 API
+
+- StillRoot API v1 (OpenAPI): `docs/api/stillroot-api.v1.openapi.yaml`
+- Backend Worker: `workers/app-api`
 
 ## 🎨 Features in Detail
 

@@ -30,6 +30,7 @@ import {
   Globe,
   Share2,
   MoreVertical,
+  KeyRound,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -368,6 +369,9 @@ export const ChannelHeader = ({
               >
                 {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
               </HeaderMenuItem>
+              <HeaderMenuItem icon={KeyRound} onSelect={() => presenter.openSettings({ tab: "apiAccess" })}>
+                {t("apiAccess.menu")}
+              </HeaderMenuItem>
               <DropdownMenuSeparator />
               <HeaderMenuItem icon={ChevronUp} onSelect={handleToggle}>
                 {t("channelHeader.collapseHeader")}
@@ -472,6 +476,9 @@ export const ChannelHeader = ({
                   onSelect={() => setIsPublishDialogOpen(true)}
                 >
                   {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
+                </HeaderMenuItem>
+                <HeaderMenuItem icon={KeyRound} onSelect={() => presenter.openSettings({ tab: "apiAccess" })}>
+                  {t("apiAccess.menu")}
                 </HeaderMenuItem>
                 <DropdownMenuSeparator />
                 <HeaderMenuItem icon={ChevronDown} onSelect={handleToggle}>

@@ -1,0 +1,21 @@
+{
+  "name": "@stillroot/app-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.6.15",
+    "jose": "^6.0.12",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260103.0",
+    "typescript": "~5.8.3",
+    "wrangler": "^3.114.0"
+  }
+}
+

@@ -4,9 +4,14 @@
   "version": "0.0.4",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n app-api,api-gateway,web -c blue,magenta,green \"pnpm dev:app-api\" \"pnpm dev:api-gateway\" \"pnpm dev:web\"",
+    "dev:web": "vite",
+    "dev:app-api": "pnpm -C workers/app-api dev",
+    "dev:api-gateway": "pnpm -C workers/api-gateway dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "api:dev": "pnpm -s dev:app-api",
+    "api:typecheck": "pnpm -C workers/app-api typecheck",
     "i18n:extract": "pnpm exec i18next -c i18next-parser.config.cjs",
     "i18n:extract:check": "pnpm -s i18n:extract && git diff --exit-code -- public/locales",
     "i18n:check": "node scripts/i18n-check.mjs",
@@ -101,6 +106,7 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "@eslint/js": "^9.30.1",
     "@types/d3-drag": "^3.0.7",
     "@types/d3-force": "^3.0.10",
