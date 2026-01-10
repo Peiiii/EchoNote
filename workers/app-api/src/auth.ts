@@ -75,24 +75,21 @@ export async function authenticatePat(options: {
   options.ctx.waitUntil(
     options.firestore.commit([
       {
-        update: {
-          name: options.firestore.documentName(tokenDocPath),
-          fields: {},
+        transform: {
+          document: options.firestore.documentName(tokenDocPath),
+          fieldTransforms: [{ fieldPath: "lastUsedAt", setToServerValue: "REQUEST_TIME" }],
         },
         currentDocument: { exists: true },
-        updateTransforms: [{ fieldPath: "lastUsedAt", setToServerValue: "REQUEST_TIME" }],
       },
       {
-        update: {
-          name: options.firestore.documentName(`users/${uid}/pats/${patId}`),
-          fields: {},
+        transform: {
+          document: options.firestore.documentName(`users/${uid}/pats/${patId}`),
+          fieldTransforms: [{ fieldPath: "lastUsedAt", setToServerValue: "REQUEST_TIME" }],
         },
         currentDocument: { exists: true },
-        updateTransforms: [{ fieldPath: "lastUsedAt", setToServerValue: "REQUEST_TIME" }],
       },
     ])
   );
 
   return { uid, scopes, patId, tokenId };
 }
-

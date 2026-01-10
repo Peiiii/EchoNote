@@ -474,29 +474,28 @@ app.get("/v1/pats", async c => {
 
   const docs = await firestore.runQuery(`users/${auth.uid}`, {
     from: [{ collectionId: "pats" }],
-    where: {
-      fieldFilter: {
-        field: { fieldPath: "revokedAt" },
-        op: "EQUAL",
-        value: { nullValue: null },
-      },
-    },
-    orderBy: [{ field: { fieldPath: "createdAt" }, direction: "DESCENDING" }],
+    // Avoid filtering/sorting on fields that could be missing if a prior version accidentally wrote partial docs.
+    // We filter in code and sort by available timestamps.
   });
 
-  const items = docs.map(d => {
+  const items = docs
+    .map(d => {
     const id = docIdFromName(d.name);
     const fields = d.fields ?? {};
+    const revokedAt = getTimestampField(fields, "revokedAt") ?? null;
+    if (revokedAt) return null;
     return {
       id,
-      name: getStringField(fields, "name"),
-      prefix: getStringField(fields, "prefix"),
+      name: getStringField(fields, "name") || "(unknown)",
+      prefix: getStringField(fields, "prefix") || "sr_pat_",
       scopes: (getStringArrayField(fields, "scopes") ?? []) as PatScope[],
-      createdAt: getTimestampField(fields, "createdAt") || new Date().toISOString(),
+      createdAt: getTimestampField(fields, "createdAt") || d.createTime || new Date().toISOString(),
       expiresAt: getTimestampField(fields, "expiresAt") ?? null,
       lastUsedAt: getTimestampField(fields, "lastUsedAt") ?? null,
     };
-  });
+    })
+    .filter((x): x is NonNullable<typeof x> => !!x)
+    .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 
   return json({ items }, 200, rid);
 });
@@ -580,19 +579,26 @@ app.delete("/v1/pats/:patId", async c => {
   const userDoc = await firestore.getDocument(`users/${auth.uid}/pats/${patId}`);
   if (!userDoc || !userDoc.fields) throw new ApiError("not_found", "PAT not found", 404);
   const tokenId = getStringField(userDoc.fields, "tokenId");
-  if (!tokenId) throw new ApiError("internal", "PAT tokenId missing", 500);
 
   const writes: unknown[] = [
     {
-      update: { name: firestore.documentName(`users/${auth.uid}/pats/${patId}`), fields: {} },
+      transform: {
+        document: firestore.documentName(`users/${auth.uid}/pats/${patId}`),
+        fieldTransforms: [{ fieldPath: "revokedAt", setToServerValue: "REQUEST_TIME" }],
+      },
       currentDocument: { exists: true },
-      updateTransforms: [{ fieldPath: "revokedAt", setToServerValue: "REQUEST_TIME" }],
     },
-    {
-      update: { name: firestore.documentName(`pat_tokens/${tokenId}`), fields: {} },
-      currentDocument: { exists: true },
-      updateTransforms: [{ fieldPath: "revokedAt", setToServerValue: "REQUEST_TIME" }],
-    },
+    ...(tokenId
+      ? [
+          {
+            transform: {
+              document: firestore.documentName(`pat_tokens/${tokenId}`),
+              fieldTransforms: [{ fieldPath: "revokedAt", setToServerValue: "REQUEST_TIME" }],
+            },
+            currentDocument: { exists: true },
+          },
+        ]
+      : []),
   ];
   await firestore.commit(writes);
 
