@@ -30,7 +30,6 @@ import {
   Globe,
   Share2,
   MoreVertical,
-  KeyRound,
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -178,7 +177,7 @@ export const ChannelHeader = ({
   // without expanding the sidebar.
   const collapsedContent = (
     <div className="flex items-center space-x-2 min-w-0 w-full max-w-full overflow-hidden">
-      <HeaderMenu tone="dark" />
+      <HeaderMenu tone="dark" onOpenApiAccess={() => presenter.openSettings({ tab: "apiAccess" })} />
       {/* Sidebar expand button when sidebar is collapsed */}
       {isLeftSidebarCollapsed && (
         <>
@@ -257,7 +256,7 @@ export const ChannelHeader = ({
     <>
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex items-center space-x-2 min-w-0 flex-1">
-          <HeaderMenu tone="light" />
+          <HeaderMenu tone="light" onOpenApiAccess={() => presenter.openSettings({ tab: "apiAccess" })} />
           {/* Sidebar expand button when sidebar is collapsed */}
           {isLeftSidebarCollapsed && (
             <>
@@ -369,9 +368,6 @@ export const ChannelHeader = ({
               >
                 {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
               </HeaderMenuItem>
-              <HeaderMenuItem icon={KeyRound} onSelect={() => presenter.openSettings({ tab: "apiAccess" })}>
-                {t("apiAccess.menu")}
-              </HeaderMenuItem>
               <DropdownMenuSeparator />
               <HeaderMenuItem icon={ChevronUp} onSelect={handleToggle}>
                 {t("channelHeader.collapseHeader")}
@@ -476,9 +472,6 @@ export const ChannelHeader = ({
                   onSelect={() => setIsPublishDialogOpen(true)}
                 >
                   {channel.shareToken ? t("channelHeader.manageSharing") : t("channelHeader.publishSpace")}
-                </HeaderMenuItem>
-                <HeaderMenuItem icon={KeyRound} onSelect={() => presenter.openSettings({ tab: "apiAccess" })}>
-                  {t("apiAccess.menu")}
                 </HeaderMenuItem>
                 <DropdownMenuSeparator />
                 <HeaderMenuItem icon={ChevronDown} onSelect={handleToggle}>

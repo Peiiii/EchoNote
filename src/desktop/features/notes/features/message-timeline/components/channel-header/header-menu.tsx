@@ -16,7 +16,7 @@ import { useFirebaseAuth } from "@/common/hooks/use-firebase-auth";
 import { useLanguage } from "@/common/hooks/use-language";
 import { cn } from "@/common/lib/utils";
 import { useAuthStore } from "@/core/stores/auth.store";
-import { LogIn, LogOut, Languages, Menu, MessageSquareText, Monitor, Moon, Sun } from "lucide-react";
+import { KeyRound, Languages, LogIn, LogOut, Menu, MessageSquareText, Monitor, Moon, Sun } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { HeaderMenuItem } from "./header-menu-item";
@@ -28,9 +28,10 @@ type HeaderMenuTone = "light" | "dark";
 interface HeaderMenuProps {
   tone?: HeaderMenuTone;
   className?: string;
+  onOpenApiAccess?: () => void;
 }
 
-export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
+export function HeaderMenu({ tone = "dark", className, onOpenApiAccess }: HeaderMenuProps) {
   const { user } = useFirebaseAuth();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
@@ -124,6 +125,12 @@ export function HeaderMenu({ tone = "dark", className }: HeaderMenuProps) {
         </DropdownMenuSub>
 
         <DropdownMenuSeparator />
+
+        {onOpenApiAccess && (
+          <HeaderMenuItem icon={KeyRound} onSelect={onOpenApiAccess}>
+            {t("apiAccess.menu")}
+          </HeaderMenuItem>
+        )}
 
         <HeaderMenuItem icon={MessageSquareText} onSelect={() => openFeedbackModal()}>
           {t("header.menu.feedback")}
