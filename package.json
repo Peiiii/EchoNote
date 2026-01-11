@@ -8,6 +8,8 @@
     "dev:web": "vite",
     "dev:app-api": "pnpm -C workers/app-api dev",
     "dev:api-gateway": "pnpm -C workers/api-gateway dev",
+    "verify:workers": "pnpm -C workers/app-api typecheck && pnpm -C workers/api-gateway typecheck",
+    "verify": "pnpm -s verify:workers && pnpm -s lint && pnpm -s build",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "api:dev": "pnpm -s dev:app-api",
@@ -23,7 +25,7 @@
     "preview": "vite preview",
     "deploy": "pnpm build && ossutil cp -r -u dist oss://memol -c ./.ossutilconfig2.local",
     "deploy:pages": "pnpm run build && gh-pages -d dist -b deploy",
-    "deploy:workers": "pnpm -C workers/app-api run deploy && pnpm -C workers/api-gateway run deploy"
+    "deploy:workers": "pnpm -s verify:workers && pnpm -C workers/app-api run deploy && pnpm -C workers/api-gateway run deploy"
   },
   "dependencies": {
     "@ag-ui/client": "^0.0.36",
