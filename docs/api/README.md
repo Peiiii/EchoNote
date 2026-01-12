@@ -1,6 +1,6 @@
 # StillRoot API（v1）
 
-本目录定义 StillRoot/EchoNote 的 **标准 HTTP API**：任何客户端都可用，同时优先优化 agent 使用体验（游标分页、幂等、严格错误等）。
+本目录定义 StillRoot 的 **标准 HTTP API**：任何客户端都可用，同时优先优化 agent 使用体验（游标分页、幂等、严格错误等）。
 
 ## 入口文件
 

@@ -1,6 +1,6 @@
 # 笔记工具展示（Notes Tools Showcase）
 
-本文档演示 EchoNote 中“笔记相关工具（Notes Tools）”在 Agent Chat 里的使用与展示方式，并对照《@agent-labs/agent-chat 使用教程（更新版）》的三种工具形态给出最小可用示例与推荐展示方案。
+本文档演示 StillRoot 中"笔记相关工具（Notes Tools）"在 Agent Chat 里的使用与展示方式，并对照《@agent-labs/agent-chat 使用教程（更新版）》的三种工具形态给出最小可用示例与推荐展示方案。
 
 参考文档：./agent-chat-tutorial.md
 

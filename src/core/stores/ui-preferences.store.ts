@@ -92,7 +92,7 @@ export const useUIPreferencesStore = create<UIPreferencesState>()(
       },
     }),
     {
-      name: "echonote-ui-preferences-storage",
+      name: "stillroot-ui-preferences-storage",
       // Persist selected UI preferences only
       partialize: state => ({
         isLeftSidebarCollapsed: state.isLeftSidebarCollapsed,

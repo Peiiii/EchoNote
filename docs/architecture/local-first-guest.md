@@ -1,7 +1,7 @@
 # Local‑First Guest + Optional Account (Long‑Term Architecture)
 
 ## Summary
-This architecture makes EchoNote usable immediately without login (Guest mode), while enabling a smooth upgrade path to an account for cloud features (sync, publishing, collaboration). The system is **local‑first**: the device is the primary source of truth; cloud services become an optional, value‑add replication layer.
+This architecture makes StillRoot usable immediately without login (Guest mode), while enabling a smooth upgrade path to an account for cloud features (sync, publishing, collaboration). The system is **local‑first**: the device is the primary source of truth; cloud services become an optional, value‑add replication layer.
 
 ## Goals
 - **Zero‑friction start**: users can create/edit notes without signing in.

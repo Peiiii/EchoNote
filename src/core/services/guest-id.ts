@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-const GUEST_ID_STORAGE_KEY = "echonote-guest-id";
+const GUEST_ID_STORAGE_KEY = "stillroot-guest-id";
 export const GUEST_USER_PREFIX = "guest:";
 
 export function isGuestUserId(userId: string): boolean {

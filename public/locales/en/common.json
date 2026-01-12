@@ -582,7 +582,7 @@
       "benefit2": "Mindmap One-Click Generation",
       "benefit3": "Zero-Friction Fragment Recording",
       "benefit4": "Cross-Platform Auto Sync",
-      "description": "Let every flash of insight become nourishment for growth. Join EchoNote and experience efficient thinking and planning guided by an AI mentor.",
+      "description": "Let every flash of insight become nourishment for growth. Join StillRoot and experience efficient thinking and planning guided by an AI mentor.",
       "primaryButton": "Start Free Growth Now",
       "secondaryButton": "Roadmap Plan",
       "title": "Start Your",
@@ -631,7 +631,7 @@
       "titleHighlight": "Fragment Inspiration"
     },
     "footer": {
-      "brand": "EchoNote",
+      "brand": "StillRoot",
       "company": {
         "about": "About Us",
         "blog": "Blog",
@@ -639,7 +639,7 @@
         "privacy": "Privacy Policy",
         "terms": "Terms of Service"
       },
-      "copyright": "© {{year}} EchoNote. Built for Cognitive Growth.",
+      "copyright": "© {{year}} StillRoot. Built for Cognitive Growth.",
       "description": "Let fragmented recording become the driving force of your growth.\nWith AI's deep organization and mentor-like guidance, start your cognitive evolution journey.",
       "product": {
         "changelog": "Changelog",
@@ -662,7 +662,7 @@
       "demoBadgeMindmap": "Mindmap Generated",
       "demoMessage": "I feel like when learning React Server Components, the information is too fragmented to form a system.",
       "demoResponse": "I understand your concern. The core of RSC is changing 'component ownership'. I've generated a mind map for you and linked it to your notes about SSR from last week.",
-      "description": "Capture every fleeting inspiration. EchoNote helps you transform fragmented information into clear actions and cognition through AI's deep organization and growth planning.",
+      "description": "Capture every fleeting inspiration. StillRoot helps you transform fragmented information into clear actions and cognition through AI's deep organization and growth planning.",
       "featureAIInsight": "AI Insight",
       "featureAutoSync": "Auto Sync",
       "featureZeroFriction": "Zero Friction",

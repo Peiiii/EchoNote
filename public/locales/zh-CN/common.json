@@ -582,7 +582,7 @@
       "benefit2": "思维导图一键生成",
       "benefit3": "零门槛碎片记录",
       "benefit4": "跨平台自动同步",
-      "description": "让每一个闪念都成为成长的养料。加入 EchoNote，体验 AI 导师引领下的高效思维与规划。",
+      "description": "让每一个闪念都成为成长的养料。加入 StillRoot，体验 AI 导师引领下的高效思维与规划。",
       "primaryButton": "立即开始免费成长",
       "secondaryButton": "路线图计划",
       "title": "立即开启你的",
@@ -631,7 +631,7 @@
       "titleHighlight": "碎片灵感"
     },
     "footer": {
-      "brand": "EchoNote",
+      "brand": "StillRoot",
       "company": {
         "about": "关于我们",
         "blog": "博客",
@@ -639,7 +639,7 @@
         "privacy": "隐私政策",
         "terms": "服务条款"
       },
-      "copyright": "© {{year}} EchoNote. Built for Cognitive Growth.",
+      "copyright": "© {{year}} StillRoot. Built for Cognitive Growth.",
       "description": "让碎片化记录成为你成长的源动力。\n借助 AI 的深度整理与导师化引导，开启你的认知进化之旅。",
       "product": {
         "changelog": "更新日志",
@@ -662,7 +662,7 @@
       "demoBadgeMindmap": "Mindmap Generated",
       "demoMessage": "感觉最近在学习 React Server Components 时，信息太碎了，没法形成系统。",
       "demoResponse": "理解你的困扰。RSC 的核心在于改变『组件所有权』。我为你生成了思维导图，并关联了你上周关于 SSR 的笔记。",
-      "description": "捕捉每一个转瞬即逝的灵感。EchoNote 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
+      "description": "捕捉每一个转瞬即逝的灵感。StillRoot 通过 AI 深度整理与成长规划，协助你将碎片化的信息转化为清晰的行动与认知。",
       "featureAIInsight": "AI Insight",
       "featureAutoSync": "Auto Sync",
       "featureZeroFriction": "Zero Friction",

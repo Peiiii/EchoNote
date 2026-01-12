@@ -14,7 +14,7 @@ type PersistedState = {
   messagesByConversation: Record<string, UIMessage[]>;
 };
 
-const STORAGE_KEY_PREFIX = "echonote-local-ai:";
+const STORAGE_KEY_PREFIX = "stillroot-local-ai:";
 
 function keyForUser(userId: string) {
   return `${STORAGE_KEY_PREFIX}${userId}`;

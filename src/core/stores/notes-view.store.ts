@@ -111,7 +111,7 @@ export const useNotesViewStore = create<NotesViewState>()(
       },
     }),
     {
-      name: "echonote-notes-view-storage",
+      name: "stillroot-notes-view-storage",
       version: 2,
       // Only persist serializable view preferences; never persist Firebase User objects.
       partialize: state => ({

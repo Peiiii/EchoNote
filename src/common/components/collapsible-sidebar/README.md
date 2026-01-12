@@ -366,4 +366,4 @@ When contributing to this component:
 
 ## License
 
-This component is part of the EchoNote project and follows the same licensing terms.
+This component is part of the StillRoot project and follows the same licensing terms.

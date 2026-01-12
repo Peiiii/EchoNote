@@ -1,4 +1,4 @@
-# i18n AI 指南（StillRoot / EchoNote）
+# i18n AI 指南（StillRoot）
 
 目标：让 AI 批量完成国际化改造时 **稳定、可维护、可自动化验证**。本项目当前只支持 `en` 与 `zh-CN`。
 
@@ -11,7 +11,7 @@
 ## 现有 i18n 机制（你要基于它工作）
 
 - 初始化：`src/common/i18n/index.ts`
-  - 语言存储：`localStorage["echonote-lang"]`
+  - 语言存储：`localStorage["stillroot-lang"]`
   - 资源加载：`public/locales/{{lng}}/{{ns}}.json`（会自动拼 `import.meta.env.BASE_URL`）
 - 入口初始化：`src/main.tsx` 在 React render 前执行 `await initI18n()`（避免 key 闪烁）
 - 资源目录：

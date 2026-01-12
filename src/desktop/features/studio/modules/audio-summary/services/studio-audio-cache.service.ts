@@ -4,7 +4,7 @@ type StoredAudio = {
   createdAt: number;
 };
 
-const DB_NAME = "echonote-audio";
+const DB_NAME = "stillroot-audio";
 const STORE_NAME = "studio-audio";
 const DB_VERSION = 1;
 

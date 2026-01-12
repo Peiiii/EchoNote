@@ -1,6 +1,6 @@
 Context System Overview
 
-This document explains the context system used by the AI assistant in EchoNote, including how channel data is collected, cached, exposed to the agent, and reflected in the UI.
+This document explains the context system used by the AI assistant in StillRoot, including how channel data is collected, cached, exposed to the agent, and reflected in the UI.
 
 Goals
 

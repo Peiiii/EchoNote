@@ -1,8 +1,8 @@
-# EchoNote 存储层架构分析与重构方案
+# StillRoot 存储层架构分析与重构方案
 
 ## 📋 概述
 
-本文档分析 EchoNote 项目当前的存储层架构，识别与 Firebase 的耦合点，并提供解耦方案以支持多后端（Firebase、IndexedDB、REST API 等）。
+本文档分析 StillRoot 项目当前的存储层架构，识别与 Firebase 的耦合点，并提供解耦方案以支持多后端（Firebase、IndexedDB、REST API 等）。
 
 ---
 
@@ -57,10 +57,10 @@ graph TD
 
 | 文件 | 导入的 Firebase 类型 |
 |------|---------------------|
-| [notes-data.store.ts](file:///Users/tongwenwen/Projects/Peiiii/EchoNote/src/core/stores/notes-data.store.ts) | `DocumentSnapshot` |
-| [auth.store.ts](file:///Users/tongwenwen/Projects/Peiiii/EchoNote/src/core/stores/auth.store.ts) | `User` from firebase/auth |
-| [notes-view.store.ts](file:///Users/tongwenwen/Projects/Peiiii/EchoNote/src/core/stores/notes-view.store.ts) | `User` from firebase/auth |
-| [channel-message.service.ts](file:///Users/tongwenwen/Projects/Peiiii/EchoNote/src/core/services/channel-message.service.ts) | `QueryDocumentSnapshot`, `DocumentData` |
+| [notes-data.store.ts](file:///Users/tongwenwen/Projects/Peiiii/StillRoot/src/core/stores/notes-data.store.ts) | `DocumentSnapshot` |
+| [auth.store.ts](file:///Users/tongwenwen/Projects/Peiiii/StillRoot/src/core/stores/auth.store.ts) | `User` from firebase/auth |
+| [notes-view.store.ts](file:///Users/tongwenwen/Projects/Peiiii/StillRoot/src/core/stores/notes-view.store.ts) | `User` from firebase/auth |
+| [channel-message.service.ts](file:///Users/tongwenwen/Projects/Peiiii/StillRoot/src/core/services/channel-message.service.ts) | `QueryDocumentSnapshot`, `DocumentData` |
 
 ### 2. Store 直接调用 Firebase 服务
 
@@ -409,9 +409,9 @@ IndexedDB 场景下：
 
 ---
 
-## ✅ 优化后的推荐方案（更贴合 EchoNote）
+## ✅ 优化后的推荐方案（更贴合 StillRoot）
 
-下面是在“Repository + Adapter”方向上，针对 EchoNote 现状做的几处关键优化（避免后续接入 IndexedDB/REST 时出现接口不匹配与反向依赖）。
+下面是在“Repository + Adapter”方向上，针对 StillRoot 现状做的几处关键优化（避免后续接入 IndexedDB/REST 时出现接口不匹配与反向依赖）。
 
 ### 1) 先把领域模型从 Store 中抽离（最关键）
 
@@ -566,7 +566,7 @@ export interface NotesRepository {
 
 ---
 
-## 🗺️ 渐进式迁移路线（EchoNote 版）
+## 🗺️ 渐进式迁移路线（StillRoot 版）
 
 ### Phase 0（准备）：抽 domain types
 - 把 `Message/Channel/AIConversation` 从 `stores/*.ts` 抽到 `core/domain/*`

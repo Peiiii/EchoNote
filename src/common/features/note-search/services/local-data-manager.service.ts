@@ -335,7 +335,7 @@ export class LocalDataManagerService {
 
   private async loadFromIndexedDB(): Promise<{ notes: Note[]; channels: Channel[] }> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("echonote_data", 1);
+      const request = indexedDB.open("stillroot_data", 1);
 
       request.onupgradeneeded = () => {
         const db = request.result;
@@ -379,7 +379,7 @@ export class LocalDataManagerService {
 
   private async saveToIndexedDB(data: { notes: Note[]; channels: Channel[] }): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("echonote_data", 1);
+      const request = indexedDB.open("stillroot_data", 1);
 
       request.onupgradeneeded = () => {
         const db = request.result;
@@ -417,24 +417,24 @@ export class LocalDataManagerService {
   // ---- Simple freshness tracking via localStorage (keeps module independent) ----
   private getLastFullUpdateTime(): number | null {
     if (typeof window === "undefined") return null;
-    const v = window.localStorage.getItem("echonote_search_last_full_update");
+    const v = window.localStorage.getItem("stillroot_search_last_full_update");
     return v ? Number(v) : null;
   }
 
   private setLastFullUpdateTime(ts: number): void {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem("echonote_search_last_full_update", String(ts));
+    window.localStorage.setItem("stillroot_search_last_full_update", String(ts));
   }
 
   private getChannelLastUpdateTime(channelId: string): number | null {
     if (typeof window === "undefined") return null;
-    const v = window.localStorage.getItem(`echonote_search_channel_update_${channelId}`);
+    const v = window.localStorage.getItem(`stillroot_search_channel_update_${channelId}`);
     return v ? Number(v) : null;
   }
 
   private setChannelLastUpdateTime(channelId: string, ts: number): void {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(`echonote_search_channel_update_${channelId}`, String(ts));
+    window.localStorage.setItem(`stillroot_search_channel_update_${channelId}`, String(ts));
   }
 }
 

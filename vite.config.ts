@@ -13,9 +13,9 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: [
         "favicon.ico",
-        "echonote-icon-modern.svg",
-        "echonote-icon-simple.svg",
-        "echonote-icon.svg",
+        "stillroot-icon-modern.svg",
+        "stillroot-icon-simple.svg",
+        "stillroot-icon.svg",
       ],
       manifest: {
         name: "StillRoot - Where Thoughts Take Root",

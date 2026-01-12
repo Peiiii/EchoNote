@@ -287,7 +287,7 @@ export const useEditStateStore = create<EditState>()(
       },
     }),
     {
-      name: "echonote-edit-state-storage",
+      name: "stillroot-edit-state-storage",
       // Persist drafts and last chosen editor mode for consistency across sessions
       partialize: state => ({ drafts: state.drafts, editorMode: state.editorMode }),
     }

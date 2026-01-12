@@ -61,7 +61,7 @@ VITE_GITHUB_DEFAULT_OWNER=your_github_username
 
 ## Optional configuration
 VITE_GITHUB_REDIRECT_URI=http://localhost:3000/#/github/auth/callback
-VITE_GITHUB_DEFAULT_REPO=echonote-data
+VITE_GITHUB_DEFAULT_REPO=stillroot-data
 
 ## Steps to get GitHub Client ID:
 1. Visit https://github.com/settings/developers

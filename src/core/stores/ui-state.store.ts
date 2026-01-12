@@ -135,7 +135,7 @@ export const useUIStateStore = create<UIState>()(
       },
     }),
     {
-      name: "echonote-ui-state",
+      name: "stillroot-ui-state",
       partialize: state => ({ sideView: state.sideView }),
     }
   )

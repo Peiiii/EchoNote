@@ -23,7 +23,7 @@ type PersistedState = {
   messagesByChannel: Record<string, PersistedMessage[]>;
 };
 
-const STORAGE_KEY_PREFIX = "echonote-local-notes:";
+const STORAGE_KEY_PREFIX = "stillroot-local-notes:";
 
 function keyForUser(userId: string) {
   return `${STORAGE_KEY_PREFIX}${userId}`;

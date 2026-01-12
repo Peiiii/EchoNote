@@ -1,7 +1,7 @@
-# EchoNote Clipper（Chrome Extension）MVP 规划与设计
+# StillRoot Clipper（Chrome Extension）MVP 规划与设计
 
 ## 1. 背景与定位
-EchoNote Clipper 的角色不是“另一个入口”，而是把用户主循环的第一步做到极致：**Capture（采集）**。
+StillRoot Clipper 的角色不是"另一个入口"，而是把用户主循环的第一步做到极致：**Capture（采集）**。
 
 核心目标：让用户在任意网页里 **1 秒保存**（右键/快捷键/按钮），并且内容 **可追溯（来源可信）**、**可再加工（可选 AI）**、**可移动归类（空间切换）**。
 
@@ -13,9 +13,9 @@ EchoNote Clipper 的角色不是“另一个入口”，而是把用户主循环
 ## 2. MVP 交付范围
 ### 2.1 入口（必须）
 - 右键菜单：
-  - Save to EchoNote
-  - Save to EchoNote (with summary)
-  - Save screenshot to EchoNote
+  - Save to StillRoot
+  - Save to StillRoot (with summary)
+  - Save screenshot to StillRoot
 - 工具栏按钮（popup）：
   - Quick save：保存选区/页面
   - 保存截图
@@ -28,7 +28,7 @@ EchoNote Clipper 的角色不是“另一个入口”，而是把用户主循环
 ### 2.2 保存内容（必须）
 - 选中文本（selection）优先；无选区则降级为整页链接（page）
 - 截图（screenshot）：默认可视区域截图（第一版）
-- 写入 EchoNote 的“默认空间”
+- 写入 StillRoot 的“默认空间”
   - 默认：用户的“第一个空间”
   - 保存后如果用户在卡片里切换空间，则：
     - 立即把刚保存的内容移动到目标空间
@@ -54,7 +54,7 @@ EchoNote Clipper 的角色不是“另一个入口”，而是把用户主循环
 - 左侧：`已保存到 <SpaceName> ▾`
   - 点击展开空间列表（支持搜索）
   - 切换后自动移动刚保存的条目
-- 右侧：`去 EchoNote 查看`
+- 右侧：`去 StillRoot 查看`
   - 打开深链：定位到对应空间 + 高亮对应消息
 - 右上角：关闭 `×`
 
@@ -63,11 +63,11 @@ EchoNote Clipper 的角色不是“另一个入口”，而是把用户主循环
 - 操作可撤回/可更改（切换空间即刻生效）
 - 视觉干净、不遮挡网页内容
 
-### 3.2 配对体验（不依赖打开 EchoNote Tab）
-原则：插件无需依赖 “必须打开 EchoNote 的某个 Tab 才能保存”。
+### 3.2 配对体验（不依赖打开 StillRoot Tab）
+原则：插件无需依赖 “必须打开 StillRoot 的某个 Tab 才能保存”。
 
 配对流程（一次性）：
-1) 用户在 EchoNote 内打开 `/#/extension/connect`
+1) 用户在 StillRoot 内打开 `/#/extension/connect`
 2) 生成 6 位配对码（10 分钟过期）
 3) 在插件 popup 输入配对码并 Connect
 4) 插件获得长期 Bearer token（后续所有写入走后端 API）
@@ -130,7 +130,7 @@ Base：`https://api-gateway.stillroot.app`
   - 返回：`{ channelId, channelName }`
 
 ## 6. 深链打开与定位
-EchoNote 使用 HashRouter，深链必须包含 `/#/`。
+StillRoot 使用 HashRouter，深链必须包含 `/#/`。
 
 Worker 返回的 `openPath` 形如：
 - `/#/notes?space=<channelId>&message=<messageId>`
@@ -196,6 +196,6 @@ pnpm run deploy
 ## 11. 验收标准（MVP）
 - 右键/快捷键保存成功率高（网络正常情况下近乎 100%）
 - 保存成功后 300ms 内出现卡片反馈（本地 UI），并在 2–5s 内完成写入
-- 切换空间移动成功，并在 EchoNote 内可立刻看到移动后的结果
-- 配对只需一次，之后无需打开 EchoNote Tab 也能保存
+- 切换空间移动成功，并在 StillRoot 内可立刻看到移动后的结果
+- 配对只需一次，之后无需打开 StillRoot Tab 也能保存
 

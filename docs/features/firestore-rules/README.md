@@ -1,6 +1,6 @@
 # Firestore Security Rules Archive
 
-This directory contains versioned Firestore security rules for the EchoNote application.
+This directory contains versioned Firestore security rules for the StillRoot application.
 
 ## Version History
 

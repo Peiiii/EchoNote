@@ -8,7 +8,7 @@ import { SpotlightTour } from "@/common/components/ui/spotlight-tour";
 
 type TourStep = "create_space" | "composer";
 
-const STORAGE_KEY = "echonote:onboarding:notes-tour:v1";
+const STORAGE_KEY = "stillroot:onboarding:notes-tour:v1";
 
 function readPersisted(): { done: boolean; step?: TourStep } {
   try {

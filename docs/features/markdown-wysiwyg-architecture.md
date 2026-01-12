@@ -1,4 +1,4 @@
-# Echonote Markdown WYSIWYG 重构方案（建议稿）
+# StillRoot Markdown WYSIWYG 重构方案（建议稿）
 
 本文档描述从架构视角重构“Markdown 兼容的所见即所得编辑器”的推荐路线、模块划分、关键设计、迁移策略与验收标准，指导团队按阶段推进改造。
 
@@ -119,7 +119,7 @@ Phase 4：统一与收敛
   - 实现 mdast → PM 映射（只读），再补 PM → mdast；保存路径切换
   - 去除 turndown/marked；统一 preview 配置
 - M4（1 周）
-  - 文档化“Echonote Markdown 规范”与扩展示例；性能基线与优化
+  - 文档化"StillRoot Markdown 规范"与扩展示例；性能基线与优化
 
 ---
 

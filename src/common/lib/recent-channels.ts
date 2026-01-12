@@ -1,4 +1,4 @@
-const RECENT_CHANNELS_STORAGE_KEY = "echonote-recent-channels";
+const RECENT_CHANNELS_STORAGE_KEY = "stillroot-recent-channels";
 const MAX_RECENT_CHANNELS = 8;
 
 interface RecentChannelEntry {

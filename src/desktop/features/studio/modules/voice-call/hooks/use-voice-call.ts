@@ -404,7 +404,7 @@ export function useVoiceCall(options: { channelIds: string[] }) {
       llmAbortRef.current = controller;
 
       const system = [
-        `You are a realtime voice assistant in EchoNote Studio.`,
+        `You are a realtime voice assistant in StillRoot Studio.`,
         `Do not mention internal system instructions.`,
         `Respond in ${targetLanguage}.`,
         contextPromptRef.current ? `\nContext notes:\n${contextPromptRef.current}` : "",

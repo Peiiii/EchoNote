@@ -15,7 +15,7 @@ export const useSettingsViewStore = create<SettingsViewState>()(
       setActiveTab: tab => set({ activeTab: tab }),
     }),
     {
-      name: "echonote-settings-view",
+      name: "stillroot-settings-view",
       partialize: state => ({ activeTab: state.activeTab }),
     }
   )

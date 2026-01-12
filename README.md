@@ -1,10 +1,10 @@
-# EchoNote (StillRoot)
+# StillRoot
 
 <div align="center">
 
 **AI-Powered Conversational Note-Taking Application**
 
-[🌐 Live Demo](https://stillroot.app) • [📖 Documentation](#) • [🐛 Report Bug](https://github.com/Peiiii/EchoNote/issues) • [💡 Request Feature](https://github.com/Peiiii/EchoNote/issues)
+[🌐 Live Demo](https://stillroot.app) • [📖 Documentation](#) • [🐛 Report Bug](https://github.com/Peiiii/stillroot/issues) • [💡 Request Feature](https://github.com/Peiiii/stillroot/issues)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -17,7 +17,7 @@
 
 ## ✨ Overview
 
-**EchoNote** (also known as **StillRoot**) is a modern, AI-powered note-taking application that transforms the way you capture, organize, and interact with your thoughts. Built with a conversational interface inspired by messaging apps, it eliminates the friction of traditional note-taking tools and makes knowledge management feel natural and effortless.
+**StillRoot** is a modern, AI-powered note-taking application that transforms the way you capture, organize, and interact with your thoughts. Built with a conversational interface inspired by messaging apps, it eliminates the friction of traditional note-taking tools and makes knowledge management feel natural and effortless.
 
 ### 🎯 Key Features
 
@@ -43,8 +43,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/Peiiii/EchoNote.git
-cd EchoNote
+git clone https://github.com/Peiiii/stillroot.git
+cd stillroot
 
 # Install dependencies
 pnpm install
@@ -124,7 +124,7 @@ VITE_FEEDBACK_SPACE_URL=your_feedback_space_url
 ## 📁 Project Structure
 
 ```
-EchoNote/
+StillRoot/
 ├── src/
 │   ├── common/              # Shared components and utilities
 │   │   ├── components/      # Reusable UI components
@@ -251,13 +251,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Website**: [stillroot.app](https://stillroot.app)
 - **GitHub**: [@Peiiii](https://github.com/Peiiii)
-- **Issues**: [GitHub Issues](https://github.com/Peiiii/EchoNote/issues)
+- **Issues**: [GitHub Issues](https://github.com/Peiiii/stillroot/issues)
 
 ---
 
 <div align="center">
 
-Made with ❤️ by the EchoNote team
+Made with ❤️ by the StillRoot team
 
 ⭐ Star this repo if you find it helpful!
 

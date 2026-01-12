@@ -1,4 +1,4 @@
-# Cleanup candidates (Musk 5-step) — EchoNote
+# Cleanup candidates (Musk 5-step) — StillRoot
 
 目的：把“没有实际使用 / 不会展示 / 不发挥作用”的代码、模块、配置项整理成一份可执行清理清单，方便后续逐步删减与验证。
 

@@ -3,7 +3,7 @@ info:
   title: StillRoot API
   version: 1.0.0
   description: >
-    Standard HTTP API for StillRoot/EchoNote. Publicly usable, optimized for agent workflows.
+    Standard HTTP API for StillRoot. Publicly usable, optimized for agent workflows.
 servers:
   - url: https://api.stillroot.app
 tags:

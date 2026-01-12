@@ -6,7 +6,7 @@ export type AppLanguage = "en" | "zh-CN";
 
 export const SUPPORTED_LANGUAGES: readonly AppLanguage[] = ["en", "zh-CN"] as const;
 
-const LANG_STORAGE_KEY = "echonote-lang";
+const LANG_STORAGE_KEY = "stillroot-lang";
 
 const normalizeLanguage = (input: string | null | undefined): AppLanguage => {
   if (!input) return "en";

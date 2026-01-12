@@ -8,7 +8,7 @@ export interface LanguageState {
   setLanguage: (language: AppLanguage) => void;
 }
 
-const LANG_STORAGE_KEY = "echonote-lang";
+const LANG_STORAGE_KEY = "stillroot-lang";
 
 const normalizeLanguage = (input: string | null | undefined): AppLanguage => {
   if (!input) return "en";

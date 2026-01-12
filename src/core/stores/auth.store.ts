@@ -42,7 +42,7 @@ type AuthListenerSingleton = {
 };
 
 function getAuthListenerSingleton(): AuthListenerSingleton {
-  const key = "__echonote_auth_listener_singleton__";
+  const key = "__stillroot_auth_listener_singleton__";
   const g = globalThis as unknown as Record<string, AuthListenerSingleton | undefined>;
   if (!g[key]) {
     g[key] = { started: false, unsubscribe: null };

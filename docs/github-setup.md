@@ -1,6 +1,6 @@
 # GitHub集成设置指南
 
-本指南将帮助你设置GitHub OAuth应用，以便EchoNote可以将数据存储到GitHub仓库。
+本指南将帮助你设置GitHub OAuth应用，以便StillRoot可以将数据存储到GitHub仓库。
 
 ## 第一步：在GitHub上注册OAuth应用
 
@@ -15,9 +15,9 @@
 - 填写应用信息：
 
 ```
-Application name: EchoNote
+Application name: StillRoot
 Homepage URL: http://localhost:3000
-Application description: EchoNote - Personal Knowledge Management System
+Application description: StillRoot - Personal Knowledge Management System
 Authorization callback URL: http://localhost:3000
 ```
 
@@ -47,7 +47,7 @@ touch .env.local
 VITE_GITHUB_CLIENT_ID=your_github_client_id_here
 VITE_GITHUB_DEFAULT_OWNER=your_github_username_here
 VITE_GITHUB_REDIRECT_URI=http://localhost:3000
-VITE_GITHUB_DEFAULT_REPO=echonote-data
+VITE_GITHUB_DEFAULT_REPO=stillroot-data
 ```
 
 **请替换以下值：**
@@ -60,13 +60,13 @@ VITE_GITHUB_DEFAULT_REPO=echonote-data
 ### 1. 创建新仓库
 
 - 在GitHub上创建一个新的仓库
-- 仓库名称建议：`echonote-data`
+- 仓库名称建议：`stillroot-data`
 - 可以选择公开或私有（私有需要repo权限）
 
 ### 2. 仓库结构建议
 
 ```
-echonote-data/
+stillroot-data/
 ├── README.md
 ├── data/
 │   ├── notes/
@@ -132,7 +132,7 @@ A: 确保：
 
 ### Q: 如何撤销授权？
 
-A: 访问 https://github.com/settings/applications，找到EchoNote应用并点击"Revoke"
+A: 访问 https://github.com/settings/applications，找到StillRoot应用并点击"Revoke"
 
 ### Q: 生产环境如何配置？
 

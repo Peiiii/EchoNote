@@ -112,7 +112,7 @@ export const useStudioStore = create<StudioState>()(
         }),
     }),
     {
-      name: "echonote-studio",
+      name: "stillroot-studio",
       partialize: (state) => ({
         contentItems: state.contentItems,
         currentContext: state.currentContext,
